@@ -85,10 +85,12 @@ if [ ! -f "$CONFIG_FILE" ]; then
     exit 1
 fi
 
+PIPELINE_BASE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
+
 PIPELINE_SCRIPT_SOURCE="$SCRIPT_DIR/$(get_section_value 'pipeline_script' 'source')"
 PIPELINE_SCRIPT_TARGET=$(expand_vars "$(get_section_value 'pipeline_script' 'target')")
 PIPELINE_SCRIPT_WORKSPACE=$(expand_vars "$(get_section_value 'pipeline_script' 'workspace')")
-PIPELINE_BASE_WORKSPACE=$(expand_vars "$(get_section_value 'pipeline' 'workspace')")
+
 ZBUILDER_TARGET_DIR=$(expand_vars "$(get_section_value 'zbuilder' 'target_dir')")
 PIPELINE_TMPHLQ=$(get_section_value 'pipeline' 'tmphlq')
 

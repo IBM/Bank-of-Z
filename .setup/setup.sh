@@ -156,8 +156,7 @@ load_config() {
     fi
     
     # Parse configuration values
-    PIPELINE_WORKSPACE=$(expand_vars "$(get_section_value 'pipeline' 'workspace')")
-    APPLICATION=$(get_section_value 'pipeline' 'application')
+    PIPELINE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
     BRANCH=$(get_section_value 'pipeline' 'branch')
     TMPHLQ=$(get_section_value 'pipeline' 'tmphlq')
     DBB_REPO_URL=$(get_config_value 'url')
@@ -168,7 +167,6 @@ load_config() {
     
     print_success "Configuration loaded successfully"
     echo "  Workspace: $PIPELINE_WORKSPACE"
-    echo "  Application: $APPLICATION"
     echo "  Branch: $BRANCH"
     echo "  Temp HLQ: $TMPHLQ"
 }

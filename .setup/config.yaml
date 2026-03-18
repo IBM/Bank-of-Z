@@ -5,19 +5,10 @@
 version: 1.0.0
 
 # Pipeline workspace configuration
-pipeline:
+global:
   # Base workspace directory on USS
-  workspace: /u/dbehm/sandbox
+  sandbox: /u/dbehm/sandbox
   
-  # Application name
-  application: MortgageApplication
-  
-  # Branch name
-  branch: main
-  
-  # Temporary HLQ for datasets
-  tmphlq: DBEHM
-
 # Git repositories to clone
 repositories:
   - name: dbb
@@ -37,18 +28,16 @@ zbuilder:
 
 # Pipeline simulation script
 pipeline_script:
+  # Target USS location
+  target: /u/dbehm/sandbox/pipeline_simulation.sh
+
   # Local source file
   source: pipeline_simulation.sh
   
   # workspace directory
   workspace: /u/dbehm/sandbox/workspace
-  
-  # Target USS location
-  target: /u/dbehm/sandbox/pipeline_simulation.sh
 
-# Zowe CLI profile (optional - uses default if not specified)
-zowe:
-  # profile: your-zowe-profile-name
-  # If not specified, uses the default Zowe CLI profile
+  # Temporary HLQ for datasets
+  tmphlq: DBEHM
 
 # Made with Bob

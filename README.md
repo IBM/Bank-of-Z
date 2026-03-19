@@ -49,14 +49,85 @@ Bank-of-Z/
 
 **Local Machine:**
 - [Node.js](https://nodejs.org/) and npm
-- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): `npm install -g @zowe/cli`
-- Zowe RSE API Plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): `npm install -g @zowe/cli@zowe-v3-lts`
+- Zowe RSE API Plugin: `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - Configured Zowe profile with z/OS connection details
+
+Here is a sample configuration for the Zowe profile. Change:
+-  the 'host' line to match your z/OS host
+- the 'account' line to match your TSO account on the host
+- the 'logonProcedure' line to match your logon procedure on the host
+
+and if you use non-default ports, you may have to change other lines as well.
+Save the file in: `~/.zowe/zowe.config.json`
+```json
+{
+  "$schema": "./zowe.schema.json",
+  "profiles": {
+    "BankOfZDemo": {
+      "properties": {
+        "host": "<your host>",
+        "rejectUnauthorized": false
+      },
+      "secure": ["user", "password"],
+      "profiles": {
+        "rseapi": {
+          "type": "rse",
+          "properties": {
+            "port": 8195,
+            "basePath": "rseapi",
+            "protocol": "https"
+          }
+        },
+        "zosmf": {
+          "type": "zosmf",
+          "properties": {
+            "port": 10443
+          }
+        },
+        "ssh": {
+          "type": "ssh",
+          "properties": {
+            "port": 22
+          }
+        },
+        "tso": {
+          "type": "tso",
+          "properties": {
+            "account": "<account>",
+            "codePage": "1047",
+            "logonProcedure": "<logon procedure>"
+          }
+        },        
+        "zOpenDebug": {
+          "type": "zOpenDebug",
+          "properties": {
+            "dpsPort": 8192,
+            "rdsPort": 8194,
+            "dpsContextRoot": "api/v1",
+            "dpsSecured": true,
+            "authenticationType": "basic",
+            "uuid": "4267a0f6-b756-4f3c-b900-0b959b4567c3"
+          }
+        }
+      }
+    }
+  },
+  "defaults": {
+    "zosmf": "BankOfZDemo.zosmf",
+    "tso": "BankOfZDemo.tso",
+    "ssh": "BankOfZDemo.ssh",
+    "rse": "BankOfZDemo.rseapi",
+    "zOpenDebug": "BankOfZDemo.zOpenDebug"
+  },
+  "autoStore": true
+}
+```
 
 **z/OS System:**
 - Git installed and available in PATH on USS
 - CICS region for application deployment
-- IBM DBB installed (typically at `/usr/lpp/dbb`)
+- IBM DBB installed (typically at `/usr/lpp/IBM/dbb`)
 - Appropriate permissions for USS directories and dataset creation
 
 ### Setup Using VS Code Tasks
@@ -65,11 +136,11 @@ The easiest way to get started is using the built-in VS Code tasks:
 
 1. **Configure Your Environment**
    
-   Edit [`.setup/config.yaml`](.setup/config.yaml) with your z/OS details:
+   Edit [`.setup/config.yaml`](.setup/config.yaml) if you want to change the defaults, e.g.
    ```yaml
    pipeline:
-     workspace: /u/$USER/sandbox
-     tmphlq: YOUR_HLQ
+     workspace: ~/sandbox
+     tmphlq:
    ```
 
 2. **Run Setup Task**

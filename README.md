@@ -29,10 +29,8 @@ graph LR
     BANKQ2["Bank of Q
     Money Transfer In"]
     
-    UI -->|"Customers with ID
-    Cnnnn"| ZOS
-    UI -->|"Customers with ID
-    Innnn"| ZOS
+    UI -->|"Customers with ID Cnnnn"| ZOS
+    UI -->|"Customers with ID Innnn"| ZOS
     
     ZOS --> CICS
     ZOS --> IMS

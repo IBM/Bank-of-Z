@@ -1,10 +1,89 @@
 # Bank of Z
 
-A sample z/OS banking application demonstrating modern mainframe development practices with COBOL, BMS, and IBM Dependency Based Build (DBB).
-
 ## Overview
 
-Bank of Z is a CICS-based banking application that showcases:
+The Bank of Z provides a modern browser interface to manage a personal bank account. The application is hybrid – it drives IMS transactions that update a Db2 database for some customers and it drives CICS transactions that update the same Db2 database for other customers.
+
+This hybrid application is the result of a merger of two banking systems into one. The Bank of Z UI routes requests based on customer number. In both cases, z/OS Connect enables the client to communicate with the transactional environment.
+
+## Architecture
+
+```mermaid
+graph LR
+    UI[Bank of Z UI]
+    ZOS[z/OS Connect]
+    
+    CICS[CICS]
+    IMS[IMS TM]
+    
+    MQ1[MQ]
+    DB2_CICS[("Money and Account
+    Management Db2 DB")]
+    HISTDB_CICS[("Account History
+    Db2 DB")]
+    
+    HISTDB_IMS[("Account History
+    Db2 DB")]
+    DB2_IMS[("Money and Account
+    Management IMS DB")]
+    MQ2[MQ]
+    
+    BANKQ1["Bank of Q
+    Money Transfer In"]
+    BANKQ2["Bank of Q
+    Money Transfer In"]
+    
+    UI -->|"Customers with ID
+    Cnnnn"| ZOS
+    UI -->|"Customers with ID
+    Innnn"| ZOS
+    
+    ZOS --> CICS
+    ZOS --> IMS
+    
+    CICS --> MQ1
+    CICS --> DB2_CICS
+    CICS --> HISTDB_CICS
+    
+    IMS --> HISTDB_IMS
+    IMS --> DB2_IMS
+    IMS --> MQ2
+    
+    MQ1 --> BANKQ1
+    MQ2 --> BANKQ2
+    
+    style UI fill:#e1f5ff
+    style ZOS fill:#fff4e6
+    style CICS fill:#f3e5f5
+    style IMS fill:#f3e5f5
+    style DB2_CICS fill:#e8f5e9
+    style DB2_IMS fill:#e8f5e9
+    style HISTDB_CICS fill:#e8f5e9
+    style HISTDB_IMS fill:#e8f5e9
+    style MQ1 fill:#fff9c4
+    style MQ2 fill:#fff9c4
+    style BANKQ1 fill:#ffebee
+    style BANKQ2 fill:#ffebee
+```
+
+## Key Components
+
+- **Bank of Z UI**: Modern browser-based interface for customer banking operations
+- **z/OS Connect**: Enterprise API gateway enabling communication between the UI and mainframe transaction systems
+- **CICS**: Transaction processing system for customers with IDs starting with 'C'
+- **IMS TM**: Transaction Manager for customers with IDs starting with 'I'
+- **Money and Account Management Db2 DB**: Shared database for account and transaction data
+- **Money and Account Management IMS DB**: IMS database for account management
+- **Account History Db2 DB**: Database storing historical account information
+- **MQ**: Message queuing system for asynchronous communication with external systems
+- **Bank of Q Money Transfer In**: External banking system for money transfers
+
+## Customer Routing
+
+- Customers with ID pattern **Cnnnn** → Routed to CICS
+- Customers with ID pattern **Innnn** → Routed to IMS TM
+
+## Build and Deploy Tools
 
 - **COBOL Programs** - Core banking business logic for account management, customer operations, and transactions
 - **BMS Maps** - Screen definitions for CICS terminal interactions
@@ -23,7 +102,7 @@ The application provides typical banking operations:
 
 ## Project Structure
 
-```
+```text
 Bank-of-Z/
 ├── src/                          # Application source code
 │   └── base/
@@ -48,12 +127,14 @@ Bank-of-Z/
 ### Prerequisites
 
 **Local Machine:**
+
 - [Node.js](https://nodejs.org/) and npm
 - [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): `npm install -g @zowe/cli`
 - Zowe RSE API Plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
 - Configured Zowe profile with z/OS connection details
 
 **z/OS System:**
+
 - Git installed and available in PATH on USS
 - CICS region for application deployment
 - IBM DBB installed (typically at `/usr/lpp/dbb`)
@@ -64,16 +145,16 @@ Bank-of-Z/
 The easiest way to get started is using the built-in VS Code tasks:
 
 1. **Configure Your Environment**
-   
    Edit [`.setup/config.yaml`](.setup/config.yaml) with your z/OS details:
-   ```yaml
+  
+```yaml
    pipeline:
      workspace: /u/$USER/sandbox
      tmphlq: YOUR_HLQ
-   ```
+```
 
 2. **Run Setup Task**
-   
+
    - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
    - Type "Tasks: Run Task"
    - Select **"Setup Pipeline Environment"**

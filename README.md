@@ -13,38 +13,38 @@ graph LR
     UI[Bank of Z UI]
     ZOS[z/OS Connect]
     
-    CICS[CICS]
-    IMS[IMS TM]
-    
-    MQ1[MQ]
-    DB2_CICS[("Money & Account Mgmt Db2 DB")]
-    HISTDB_CICS[("Account History Db2 DB")]
-    
-    HISTDB_IMS[("Account History Db2 DB")]
-    DB2_IMS[("Money & Account Mgmt IMS DB")]
-    MQ2[MQ]
-    
     BANKQ1["Bank of Q
     Money Transfer In"]
     BANKQ2["Bank of Q
     Money Transfer In"]
     
-    UI -->|"Customers with ID Cnnnn"| ZOS
-    UI -->|"Customers with ID Innnn"| ZOS
+    subgraph CICS_Flow[" "]
+        CICS[CICS]
+        MQ1[MQ]
+        DB2_CICS[("Money & Account Mgmt Db2 DB")]
+    end
     
-    ZOS --> CICS
-    ZOS --> IMS
+    subgraph IMS_Flow[" "]
+        MQ2[MQ]
+        IMS[IMS TM]
+        DB2_IMS[("Money & Account Mgmt IMS DB")]
+    end
     
-    CICS --> MQ1
+    HISTDB[("Account History Db2 DB")]
+    
+    UI --> ZOS
+    
+    BANKQ1 --> MQ1
+    ZOS -->|"CICS Path (Customers with ID Cnnnn)"| CICS
+    MQ1 --> CICS
     CICS --> DB2_CICS
-    CICS --> HISTDB_CICS
+    CICS --> HISTDB
     
-    IMS --> HISTDB_IMS
+    BANKQ2 --> MQ2
+    MQ2 --> IMS
+    ZOS -->|"IMS Path (Customers with ID Innnn)"| IMS
     IMS --> DB2_IMS
-    IMS --> MQ2
-    
-    MQ1 --> BANKQ1
-    MQ2 --> BANKQ2
+    IMS --> HISTDB
     
     style UI fill:#e1f5ff
     style ZOS fill:#fff4e6
@@ -52,8 +52,7 @@ graph LR
     style IMS fill:#f3e5f5
     style DB2_CICS fill:#e8f5e9
     style DB2_IMS fill:#e8f5e9
-    style HISTDB_CICS fill:#e8f5e9
-    style HISTDB_IMS fill:#e8f5e9
+    style HISTDB fill:#e8f5e9
     style MQ1 fill:#fff9c4
     style MQ2 fill:#fff9c4
     style BANKQ1 fill:#ffebee

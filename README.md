@@ -17,15 +17,11 @@ graph LR
     IMS[IMS TM]
     
     MQ1[MQ]
-    DB2_CICS[("Money and Account
-    Management Db2 DB")]
-    HISTDB_CICS[("Account History
-    Db2 DB")]
+    DB2_CICS[("Money & Account Mgmt Db2 DB")]
+    HISTDB_CICS[("Account History Db2 DB")]
     
-    HISTDB_IMS[("Account History
-    Db2 DB")]
-    DB2_IMS[("Money and Account
-    Management IMS DB")]
+    HISTDB_IMS[("Account History Db2 DB")]
+    DB2_IMS[("Money & Account Mgmt IMS DB")]
     MQ2[MQ]
     
     BANKQ1["Bank of Q

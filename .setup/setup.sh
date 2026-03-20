@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #########################################################
@@ -6,6 +7,7 @@
 #########################################################
 
 set -e  # Exit on error
+set -x
 
 # Colors for output
 RED='\033[0;31m'
@@ -20,27 +22,37 @@ CONFIG_FILE="$SCRIPT_DIR/config.yaml"
 
 # Function to print colored messages
 print_info() {
+    { set +x; } 2>/dev/null
     echo -e "${BLUE}[INFO]${NC} $1"
+    { set -x; } 2>/dev/null
 }
 
 print_success() {
+    { set +x; } 2>/dev/null
     echo -e "${GREEN}[SUCCESS]${NC} $1"
+    { set -x; } 2>/dev/null
 }
 
 print_warning() {
+    { set +x; } 2>/dev/null
     echo -e "${YELLOW}[WARNING]${NC} $1"
+    { set -x; } 2>/dev/null
 }
 
 print_error() {
+    { set +x; } 2>/dev/null
     echo -e "${RED}[ERROR]${NC} $1"
+    { set -x; } 2>/dev/null
 }
 
 print_stage() {
+    { set +x; } 2>/dev/null
     echo ""
     echo -e "${GREEN}========================================${NC}"
     echo -e "${GREEN}$1${NC}"
     echo -e "${GREEN}========================================${NC}"
     echo ""
+    { set -x; } 2>/dev/null
 }
 
 # Function to parse YAML config (simple parser for our needs)

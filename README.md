@@ -120,31 +120,120 @@ Bank-of-Z/
 ### Prerequisites
 
 **Local Machine:**
-
+- [Java version 21 of IBM's Semeru Runtime](https://developer.ibm.com/languages/java/semeru-runtimes/downloads/)
 - [Node.js](https://nodejs.org/) and npm
-- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): `npm install -g @zowe/cli`
-- Zowe RSE API Plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+  - npm: ">=10.9.4 < 10.10.0"
+    - `npm -v`
+  - node: ">=22.22.1 < 23"
+    - `node -v`
+- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): 
+  - `npm install -g @zowe/cli@zowe-v3-lts`
+- Zowe RSE API Plugin: 
+  - `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - Configured Zowe profile with z/OS connection details
+
+Here is a sample configuration for the Zowe profile. Change:
+-  the 'host' line to match your z/OS host
+- the 'account' line to match your TSO account on the host
+- the 'logonProcedure' line to match your logon procedure on the host
+
+and if you use non-default ports, you may have to change other lines as well.
+Save the file in: `~/.zowe/zowe.config.json`
+```json
+{
+  "$schema": "./zowe.schema.json",
+  "profiles": {
+    "BankOfZDemo": {
+      "properties": {
+        "host": "<your host>",
+        "rejectUnauthorized": false
+      },
+      "secure": ["user", "password"],
+      "profiles": {
+        "rseapi": {
+          "type": "rse",
+          "properties": {
+            "port": 8195,
+            "basePath": "rseapi",
+            "protocol": "https"
+          }
+        },
+        "zosmf": {
+          "type": "zosmf",
+          "properties": {
+            "port": 10443
+          }
+        },
+        "ssh": {
+          "type": "ssh",
+          "properties": {
+            "port": 22
+          }
+        },
+        "tso": {
+          "type": "tso",
+          "properties": {
+            "account": "<account>",
+            "codePage": "1047",
+            "logonProcedure": "<logon procedure>"
+          }
+        },        
+        "zOpenDebug": {
+          "type": "zOpenDebug",
+          "properties": {
+            "dpsPort": 8192,
+            "rdsPort": 8194,
+            "dpsContextRoot": "api/v1",
+            "dpsSecured": true,
+            "authenticationType": "basic",
+            "uuid": "4267a0f6-b756-4f3c-b900-0b959b4567c3"
+          }
+        }
+      }
+    }
+  },
+  "defaults": {
+    "zosmf": "BankOfZDemo.zosmf",
+    "tso": "BankOfZDemo.tso",
+    "ssh": "BankOfZDemo.ssh",
+    "rse": "BankOfZDemo.rseapi",
+    "zOpenDebug": "BankOfZDemo.zOpenDebug"
+  },
+  "autoStore": true
+}
+```
+
+You can then test each connection. Example:
+- `zowe zosmf check status`
+- `zowe rse check status`
+- ...
 
 **z/OS System:**
 
 - Git installed and available in PATH on USS
 - CICS region for application deployment
-- IBM DBB installed (typically at `/usr/lpp/dbb`)
+- IBM DBB installed (typically at `/usr/lpp/IBM/dbb`)
 - Appropriate permissions for USS directories and dataset creation
+
+### Setup Using Bob
+
+Install Bob IDE and required extensions:
+- Zowe Explorer
+- IBM Z Open Editor
+- DB2/CICS/IMS/MQ Extensions
+
 
 ### Setup Using VS Code Tasks
 
 The easiest way to get started is using the built-in VS Code tasks:
 
 1. **Configure Your Environment**
-   Edit [`.setup/config.yaml`](.setup/config.yaml) with your z/OS details:
-  
-```yaml
+   Edit [`.setup/config.yaml`](.setup/config.yaml) if you want to change the defaults, e.g.
+   ```yaml
    pipeline:
-     workspace: /u/$USER/sandbox
-     tmphlq: YOUR_HLQ
-```
+     workspace: ~/sandbox
+     tmphlq:
+   ```
 
 2. **Run Setup Task**
 
@@ -158,7 +247,8 @@ The easiest way to get started is using the built-in VS Code tasks:
    - Upload zBuilder framework
 
 3. **Run Pipeline Simulation**
-   
+
+   - You must adpat this file before [pipeline_simulation.sh](.setup/pipeline_simulation.sh)  (TODO needs variables)
    - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
    - Type "Tasks: Run Task"
    - Select **"Run Pipeline Simulation"**

@@ -5,21 +5,21 @@ gitRepository=${1:-"https://github.com/IBM/Bank-of-Z.git"}
 branchName=${2:-"main"}
 
 # DBB repository location on USS
-export DBB_REPO=${DBB_REPO:-/u/dbehm/sandbox/dbb}
+export DBB_REPO=${DBB_REPO:-/u/ibmuser/sandbox/dbb}
 
 # Location of the configured CBS scripts on USS - https://github.com/IBM/dbb/tree/main/Templates/Common-Backend-Scripts
 # Not yet used
 export PIPELINE_SCRIPTS=${DBB_REPO}/Templates/Common-Backend-Scripts
 
 # Pipeline Workspace / use a shared folder/zfs
-export PIPELINE_WORKSPACE=${PIPELINE_WORKSPACE:-/u/dbehm/sandbox/workspace}
+export PIPELINE_WORKSPACE=${PIPELINE_WORKSPACE:-/u/ibmuser/sandbox/workspace}
 
 # zBuilder framework path (used for DBB_BUILD)
-export DBB_BUILD_PATH=${DBB_BUILD_PATH:-/u/dbehm/sandbox/zBuilder}
+export DBB_BUILD_PATH=${DBB_BUILD_PATH:-/u/ibmuser/sandbox/zBuilder}
 
 # Adding pipeline scripts to PATH of the user running this script
 export PATH=$PIPELINE_SCRIPTS:$PATH
-export TMPHLQ=${TMPHLQ:-DBEHM}
+export TMPHLQ=${TMPHLQ:-ibmuser}
 
 # Using a timestamp to simulate the buildIdentifier and unique workspace
 timestamp=$(date +%F_%H-%M-%S)
@@ -54,13 +54,13 @@ echo "[STAGE] Clone repo completed in $workspaceDir with rc:$rc"
 if [ $rc -eq 0 ]; then
     
     # Set the DBB environment variables
-    export DBB_HOME=/usr/lpp/dbb/v3r0/
+    export DBB_HOME=/usr/lpp/IBM/dbb
     export PATH=$DBB_HOME:$PATH
     export DBB_BUILD=$DBB_BUILD_PATH
     
     # Run build
     cd $workspaceDir/$application
-    dbb build full --hlq DBEHM.BOZ.BLD
+    dbb build full --hlq ibmuser.BOZ.BLD
     rc=$?
     
     # For later use

@@ -65,27 +65,27 @@ variables:
 
   # High Level Assembler (HLASM) load library. Example: ASM.SASMMOD1
   - name: SASMMOD1
-    value: HLASM.SASMMOD1
+    value: ASM.SASMMOD1
 
   # Cobol Compiler Data Sets. Example: COBOL.V6R1M0.SIGYCOMP
   - name: SIGYCOMP
-    value: COBOL.V6R4.SIGYCOMP
+    value: IGY.V6R5M0.SIGYCOMP
 
   # CICS Macro Library. Example: CICSTS.V6R1M0.CICS.SDFHMAC
   - name: SDFHMAC
-    value: CICSTS.V5R4.CICS.SDFHMAC
+    value: CICSTS62.CICS.SDFHMAC
 
   # CICS COBOL Library. Example: CICSTS.V6R1M0.CICS.SDFHCOB
   - name: SDFHCOB
-    value: CICSTS.V5R4.CICS.SDFHCOB 
+    value: CICSTS62.CICS.SDFHCOB
   
   # CICS Load Library. Example: CICSTS.V6R1M0.CICS.SDFHLOAD
   - name: SDFHLOAD
-    value: CICSTS.V5R4.CICS.SDFHLOAD
+    value: CICSTS62.CICS.SDFHLOAD
   
   # DB2 Load Library. Example: DB2.V12R1M0.SDSNLOAD
   - name: SDSNLOAD
-    value: DBC0CFG.DB2.V12.SDSNLOAD
+    value: DB2V13.SDSNLOAD
 
   # Optional IDz Load Library. Needed for Error Feedback option. Example: FEL.V16R0M0.SFELLOAD
   #- name: SFELLOAD

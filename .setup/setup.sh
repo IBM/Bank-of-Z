@@ -7,7 +7,6 @@
 #########################################################
 
 set -e  # Exit on error
-set -x
 
 # Colors for output
 RED='\033[0;31m'

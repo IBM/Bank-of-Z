@@ -1,0 +1,149 @@
+{
+
+"macros": [
+
+
+"path1",
+
+
+"path2",
+
+
+{
+
+
+
+"connectionName": "connection1",
+
+
+
+"connectionType": "zosmf",
+
+
+
+"paths": [
+
+
+
+
+"NAME.OF.DATASET1",
+
+
+
+
+"NAME.OF.DATASET2"
+
+
+
+]
+
+
+}
+
+],
+
+"listingFileDetails": {
+
+
+"default": "datasets",
+
+
+"local-directories": [
+
+
+
+"/path/to/local/dir1",
+
+
+
+"/path/to/local/dir2"
+
+
+],
+
+
+"remote": [
+
+
+
+{
+
+
+
+
+"connectionName": "fultonm_9_47_80_126",
+
+
+
+
+"connectionType": "zosmf",
+
+
+
+
+"datasets": [
+
+
+
+
+
+"NAME.OF.DATASET1",
+
+
+
+
+
+"NAME.OF.DATASET2"
+
+
+
+
+],
+
+
+
+
+"uss-directories": [
+
+
+
+
+
+"~/projects/Bank-of-Z",
+
+
+
+
+
+"/path/to/uss/dir1",
+
+
+
+
+
+"/path/to/uss/dir2"
+
+
+
+
+]
+
+
+
+}
+
+
+]
+
+},
+
+"buildSettings": {
+
+
+"serverBuildTool": "~/grubServer/grub-main/bin/grub_server",
+
+
+"remoteOefDir": "/usr/lpp/IBM/foz/v1r1/bin"
+
+}
+}

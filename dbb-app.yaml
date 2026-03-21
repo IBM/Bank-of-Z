@@ -37,4 +37,19 @@ application:
             - languageExt: lnk                    
               dependencyPatterns: 
                 - ${APP_DIR_NAME}/src/**/*.cbl      # Static link dependency
+    # Variable overrides for the Cobol language task
+    - task: Cobol
+      sources:
+        - "**/src/base/cobol/*.cbl"
+      
+      variables:  
+        - name: doLinkEdit
+          value: true
 
+        # default dependency search path for single repository build
+        - name: dependencySearchPath
+          value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/src/base/copy/*.cpy
+        - name: LOAD_LLQ
+          value: LOADLIB
+        - name: deployType
+          value: LOADLIB

@@ -28,7 +28,11 @@ tasks:
       # default flag to identify CICS load modules
       - name: hasCICSModules
         value: false
-        
+
+      # flag to activate IMS options
+      - name: isIMS
+        value: false
+                
       # default flag to scan load modules  
       - name: scanLoadModule
         value: true
@@ -43,10 +47,6 @@ tasks:
             value: IMSLOAD
           - condition: ${isIMS}
             value: IMSLOAD
-
-      # flag to activate IMS options
-      - name: isIMS
-        value: false
         
     # datasets that need to be created / validated for this language configuration
     datasets:

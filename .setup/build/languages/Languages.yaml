@@ -86,6 +86,10 @@ variables:
   # CICS Load Library. Example: CICSTS.V6R1M0.CICS.SDFHLOAD
   - name: SDFHLOAD
     value: CICSTS63.CICS.SDFHLOAD
+
+   # IMS Load Library. Example: CICSTS.V6R1M0.CICS.SDFHLOAD
+  - name: IMSLOAD
+    value: IMSV15.SDFSRESL
   
   # DB2 Load Library. Example: DB2.V12R1M0.SDSNLOAD
   - name: SDSNLOAD

@@ -17,12 +17,15 @@ tasks:
 
     # source file association patterns
     sources:
-      - "**/cobol/*.cbl"
+      - "**/cobol/**.cbl"
       
     # overridable variables
     variables:
       # conditional variable builds compile parameters i.e CICS,SQL
+      - name: LOAD_LLQ
+        value: LOAD
       - name: compileParms
+        value: LIB
         append:
           - condition: ${IS_CICS}
             value: CICS
@@ -61,7 +64,7 @@ tasks:
         
       # default dependency search path for single repository build
       - name: dependencySearchPath
-        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/**/*.cpy
+        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/copybook/*.cpy
 
       # flag incating to scan the load module for static link dependencies  
       - name: scanLoadModule
@@ -83,7 +86,7 @@ tasks:
         options: cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library)
       - name: ${HLQ}.OBJ
         options: cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library)
-      - name: ${HLQ}.LOAD
+      - name: ${HLQ}.${LOAD_LLQ}
         options: cyl space(1,1) dsorg(PO) recfm(U) blksize(32760) dsntype(library)
 
     # list of steps to execute for each program processed by this language configuration
@@ -112,33 +115,33 @@ tasks:
           - {                  dsn: "${SDFHLOAD}", condition: "${IS_CICS}", options: "shr" }
           - {                 dsn: "${SDSNLOAD}", condition: "${IS_SQL}", options: "shr" }
           - {                 dsn: "${SFELLOAD}", condition: { exists: "SFELLOAD" }, options: "shr" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(133) recfm(f,b) new" }
-          - { name: "SYSMDECK", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT4", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT5", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT6", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT7", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT8", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new"}
-          - { name: "SYSUT9", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT10", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT11", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT12", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT13", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT14", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT15", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT16", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT17", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
+          - { name: "SYSMDECK", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT4", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT5", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT6", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT7", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT8", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new"}
+          - { name: "SYSUT9", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT10", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT11", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT12", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT13", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT14", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT15", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT16", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT17", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIB", dsn: "${HLQ}.COPY", options: "shr" }
           - {                 dsn: "${HLQ}.BMS.COPY", options: "shr" }
+          - {                 dsn: "${SCEESAMP}", options: "shr" }
           - {                 dsn: "${SDFHCOB}", condition: "${IS_CICS}", options: "shr" }
           - {                 dsn: "${SCSQCOBC}", condition: "${IS_MQ}", options: "shr" }
-          - {                 dsn: "${SCEESAMP}", options: "shr" }
           - { name: "DBRMLIB", dsn: "${HLQ}.DBRM(${MEMBER})", condition: "${IS_SQL}", options: "shr", output: true, deployType: "DBRM" }          
           - { name: "SYSADATA", condition: { exists: "errPrefix" }, options: "DUMMY" }
-          - { name: "SYSXMLSD", condition: { exists: "errPrefix" }, dsn: "${HLQ}.${errPrefix}.SYSXMLSD.XML", options: "tracks space(200,40) dsorg(PS) lrecl(16383) recfm(v,b) new keep" }
+          - { name: "SYSXMLSD", condition: { exists: "errPrefix" }, dsn: "${HLQ}.${errPrefix}.SYSXMLSD.XML", options: "tracks space(200,40) dsorg(PS) blksize(27998) lrecl(16383) recfm(v,b) new keep" }
 
 
       # Link-Edit step
@@ -150,9 +153,9 @@ tasks:
         maxRC: 0
         dds:
           - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${ENTRY})", options: "shr" }
-          - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${ENTRY})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(133) recfm(f,b) new" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSLMOD", dsn: "${HLQ}.${LOAD_LLQ}(${ENTRY})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "RESLIB", condition: { exists: RESLIB }, options: "shr" }
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }

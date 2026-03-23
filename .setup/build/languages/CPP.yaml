@@ -93,21 +93,21 @@ tasks:
           - {                 dsn: "${SCEEHNIH}", options: "shr", condition: {exists: "${SCEEHNIH}"} }
           - {                 dsn: "${SCEEHT}", options: "shr", condition: {exists: "${SCEEHT}"} }
           - {                 dsn: "${SCLBHH}", options: "shr", condition: {exists: "${SCLBHH}"} }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT5", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT6", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT7", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT8", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT9", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT10", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT14", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT16", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT17", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT5", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT6", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT7", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT8", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT9", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT10", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT14", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT16", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT17", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSMSGS", dsn: "${SCEEMSGP}", options: "shr" }
           - { name: "SYSXMSGS", dsn: "${SCEEMSGP}", options: "shr" }
-          - { name: "SYSOUT", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
-          - { name: "SYSCPRT", options: "cyl space(5,5) unit(vio) lrecl(133) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
-          - { name: "SYSPRINT", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
+          - { name: "SYSOUT", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
+          - { name: "SYSCPRT", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
+          - { name: "SYSPRINT", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
 
       # Link-Edit step
       - step: linkEdit
@@ -118,8 +118,8 @@ tasks:
         maxRC: 0
         dds:
           - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${MEMBER})", options: "shr", output: true, deployType: "${deployType}" }
-          - { name: "SYSPRINT", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", log: "${STEP}-${FILE_NAME}.log", logAppend: true }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${MEMBER})", options: "shr" }
           - {                 dsn: "CEE.SCEELIB(CELHSCPP)", options: "shr" }
           - {                 dsn: "CEE.SCEELIB(CELHS003)", options: "shr" }

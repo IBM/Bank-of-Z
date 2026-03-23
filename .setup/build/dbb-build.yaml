@@ -15,6 +15,7 @@ include:
   # language configuration files from #DBB_HOME/samples/languages
   # to your $DBB_BUILD directory before executing zBuilder.
   - file: languages/Languages.yaml
+  - file: datasets.yaml
 
 #########################################
 # Executable build lifecycles
@@ -31,6 +32,7 @@ lifecycles:
       - MetadataInit
       - FileAnalysis
       - Languages    # Defined in Languages.yaml
+      #- zOSConnect
       - Finish
 
   # build all programs for the application
@@ -43,6 +45,7 @@ lifecycles:
       - MetadataInit
       - FullAnalysis
       - Languages    # Defined in Languages.yaml
+      #- zOSConnect
       - Finish
 
   # build only programs impacted by changes to the application
@@ -64,6 +67,28 @@ lifecycles:
       - MetadataInit
       - ImpactAnalysis
       - Languages    # Defined in Languages.yaml
+      #- zOSConnect
+      - Finish
+
+  - lifecycle: pipeline
+    cli:
+      usage: dbb build pipeline [arguments] [options]
+      options:
+        - longOption: "release-id"
+          hasArg: true
+          description: "The release identifier for the package being created. ie: 1.0.0"
+        - longOption: "build-id"
+          hasArg: true
+          description: "The build identifier for the package being created. ie: 20240415.7"
+    
+    tasks:
+      - Start
+      - ScannerInit
+      - MetadataInit
+      - ImpactAnalysis
+      - Languages    # Defined in Languages.yaml
+      #- zOSConnect
+      - Package
       - Finish
 
   # build only changed programs on a topic branch which will be merged back into the main build branch
@@ -76,6 +101,7 @@ lifecycles:
       - MetadataInit
       - MergeAnalysis
       - Languages    # Defined in Languages.yaml
+      #- zOSConnect
       - Finish
 
   # user build for a single program 
@@ -104,6 +130,7 @@ lifecycles:
       - ScannerInit
       - FileAnalysis
       - Languages    # Defined in Languages.yaml
+      #- zOSConnect
       - task: UnitTest
         condition: ${STATUS} == 2 || ${STATUS} == 0 # Skip task on build error or PREVIEW
       - Finish
@@ -122,32 +149,10 @@ lifecycles:
       - MetadataInit
     # - FullAnalysis
       - ImpactAnalysis
-      - Languages    # Defined in Languages.yaml
-      - Finish
-
-  # build only programs impacted by changes to the application and package the build outputs
-  - lifecycle: pipeline
-
-    # Optional argument to supply release and build identifiers for packaging
-    # See https://www.ibm.com/docs/en/dbb/3.0?topic=packaging
-    cli:
-      usage: dbb build pipeline [arguments] [options]
-      options:
-        - longOption: "release-id"
-          hasArg: true
-          description: "The release identifier for the package being created. ie: 1.0.0"
-        - longOption: "build-id"
-          hasArg: true
-          description: "The build identifier for the package being created. ie: 20240415.7"
-
-    # define the list of tasks to execute during the build lifecycle
-    tasks:
-      - Start
-      - ScannerInit
-      - MetadataInit
-      - ImpactAnalysis
-      - Languages    # Defined in Languages.yaml
-      - Package
+      - task: ScanLoadModule
+        variables:
+          - name: pds
+            value: ${HLQ}.LOAD
       - Finish
       
 #########################################################################
@@ -176,12 +181,19 @@ tasks:
   # create a build list of topic branch changes flowing back to the main build branch
   - task: MergeAnalysis
 
-  # create build package
+    # create build package
   - task: Package
     condition: ${STATUS} == 2 || ${STATUS} == 0 # Skip task on build error or PREVIEW
+    variables:
+      - name: copyModeMappings
+        value:
+          - deployType: LOADLIB
+            copyMode: LOAD
     
   # build finialization
   - task: Finish
+
+  - task: zOSConnect
   
   # default empty Languages stage
   # to be replaced by content of Languges.yaml

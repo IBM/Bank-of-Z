@@ -55,7 +55,7 @@ if [ $rc -eq 0 ]; then
     
     # Set the DBB environment variables
     export DBB_HOME=/usr/lpp/IBM/dbb
-    export PATH=$DBB_HOME:$PATH
+    export PATH=$DBB_HOME/bin:$PATH
     export DBB_BUILD=$DBB_BUILD_PATH
     
     # Run build

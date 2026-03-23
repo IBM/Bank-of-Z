@@ -67,7 +67,7 @@ tasks:
 
       # default dependency search path for single repository build
       - name: dependencySearchPath
-        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/maclib/**.mac
+        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/**.mac
 
       # flag to scan load module for static link dependencies
       - name: scanLoadModule
@@ -112,9 +112,9 @@ tasks:
       - name: ${HLQ}.LOAD
         options: cyl space(1,1) dsorg(PO) recfm(U) blksize(32760) dsntype(library)
       - name: ${HLQ}.SYSADATA
-        options: cyl space(5,5) lrecl(32756) dsorg(PO) recfm(v,b) dsntype(library)
+        options: cyl space(5,5) lrecl(32756) dsorg(PO) recfm(v,b) blksize(32760) dsntype(library)
       - name: ${HLQ}.EQALANGX
-        options: cyl dsorg(PO) dsntype(library) space(5,5) lrecl(1562) recfm(v,b)
+        options: cyl dsorg(PO) dsntype(library) space(5,5) blksize(27998) lrecl(1562) recfm(v,b)
 
     # list of steps to execute for each program processed by this language configuration
     steps:
@@ -142,8 +142,8 @@ tasks:
           - { name: "SYSCIN", dsn: "&&SYSCIN", options: "cyl space(5,5) unit(vio) new", pass: true }          
           - { name: "TASKLIB", dsn: "${SDSNLOAD}", options: "shr" }
           - {                  dsn: "${SDSNEXIT}", condition: { exists: "SDSNEXIT" }, options: "shr" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new ", append: true }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(400) lrecl(80) recfm(f,b) new ", append: true }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
 
       # CICS Translator Command
       - step: CICSTranslator
@@ -155,8 +155,8 @@ tasks:
         ddnameSubstitution: ${CICSTranslatorDDNameSubstitionList}
         dds:
           - { name: "SYSIN", condition: "!${IS_SQL}", dsn: "${HLQ}.ASM(${MEMBER})", options: "shr", input: true }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new ", append: true }
-          - { name: "SYSPUNCH", dsn: "&&SYSCICS", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new ", pass: true }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(400) lrecl(80) recfm(f,b) new ", append: true }
+          - { name: "SYSPUNCH", dsn: "&&SYSCICS", options: "cyl space(5,5) unit(vio) blksize(400) lrecl(80) recfm(f,b) new ", pass: true }
           - { name: "TASKLIB", dsn: "${SDFHLOAD}", options: "shr" }
 
                
@@ -170,19 +170,19 @@ tasks:
         dds:
           - { name: "SYSIN", condition: "!${IS_CICS} && !${IS_SQL}", dsn: "${HLQ}.ASM(${MEMBER})", options: "shr", input: true }
           - { name: "ASMAOPT", condition: "${isAsmaOptionsFile}", dsn: "${HLQ}.ASMAOPT(${MEMBER})", options: "shr", input: true }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", append: true }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", append: true }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${MEMBER})", options: "shr", output: true, deployType: "OBJ" }
           - { name: "SYSLIB", dsn: "${HLQ}.MACRO", options: "shr" }
           - {                 dsn: "${SCEEMAC}", condition: { exists: "SCEEMAC" }, options: "shr" }
+          - {                 dsn: "${SDFSMAC}", condition: { exists: "SDFSMAC" }, options: "shr" }
           - {                 dsn: "${MACLIB}", condition: { exists: "MACLIB" }, options: "shr" }
           - {                 dsn: "${MODGEN}", condition: { exists: "MODGEN" }, options: "shr" }
           - {                 dsn: "${SDFHMAC}", condition: "${IS_CICS}", options: "shr" }
           - {                 dsn: "${SCSQMACS}", condition: "${IS_MQ}", options: "shr" }
-          - {                 dsn: "${SDFSMAC}", condition: { exists: "SDFSMAC" }, options: "shr" }
           - { name: "SYSADATA", condition: { exists: "errPrefix" }, dsn: "${HLQ}.SYSADATA(${MEMBER})", options: "shr" }
           - { name: "SYSADATA", condition: { exists: "debug", notExists: "errPrefix" }, dsn: "${HLQ}.SYSADATA(${MEMBER})", options: "shr" }
-          - { name: "SYSXMLSD", condition: { exists: "errPrefix" }, dsn: "${HLQ}.${errPrefix}.SYSXMLSD.XML", options: "tracks space(200,40) dsorg(PS) lrecl(16383) recfm(v,b) new keep" }
+          - { name: "SYSXMLSD", condition: { exists: "errPrefix" }, dsn: "${HLQ}.${errPrefix}.SYSXMLSD.XML", options: "tracks space(200,40) dsorg(PS) blksize(27998) lrecl(16383) recfm(v,b) new keep" }
 
       # Debug Side File Command
       - step: debugSideFile
@@ -207,8 +207,8 @@ tasks:
         maxRC: 0
         dds:
           - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${MEMBER})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", append: true }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", append: true }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${MEMBER})", options: "shr", output: true }
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }

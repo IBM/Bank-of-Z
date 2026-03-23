@@ -75,8 +75,8 @@ tasks:
         dds:
           - { name: "SYSLIN", dsn: "${HLQ}.LINK(${ENTRY})", options: "shr" }
           - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${ENTRY})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(133) recfm(f,b) new" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SDFHLOAD}", condition: "${hasCICSModules}", options: "shr" }

@@ -187,8 +187,13 @@ tasks:
     variables:
       - name: copyModeMappings
         value:
+          - deployType: LOAD
+            copyMode: LOAD
           - deployType: LOADLIB
             copyMode: LOAD
+          - deployType: CICSLOAD
+            copyMode: LOAD
+
     
   # build finialization
   - task: Finish

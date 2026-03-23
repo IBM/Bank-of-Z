@@ -50,7 +50,10 @@ application:
         - name: dependencySearchPath
           value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/src/base/copy/*.cpy
         - name: LOAD_LLQ
-          value: LOADLIB
+          value: LOAD  # default value
+          select:
+            - condition: ${IS_CICS}
+              value: CICSLOAD
         - name: deployType
           value: LOAD  # default value
           select:

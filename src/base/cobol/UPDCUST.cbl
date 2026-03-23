@@ -1,5 +1,6 @@
        PROCESS CICS,NODYNAM,NSYMBOL(NATIONAL),TRUNC(STD)
        CBL CICS('SP,EDF,DLI')
+       CBL SQL
       ******************************************************************
       *                                                                *
       *  Copyright IBM Corp. 2023                                      *
@@ -46,6 +47,29 @@
 
        77 SYSIDERR-RETRY               PIC 999.
 
+      * CUSTOMER DB2 copybook
+          EXEC SQL
+             INCLUDE CUSTDB2
+          END-EXEC.
+
+      * CUSTOMER host variables for DB2
+       01 HOST-CUSTOMER-ROW.
+          03 HV-CUSTOMER-EYECATCHER     PIC X(4).
+          03 HV-CUSTOMER-SORTCODE       PIC X(6).
+          03 HV-CUSTOMER-NUMBER         PIC X(10).
+          03 HV-CUSTOMER-NAME           PIC X(60).
+          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
+          03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
+
+      * Pull in the SQL COMMAREA
+       EXEC SQL
+          INCLUDE SQLCA
+       END-EXEC.
+
+       01 SQLCODE-DISPLAY               PIC S9(8) DISPLAY
+             SIGN LEADING SEPARATE.
 
        01 WS-CICS-WORK-AREA.
           03 WS-CICS-RESP              PIC S9(8) COMP.
@@ -197,7 +221,7 @@
       *
       *          Update the CUSTOMER datastore
       *
-           PERFORM UPDATE-CUSTOMER-VSAM
+           PERFORM UPDATE-CUSTOMER-DB2
       *
       *    The COMMAREA values have now been set so all we need to do
       *    is finish
@@ -208,131 +232,129 @@
            EXIT.
 
 
-       UPDATE-CUSTOMER-VSAM SECTION.
-       UCV010.
+       UPDATE-CUSTOMER-DB2 SECTION.
+       UCD010.
 
       *
-      *    Position at the matching CUSTOMER record and
-      *    lock it.
+      *    Update customer record in DB2
       *
+           MOVE COMM-SCODE TO DESIRED-SORT-CODE.
            MOVE COMM-CUSTNO TO DESIRED-CUSTNO.
 
-           EXEC CICS READ FILE('CUSTOMER')
-                RIDFLD(DESIRED-CUST-KEY)
-                INTO(WS-CUST-DATA)
-                UPDATE
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
-           END-EXEC.
-
       *
-      *    Check that the READ was successful. If not mark the return
-      *    field as not successful
-      *
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
-
-              MOVE 'N' TO COMM-UPD-SUCCESS
-
-              IF WS-CICS-RESP = DFHRESP(NOTFND)
-                 MOVE '1' TO COMM-UPD-FAIL-CD
-              ELSE
-                 MOVE '2' TO COMM-UPD-FAIL-CD
-              END-IF
-
-              GO TO UCV999
-
-           END-IF.
-
-      *
-      *    If the RESP CODE was OK then update the customer record
-      *    but only if the COMM-AREA supplied name or address has
-      *    been supplied. These fields will both be supplied every time
-      *    if the update is being made via the BMS screen, but if the
-      *    update is being made via the API, it is possible that neither
-      *    fields are supplied, in that instance it would corrupt the
-      *    backend data if we just updated it.
-      *    So we will include a check to reject the update if the
-      *    name and address are both empty or they both start with
-      *    a space (a COMM_UPD-FAIL-CD of '4' gets returned & we exit).
-      *    If the name is empty and not the address just update
-      *    the address. If the address is empty and not the name,
-      *    just update the name. If the name and address don't start
-      *    with a space, then update them both.
+      *    Validate that name and address are provided
+      *    (same validation logic as VSAM version)
       *
            IF (COMM-NAME = SPACES OR COMM-NAME(1:1) = ' ') AND
            (COMM-ADDR = SPACES OR COMM-ADDR(1:1) = ' ')
               MOVE 'N' TO COMM-UPD-SUCCESS
-
               MOVE '4' TO COMM-UPD-FAIL-CD
-
-              GO TO UCV999
-
+              GO TO UCD999
            END-IF.
 
+      *
+      *    First, read the current customer record
+      *
+           MOVE DESIRED-SORT-CODE TO HV-CUSTOMER-SORTCODE.
+           MOVE DESIRED-CUSTNO TO HV-CUSTOMER-NUMBER.
+
+           EXEC SQL
+              SELECT CUSTOMER_EYECATCHER,
+                     CUSTOMER_SORTCODE,
+                     CUSTOMER_NUMBER,
+                     CUSTOMER_NAME,
+                     CUSTOMER_ADDRESS,
+                     CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_CREDIT_SCORE,
+                     CUSTOMER_CS_REVIEW_DATE
+                INTO :HV-CUSTOMER-EYECATCHER,
+                     :HV-CUSTOMER-SORTCODE,
+                     :HV-CUSTOMER-NUMBER,
+                     :HV-CUSTOMER-NAME,
+                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-CREDIT-SCORE,
+                     :HV-CUSTOMER-CS-REVIEW-DATE
+                FROM CUSTOMER
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+                 AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
+           END-EXEC.
+
+      *
+      *    Check if customer was found
+      *
+           IF SQLCODE = 100
+              MOVE 'N' TO COMM-UPD-SUCCESS
+              MOVE '1' TO COMM-UPD-FAIL-CD
+              GO TO UCD999
+           END-IF.
+
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'UPDCUST - SELECT CUSTOMER failed. SQLCODE='
+                 SQLCODE-DISPLAY
+              MOVE 'N' TO COMM-UPD-SUCCESS
+              MOVE '2' TO COMM-UPD-FAIL-CD
+              GO TO UCD999
+           END-IF.
+
+      *
+      *    Update the fields based on what was provided
+      *    (same logic as VSAM version)
+      *
            IF (COMM-NAME = SPACES OR COMM-NAME(1:1) = ' ') AND
            (COMM-ADDR NOT = SPACES OR COMM-ADDR(1:1) NOT = ' ')
-              MOVE COMM-ADDR TO CUSTOMER-ADDRESS OF WS-CUST-DATA
+              MOVE COMM-ADDR TO HV-CUSTOMER-ADDRESS
            END-IF.
 
            IF (COMM-ADDR = SPACES OR COMM-ADDR(1:1) = ' ') AND
            (COMM-NAME NOT = SPACES OR COMM-NAME(1:1) NOT = ' ')
-              MOVE COMM-NAME TO CUSTOMER-NAME OF WS-CUST-DATA
+              MOVE COMM-NAME TO HV-CUSTOMER-NAME
            END-IF.
 
            IF COMM-ADDR(1:1) NOT = ' ' AND COMM-NAME(1:1) NOT = ' '
-              MOVE COMM-ADDR TO CUSTOMER-ADDRESS OF WS-CUST-DATA
-              MOVE COMM-NAME TO CUSTOMER-NAME OF WS-CUST-DATA
+              MOVE COMM-ADDR TO HV-CUSTOMER-ADDRESS
+              MOVE COMM-NAME TO HV-CUSTOMER-NAME
            END-IF.
 
-
-      *     MOVE COMM-NAME TO CUSTOMER-NAME OF WS-CUST-DATA.
-      *     MOVE COMM-ADDR TO CUSTOMER-ADDRESS OF WS-CUST-DATA.
-
-
-           COMPUTE WS-CUST-REC-LEN = LENGTH OF WS-CUST-DATA.
-
-           EXEC CICS REWRITE
-              FILE ('CUSTOMER')
-              FROM (WS-CUST-DATA)
-              LENGTH(WS-CUST-REC-LEN)
-              RESP(WS-CICS-RESP)
-              RESP2(WS-CICS-RESP2)
+      *
+      *    Update the customer record in DB2
+      *
+           EXEC SQL
+              UPDATE CUSTOMER
+                 SET CUSTOMER_NAME = :HV-CUSTOMER-NAME,
+                     CUSTOMER_ADDRESS = :HV-CUSTOMER-ADDRESS
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+                 AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
 
       *
-      *    If the RESP CODE for the REWRITE was NOT OK then we
-      *    need to mark it as failed
+      *    Check if update was successful
       *
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'UPDCUST - UPDATE CUSTOMER failed. SQLCODE='
+                 SQLCODE-DISPLAY
               MOVE 'N' TO COMM-UPD-SUCCESS
               MOVE '3' TO COMM-UPD-FAIL-CD
-              GO TO UCV999
+              GO TO UCD999
            END-IF.
 
       *
-      *    If the RESP CODE was normal then we just need to set the
-      *    SUCCESS CODE
+      *    Update was successful - set return values
       *
-           MOVE CUSTOMER-EYECATCHER OF WS-CUST-DATA
-              TO COMM-EYE.
-           MOVE CUSTOMER-SORTCODE OF WS-CUST-DATA
-              TO COMM-SCODE.
-           MOVE CUSTOMER-NUMBER OF WS-CUST-DATA
-              TO COMM-CUSTNO.
-           MOVE CUSTOMER-NAME OF WS-CUST-DATA
-              TO COMM-NAME.
-           MOVE CUSTOMER-ADDRESS OF WS-CUST-DATA
-              TO COMM-ADDR.
-           MOVE CUSTOMER-DATE-OF-BIRTH OF WS-CUST-DATA
-              TO COMM-DOB.
-           MOVE CUSTOMER-CREDIT-SCORE OF WS-CUST-DATA
-              TO COMM-CREDIT-SCORE.
-           MOVE CUSTOMER-CS-REVIEW-DATE OF WS-CUST-DATA
-              TO COMM-CS-REVIEW-DATE.
+           MOVE HV-CUSTOMER-EYECATCHER TO COMM-EYE.
+           MOVE HV-CUSTOMER-SORTCODE TO COMM-SCODE.
+           MOVE HV-CUSTOMER-NUMBER TO COMM-CUSTNO.
+           MOVE HV-CUSTOMER-NAME TO COMM-NAME.
+           MOVE HV-CUSTOMER-ADDRESS TO COMM-ADDR.
+           MOVE HV-CUSTOMER-DOB TO COMM-DOB.
+           MOVE HV-CUSTOMER-CREDIT-SCORE TO COMM-CREDIT-SCORE.
+           MOVE HV-CUSTOMER-CS-REVIEW-DATE TO COMM-CS-REVIEW-DATE.
 
            MOVE 'Y' TO COMM-UPD-SUCCESS.
 
-       UCV999.
+       UCD999.
            EXIT.
 
 

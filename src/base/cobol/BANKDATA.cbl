@@ -14,7 +14,7 @@
       *                                                                *
       * Description: Batch program to initialise the data used in the  *
       *              bank application. Datastores populated by         *
-      *              this program include CUSTOMER (VSAM) and ACCOUNT  *
+      *              this program include CUSTOMER (DB2) and ACCOUNT   *
       *              (DB2).                                            *
       *                                                                *
       *                                                                *
@@ -24,8 +24,7 @@
       *              sssssss is the step for generation                *
       *              rrrrrrr is the random event seed                  *
       *                                                                *
-      * Output: The populated VSAM file CUSTOMER, the DB2 table        *
-      *         ACCOUNT.                                               *
+      * Output: The populated DB2 tables CUSTOMER and ACCOUNT.         *
       *                                                                *
       *                                                                *
       *                                                                *
@@ -41,33 +40,33 @@
       *****************************************************************
       *** File Control                                              ***
       *****************************************************************
-       INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-           SELECT CUSTOMER-FILE
-                  ASSIGN TO VSAM
-                  ORGANIZATION IS INDEXED
-                  ACCESS MODE  IS RANDOM
-                  RECORD KEY   IS CUSTOMER-KEY
-                  FILE STATUS  IS CUSTOMER-VSAM-STATUS.
+      * No file control needed - using DB2 for all data storage
 
        DATA DIVISION.
-      *****************************************************************
-      *** File Section                                              ***
-      *****************************************************************
-       FILE SECTION.
-
-       FD  CUSTOMER-FILE.
-       01  CUSTOMER-RECORD-STRUCTURE.
-       COPY CUSTOMER.
-
-
-
       *****************************************************************
       *** Working storage                                           ***
       *****************************************************************
        WORKING-STORAGE SECTION.
 
+      * Get the CUSTOMER DB2 copybook
+           EXEC SQL
+              INCLUDE CUSTDB2
+           END-EXEC.
 
+      * CUSTOMER Host variables for DB2
+       01 HOST-CUSTOMER-ROW.
+           03 HV-CUSTOMER-EYECATCHER         PIC X(4).
+           03 HV-CUSTOMER-SORTCODE           PIC X(6).
+           03 HV-CUSTOMER-NUMBER             PIC X(10).
+           03 HV-CUSTOMER-NAME               PIC X(60).
+           03 HV-CUSTOMER-ADDRESS            PIC X(160).
+           03 HV-CUSTOMER-DOB                PIC S9(9) COMP.
+           03 HV-CUSTOMER-CREDIT-SCORE       PIC S9(4) COMP.
+           03 HV-CUSTOMER-CS-REVIEW-DATE     PIC S9(9) COMP.
+
+      * Working storage for CUSTOMER data generation
+       01  WS-CUSTOMER-RECORD.
+       COPY CUSTOMER.
 
       * Get the ACCOUNT DB2 copybook
            EXEC SQL
@@ -131,10 +130,6 @@
        01  END-KEY                     PIC 9(10) DISPLAY.
        01  STEP-KEY                    PIC 9(10) DISPLAY.
        01  TESTNM                      PIC 9(4)  DISPLAY.
-
-       01  CUSTOMER-VSAM-STATUS.
-           05 VSAM-STATUS1             PIC X.
-           05 VSAM-STATUS2             PIC X.
 
        01  NEXT-KEY                    PIC 9(10) DISPLAY.
 
@@ -323,10 +318,10 @@
        01 WS-NEW-REVIEW-YYYYMMDD         PIC 9(8) VALUE 0.
 
        01 CUSTOMER-CONTROL.
-       COPY CUSTCTRL.
+          COPY CUSTCTRL.
 
        01 ACCOUNT-CONTROL.
-       COPY ACCTCTRL.
+          COPY ACCTCTRL.
 
       * Get the CONTROL table
            EXEC SQL
@@ -443,22 +438,9 @@
                                    FUNCTION RANDOM.
 
       *
-      * Open the files
+      * Initialize commit counter for DB2 transaction management
       *
-
-           OPEN OUTPUT CUSTOMER-FILE.
-           IF CUSTOMER-VSAM-STATUS NOT EQUAL '00' THEN
-               DISPLAY 'Error opening CUSTOMER file, status='
-                       CUSTOMER-VSAM-STATUS
-               MOVE 12 TO RETURN-CODE
-               PERFORM PROGRAM-DONE
-           END-IF.
-
-
-      *
-      * Populate the CUSTOMER file
-      *
-           MOVE 'Populating Customer + Account files'
+           MOVE 'Populating Customer + Account tables'
              to TIMESTAMP-FUNCTION
            perform TIMESTAMP
            MOVE ZERO TO COMMIT-COUNT
@@ -468,7 +450,7 @@
                    VARYING NEXT-KEY FROM START-KEY BY STEP-KEY
                      UNTIL NEXT-KEY > END-KEY
 
-               INITIALIZE CUSTOMER-RECORD IN CUSTOMER-RECORD-STRUCTURE
+               INITIALIZE WS-CUSTOMER-RECORD
 
                SET CUSTOMER-EYECATCHER-VALUE TO TRUE
 
@@ -559,13 +541,65 @@
                MOVE WS-NEW-REVIEW-YYYYMMDD(7:2) TO
                   CUSTOMER-CS-REVIEW-DAY
 
-               WRITE CUSTOMER-RECORD-STRUCTURE
+      *
+      * Populate host variables for DB2 INSERT
+      *
+               MOVE 'CUST' TO HV-CUSTOMER-EYECATCHER
+               MOVE CUSTOMER-SORTCODE TO HV-CUSTOMER-SORTCODE
+               MOVE CUSTOMER-NUMBER TO HV-CUSTOMER-NUMBER
+               MOVE CUSTOMER-NAME TO HV-CUSTOMER-NAME
+               MOVE CUSTOMER-ADDRESS TO HV-CUSTOMER-ADDRESS
 
-               IF CUSTOMER-VSAM-STATUS NOT EQUAL '00' THEN
-                   DISPLAY 'Error writing to VSAM file, status='
-                           CUSTOMER-VSAM-STATUS
-                   MOVE 12 TO RETURN-CODE
-                   PERFORM PROGRAM-DONE
+      *
+      * Convert date of birth to INTEGER format (YYYYMMDD)
+      *
+               COMPUTE HV-CUSTOMER-DOB =
+                   (CUSTOMER-BIRTH-YEAR * 10000) +
+                   (CUSTOMER-BIRTH-MONTH * 100) +
+                   CUSTOMER-BIRTH-DAY
+
+               MOVE CUSTOMER-CREDIT-SCORE TO HV-CUSTOMER-CREDIT-SCORE
+
+      *
+      * Convert credit score review date to INTEGER format (YYYYMMDD)
+      *
+               COMPUTE HV-CUSTOMER-CS-REVIEW-DATE =
+                   (CUSTOMER-CS-REVIEW-YEAR * 10000) +
+                   (CUSTOMER-CS-REVIEW-MONTH * 100) +
+                   CUSTOMER-CS-REVIEW-DAY
+
+      *
+      * Insert customer record into DB2
+      *
+               EXEC SQL
+                  INSERT INTO CUSTOMER
+                         (CUSTOMER_EYECATCHER,
+                          CUSTOMER_SORTCODE,
+                          CUSTOMER_NUMBER,
+                          CUSTOMER_NAME,
+                          CUSTOMER_ADDRESS,
+                          CUSTOMER_DATE_OF_BIRTH,
+                          CUSTOMER_CREDIT_SCORE,
+                          CUSTOMER_CS_REVIEW_DATE)
+                  VALUES (:HV-CUSTOMER-EYECATCHER,
+                          :HV-CUSTOMER-SORTCODE,
+                          :HV-CUSTOMER-NUMBER,
+                          :HV-CUSTOMER-NAME,
+                          :HV-CUSTOMER-ADDRESS,
+                          :HV-CUSTOMER-DOB,
+                          :HV-CUSTOMER-CREDIT-SCORE,
+                          :HV-CUSTOMER-CS-REVIEW-DATE)
+               END-EXEC
+
+               IF SQLCODE NOT = 0
+                  MOVE SQLCODE TO WS-SQLCODE-DISPLAY
+                  DISPLAY 'Error inserting CUSTOMER row. '
+                          'CUSTOMER=' HV-CUSTOMER-NUMBER
+                          ' SORTCODE=' HV-CUSTOMER-SORTCODE
+                          ' SQLCODE=' WS-SQLCODE-DISPLAY
+                          ' SQLSTATE=' SQLSTATE
+                  MOVE 12 TO RETURN-CODE
+                  PERFORM PROGRAM-DONE
                END-IF
       *
       * Having written out to the CUSTOMER datastore we now need to
@@ -585,24 +619,55 @@
                END-IF
            END-PERFORM
 
-           MOVE '000000' TO CUSTOMER-CONTROL-SORTCODE
-           MOVE '9999999999' TO CUSTOMER-CONTROL-NUMBER
-           SET CUSTOMER-CONTROL-EYECATCHER-V TO TRUE
-      D    DISPLAY 'ABOUT TO WRITE CUSTOMER-CONTROL-RECORD'
-           MOVE CUSTOMER-CONTROL-RECORD
-             TO CUSTOMER-RECORD IN CUSTOMER-RECORD-STRUCTURE
-           WRITE CUSTOMER-RECORD-STRUCTURE
-           IF CUSTOMER-VSAM-STATUS NOT EQUAL '00' THEN
-                   DISPLAY 'Error writing CUSTOMER-CONTROL-RECORD file'
-                   ', status=' CUSTOMER-VSAM-STATUS
-                   MOVE 12 TO RETURN-CODE
-                   PERFORM PROGRAM-DONE
-           END-IF.
-      * We need to store 2 values in DB2
+      *
+      * Update CONTROL table with last customer number for this sortcode
+      *
+      D    DISPLAY 'Updating CONTROL table with customer count'
+           MOVE SPACES TO HV-CONTROL-NAME
+           STRING 'CBSACUST' DELIMITED BY SIZE
+                  SORTCODE DELIMITED BY SIZE
+                  '  ' DELIMITED BY SIZE
+           INTO HV-CONTROL-NAME
+
+      *
+      * First try to update existing record
+      *
+           MOVE LAST-CUSTOMER-NUMBER TO HV-CONTROL-VALUE-NUM
+           EXEC SQL
+              UPDATE CONTROL
+              SET CONTROL_VALUE_NUM = :HV-CONTROL-VALUE-NUM
+              WHERE CONTROL_NAME = :HV-CONTROL-NAME
+           END-EXEC
+
+      *
+      * If not found (SQLCODE 100), insert new record
+      *
+           IF SQLCODE = 100
+              MOVE LAST-CUSTOMER-NUMBER TO HV-CONTROL-VALUE-NUM
+              MOVE SPACES TO HV-CONTROL-VALUE-STR
+              EXEC SQL
+                 INSERT INTO CONTROL
+                        (CONTROL_NAME,
+                         CONTROL_VALUE_NUM,
+                         CONTROL_VALUE_STR)
+                 VALUES (:HV-CONTROL-NAME,
+                         :HV-CONTROL-VALUE-NUM,
+                         :HV-CONTROL-VALUE-STR)
+              END-EXEC
+           END-IF
+
+           IF SQLCODE NOT = 0 AND SQLCODE NOT = 100
+              MOVE SQLCODE TO WS-SQLCODE-DISPLAY
+              DISPLAY 'Error updating CONTROL table for customers. '
+                      'CONTROL_NAME=' HV-CONTROL-NAME
+                      ' SQLCODE=' WS-SQLCODE-DISPLAY
+           END-IF
+
+      *
+      * Store ACCOUNT control values in DB2
       * <<sortcode>>-ACCOUNT-LAST
       * <<sortcode>>-ACCOUNT-COUNT
-
-
+      *
            MOVE SPACES TO HV-CONTROL-NAME
            MOVE LAST-ACCOUNT-NUMBER TO HV-CONTROL-VALUE-NUM
            MOVE SPACES TO HV-CONTROL-VALUE-STR
@@ -664,9 +729,17 @@
 
 
       *
-      *** Close the files
+      * Final commit for any remaining transactions
       *
-           CLOSE CUSTOMER-FILE.
+           EXEC SQL
+              COMMIT WORK
+           END-EXEC
+
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO WS-SQLCODE-DISPLAY
+              DISPLAY 'Error on final COMMIT. '
+                      'SQLCODE=' WS-SQLCODE-DISPLAY
+           END-IF
 
            MOVE 'Finishing BANKDATA'
              to TIMESTAMP-FUNCTION

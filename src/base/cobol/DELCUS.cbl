@@ -49,6 +49,21 @@
        01 FILE-RETRY                   PIC 999.
        01 WS-EXIT-RETRY-LOOP           PIC X VALUE ' '.
 
+      * CUSTOMER DB2 copybook
+           EXEC SQL
+              INCLUDE CUSTDB2
+           END-EXEC.
+
+      * CUSTOMER host variables for DB2
+       01 HOST-CUSTOMER-ROW.
+           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
+           03 HV-CUSTOMER-SORTCODE       PIC X(6).
+           03 HV-CUSTOMER-NUMBER         PIC X(10).
+           03 HV-CUSTOMER-NAME           PIC X(60).
+           03 HV-CUSTOMER-ADDRESS        PIC X(160).
+           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
+           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
       * PROCTRAN DB2 copybook
            EXEC SQL
@@ -71,6 +86,9 @@
         EXEC SQL
           INCLUDE SQLCA
         END-EXEC.
+
+       01 SQLCODE-DISPLAY               PIC S9(8) DISPLAY
+             SIGN LEADING SEPARATE.
 
        01 WS-CICS-WORK-AREA.
            05 WS-CICS-RESP             PIC S9(8) COMP.
@@ -188,9 +206,6 @@
 
        01 WS-EXIT-FETCH                PIC X VALUE 'N'.
 
-       01 SQLCODE-DISPLAY              PIC S9(8) DISPLAY
-                                         SIGN LEADING SEPARATE.
-
        01 DELACC-COMMAREA.
           03 DELACC-COMM-EYE           PIC X(4).
           03 DELACC-COMM-CUSTNO        PIC X(10).
@@ -283,7 +298,7 @@
       *    then we must go on to delete the CUSTOMER record
       *
 
-           PERFORM DEL-CUST-VSAM
+           PERFORM DEL-CUST-DB2
 
 
            MOVE 'Y' TO COMM-DEL-SUCCESS.
@@ -340,67 +355,60 @@
            EXIT.
 
 
-       DEL-CUST-VSAM SECTION.
-       DCV010.
+       DEL-CUST-DB2 SECTION.
+       DCD010.
 
       *
-      *    Read the CUSTOMER record and store the details
-      *    for inclusion on PROCTRAN later, then delete the CUSTOMER
-      *    record and write to PROCTRAN.
+      *    Read and delete the CUSTOMER record from DB2
       *
            INITIALIZE OUTPUT-CUST-DATA.
+           INITIALIZE HOST-CUSTOMER-ROW.
 
-           EXEC CICS READ FILE('CUSTOMER')
-                RIDFLD(DESIRED-KEY)
-                INTO(OUTPUT-CUST-DATA)
-                UPDATE
-                TOKEN(WS-TOKEN)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
+      *
+      *    First, read the customer to get details for PROCTRAN
+      *
+           MOVE COMM-SCODE IN DFHCOMMAREA TO HV-CUSTOMER-SORTCODE.
+           MOVE COMM-CUSTNO IN DFHCOMMAREA TO HV-CUSTOMER-NUMBER.
+
+           EXEC SQL
+              SELECT CUSTOMER_EYECATCHER,
+                     CUSTOMER_SORTCODE,
+                     CUSTOMER_NUMBER,
+                     CUSTOMER_NAME,
+                     CUSTOMER_ADDRESS,
+                     CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_CREDIT_SCORE,
+                     CUSTOMER_CS_REVIEW_DATE
+                INTO :HV-CUSTOMER-EYECATCHER,
+                     :HV-CUSTOMER-SORTCODE,
+                     :HV-CUSTOMER-NUMBER,
+                     :HV-CUSTOMER-NAME,
+                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-CREDIT-SCORE,
+                     :HV-CUSTOMER-CS-REVIEW-DATE
+                FROM CUSTOMER
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+                 AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS READ FILE('CUSTOMER')
-                    RIDFLD(DESIRED-KEY)
-                    INTO(OUTPUT-CUST-DATA)
-                    UPDATE
-                    TOKEN(WS-TOKEN)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                 END-EXEC
-
-              END-PERFORM
-
-           END-IF
-
-           IF WS-CICS-RESP = DFHRESP(NOTFND)
+      *
+      *    Check if customer was found
+      *
+           IF SQLCODE = 100
       *
       *       Someone else has deleted it
       *
-              GO TO DCV999
-           END-IF
+              GO TO DCD999
+           END-IF.
 
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+           IF SQLCODE NOT = 0
       *
-      *       Preserve the RESP and RESP2, then set up the
-      *       standard ABEND info before getting the applid,
-      *       date/time etc. and linking to the Abend Handler
-      *       program.
+      *       Database error - set up abend info
       *
               INITIALIZE ABNDINFO-REC
-              MOVE EIBRESP    TO ABND-RESPCODE
-              MOVE EIBRESP2   TO ABND-RESP2CODE
-      *
-      *       Get supplemental information
-      *
+              MOVE SQLCODE TO ABND-SQLCODE
+
               EXEC CICS ASSIGN APPLID(ABND-APPLID)
               END-EXEC
 
@@ -424,15 +432,12 @@
               EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
               END-EXEC
 
-              MOVE ZEROS    TO ABND-SQLCODE
-
-              STRING 'DCV010 - Unable to READ CUSTOMER VSAM rec '
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              STRING 'DCD010 - Unable to SELECT CUSTOMER from DB2 '
                     DELIMITED BY SIZE,
                     'for key:' DESIRED-KEY DELIMITED BY SIZE,
-                    ' EIBRESP=' DELIMITED BY SIZE,
-                    ABND-RESPCODE DELIMITED BY SIZE,
-                    ' RESP2=' DELIMITED BY SIZE,
-                    ABND-RESP2CODE DELIMITED BY SIZE
+                    ' SQLCODE=' DELIMITED BY SIZE,
+                    SQLCODE-DISPLAY DELIMITED BY SIZE
                     INTO ABND-FREEFORM
               END-STRING
 
@@ -440,9 +445,9 @@
                         COMMAREA(ABNDINFO-REC)
               END-EXEC
 
-              DISPLAY 'In DELCUS (DCV010) '
-              'UNABLE TO READ CUSTOMER VSAM REC'
-              ' RESP CODE=' WS-CICS-RESP, ' RESP2=' WS-CICS-RESP2
+              DISPLAY 'In DELCUS (DCD010) '
+              'UNABLE TO SELECT CUSTOMER FROM DB2'
+              ' SQLCODE=' SQLCODE-DISPLAY
               'FOR KEY=' DESIRED-KEY
 
               EXEC CICS ABEND
@@ -451,82 +456,71 @@
 
            END-IF.
 
-           MOVE CUSTOMER-EYECATCHER TO WS-STOREDC-EYECATCHER
+      *
+      *    Store customer details for PROCTRAN and COMMAREA
+      *
+           MOVE HV-CUSTOMER-EYECATCHER TO WS-STOREDC-EYECATCHER
                                         COMM-EYE IN DFHCOMMAREA.
-           MOVE CUSTOMER-SORTCODE   TO WS-STOREDC-SORTCODE
+           MOVE HV-CUSTOMER-SORTCODE TO WS-STOREDC-SORTCODE
                                        COMM-SCODE IN DFHCOMMAREA.
-           MOVE CUSTOMER-NUMBER OF CUSTOMER-RECORD
-              TO WS-STOREDC-NUMBER COMM-CUSTNO IN DFHCOMMAREA.
-           MOVE CUSTOMER-NAME       TO WS-STOREDC-NAME
-                                       COMM-NAME IN DFHCOMMAREA.
-           MOVE CUSTOMER-ADDRESS    TO WS-STOREDC-ADDRESS
-                                       COMM-ADDR IN DFHCOMMAREA.
+           MOVE HV-CUSTOMER-NUMBER TO WS-STOREDC-NUMBER
+                                      COMM-CUSTNO IN DFHCOMMAREA.
+           MOVE HV-CUSTOMER-NAME TO WS-STOREDC-NAME
+                                   COMM-NAME IN DFHCOMMAREA.
+           MOVE HV-CUSTOMER-ADDRESS TO WS-STOREDC-ADDRESS
+                                      COMM-ADDR IN DFHCOMMAREA.
+
+      *
+      *    Format date of birth (convert from INTEGER to formatted string)
+      *
+           MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH.
            MOVE CUSTOMER-DATE-OF-BIRTH(1:2)
               TO WS-STOREDC-DATE-OF-BIRTH(1:2)
                  COMM-BIRTH-DAY IN DFHCOMMAREA.
-           MOVE '/'                 TO WS-STOREDC-DATE-OF-BIRTH(3:1).
+           MOVE '/' TO WS-STOREDC-DATE-OF-BIRTH(3:1).
            MOVE CUSTOMER-DATE-OF-BIRTH(3:2)
               TO WS-STOREDC-DATE-OF-BIRTH(4:2)
                  COMM-BIRTH-MONTH IN DFHCOMMAREA.
-           MOVE '/'                 TO WS-STOREDC-DATE-OF-BIRTH(6:1).
-
+           MOVE '/' TO WS-STOREDC-DATE-OF-BIRTH(6:1).
            MOVE CUSTOMER-DATE-OF-BIRTH(5:4)
               TO WS-STOREDC-DATE-OF-BIRTH(7:4)
                  COMM-BIRTH-YEAR IN DFHCOMMAREA.
 
-           MOVE CUSTOMER-CREDIT-SCORE TO WS-STOREDC-CREDIT-SCORE
-                                         COMM-CREDIT-SCORE.
+           MOVE HV-CUSTOMER-CREDIT-SCORE TO WS-STOREDC-CREDIT-SCORE
+                                           COMM-CREDIT-SCORE.
+
+      *
+      *    Format credit score review date
+      *
+           MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE.
            MOVE CUSTOMER-CS-REVIEW-DATE(1:2)
              TO WS-STOREDC-CS-REVIEW-DATE(1:2)
                 COMM-CS-REVIEW-DD IN DFHCOMMAREA.
-           MOVE '/'                 TO WS-STOREDC-CS-REVIEW-DATE(3:1).
+           MOVE '/' TO WS-STOREDC-CS-REVIEW-DATE(3:1).
            MOVE CUSTOMER-CS-REVIEW-DATE(3:2)
              TO WS-STOREDC-CS-REVIEW-DATE(4:2)
                 COMM-CS-REVIEW-MM IN DFHCOMMAREA.
-           MOVE '/'                 TO WS-STOREDC-CS-REVIEW-DATE(6:1).
+           MOVE '/' TO WS-STOREDC-CS-REVIEW-DATE(6:1).
            MOVE CUSTOMER-CS-REVIEW-DATE(5:4)
              TO WS-STOREDC-CS-REVIEW-DATE(7:4)
                 COMM-CS-REVIEW-YYYY IN DFHCOMMAREA.
 
-           EXEC CICS
-              DELETE FILE ('CUSTOMER')
-              TOKEN(WS-TOKEN)
-              RESP(WS-CICS-RESP)
-              RESP2(WS-CICS-RESP2)
+      *
+      *    Now delete the customer from DB2
+      *
+           EXEC SQL
+              DELETE FROM CUSTOMER
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+                 AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS DELETE FILE ('CUSTOMER')
-                    TOKEN(WS-TOKEN)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                 END-EXEC
-              END-PERFORM
-
-           END-IF
-
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+           IF SQLCODE NOT = 0
       *
-      *       Preserve the RESP and RESP2, then set up the
-      *       standard ABEND info before getting the applid,
-      *       date/time etc. and linking to the Abend Handler
-      *       program.
+      *       Database error - set up abend info
       *
               INITIALIZE ABNDINFO-REC
-              MOVE EIBRESP    TO ABND-RESPCODE
-              MOVE EIBRESP2   TO ABND-RESP2CODE
-      *
-      *       Get supplemental information
-      *
+              MOVE SQLCODE TO ABND-SQLCODE
+
               EXEC CICS ASSIGN APPLID(ABND-APPLID)
               END-EXEC
 
@@ -550,15 +544,12 @@
               EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
               END-EXEC
 
-              MOVE ZEROS    TO ABND-SQLCODE
-
-              STRING 'DCV010(2) - Unbale to DELETE CUSTOMER VSAM rec '
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              STRING 'DCD010(2) - Unable to DELETE CUSTOMER from DB2 '
                     DELIMITED BY SIZE,
                     'for key:' DESIRED-KEY DELIMITED BY SIZE,
-                    ' EIBRESP=' DELIMITED BY SIZE,
-                    ABND-RESPCODE DELIMITED BY SIZE,
-                    ' RESP2=' DELIMITED BY SIZE,
-                    ABND-RESP2CODE DELIMITED BY SIZE
+                    ' SQLCODE=' DELIMITED BY SIZE,
+                    SQLCODE-DISPLAY DELIMITED BY SIZE
                     INTO ABND-FREEFORM
               END-STRING
 
@@ -566,9 +557,9 @@
                         COMMAREA(ABNDINFO-REC)
               END-EXEC
 
-              DISPLAY 'In DELCUS (DCV010) '
-              'UNABLE TO DELETE CUSTOMER VSAM REC'
-              ' RESP CODE=' WS-CICS-RESP, ' RESP2=' WS-CICS-RESP2
+              DISPLAY 'In DELCUS (DCD010) '
+              'UNABLE TO DELETE CUSTOMER FROM DB2'
+              ' SQLCODE=' SQLCODE-DISPLAY
               'FOR KEY=' DESIRED-KEY
 
               EXEC CICS ABEND
@@ -579,7 +570,7 @@
 
            PERFORM WRITE-PROCTRAN-CUST.
 
-       DCV999.
+       DCD999.
            EXIT.
 
 

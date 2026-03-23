@@ -58,10 +58,26 @@
 
        01 SYSIDERR-RETRY                PIC 999.
 
+      * CUSTOMER DB2 copybook
+          EXEC SQL
+             INCLUDE CUSTDB2
+             END-EXEC.
+
+      * CUSTOMER host variables for DB2
+       01 HOST-CUSTOMER-ROW.
+          03 HV-CUSTOMER-EYECATCHER     PIC X(4).
+          03 HV-CUSTOMER-SORTCODE       PIC X(6).
+          03 HV-CUSTOMER-NUMBER         PIC X(10).
+          03 HV-CUSTOMER-NAME           PIC X(60).
+          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
+          03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
+
       * PROCTRAN DB2 copybook
           EXEC SQL
              INCLUDE PROCDB2
-          END-EXEC.
+             END-EXEC.
 
       * PROCTRAN host variables for DB2
        01 HOST-PROCTRAN-ROW.
@@ -74,6 +90,17 @@
           03 HV-PROCTRAN-TYPE           PIC X(3).
           03 HV-PROCTRAN-DESC           PIC X(40).
           03 HV-PROCTRAN-AMOUNT         PIC S9(10)V99 COMP-3.
+
+      * Get the CONTROL table
+           EXEC SQL
+              INCLUDE CONTDB2
+           END-EXEC.
+
+      * CONTROL Host variables for DB2
+       01 HOST-CONTROL-ROW.
+          03 HV-CONTROL-NAME            PIC X(32).
+          03 HV-CONTROL-VALUE-NUM       PIC S9(9) COMP.
+          03 HV-CONTROL-VALUE-STR       PIC X(32).
 
       * Pull in the SQL COMMAREA
        EXEC SQL
@@ -469,7 +496,7 @@
       *
       *    Update the datastore
       *
-           PERFORM WRITE-CUSTOMER-VSAM.
+           PERFORM WRITE-CUSTOMER-DB2.
 
 
            PERFORM GET-ME-OUT-OF-HERE.
@@ -550,7 +577,7 @@
       *
            MOVE 1 TO NCS-CUST-NO-INC.
 
-           PERFORM GET-LAST-CUSTOMER-VSAM
+           PERFORM GET-LAST-CUSTOMER-DB2
 
            MOVE 'Y' TO NCS-UPDATED.
 
@@ -1066,12 +1093,13 @@
            EXIT.
 
 
-       WRITE-CUSTOMER-VSAM SECTION.
-       WCV010.
+       WRITE-CUSTOMER-DB2 SECTION.
+       WCD010.
       *
-      *    Write a record to the CUSTOMER VSAM file
+      *    Write a record to the CUSTOMER DB2 table
       *
            INITIALIZE OUTPUT-DATA.
+           INITIALIZE HOST-CUSTOMER-ROW.
 
            MOVE 'CUST'              TO CUSTOMER-EYECATCHER.
            MOVE SORTCODE            TO CUSTOMER-SORTCODE.
@@ -1082,68 +1110,75 @@
            MOVE COMM-CREDIT-SCORE   TO CUSTOMER-CREDIT-SCORE.
            MOVE COMM-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE.
 
-           COMPUTE WS-CUST-REC-LEN = LENGTH OF OUTPUT-DATA.
+      *
+      *    Populate host variables for DB2 INSERT
+      *
+           MOVE 'CUST'              TO HV-CUSTOMER-EYECATCHER.
+           MOVE SORTCODE            TO HV-CUSTOMER-SORTCODE.
+           MOVE NCS-CUST-NO-VALUE   TO HV-CUSTOMER-NUMBER.
+           MOVE COMM-NAME           TO HV-CUSTOMER-NAME.
+           MOVE COMM-ADDRESS        TO HV-CUSTOMER-ADDRESS.
+           MOVE COMM-DATE-OF-BIRTH  TO HV-CUSTOMER-DOB.
+           MOVE COMM-CREDIT-SCORE   TO HV-CUSTOMER-CREDIT-SCORE.
+           MOVE COMM-CS-REVIEW-DATE TO HV-CUSTOMER-CS-REVIEW-DATE.
 
-           EXEC CICS WRITE
-                FILE('CUSTOMER')
-                FROM(OUTPUT-DATA)
-                RIDFLD(CUSTOMER-KEY)
-                LENGTH(WS-CUST-REC-LEN)
-                KEYLENGTH(16)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
+      *
+      *    Insert customer record into DB2
+      *
+           EXEC SQL
+              INSERT INTO CUSTOMER
+                 (CUSTOMER_EYECATCHER,
+                  CUSTOMER_SORTCODE,
+                  CUSTOMER_NUMBER,
+                  CUSTOMER_NAME,
+                  CUSTOMER_ADDRESS,
+                  CUSTOMER_DATE_OF_BIRTH,
+                  CUSTOMER_CREDIT_SCORE,
+                  CUSTOMER_CS_REVIEW_DATE)
+              VALUES
+                 (:HV-CUSTOMER-EYECATCHER,
+                  :HV-CUSTOMER-SORTCODE,
+                  :HV-CUSTOMER-NUMBER,
+                  :HV-CUSTOMER-NAME,
+                  :HV-CUSTOMER-ADDRESS,
+                  :HV-CUSTOMER-DOB,
+                  :HV-CUSTOMER-CREDIT-SCORE,
+                  :HV-CUSTOMER-CS-REVIEW-DATE)
            END-EXEC.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS WRITE
-                    FILE('CUSTOMER')
-                    FROM(OUTPUT-DATA)
-                    RIDFLD(CUSTOMER-KEY)
-                    LENGTH(WS-CUST-REC-LEN)
-                    KEYLENGTH(16)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                 END-EXEC
-
-              END-PERFORM
-           END-IF
-
       *
-      *    Check if the WRITE was unsuccessful and take action.
+      *    Check if the INSERT was unsuccessful and take action.
       *
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'CRECUST - INSERT CUSTOMER failed. SQLCODE='
+                 SQLCODE-DISPLAY
               MOVE 'N' TO COMM-SUCCESS
               MOVE '1' TO COMM-FAIL-CODE
               PERFORM DEQ-NAMED-COUNTER
               PERFORM GET-ME-OUT-OF-HERE
            END-IF.
 
-           INITIALIZE CUSTOMER-CONTROL
-           MOVE ZERO TO CUSTOMER-CONTROL-SORTCODE
-           MOVE ALL '9' TO CUSTOMER-CONTROL-NUMBER
+      *
+      *    Update the CONTROL table to track customer count
+      *
+           MOVE SORTCODE TO NCS-CUST-NO-TEST-SORT
+           STRING NCS-CUST-NO-ACT-NAME
+                  NCS-CUST-NO-TEST-SORT
+                  DELIMITED BY SIZE
+                  INTO HV-CONTROL-NAME
 
-           EXEC CICS READ FILE('CUSTOMER')
-                RIDFLD(CUSTOMER-CONTROL-KEY)
-                INTO(CUSTOMER-CONTROL)
-                UPDATE
-           END-EXEC
+           EXEC SQL
+              UPDATE CONTROL
+                 SET CONTROL_VALUE_NUM = CONTROL_VALUE_NUM + 1
+               WHERE CONTROL_NAME = :HV-CONTROL-NAME
+           END-EXEC.
 
-           ADD 1 TO NUMBER-OF-CUSTOMERS IN CUSTOMER-CONTROL-RECORD
-           GIVING NUMBER-OF-CUSTOMERS IN CUSTOMER-CONTROL-RECORD
-           MOVE CUSTOMER-NUMBER OF CUSTOMER-RECORD TO
-           LAST-CUSTOMER-NUMBER IN CUSTOMER-CONTROL-RECORD
-
-           EXEC CICS REWRITE FILE('CUSTOMER')
-                FROM(CUSTOMER-CONTROL)
-           END-EXEC
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'CRECUST - UPDATE CONTROL failed. SQLCODE='
+                 SQLCODE-DISPLAY
+           END-IF
 
       *
       *    If the WRITE was successful then WRITE to PROCTRAN datastore
@@ -1338,80 +1373,65 @@
            EXIT.
 
 
-       GET-LAST-CUSTOMER-VSAM SECTION.
-       GLCV010.
+       GET-LAST-CUSTOMER-DB2 SECTION.
+       GLCD010.
+      *
+      *    Get and increment the customer number from DB2 CONTROL table
+      *
+           MOVE SORTCODE TO NCS-CUST-NO-TEST-SORT
+           STRING NCS-CUST-NO-ACT-NAME
+                  NCS-CUST-NO-TEST-SORT
+                  DELIMITED BY SIZE
+                  INTO HV-CONTROL-NAME.
 
-           INITIALIZE CUSTOMER-CONTROL
-           MOVE ZERO TO CUSTOMER-CONTROL-SORTCODE
-           MOVE ALL '9' TO CUSTOMER-CONTROL-NUMBER
+      *
+      *    Select current customer number from CONTROL table
+      *
+           EXEC SQL
+              SELECT CONTROL_VALUE_NUM
+                INTO :HV-CONTROL-VALUE-NUM
+                FROM CONTROL
+               WHERE CONTROL_NAME = :HV-CONTROL-NAME
+           END-EXEC.
 
-           EXEC CICS READ FILE('CUSTOMER')
-                     RIDFLD(CUSTOMER-CONTROL-KEY)
-                     UPDATE
-                     INTO(CUSTOMER-CONTROL)
-                     RESP(WS-CICS-RESP)
-                     RESP2(WS-CICS-RESP2)
-           END-EXEC
-
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-             PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-             UNTIL SYSIDERR-RETRY > 100
-             OR WS-CICS-RESP = DFHRESP(NORMAL)
-             OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-               EXEC CICS DELAY FOR SECONDS(3)
-               END-EXEC
-
-               EXEC CICS READ FILE('CUSTOMER')
-                         RIDFLD(CUSTOMER-CONTROL-KEY)
-                         UPDATE
-                         INTO(CUSTOMER-CONTROL)
-                         RESP(WS-CICS-RESP)
-                         RESP2(WS-CICS-RESP2)
-               END-EXEC
-
-             END-PERFORM
-           ELSE
-             IF WS-CICS-RESP IS NOT = DFHRESP(NORMAL)
-               MOVE 'N' TO COMM-SUCCESS
-               MOVE '4' TO COMM-FAIL-CODE
-               PERFORM DEQ-NAMED-COUNTER
-               PERFORM GET-ME-OUT-OF-HERE
-             END-IF
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'CRECUST - SELECT CONTROL failed. SQLCODE='
+                 SQLCODE-DISPLAY
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE '4' TO COMM-FAIL-CODE
+              PERFORM DEQ-NAMED-COUNTER
+              PERFORM GET-ME-OUT-OF-HERE
            END-IF.
-           ADD 1 TO LAST-CUSTOMER-NUMBER IN CUSTOMER-CONTROL
-           GIVING LAST-CUSTOMER-NUMBER IN CUSTOMER-CONTROL
 
-           EXEC CICS REWRITE FILE('CUSTOMER')
-                FROM(CUSTOMER-CONTROL)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
-           END-EXEC
+      *
+      *    Increment the customer number
+      *
+           ADD 1 TO HV-CONTROL-VALUE-NUM.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
+      *
+      *    Update the CONTROL table with new customer number
+      *
+           EXEC SQL
+              UPDATE CONTROL
+                 SET CONTROL_VALUE_NUM = :HV-CONTROL-VALUE-NUM
+               WHERE CONTROL_NAME = :HV-CONTROL-NAME
+           END-EXEC.
 
-                 EXEC CICS REWRITE FILE('CUSTOMER')
-                    FROM(CUSTOMER-CONTROL)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                 END-EXEC
-              END-PERFORM
-           ELSE
-              IF WS-CICS-RESP IS NOT EQUAL TO DFHRESP(NORMAL)
-                 MOVE 'N' TO COMM-SUCCESS
-                 MOVE '4' TO COMM-FAIL-CODE
+           IF SQLCODE NOT = 0
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              DISPLAY 'CRECUST - UPDATE CONTROL failed. SQLCODE='
+                 SQLCODE-DISPLAY
+              MOVE 'N' TO COMM-SUCCESS
+              MOVE '4' TO COMM-FAIL-CODE
+              PERFORM DEQ-NAMED-COUNTER
+              PERFORM GET-ME-OUT-OF-HERE
+           END-IF.
 
-                 PERFORM DEQ-NAMED-COUNTER
-                 PERFORM GET-ME-OUT-OF-HERE
-              END-IF
-           END-IF
-
-           MOVE LAST-CUSTOMER-NUMBER OF CUSTOMER-CONTROL  TO
+      *
+      *    Set the new customer number in various fields
+      *
+           MOVE HV-CONTROL-VALUE-NUM TO
               COMM-NUMBER CUSTOMER-NUMBER REQUIRED-CUST-NUMBER2
               NCS-CUST-NO-VALUE.
 

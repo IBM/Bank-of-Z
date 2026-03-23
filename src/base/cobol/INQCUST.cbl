@@ -1,4 +1,5 @@
        CBL CICS('SP,EDF')
+       CBL SQL
       ******************************************************************
       *                                                                *
       *  Copyright IBM Corp. 2023                                      *
@@ -37,6 +38,30 @@
 
        77 SYSIDERR-RETRY               PIC 999.
        77 INQCUST-RETRY                PIC 9999.
+
+      * CUSTOMER DB2 copybook
+          EXEC SQL
+             INCLUDE CUSTDB2
+          END-EXEC.
+
+      * CUSTOMER host variables for DB2
+       01 HOST-CUSTOMER-ROW.
+          03 HV-CUSTOMER-EYECATCHER     PIC X(4).
+          03 HV-CUSTOMER-SORTCODE       PIC X(6).
+          03 HV-CUSTOMER-NUMBER         PIC X(10).
+          03 HV-CUSTOMER-NAME           PIC X(60).
+          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
+          03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
+
+      * Pull in the SQL COMMAREA
+       EXEC SQL
+          INCLUDE SQLCA
+       END-EXEC.
+
+       01 SQLCODE-DISPLAY               PIC S9(8) DISPLAY
+             SIGN LEADING SEPARATE.
 
        01 WS-CICS-WORK-AREA.
           03 WS-CICS-RESP              PIC S9(8) COMP.
@@ -116,9 +141,6 @@
 
        01 WS-STORM-DRAIN               PIC X VALUE 'N'.
        01 STORM-DRAIN-CONDITION        PIC X(20).
-
-       01 SQLCODE-DISPLAY              PIC S9(8) DISPLAY
-           SIGN LEADING SEPARATE.
 
         01 WS-INVOKING-PROGRAM         PIC X(8).
 
@@ -212,7 +234,7 @@
       *
       *          Get the customer information
       *
-           PERFORM READ-CUSTOMER-VSAM
+           PERFORM READ-CUSTOMER-DB2
              UNTIL EXIT-VSAM-READ = 'Y'.
       *
       * Return the CUSTOMER data in the commarea.
@@ -248,58 +270,61 @@
       *
       *    Retrieve the last CUSTOMER number in use
       *
-           PERFORM GET-LAST-CUSTOMER-VSAM
+           PERFORM GET-LAST-CUSTOMER-DB2
            IF INQCUST-INQ-SUCCESS = 'Y'
              MOVE REQUIRED-CUST-NUMBER2 TO NCS-CUST-NO-VALUE
            END-IF.
        RCN999.
            EXIT.
 
-       READ-CUSTOMER-VSAM SECTION.
-       RCV010.
+       READ-CUSTOMER-DB2 SECTION.
+       RCD010.
       *
-      *    Read the VSAM CUSTOMER file
+      *    Read customer from DB2
       *
            INITIALIZE OUTPUT-DATA.
+           INITIALIZE HOST-CUSTOMER-ROW.
 
-           EXEC CICS READ FILE('CUSTOMER')
-                RIDFLD(CUSTOMER-KY)
-                INTO(OUTPUT-DATA)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
+           MOVE REQUIRED-SORT-CODE TO HV-CUSTOMER-SORTCODE.
+           MOVE REQUIRED-CUST-NUMBER TO HV-CUSTOMER-NUMBER.
+
+           EXEC SQL
+              SELECT CUSTOMER_EYECATCHER,
+                     CUSTOMER_SORTCODE,
+                     CUSTOMER_NUMBER,
+                     CUSTOMER_NAME,
+                     CUSTOMER_ADDRESS,
+                     CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_CREDIT_SCORE,
+                     CUSTOMER_CS_REVIEW_DATE
+                INTO :HV-CUSTOMER-EYECATCHER,
+                     :HV-CUSTOMER-SORTCODE,
+                     :HV-CUSTOMER-NUMBER,
+                     :HV-CUSTOMER-NAME,
+                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-CREDIT-SCORE,
+                     :HV-CUSTOMER-CS-REVIEW-DATE
+                FROM CUSTOMER
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+                 AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
 
       *
-      *    Check that the READ was successful. If it was
-      *    exit this loop
+      *    Check if the SELECT was successful
       *
-           IF WS-CICS-RESP = DFHRESP(NORMAL)
+           IF SQLCODE = 0
               MOVE 'Y' TO EXIT-VSAM-READ
               MOVE 'Y' TO INQCUST-INQ-SUCCESS
-              GO TO RCV999
-           END-IF.
-
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS READ FILE('CUSTOMER')
-                    RIDFLD(CUSTOMER-KY)
-                    INTO(OUTPUT-DATA)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                  END-EXEC
-
-                  IF WS-CICS-RESP = DFHRESP(NORMAL)
-                     MOVE 'Y' TO EXIT-VSAM-READ
-                     MOVE 'Y' TO INQCUST-INQ-SUCCESS
-                     GO TO RCV999
-                  END-IF
-              END-PERFORM
+              MOVE HV-CUSTOMER-EYECATCHER TO CUSTOMER-EYECATCHER
+              MOVE HV-CUSTOMER-SORTCODE TO CUSTOMER-SORTCODE
+              MOVE HV-CUSTOMER-NUMBER TO CUSTOMER-NUMBER
+              MOVE HV-CUSTOMER-NAME TO CUSTOMER-NAME
+              MOVE HV-CUSTOMER-ADDRESS TO CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH
+              MOVE HV-CUSTOMER-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE
+              MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE
+              GO TO RCD999
            END-IF.
 
       * If the customer record was NOT found and the incoming
@@ -307,38 +332,40 @@
       * customer number) then have another go at generating a
       * different random customer number and try reading that.
       *
-           IF WS-CICS-RESP = DFHRESP(NOTFND) AND
+           IF SQLCODE = 100 AND
               INQCUST-CUSTNO = 0000000000
             IF INQCUST-RETRY < 1000
                 PERFORM GENERATE-RANDOM-CUSTOMER-AGAIN
                 MOVE RANDOM-CUSTOMER TO REQUIRED-CUST-NUMBER
-                GO TO RCV999
+                GO TO RCD999
               ELSE
                 MOVE 'Y' TO EXIT-VSAM-READ
                 MOVE 'N' TO INQCUST-INQ-SUCCESS
                 MOVE '1' TO INQCUST-INQ-FAIL-CD
-                GO TO RCV999
+                GO TO RCD999
               END-IF
            END-IF.
-           IF WS-CICS-RESP = DFHRESP(NOTFND) AND
+
+           IF SQLCODE = 100 AND
            INQCUST-CUSTNO = 9999999999 AND
            WS-V-RETRIED = 'N'
-              PERFORM GET-LAST-CUSTOMER-VSAM
-      D       DISPLAY 'CUSTOMER NUMBER RETURNED FROM NCS IS='
+              PERFORM GET-LAST-CUSTOMER-DB2
+      D       DISPLAY 'CUSTOMER NUMBER RETURNED FROM DB2 IS='
       D           NCS-CUST-NO-VALUE
               MOVE NCS-CUST-NO-VALUE TO REQUIRED-CUST-NUMBER
               MOVE 'Y' TO WS-V-RETRIED
-              GO TO RCV999
+              GO TO RCD999
            END-IF.
+
       *
       *    If the customer record was NOT found
       *    we must return the customer number with an initialised
       *    output record (this will indicate that the supplied
       *    customer number was a dud.
       *
-           IF (WS-CICS-RESP = DFHRESP(NOTFND)
+           IF (SQLCODE = 100
                 AND INQCUST-CUSTNO NOT = 9999999999)
-                AND (WS-CICS-RESP = DFHRESP(NOTFND)
+                AND (SQLCODE = 100
                 AND INQCUST-CUSTNO NOT = 0000000000)
               MOVE REQUIRED-CUST-NUMBER TO CUSTOMER-NUMBER
                                            OF OUTPUT-DATA
@@ -347,23 +374,22 @@
               MOVE '1' TO INQCUST-INQ-FAIL-CD
               MOVE SPACES TO INQCUST-ADDR
               MOVE SPACES TO INQCUST-NAME
-              GO TO RCV999
+              GO TO RCD999
            END-IF.
 
       *
       *    If something else went wrong all we can do is report it
       *    and abend
       *
-           IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+           IF SQLCODE NOT = 0 AND SQLCODE NOT = 100
       *
-      *       Preserve the RESP and RESP2, then set up the
-      *       standard ABEND info before getting the applid,
+      *       Set up the standard ABEND info before getting the applid,
       *       date/time etc. and linking to the Abend Handler
       *       program.
       *
               INITIALIZE ABNDINFO-REC
-              MOVE EIBRESP    TO ABND-RESPCODE
-              MOVE EIBRESP2   TO ABND-RESP2CODE
+              MOVE SQLCODE TO ABND-SQLCODE
+
       *
       *       Get supplemental information
       *
@@ -390,15 +416,13 @@
               EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
               END-EXEC
 
-              MOVE ZEROS      TO ABND-SQLCODE
-
-              STRING 'RCV010 - CUSTOMER VSAM RECORD KEY='
+              MOVE SQLCODE TO SQLCODE-DISPLAY
+              STRING 'RCD010 - CUSTOMER DB2 SELECT KEY='
                     DELIMITED BY SIZE,
                     CUSTOMER-KY DELIMITED SIZE,
-                    ' GAVE VSAM RC=' DELIMITED BY SIZE,
-                    ' EIBRESP=' DELIMITED BY SIZE,
-                    ABND-RESPCODE DELIMITED BY SIZE,
-                    ' RESP2=' DELIMITED BY SIZE,
+                    ' GAVE SQLCODE=' DELIMITED BY SIZE,
+                    SQLCODE-DISPLAY DELIMITED BY SIZE,
+                    ' FOR CUSTOMER=' DELIMITED BY SIZE,
                     ABND-RESP2CODE DELIMITED BY SIZE
                     INTO ABND-FREEFORM
               END-STRING
@@ -407,9 +431,9 @@
                         COMMAREA(ABNDINFO-REC)
               END-EXEC
 
-              DISPLAY 'CUSTOMER VSAM RECORD KEY='
-                  CUSTOMER-KY ' GAVE VSAM RC='
-                  WS-CICS-RESP
+              DISPLAY 'CUSTOMER DB2 SELECT KEY='
+                  CUSTOMER-KY ' GAVE SQLCODE='
+                  SQLCODE-DISPLAY
 
               IF WS-V-RETRIED = 'Y'
                  DISPLAY 'ON A RETRY'
@@ -421,7 +445,7 @@
 
            END-IF.
 
-       RCV999.
+       RCD999.
            EXIT.
 
 
@@ -561,111 +585,67 @@
            EXIT.
 
 
-       GET-LAST-CUSTOMER-VSAM SECTION.
-       GLCV010.
+       GET-LAST-CUSTOMER-DB2 SECTION.
+       GLCD010.
       *
-      *    Retrieves the last customer number in use on the
-      *    CUSTOMER file
+      *    Retrieves the last customer number in use from DB2
+      *    using ORDER BY DESC and FETCH FIRST 1 ROW
       *
            INITIALIZE OUTPUT-DATA.
+           INITIALIZE HOST-CUSTOMER-ROW.
 
-           MOVE HIGH-VALUES TO CUSTOMER-KY2.
+           MOVE REQUIRED-SORT-CODE2 TO HV-CUSTOMER-SORTCODE.
 
-           EXEC CICS STARTBR FILE('CUSTOMER')
-                RIDFLD(CUSTOMER-KY2)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
+           EXEC SQL
+              SELECT CUSTOMER_EYECATCHER,
+                     CUSTOMER_SORTCODE,
+                     CUSTOMER_NUMBER,
+                     CUSTOMER_NAME,
+                     CUSTOMER_ADDRESS,
+                     CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_CREDIT_SCORE,
+                     CUSTOMER_CS_REVIEW_DATE
+                INTO :HV-CUSTOMER-EYECATCHER,
+                     :HV-CUSTOMER-SORTCODE,
+                     :HV-CUSTOMER-NUMBER,
+                     :HV-CUSTOMER-NAME,
+                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-CREDIT-SCORE,
+                     :HV-CUSTOMER-CS-REVIEW-DATE
+                FROM CUSTOMER
+               WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
+               ORDER BY CUSTOMER_NUMBER DESC
+               FETCH FIRST 1 ROW ONLY
            END-EXEC.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS STARTBR FILE('CUSTOMER')
-                    RIDFLD(CUSTOMER-KY2)
-                    RESP(WS-CICS-RESP)
-                    RESP2(WS-CICS-RESP2)
-                 END-EXEC
-
-              END-PERFORM
-
+           IF SQLCODE = 0
+              MOVE 'Y' TO INQCUST-INQ-SUCCESS
+              MOVE HV-CUSTOMER-NUMBER TO REQUIRED-CUST-NUMBER2
+              GO TO GLCDE999
            END-IF.
 
-      *    At this point we have either done a successful
-      *    STARTBR, or we have a non-SYSIDERR RESP, or we've retried
-      *    more than 100 times.
-
-           IF WS-CICS-RESP IS NOT EQUAL TO DFHRESP(NORMAL)
-               MOVE 'N' TO INQCUST-INQ-SUCCESS
-               MOVE '9' TO INQCUST-INQ-FAIL-CD
-               GO TO GLCVE999
-           END-IF.
-
-           EXEC CICS READPREV FILE('CUSTOMER')
-                RIDFLD(CUSTOMER-KY2)
-                INTO(OUTPUT-DATA)
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
-           END-EXEC.
-
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
-
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS READPREV FILE('CUSTOMER')
-                      RIDFLD(CUSTOMER-KY2)
-                      INTO(OUTPUT-DATA)
-                      RESP(WS-CICS-RESP)
-                      RESP2(WS-CICS-RESP2)
-                 END-EXEC
-
-              END-PERFORM
-
-           END-IF.
-
-           IF WS-CICS-RESP IS NOT EQUAL TO DFHRESP(NORMAL)
+           IF SQLCODE = 100
               MOVE 'N' TO INQCUST-INQ-SUCCESS
               MOVE '9' TO INQCUST-INQ-FAIL-CD
-              GO TO GLCVE999
+              GO TO GLCDE999
            END-IF.
 
-           EXEC CICS ENDBR FILE('CUSTOMER')
-                RESP(WS-CICS-RESP)
-                RESP2(WS-CICS-RESP2)
-           END-EXEC.
+      *
+      *    Database error
+      *
+           MOVE 'N' TO INQCUST-INQ-SUCCESS
+           MOVE '9' TO INQCUST-INQ-FAIL-CD.
 
-           IF WS-CICS-RESP = DFHRESP(SYSIDERR)
-              PERFORM VARYING SYSIDERR-RETRY FROM 1 BY 1
-              UNTIL SYSIDERR-RETRY > 100
-              OR WS-CICS-RESP = DFHRESP(NORMAL)
-              OR WS-CICS-RESP IS NOT EQUAL TO DFHRESP(SYSIDERR)
+       GLCDE999.
+           EXIT.
 
-                 EXEC CICS DELAY FOR SECONDS(3)
-                 END-EXEC
-
-                 EXEC CICS ENDBR FILE('CUSTOMER')
-                      RESP(WS-CICS-RESP)
-                      RESP2(WS-CICS-RESP2)
-                 END-EXEC
-
-              END-PERFORM
-
-           IF WS-CICS-RESP IS NOT EQUAL TO DFHRESP(NORMAL)
-              MOVE 'N' TO INQCUST-INQ-SUCCESS
-              MOVE '9' TO INQCUST-INQ-FAIL-CD
-              GO TO GLCVE999
-           END-IF.
-
+       GLCV010.
+      *
+      *    Old VSAM section - kept for compatibility
+      *    Now redirects to DB2 version
+      *
+           PERFORM GET-LAST-CUSTOMER-DB2.
            MOVE 'Y' TO INQCUST-INQ-SUCCESS.
 
        GLCVE999.

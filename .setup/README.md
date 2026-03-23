@@ -31,9 +31,9 @@ This directory contains the setup scripts and configuration for preparing a z/OS
 
 Edit [`config.yaml`](config.yaml) to customize your environment:
 
-- **pipeline.workspace**: USS directory for pipeline workspace (default: `/u/$USER/sandbox`)
-- **pipeline.application**: Application name (default: `MortgageApplication`)
-- **pipeline.tmphlq**: Temporary high-level qualifier for datasets
+- **pipeline_script.workspace**: USS directory for pipeline workspace (default: `/u/$USER/sandbox`)
+- **pipeline_script.application**: Application name (default: `MortgageApplication`)
+- **pipeline_script.tmphlq**: Temporary high-level qualifier for datasets
 - **repositories**: Git repositories to clone
 - **zbuilder**: zBuilder framework configuration
 - **pipeline_script**: Pipeline simulation script configuration

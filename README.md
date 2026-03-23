@@ -230,7 +230,7 @@ The easiest way to get started is using the built-in VS Code tasks:
 1. **Configure Your Environment**
    Edit [`.setup/config.yaml`](.setup/config.yaml) if you want to change the defaults, e.g.
    ```yaml
-   pipeline:
+   pipeline_script:
      workspace: ~/sandbox
      tmphlq:
    ```

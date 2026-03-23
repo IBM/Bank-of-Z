@@ -28,7 +28,7 @@ This project provides two VS Code custom tasks:
 Edit [`.setup/config.yaml`](.setup/config.yaml) to match your environment:
 
 ```yaml
-pipeline:
+pipeline_script:
   workspace: /u/$USER/sandbox  # Your USS workspace directory
   application: MortgageApplication
   branch: main
@@ -83,7 +83,7 @@ The setup task performs three main stages:
 ### config.yaml Structure
 
 ```yaml
-pipeline:
+pipeline_script:
   workspace: /u/$USER/sandbox      # USS workspace directory
   application: Bank-of-z # Application name
   branch: main                     # Git branch

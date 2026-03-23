@@ -34,7 +34,7 @@ application:
                 - ${APP_DIR_NAME}/src/**/*.bms         # BMS Map source dependency
                 - ${APP_DIR_NAME}/src/**/.cbl         # Static link dependency  
             # Link card dependency patterns
-            - languageExt: lnk                    
+            - languageExt: lnk
               dependencyPatterns: 
                 - ${APP_DIR_NAME}/src/**/*.cbl      # Static link dependency
     # Variable overrides for the Cobol language task
@@ -44,7 +44,7 @@ application:
       
       variables:  
         - name: doLinkEdit
-          value: true
+          value: ${IS_CICS}
 
         # default dependency search path for single repository build
         - name: dependencySearchPath
@@ -52,4 +52,18 @@ application:
         - name: LOAD_LLQ
           value: LOADLIB
         - name: deployType
-          value: LOADLIB
+          value: LOAD  # default value
+          select:
+            - condition: ${IS_CICS}
+              value: CICSLOAD
+
+    # Variable overrides for the PLI language task
+    - task: PLI
+      sources:
+        - "**/src/base/pli/*.pli"
+      variables:  
+        - name: doLinkEdit
+          value: false
+        # flag to activate IMS options
+        - name: isIMS
+          value: false

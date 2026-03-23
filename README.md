@@ -1,10 +1,82 @@
 # Bank of Z
 
-A sample z/OS banking application demonstrating modern mainframe development practices with COBOL, BMS, and IBM Dependency Based Build (DBB).
-
 ## Overview
 
-Bank of Z is a CICS-based banking application that showcases:
+The Bank of Z provides a modern browser interface to manage a personal bank account. The application is hybrid – it drives IMS transactions that update a Db2 database for some customers and it drives CICS transactions that update the same Db2 database for other customers.
+
+This hybrid application is the result of a merger of two banking systems into one. The Bank of Z UI routes requests based on customer number. In both cases, z/OS Connect enables the client to communicate with the transactional environment.
+
+## Architecture
+
+```mermaid
+graph LR
+    UI[Bank of Z UI]
+    ZOS[z/OS Connect]
+    
+    BANKQ1["Bank of Q
+    Money Transfer In"]
+    BANKQ2["Bank of Q
+    Money Transfer In"]
+    
+    subgraph CICS_Flow[" "]
+        CICS[CICS]
+        MQ1[MQ]
+        DB2_CICS[("Money & Account Mgmt Db2 DB")]
+    end
+    
+    subgraph IMS_Flow[" "]
+        MQ2[MQ]
+        IMS[IMS TM]
+        DB2_IMS[("Money & Account Mgmt IMS DB")]
+    end
+    
+    HISTDB[("Account History Db2 DB")]
+    
+    UI --> ZOS
+    
+    BANKQ1 --> MQ1
+    ZOS -->|"CICS Path (Customers with ID Cnnnn)"| CICS
+    MQ1 --> CICS
+    CICS --> DB2_CICS
+    CICS --> HISTDB
+    
+    BANKQ2 --> MQ2
+    MQ2 --> IMS
+    ZOS -->|"IMS Path (Customers with ID Innnn)"| IMS
+    IMS --> DB2_IMS
+    IMS --> HISTDB
+    
+    style UI fill:#e1f5ff
+    style ZOS fill:#fff4e6
+    style CICS fill:#f3e5f5
+    style IMS fill:#f3e5f5
+    style DB2_CICS fill:#e8f5e9
+    style DB2_IMS fill:#e8f5e9
+    style HISTDB fill:#e8f5e9
+    style MQ1 fill:#fff9c4
+    style MQ2 fill:#fff9c4
+    style BANKQ1 fill:#ffebee
+    style BANKQ2 fill:#ffebee
+```
+
+## Key Components
+
+- **Bank of Z UI**: Modern browser-based interface for customer banking operations
+- **z/OS Connect**: Enterprise API gateway enabling communication between the UI and mainframe transaction systems
+- **CICS**: Transaction processing system for customers with IDs starting with 'C'
+- **IMS TM**: Transaction Manager for customers with IDs starting with 'I'
+- **Money and Account Management Db2 DB**: Shared database for account and transaction data
+- **Money and Account Management IMS DB**: IMS database for account management
+- **Account History Db2 DB**: Database storing historical account information
+- **MQ**: Message queuing system for asynchronous communication with external systems
+- **Bank of Q Money Transfer In**: External banking system for money transfers
+
+## Customer Routing
+
+- Customers with ID pattern **Cnnnn** → Routed to CICS
+- Customers with ID pattern **Innnn** → Routed to IMS TM
+
+## Build and Deploy Tools
 
 - **COBOL Programs** - Core banking business logic for account management, customer operations, and transactions
 - **BMS Maps** - Screen definitions for CICS terminal interactions
@@ -23,7 +95,7 @@ The application provides typical banking operations:
 
 ## Project Structure
 
-```
+```text
 Bank-of-Z/
 ├── src/                          # Application source code
 │   └── base/
@@ -48,32 +120,123 @@ Bank-of-Z/
 ### Prerequisites
 
 **Local Machine:**
+- [Java version 21 of IBM's Semeru Runtime](https://developer.ibm.com/languages/java/semeru-runtimes/downloads/)
 - [Node.js](https://nodejs.org/) and npm
-- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): `npm install -g @zowe/cli`
-- Zowe RSE API Plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+  - npm: ">=10.9.4 < 10.10.0"
+    - `npm -v`
+  - node: ">=22.22.1 < 23"
+    - `node -v`
+- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): 
+  - `npm install -g @zowe/cli@zowe-v3-lts`
+- Zowe RSE API Plugin: 
+  - `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - Configured Zowe profile with z/OS connection details
 
+Here is a sample configuration for the Zowe profile. Change:
+-  the 'host' line to match your z/OS host
+- the 'account' line to match your TSO account on the host
+- the 'logonProcedure' line to match your logon procedure on the host
+
+and if you use non-default ports, you may have to change other lines as well.
+Save the file in: `~/.zowe/zowe.config.json`
+```json
+{
+  "$schema": "./zowe.schema.json",
+  "profiles": {
+    "BankOfZDemo": {
+      "properties": {
+        "host": "<your host>",
+        "rejectUnauthorized": false
+      },
+      "secure": ["user", "password"],
+      "profiles": {
+        "rseapi": {
+          "type": "rse",
+          "properties": {
+            "port": 8195,
+            "basePath": "rseapi",
+            "protocol": "https"
+          }
+        },
+        "zosmf": {
+          "type": "zosmf",
+          "properties": {
+            "port": 10443
+          }
+        },
+        "ssh": {
+          "type": "ssh",
+          "properties": {
+            "port": 22
+          }
+        },
+        "tso": {
+          "type": "tso",
+          "properties": {
+            "account": "<account>",
+            "codePage": "1047",
+            "logonProcedure": "<logon procedure>"
+          }
+        },        
+        "zOpenDebug": {
+          "type": "zOpenDebug",
+          "properties": {
+            "dpsPort": 8192,
+            "rdsPort": 8194,
+            "dpsContextRoot": "api/v1",
+            "dpsSecured": true,
+            "authenticationType": "basic",
+            "uuid": "4267a0f6-b756-4f3c-b900-0b959b4567c3"
+          }
+        }
+      }
+    }
+  },
+  "defaults": {
+    "zosmf": "BankOfZDemo.zosmf",
+    "tso": "BankOfZDemo.tso",
+    "ssh": "BankOfZDemo.ssh",
+    "rse": "BankOfZDemo.rseapi",
+    "zOpenDebug": "BankOfZDemo.zOpenDebug"
+  },
+  "autoStore": true
+}
+```
+
+You can then test each connection. Example:
+- `zowe zosmf check status`
+- `zowe rse check status`
+- ...
+
 **z/OS System:**
+
 - Git installed and available in PATH on USS
 - CICS region for application deployment
-- IBM DBB installed (typically at `/usr/lpp/dbb`)
+- IBM DBB installed (typically at `/usr/lpp/IBM/dbb`)
 - Appropriate permissions for USS directories and dataset creation
+
+### Setup Using Bob
+
+Install Bob IDE and required extensions:
+- Zowe Explorer
+- IBM Z Open Editor
+- DB2/CICS/IMS/MQ Extensions
+
 
 ### Setup Using VS Code Tasks
 
 The easiest way to get started is using the built-in VS Code tasks:
 
 1. **Configure Your Environment**
-   
-   Edit [`.setup/config.yaml`](.setup/config.yaml) with your z/OS details:
+   Edit [`.setup/config.yaml`](.setup/config.yaml) if you want to change the defaults, e.g.
    ```yaml
    pipeline:
-     workspace: /u/$USER/sandbox
-     tmphlq: YOUR_HLQ
+     workspace: ~/sandbox
+     tmphlq:
    ```
 
 2. **Run Setup Task**
-   
+
    - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
    - Type "Tasks: Run Task"
    - Select **"Setup Pipeline Environment"**
@@ -84,7 +247,8 @@ The easiest way to get started is using the built-in VS Code tasks:
    - Upload zBuilder framework
 
 3. **Run Pipeline Simulation**
-   
+
+   - You must adpat this file before [pipeline_simulation.sh](.setup/pipeline_simulation.sh)  (TODO needs variables)
    - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
    - Type "Tasks: Run Task"
    - Select **"Run Pipeline Simulation"**

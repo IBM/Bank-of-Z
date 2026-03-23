@@ -1,0 +1,671 @@
+openapi: 3.0.3
+info:
+  title: Bank of Z - OpenBanking API
+  description: |
+    OpenBanking-compliant API for Bank of Z providing access to customer information and account data.
+    This API follows the OpenBanking UK specification standards for secure access to banking data.
+  version: 1.0.0
+  contact:
+    name: Bank of Z API Support
+    email: api-support@bankofz.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.bankofz.com/v1
+    description: Production server
+  - url: https://sandbox.bankofz.com/v1
+    description: Sandbox server for testing
+
+tags:
+  - name: Customers
+    description: Customer information endpoints
+  - name: Accounts
+    description: Account information endpoints
+  - name: Balances
+    description: Account balance endpoints
+  - name: Transactions
+    description: Transaction history endpoints
+
+security:
+  - OAuth2:
+      - accounts
+      - customers
+
+paths:
+  /customers/{customerId}:
+    get:
+      tags:
+        - Customers
+      summary: Get customer information
+      description: Retrieve detailed information about a specific customer
+      operationId: getCustomer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "CUST123456"
+      responses:
+        '200':
+          description: Customer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /customers/{customerId}/accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Get customer accounts
+      description: Retrieve all accounts associated with a customer
+      operationId: getCustomerAccounts
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "CUST123456"
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Get all accounts
+      description: Retrieve all accounts accessible by the authenticated user
+      operationId: getAccounts
+      parameters:
+        - name: accountType
+          in: query
+          description: Filter by account type
+          schema:
+            type: string
+            enum: [CURRENT, SAVINGS, CREDIT_CARD, LOAN]
+        - name: status
+          in: query
+          description: Filter by account status
+          schema:
+            type: string
+            enum: [ACTIVE, INACTIVE, CLOSED]
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      summary: Get account details
+      description: Retrieve detailed information about a specific account
+      operationId: getAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321"
+      responses:
+        '200':
+          description: Account details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts/{accountId}/balances:
+    get:
+      tags:
+        - Balances
+      summary: Get account balances
+      description: Retrieve current balance information for a specific account
+      operationId: getAccountBalances
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321"
+      responses:
+        '200':
+          description: Balance information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts/{accountId}/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Get account transactions
+      description: Retrieve transaction history for a specific account
+      operationId: getAccountTransactions
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321"
+        - name: fromDate
+          in: query
+          description: Start date for transaction history (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+            example: "2026-01-01"
+        - name: toDate
+          in: query
+          description: End date for transaction history (ISO 8601 format)
+          schema:
+            type: string
+            format: date
+            example: "2026-03-13"
+        - name: limit
+          in: query
+          description: Maximum number of transactions to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: Number of transactions to skip for pagination
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts/{accountId}/transactions/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Get transaction details
+      description: Retrieve detailed information about a specific transaction
+      operationId: getTransaction
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321"
+        - name: transactionId
+          in: path
+          required: true
+          description: Unique identifier for the transaction
+          schema:
+            type: string
+            example: "TXN456789"
+      responses:
+        '200':
+          description: Transaction details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: OAuth2 authentication for secure API access
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.bankofz.com/oauth/authorize
+          tokenUrl: https://auth.bankofz.com/oauth/token
+          scopes:
+            accounts: Access to account information
+            customers: Access to customer information
+            transactions: Access to transaction history
+
+  schemas:
+    Customer:
+      type: object
+      required:
+        - customerId
+        - firstName
+        - lastName
+        - email
+      properties:
+        customerId:
+          type: string
+          description: Unique identifier for the customer
+          example: "CUST123456"
+        title:
+          type: string
+          description: Customer title
+          example: "Mr"
+        firstName:
+          type: string
+          description: Customer first name
+          example: "John"
+        lastName:
+          type: string
+          description: Customer last name
+          example: "Smith"
+        dateOfBirth:
+          type: string
+          format: date
+          description: Customer date of birth
+          example: "1985-06-15"
+        email:
+          type: string
+          format: email
+          description: Customer email address
+          example: "john.smith@example.com"
+        phoneNumber:
+          type: string
+          description: Customer phone number
+          example: "+44 20 7946 0958"
+        address:
+          $ref: '#/components/schemas/Address'
+        customerStatus:
+          type: string
+          enum: [ACTIVE, INACTIVE, SUSPENDED]
+          description: Current status of the customer
+          example: "ACTIVE"
+        createdDate:
+          type: string
+          format: date-time
+          description: Date when customer account was created
+          example: "2020-01-15T10:30:00Z"
+
+    Address:
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          example: "123 High Street"
+        addressLine2:
+          type: string
+          example: "Apartment 4B"
+        city:
+          type: string
+          example: "London"
+        postalCode:
+          type: string
+          example: "SW1A 1AA"
+        country:
+          type: string
+          example: "United Kingdom"
+
+    AccountList:
+      type: object
+      required:
+        - accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        totalCount:
+          type: integer
+          description: Total number of accounts
+          example: 3
+
+    Account:
+      type: object
+      required:
+        - accountId
+        - accountType
+        - currency
+        - status
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier for the account
+          example: "ACC987654321"
+        accountType:
+          type: string
+          enum: [CURRENT, SAVINGS, CREDIT_CARD, LOAN]
+          description: Type of account
+          example: "CURRENT"
+        accountSubType:
+          type: string
+          description: Sub-type of account
+          example: "PERSONAL_CURRENT"
+        currency:
+          type: string
+          description: Currency code (ISO 4217)
+          example: "GBP"
+        nickname:
+          type: string
+          description: Customer-defined nickname for the account
+          example: "My Main Account"
+        accountNumber:
+          type: string
+          description: Account number
+          example: "12345678"
+        sortCode:
+          type: string
+          description: Bank sort code
+          example: "12-34-56"
+        iban:
+          type: string
+          description: International Bank Account Number
+          example: "GB29NWBK60161331926819"
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, CLOSED]
+          description: Current status of the account
+          example: "ACTIVE"
+        openingDate:
+          type: string
+          format: date
+          description: Date when account was opened
+          example: "2020-01-15"
+        customerId:
+          type: string
+          description: Customer ID associated with this account
+          example: "CUST123456"
+
+    BalanceList:
+      type: object
+      required:
+        - balances
+      properties:
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Balance'
+
+    Balance:
+      type: object
+      required:
+        - balanceType
+        - amount
+        - currency
+        - dateTime
+      properties:
+        balanceType:
+          type: string
+          enum: [AVAILABLE, CURRENT, OPENING_AVAILABLE, OPENING_BOOKED]
+          description: Type of balance
+          example: "AVAILABLE"
+        amount:
+          type: number
+          format: double
+          description: Balance amount
+          example: 1234.56
+        currency:
+          type: string
+          description: Currency code (ISO 4217)
+          example: "GBP"
+        creditDebitIndicator:
+          type: string
+          enum: [CREDIT, DEBIT]
+          description: Indicates if balance is credit or debit
+          example: "CREDIT"
+        dateTime:
+          type: string
+          format: date-time
+          description: Date and time of the balance
+          example: "2026-03-13T09:57:22Z"
+
+    TransactionList:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        totalCount:
+          type: integer
+          description: Total number of transactions
+          example: 150
+        limit:
+          type: integer
+          description: Maximum number of transactions returned
+          example: 50
+        offset:
+          type: integer
+          description: Number of transactions skipped
+          example: 0
+
+    Transaction:
+      type: object
+      required:
+        - transactionId
+        - accountId
+        - amount
+        - currency
+        - creditDebitIndicator
+        - status
+        - bookingDateTime
+      properties:
+        transactionId:
+          type: string
+          description: Unique identifier for the transaction
+          example: "TXN456789"
+        accountId:
+          type: string
+          description: Account identifier
+          example: "ACC987654321"
+        amount:
+          type: number
+          format: double
+          description: Transaction amount
+          example: 50.00
+        currency:
+          type: string
+          description: Currency code (ISO 4217)
+          example: "GBP"
+        creditDebitIndicator:
+          type: string
+          enum: [CREDIT, DEBIT]
+          description: Indicates if transaction is credit or debit
+          example: "DEBIT"
+        status:
+          type: string
+          enum: [PENDING, BOOKED, CANCELLED]
+          description: Transaction status
+          example: "BOOKED"
+        bookingDateTime:
+          type: string
+          format: date-time
+          description: Date and time when transaction was booked
+          example: "2026-03-12T14:30:00Z"
+        valueDateTime:
+          type: string
+          format: date-time
+          description: Date and time when transaction value is applied
+          example: "2026-03-12T14:30:00Z"
+        transactionInformation:
+          type: string
+          description: Additional information about the transaction
+          example: "Payment to ABC Store"
+        merchantDetails:
+          $ref: '#/components/schemas/MerchantDetails'
+        balance:
+          $ref: '#/components/schemas/Balance'
+
+    MerchantDetails:
+      type: object
+      properties:
+        merchantName:
+          type: string
+          description: Name of the merchant
+          example: "ABC Store"
+        merchantCategoryCode:
+          type: string
+          description: Merchant category code
+          example: "5411"
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: "INVALID_REQUEST"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "The request parameters are invalid"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "accountId"
+              issue:
+                type: string
+                example: "Account ID must be a valid format"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "BAD_REQUEST"
+            message: "Invalid request parameters"
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "UNAUTHORIZED"
+            message: "Authentication credentials are missing or invalid"
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "FORBIDDEN"
+            message: "You do not have permission to access this resource"
+
+    NotFound:
+      description: Not found - resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "The requested resource was not found"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "INTERNAL_ERROR"
+            message: "An unexpected error occurred"
+
+# Made with Bob

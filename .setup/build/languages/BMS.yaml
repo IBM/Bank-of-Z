@@ -58,12 +58,12 @@ tasks:
         parm: ${copyGenParms}
         dds:
           - { name: "SYSIN", dsn: "${HLQ}.BMS(${MEMBER})", options: "shr", input: true }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSPUNCH", dsn: "${HLQ}.BMS.COPY(${MEMBER})", options: "shr", output: true, deployType: "MAPCOPY" }
           - { name: "TASKLIB", dsn: "${SASMMOD1}", options: "shr" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIB", dsn: "${SDFHMAC}", options: "shr" }
           - {                 dsn: "${MACLIB}", options: "shr" }
 
@@ -74,12 +74,12 @@ tasks:
         parm: ${compileParms}
         dds:
           - { name: "SYSIN", dsn: "${HLQ}.BMS(${MEMBER})", options: "shr", input: true }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSPUNCH", dsn: "&&TEMPOBJ", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new", pass: true }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPUNCH", dsn: "&&TEMPOBJ", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new", pass: true }
           - { name: "TASKLIB", dsn: "${SASMMOD1}", options: "shr" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIB", dsn: "${SDFHMAC}", options: "shr" }
           - {                 dsn: "${MACLIB}", options: "shr" }
           
@@ -91,8 +91,8 @@ tasks:
         dds:
           - { name: "SYSLIN", dsn: "&&TEMPOBJ", options: "shr" }
           - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${MEMBER})", options: "shr", output: true, deployType: "MAPLOAD" }
-          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
-          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
           - { name: "SYSLIB", dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SDFHLOAD}", options: "shr" }
           

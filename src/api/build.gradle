@@ -1,0 +1,9 @@
+
+plugins {
+   id 'com.ibm.zosconnect.gradle' version '1.5.0'
+}
+repositories {
+
+   mavenCentral()
+
+}

@@ -1,6 +1,6 @@
        CBL LIST,MAP,XREF,FLAG(I)
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. FBACSUM.
+       PROGRAM-ID. IBACSUM.
       *test11289
       ******************************************************************
       * Licensed Materials - Property of IBM

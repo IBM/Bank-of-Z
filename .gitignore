@@ -2,3 +2,4 @@
 /.settings/
 /.bob/*.json
 /.setup/.env
+provisioning/

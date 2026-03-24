@@ -1,6 +1,6 @@
        CBL LIST,MAP,XREF,FLAG(I)
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. IBLOGIN.
+       PROGRAM-ID. IBLOGIN1
 
       ******************************************************************
       * Licensed Materials - Property of IBM

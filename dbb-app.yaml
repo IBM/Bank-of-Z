@@ -6,63 +6,240 @@
 # US Government users restricted rights  -  Use, duplication or
 # disclosure restricted by GSA ADP schedule contract with IBM Corp.
 #
+
+# ============================================================
+# DBB (Dependency Based Build) configuration file for the
+# Bank of Z z/OS native application.
+# Defines build tasks, source file patterns, compile options,
+# link-edit settings, and deployment types for COBOL and PL/I.
+# ============================================================
+
 version: 1.0.0
 application:
   name: cbsa-zos-native
-  tasks:
-    #- task: Cobol
-      # source file association patterns
-    #  variables:
-        # default dependency search path for single repository build
-    #    - name: dependencySearchPath
-    #      value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/copy/*.cpy
 
-    # Variable overrides for the ImpactAnalysis task
+  tasks:
+
+    # ----------------------------------------------------------
+    # ImpactAnalysis task
+    # Determines which programs need to be rebuilt when a source
+    # file changes, by tracing file dependencies (copybooks,
+    # BMS maps, static calls).
+    # ----------------------------------------------------------
     - task: ImpactAnalysis
       variables:
+        # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems
         #  value: true
 
-        # Associate dependency files to program types. For more information see 
-        # https://www.ibm.com/docs/en/dbb/3.0?topic=index-task-impactanalysis#defining-impact-query-patterns
+        # Maps each language extension to the dependency file
+        # patterns it can reference. Used to build the impact
+        # graph when a shared file (e.g. a copybook) changes.
         - name: impactQueryPatterns
           value:
-            # Cobol program dependency patterns
-            - languageExt: cbl      
-              dependencyPatterns: 
-                - ${APP_DIR_NAME}/src/**/*.cpy       # Copybook source dependency
-                - ${APP_DIR_NAME}/src/**/*.bms         # BMS Map source dependency
-                - ${APP_DIR_NAME}/src/**/.cbl         # Static link dependency  
-            # Link card dependency patterns
+            # COBOL program dependencies
+            - languageExt: cbl
+              dependencyPatterns:
+                - ${APP_DIR_NAME}/src/**/*.cpy   # COPY member (copybook)
+                - ${APP_DIR_NAME}/src/**/*.bms   # BMS map source
+                - ${APP_DIR_NAME}/src/**/.cbl    # Statically CALLed program
+
+            # Link-card dependencies: each .lnk file may reference
+            # one or more COBOL object modules to be link-edited.
             - languageExt: lnk
-              dependencyPatterns: 
-                - ${APP_DIR_NAME}/src/**/*.cbl      # Static link dependency
-    # Variable overrides for the Cobol language task
+              dependencyPatterns:
+                - ${APP_DIR_NAME}/src/**/*.cbl   # COBOL object to include
+
+    # ----------------------------------------------------------
+    # Cobol task
+    # Compiles all COBOL sources found under src/base/**/cobol/
+    # and link-edits them into load modules.
+    # ----------------------------------------------------------
     - task: Cobol
+      # Glob pattern selecting COBOL source files to compile
       sources:
         - "**/src/base/**/cobol/*.cbl"
-      
-      variables:  
-        - name: doLinkEdit
-          value: ${IS_CICS}
 
-        # default dependency search path for single repository build
+      variables:
+
+        # Automatically run the link-edit step after compilation
+        - name: doLinkEdit
+          value: true
+
+        # ----- Compiler parameters (default) -----
+        # Base option: LIB enables the COPY statement.
+        # Conditional suffixes are appended at build time:
+        #   CICS  - when the program uses EXEC CICS statements
+        #   SQL   - when the program uses embedded SQL
+        #   ADATA/EX - when an error prefix variable is set
+        #              (used by error-capture tooling)
+        #   TEST  - when the debug flag is set (enables debugger)
+        - name: compileParms
+          value: LIB
+          append:
+          - condition: ${IS_CICS}
+            value: CICS
+          - condition: ${IS_SQL}
+            value: SQL
+          - condition:
+              exists: errPrefix
+            value: ADATA,EX(ADX(ELAXMGUX))
+          - condition:
+              exists: debug
+              eval: ${debug}
+            value: TEST
+
+        # ----- Compiler parameters for IBTRAN (IMS Java bridge) -----
+        # IBTRAN is a special IMS program that bridges COBOL and Java.
+        # It requires PGMNAME(LONGMIXED) for mixed-case entry points
+        # and NODYNAM because it is statically linked with Java libs.
+        - name: compileParms
+          forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
+          value: NODYNAM,MAP,OBJECT,APOST,XREF,PGMNAME(LONGMIXED),NOEXP,NORENT
+          append:
+          - condition:
+              exists: errPrefix
+            value: ADATA,EX(ADX(ELAXMGUX))
+          - condition:
+              exists: debug
+              eval: ${debug}
+            value: TEST
+
+        # ----- Link-edit parameters for IBTRAN -----
+        # DYNAM(DLL) produces a DLL-style load module required
+        # for the IMS Java integration; CASE(MIXED) preserves
+        # mixed-case external names.
+        - name: linkEditParms
+          forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
+          value: LIST,XREF,LET,DYNAM(DLL),CASE(MIXED)
+
+        # ----- Link-edit instream for IBTRAN -----
+        # Includes the IMS language interface (DFSLI000),
+        # the compiled object, and the IBM COBOL Java library
+        # needed for the Java bridge. Names the output module IBTRAN.
+        - name: linkEditStream
+          forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
+          value: |2
+              INCLUDE  RESLIB(DFSLI000)
+              INCLUDE  SYSLIB(${MEMBER})
+              INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzcjava.x'
+              NAME     IBTRAN(R)
+
+        # ----- Link-edit instream for IMS batch programs -----
+        # These programs use the IMS DL/I call interface (CBLTDLI).
+        # ENTRY DLITCBL sets the standard IMS COBOL entry point so
+        # IMS can locate and invoke the program correctly.
+        - name: linkEditStream
+          forFiles:
+            - "**/src/base/ims/cobol/IBACSUM.cbl"
+            - "**/src/base/ims/cobol/IBGCUDAT.cbl"
+            - "**/src/base/ims/cobol/IBLOGIN1.cbl"
+            - "**/src/base/ims/cobol/IBLOGOUT.cbl"
+            - "**/src/base/ims/cobol/IBSCUDAT.cbl"
+            - "**/src/base/ims/cobol/LOADACCT.cbl"
+            - "**/src/base/ims/cobol/LOADCUSA.cbl"
+            - "**/src/base/ims/cobol/LOADCUST.cbl"
+            - "**/src/base/ims/cobol/LOADHIST.cbl"
+            - "**/src/base/ims/cobol/LOADTSTA.cbl"
+          value: |2
+              INCLUDE  RESLIB(CBLTDLI)
+              INCLUDE  SYSLIB(${MEMBER})
+              ENTRY    DLITCBL
+              NAME     ${MEMBER}(R)
+
+        # Search path for copybooks (.cpy) used by COBOL sources.
+        # Scanned recursively under src/base/ in a single-repo build.
         - name: dependencySearchPath
           value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/src/base/**/*.cpy
 
+        # ----- Deployment type -----
+        # Controls which target library the load module is deployed to:
+        #   LOAD     - standard batch load library (default)
+        #   CICSLOAD - CICS program library
+        #   IMSLOAD  - IMS program library (for all programs under ims/cobol/)
         - name: deployType
-          value: LOAD  # default value
+          value: LOAD
           select:
             - condition: ${IS_CICS}
               value: CICSLOAD
+            - condition:
+                forFiles: "**/src/base/ims/cobol/*.cbl"
+              value: IMSLOAD
 
-    # Variable overrides for the PLI language task
+    # ----------------------------------------------------------
+    # PLI task
+    # Compiles all PL/I sources found under src/base/**/pli/
+    # and link-edits them. IMS mode is enabled for all PL/I
+    # programs in this application.
+    # ----------------------------------------------------------
     - task: PLI
+      # Glob pattern selecting PL/I source files to compile
       sources:
         - "**/src/base/**/pli/*.pli"
-      variables:  
+
+      variables:
+
+        # Automatically run the link-edit step after compilation
         - name: doLinkEdit
-          value: false
-        # flag to activate IMS options
+          value: true
+
+        # Enable IMS-specific compiler and runtime options
+        # (e.g. DL/I call support, IMS PSB/DBD handling)
         - name: isIMS
-          value: false
+          value: true
+
+        # ----- Link-edit instream for IBLOGIN (IMS PL/I program) -----
+        # CEESTART is the Language Environment entry point required
+        # for PL/I programs running under IMS.
+        # DFSLI000 provides the IMS language interface stub.
+        - name: linkEditStream
+          forFiles:
+            - "**/src/base/ims/pli/IBLOGIN.pli"
+          value: |2
+              INCLUDE  SYSLIB(${MEMBER})
+              INCLUDE RESLIB(DFSLI000)
+              ENTRY CEESTART
+
+        # ----- Deployment type -----
+        # Controls which target library the load module is deployed to:
+        #   IMSLOAD  - IMS program library (for all programs under ims/pli/)
+        - name: deployType
+          value: IMSLOAD
+
+
+    # ----------------------------------------------------------
+    # Assembler task
+    # Handles IMS control block sources: PSBs (Program Specification
+    # Blocks) and DBDs (Database Descriptors). These are not compiled
+    # like application programs — they are assembled by the IMS ACBGEN
+    # utility and stored in dedicated load libraries.
+    # ----------------------------------------------------------
+    - task: Assembler
+
+      variables:
+
+        # ----- Deployment type -----
+        # Determines which target library the assembled output is
+        # deployed to after a successful build:
+        #
+        #   LOAD    - default; standard load library for regular
+        #             assembler modules (no IMS-specific handling)
+        #
+        #   PSBLOAD - IMS PSB library; a PSB defines the set of
+        #             databases (DBDs) a program is allowed to access
+        #             and the sensitive segments within each DB.
+        #             Every IMS application program references exactly
+        #             one PSB at schedule time.
+        #
+        #   DBDLOAD - IMS DBD library; a DBD describes the physical
+        #             structure of an IMS database: segment types,
+        #             field layouts, and access methods (HDAM, HIDAM…).
+        #             DBDs are the counterpart to PSBs — PSBs reference
+        #             DBDs to express what a program can see.
+        - name: deployType
+          forFiles: "**/src/base/ims/PSB/*.asm"
+          value: PSBLOAD
+
+        - name: deployType
+          forFiles: "**/src/base/ims/DBD/*.asm"
+          value: DBDLOAD

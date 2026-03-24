@@ -8,7 +8,7 @@
 #
 ####################################
 # Cobol language configuration
-#################################### 
+####################################
 
 version: 1.0.3
 tasks:
@@ -18,7 +18,7 @@ tasks:
     # source file association patterns
     sources:
       - "**/cobol/**.cbl"
-      
+
     # overridable variables
     variables:
       # conditional variable builds compile parameters i.e CICS,SQL
@@ -31,18 +31,18 @@ tasks:
             value: CICS
           - condition: ${IS_SQL}
             value: SQL
-          - condition: 
+          - condition:
               exists: errPrefix
             value: ADATA,EX(ADX(ELAXMGUX))
-          - condition: 
+          - condition:
               exists: debug
               eval: ${debug}
             value: TEST
-            
+
       # flag to perform linkedit
       - name: doLinkEdit
         value: true
-        
+
       # default link edit parameters
       - name: linkEditParms
         value: MAP,RENT
@@ -61,15 +61,15 @@ tasks:
       # flag to activate IMS options
       - name: isIMS
         value: false
-        
+
       # default dependency search path for single repository build
       - name: dependencySearchPath
         value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/copybook/*.cpy
 
-      # flag incating to scan the load module for static link dependencies  
+      # flag incating to scan the load module for static link dependencies
       - name: scanLoadModule
         value: true
-        
+
       # Uncomment to resolve logical files using resolveSubsystems
       # - name: subsystemSearchPath
       #   value: ${dependencySearchPath}
@@ -91,7 +91,7 @@ tasks:
 
     # list of steps to execute for each program processed by this language configuration
     steps:
-    
+
       # Copy build file and dependency files to data sets
       - step: copySrc
         type: copy
@@ -101,8 +101,8 @@ tasks:
             mappings:
               - source: "**/*"
                 dataset: ${HLQ}.COPY
-                
-      # COBOL compile step          
+
+      # COBOL compile step
       - step: compile
         type: mvs
         pgm: IGYCRCTL
@@ -139,7 +139,7 @@ tasks:
           - {                 dsn: "${SCEESAMP}", options: "shr" }
           - {                 dsn: "${SDFHCOB}", condition: "${IS_CICS}", options: "shr" }
           - {                 dsn: "${SCSQCOBC}", condition: "${IS_MQ}", options: "shr" }
-          - { name: "DBRMLIB", dsn: "${HLQ}.DBRM(${MEMBER})", condition: "${IS_SQL}", options: "shr", output: true, deployType: "DBRM" }          
+          - { name: "DBRMLIB", dsn: "${HLQ}.DBRM(${MEMBER})", condition: "${IS_SQL}", options: "shr", output: true, deployType: "DBRM" }
           - { name: "SYSADATA", condition: { exists: "errPrefix" }, options: "DUMMY" }
           - { name: "SYSXMLSD", condition: { exists: "errPrefix" }, dsn: "${HLQ}.${errPrefix}.SYSXMLSD.XML", options: "tracks space(200,40) dsorg(PS) blksize(27998) lrecl(16383) recfm(v,b) new keep" }
 
@@ -152,13 +152,18 @@ tasks:
         condition: ${doLinkEdit}
         maxRC: 0
         dds:
-          - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${ENTRY})", options: "shr" }
+          # create a SYSREF DD to add an instream DD to a concatenation
+          - { name: "SYSREF", condition: {exists: linkEditStream}, instream: "${linkEditStream}", options: "tracks space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          # SYSLIN concatenation
+          - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${MEMBER})", options: "shr" }
+          # Add a DD Ref DD statement for the instream concatenation
+          - { condition: {exists: linkEditStream}, ref: "SYSREF" }
           - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${ENTRY})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
           - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
           - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
-          - { name: "RESLIB", condition: { exists: RESLIB }, options: "shr" }
+          - { name: "RESLIB", condition: { exists: RESLIB }, dsn: "${RESLIB}", options: "shr" }
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SDFHLOAD}", condition: "${IS_CICS}", options: "shr" }
           - {                 dsn: "${SDSNLOAD}", condition: "${IS_SQL}", options: "shr" }
-
+          - {                 dsn: "${RESLIB}", condition: {exits: RESLIB}, options: "shr" }

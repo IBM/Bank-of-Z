@@ -40,7 +40,7 @@ application:
     # Variable overrides for the Cobol language task
     - task: Cobol
       sources:
-        - "**/src/base/cobol/*.cbl"
+        - "**/src/base/**/cobol/*.cbl"
       
       variables:  
         - name: doLinkEdit
@@ -48,12 +48,8 @@ application:
 
         # default dependency search path for single repository build
         - name: dependencySearchPath
-          value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/src/base/copy/*.cpy
-        - name: LOAD_LLQ
-          value: LOAD  # default value
-          select:
-            - condition: ${IS_CICS}
-              value: CICSLOAD
+          value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/src/base/**/*.cpy
+
         - name: deployType
           value: LOAD  # default value
           select:
@@ -63,7 +59,7 @@ application:
     # Variable overrides for the PLI language task
     - task: PLI
       sources:
-        - "**/src/base/pli/*.pli"
+        - "**/src/base/**/pli/*.pli"
       variables:  
         - name: doLinkEdit
           value: false

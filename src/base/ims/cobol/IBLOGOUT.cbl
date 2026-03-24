@@ -1,6 +1,6 @@
        CBL LIST,MAP,XREF,FLAG(I),RENT
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.  FBLOGOUT.
+       PROGRAM-ID.  IBLOGOUT.
 
       ******************************************************************
       * Licensed Materials - Property of IBM

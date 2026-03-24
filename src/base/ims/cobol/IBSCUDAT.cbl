@@ -1,6 +1,6 @@
        CBL LIST,MAP,XREF,FLAG(I)
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. FBSCUDAT.
+       PROGRAM-ID. IBSCUDAT.
 
       ******************************************************************
       * Licensed Materials - Property of IBM

@@ -1,0 +1,22 @@
+#
+# Limited Materials - Property of IBM
+# 5900-BPZ
+# (C) Copyright IBM Corp. 2025 All Rights Reserved
+# US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+ 
+
+
+
+# This is the detect-secrete pre-commit config file
+#
+# Read pre-commit hook framework https://pre-commit.com/ for more details about the structure of config yaml file and how git pre-commit would invoke each hook.
+#
+# This line indicates we will use the hook from ibm/detect-secrets to run scan during committing phase.
+repos:
+  - repo: https://github.com/ibm/detect-secrets
+    # Running "pre-commit autoupdate" automatically updates rev to latest tag
+    rev: 0.13.1+ibm.64.dss
+    hooks:
+      - id: detect-secrets
+        language: system
+        args: [--baseline, .secrets.baseline, "--use-all-plugins",  "--no-box-scan", "--fail-on-unaudited"]

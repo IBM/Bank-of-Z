@@ -71,7 +71,7 @@
         {
             "id": "sandbox",
             "type": "promptString",
-            "description": "Sandbox localtion"
+            "description": "Sandbox location"
         }
     ]
 }

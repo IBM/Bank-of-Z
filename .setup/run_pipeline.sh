@@ -17,7 +17,15 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ ! -f $SCRIPT_DIR/.env ]; then
+  echo -e "${RED}[ERROR] The .env file does not exist. Please run Setup Pipeline Environment before.${NC}"
+  exit 1
+fi
+
 CONFIG_FILE="$SCRIPT_DIR/config.yaml"
+
+. $SCRIPT_DIR/global.sh
+. $SCRIPT_DIR/.env
 
 # Function to print colored messages
 print_info() {
@@ -30,39 +38,6 @@ print_success() {
 
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Function to parse YAML config
-get_section_value() {
-    local section=$1
-    local key=$2
-    local in_section=0
-    local value=""
-    
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^${section}: ]]; then
-            in_section=1
-            continue
-        fi
-        
-        if [[ $in_section -eq 1 ]] && [[ "$line" =~ ^[a-zA-Z] ]] && [[ ! "$line" =~ ^[[:space:]] ]]; then
-            break
-        fi
-        
-        if [[ $in_section -eq 1 ]] && [[ "$line" =~ ^[[:space:]]+${key}: ]]; then
-            value=$(echo "$line" | sed 's/^[[:space:]]*[^:]*:[[:space:]]*//' | sed 's/#.*//' | sed 's/[[:space:]]*$//')
-            break
-        fi
-    done < "$CONFIG_FILE"
-    
-    echo "$value"
-}
-
-# Function to expand variables
-expand_vars() {
-    local value=$1
-    value="${value//\$USER/$USER}"
-    echo "$value"
 }
 
 # Parse command line arguments
@@ -85,14 +60,14 @@ if [ ! -f "$CONFIG_FILE" ]; then
     exit 1
 fi
 
-PIPELINE_BASE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
+PIPELINE_BASE_WORKSPACE=$PIPELINE_WORKSPACE
 
 PIPELINE_SCRIPT_SOURCE="$SCRIPT_DIR/$(get_section_value 'pipeline_script' 'source')"
 PIPELINE_SCRIPT_TARGET=$(expand_vars "$(get_section_value 'pipeline_script' 'target')")
 PIPELINE_SCRIPT_WORKSPACE=$(expand_vars "$(get_section_value 'pipeline_script' 'workspace')")
 
 ZBUILDER_TARGET_DIR=$(expand_vars "$(get_section_value 'zbuilder' 'target_dir')")
-PIPELINE_TMPHLQ=$(get_section_value 'pipeline' 'tmphlq')
+PIPELINE_TMPHLQ=$(get_section_value 'pipeline_script' 'tmphlq')
 
 # Get DBB repository target directory from config
 DBB_REPO_TARGET=$(get_section_value 'repositories' 'target_dir')
@@ -142,6 +117,7 @@ export DBB_REPO='$DBB_REPO_PATH' && \
 export DBB_BUILD_PATH='$ZBUILDER_TARGET_DIR' && \
 export DBB_BUILD='$ZBUILDER_TARGET_DIR' && \
 export TMPHLQ='$PIPELINE_TMPHLQ' && \
+export PIPELINE_WORKSPACE='$PIPELINE_WORKSPACE' && \
 $PIPELINE_SCRIPT_TARGET $GIT_REPO $GIT_BRANCH"
 
 zowe rse-api-for-zowe-cli issue unix-shell "$EXEC_CMD" --cwd "$SCRIPT_PARENT_DIR"

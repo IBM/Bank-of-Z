@@ -6,7 +6,8 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/.setup/setup.sh"
+                "${workspaceFolder}/.setup/setup.sh",
+                "${input:sandbox}"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/.setup"
@@ -66,6 +67,11 @@
             "type": "promptString",
             "description": "Git branch name",
             "default": "main"
+        },
+        {
+            "id": "sandbox",
+            "type": "promptString",
+            "description": "Sandbox location"
         }
     ]
 }

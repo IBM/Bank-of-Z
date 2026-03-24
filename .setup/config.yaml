@@ -3,12 +3,7 @@
 # Setup Configuration for Pipeline Simulation
 #########################################################
 version: 1.0.0
-
-# Pipeline workspace configuration
-global:
-  # Base workspace directory on USS
-  sandbox: /u/ibmuser/sandbox
-  
+ 
 # Git repositories to clone
 repositories:
   - name: dbb
@@ -21,7 +16,7 @@ zbuilder:
   source_dir: build
   
   # Target USS directory for upload
-  target_dir: /u/ibmuser/sandbox/zBuilder
+  target_dir: $PIPELINE_WORKSPACE/zBuilder
   
   # Languages configuration file
   languages_config: build/languages/Languages.yaml
@@ -29,15 +24,12 @@ zbuilder:
 # Pipeline simulation script
 pipeline_script:
   # Target USS location
-  target: /u/ibmuser/sandbox/pipeline_simulation.sh
+  target: $PIPELINE_WORKSPACE/pipeline_simulation.sh
 
   # Local source file
   source: pipeline_simulation.sh
   
   # workspace directory
-  workspace: /u/ibmuser/sandbox/workspace
-
-  # Temporary HLQ for datasets (defaults to $USER)
-  tmphlq: ibmuser
+  workspace: $PIPELINE_WORKSPACE/workspace
 
 # Made with Bob

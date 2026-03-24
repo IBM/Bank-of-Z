@@ -8,6 +8,7 @@
 
 set -e  # Exit on error
 
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -18,6 +19,8 @@ NC='\033[0m' # No Color
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/config.yaml"
+
+. $SCRIPT_DIR/global.sh
 
 # Function to print colored messages
 print_info() {
@@ -48,43 +51,6 @@ print_stage() {
 get_config_value() {
     local key=$1
     local value=$(grep "^[[:space:]]*${key}:" "$CONFIG_FILE" | head -1 | sed 's/^[[:space:]]*[^:]*:[[:space:]]*//' | sed 's/#.*//' | sed 's/[[:space:]]*$//')
-    echo "$value"
-}
-
-# Function to get value from a specific section
-get_section_value() {
-    local section=$1
-    local key=$2
-    local in_section=0
-    local value=""
-    
-    while IFS= read -r line; do
-        # Check if we're entering the target section
-        if [[ "$line" =~ ^${section}: ]]; then
-            in_section=1
-            continue
-        fi
-        
-        # Check if we've left the section (new top-level key)
-        if [[ $in_section -eq 1 ]] && [[ "$line" =~ ^[a-zA-Z] ]] && [[ ! "$line" =~ ^[[:space:]] ]]; then
-            break
-        fi
-        
-        # If we're in the section, look for the key
-        if [[ $in_section -eq 1 ]] && [[ "$line" =~ ^[[:space:]]+${key}: ]]; then
-            value=$(echo "$line" | sed 's/^[[:space:]]*[^:]*:[[:space:]]*//' | sed 's/#.*//' | sed 's/[[:space:]]*$//')
-            break
-        fi
-    done < "$CONFIG_FILE"
-    
-    echo "$value"
-}
-
-# Function to expand variables in config values
-expand_vars() {
-    local value=$1
-    # Replace $USER with actual username
-    value="${value//\$USER/$USER}"
     echo "$value"
 }
 
@@ -157,9 +123,11 @@ load_config() {
     fi
     
     # Parse configuration values
-    PIPELINE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
-    BRANCH=$(get_section_value 'pipeline' 'branch')
-    TMPHLQ=$(get_section_value 'pipeline' 'tmphlq')
+    if [[ -n "$1" ]]; then
+        PIPELINE_WORKSPACE="$1"
+    else
+        PIPELINE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
+    fi
     DBB_REPO_URL=$(get_config_value 'url')
     ZBUILDER_SOURCE="$SCRIPT_DIR/$(get_section_value 'zbuilder' 'source_dir')"
     ZBUILDER_TARGET=$(expand_vars "$(get_section_value 'zbuilder' 'target_dir')")
@@ -168,8 +136,6 @@ load_config() {
     
     print_success "Configuration loaded successfully"
     echo "  Workspace: $PIPELINE_WORKSPACE"
-    echo "  Branch: $BRANCH"
-    echo "  Temp HLQ: $TMPHLQ"
 }
 
 #########################################################
@@ -347,7 +313,7 @@ main() {
     check_zowe_cli
     
     # Load configuration
-    load_config
+    load_config "$1"
     
     # Execute stages
     stage1_initialize_workspace
@@ -357,6 +323,8 @@ main() {
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
+    echo "PIPELINE_WORKSPACE=$PIPELINE_WORKSPACE" > .env
+    chmod +x .env
     echo ""
     echo "Next steps:"
     echo "  1. Review the uploaded files on USS"

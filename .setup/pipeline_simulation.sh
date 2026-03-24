@@ -5,21 +5,21 @@ gitRepository=${1:-"https://github.com/IBM/Bank-of-Z.git"}
 branchName=${2:-"main"}
 
 # DBB repository location on USS
-export DBB_REPO=${DBB_REPO:-/u/ibmuser/sandbox/dbb}
+export DBB_REPO=${DBB_REPO:-$PIPELINE_WORKSPACE/dbb}
 
 # Location of the configured CBS scripts on USS - https://github.com/IBM/dbb/tree/main/Templates/Common-Backend-Scripts
 # Not yet used
 export PIPELINE_SCRIPTS=${DBB_REPO}/Templates/Common-Backend-Scripts
 
 # Pipeline Workspace / use a shared folder/zfs
-export PIPELINE_WORKSPACE=${PIPELINE_WORKSPACE:-/u/ibmuser/sandbox/workspace}
+export PIPELINE_WORKSPACE=${PIPELINE_WORKSPACE:-$PIPELINE_WORKSPACE/workspace}
 
 # zBuilder framework path (used for DBB_BUILD)
-export DBB_BUILD_PATH=${DBB_BUILD_PATH:-/u/ibmuser/sandbox/zBuilder}
+export DBB_BUILD_PATH=${DBB_BUILD_PATH:-$PIPELINE_WORKSPACE/zBuilder}
 
 # Adding pipeline scripts to PATH of the user running this script
 export PATH=$PIPELINE_SCRIPTS:$PATH
-export TMPHLQ=${TMPHLQ:-ibmuser}
+export TMPHLQ=${TMPHLQ:-TMPHLQ}
 
 # Using a timestamp to simulate the buildIdentifier and unique workspace
 timestamp=$(date +%F_%H-%M-%S)
@@ -60,7 +60,7 @@ if [ $rc -eq 0 ]; then
     
     # Run build
     cd $workspaceDir/$application
-    dbb build full --hlq ibmuser.BOZ.BLD
+    dbb build full --hlq BANKZ.BOZ.BLD
     rc=$?
     
     # For later use

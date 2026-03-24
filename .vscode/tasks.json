@@ -71,8 +71,7 @@
         {
             "id": "sandbox",
             "type": "promptString",
-            "description": "Sandbox localtion",
-            "default": "/u/ibmuser/sandbox"
+            "description": "Sandbox localtion"
         }
     ]
 }

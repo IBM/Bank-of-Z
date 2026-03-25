@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Create Account - CBSA</title>
+
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page">
+        <!-- Banner -->
+        <cds-layer class="landing-page__banner landing-page__heading">
+            <cds-breadcrumb>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="account-create.html">Create Account</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+            </cds-breadcrumb>
+            <h1>Create new account</h1>
+        </cds-layer>
+
+        <!-- Form Content -->
+        <cds-grid class="cds--content">
+            <cds-column lg="6" md="4" sm="2">
+                <cds-form id=account-form">
+                    <cds-stack gap="7">
+                        <cds-form-item>
+                            <cds-text-input id="customerNumber" label="Customer Number"
+                                placeholder="Enter customer number" required>
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-select id="accountType" label-text="Account Type">
+                                <cds-select-item value="">Select...</cds-select-item>
+                                <cds-select-item value="SAVING">Savings</cds-select-item>
+                                <cds-select-item value="CURRENT">Current</cds-select-item>
+                                <cds-select-item value="LOAN">Loan</cds-select-item>
+                                <cds-select-item value="MORTGAGE">Mortgage</cds-select-item>
+                                <cds-select-item value="ISA">ISA</cds-select-item>
+                            </cds-select>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-number-input id="interestRate" label="Interest Rate (%)" value="0" min="0" max="100"
+                                step="0.01">
+                            </cds-number-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-number-input id="overdraft" label="Overdraft Limit" value="0" min="0" step="100">
+                            </cds-number-input>
+                        </cds-form-item>
+
+                        <cds-button id="submit-btn" type="submit">Submit</cds-button>
+                    </cds-stack>
+                </cds-form>
+            </cds-column>
+            <cds-column lg="10" md="4" sm="2">
+                <img class="page-image" src="assets/images/ibm-db2-support.png" alt="account">
+            </cds-column>
+        </cds-grid>
+    </cds-layer>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/number-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+        import { config } from './config.js';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+
+            // Handle form submission
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await createAccount();
+            });
+        });
+
+        async function createAccount() {
+            // Get form values
+            const customerNumber = document.getElementById('customerNumber').value;
+            const accountType = document.getElementById('accountType').value;
+            const interestRate = document.getElementById('interestRate').value || '0';
+            const overdraft = document.getElementById('overdraft').value || '0';
+
+            // Validate required fields
+            if (!customerNumber || !accountType) {
+                showErrorModal('Validation Error', 'Please fill in all required fields');
+                return;
+            }
+
+            // Get current date in YYYY-MM-DD format for dateOpened
+            const today = new Date().toISOString().split('T')[0];
+
+            // Prepare data according to API schema
+            const accountData = {
+                customerNumber: customerNumber,
+                accountType: accountType,
+                interestRate: interestRate,
+                overdraft: overdraft,
+                dateOpened: today,
+                sortCode: config.defaults.sortCode
+            };
+
+            // Show loading
+            showLoadingModal('Creating account...');
+
+            try {
+                const response = await api.accounts.createAccount(accountData);
+                hideLoadingModal();
+
+                showSuccessModal(
+                    'Account created successfully',
+                    `Account has been created. Account Number: ${response.id || response.accountNumber}`,
+                    () => {
+                        window.location.href = 'account-details.html';
+                    }
+                );
+            } catch (error) {
+                hideLoadingModal();
+
+                console.log(error);
+
+
+                if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', 'Failed to create account. Please check the customer number exists.');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+/*
+ *
+ *    Copyright IBM Corp. 2023
+ *
+ */
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Info Panel - Custom Component */
+.info-panel {
+    background-color: var(--cds-layer);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-top: 2rem;
+}
+
+.info-panel h4 {
+    margin-top: 0;
+}
+
+.info-panel ul {
+    padding-left: 1.5rem;
+}
+
+.info-panel li {
+    margin-bottom: 0.5rem;
+}
+
+/* Details Display - Custom Component */
+.customer-details,
+.account-details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 2rem;
+    background-color: var(--cds-layer);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.customer-details dt,
+.account-details dt {
+    font-weight: 600;
+}
+
+.customer-details dd,
+.account-details dd {
+    margin: 0;
+}
+
+/* Tables - Custom Styling */
+.cds--data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--cds-layer);
+    margin-top: 1rem;
+}
+
+.cds--data-table th,
+.cds--data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cds-border-subtle);
+}
+
+.cds--data-table th {
+    background-color: var(--cds-layer-accent);
+    font-weight: 600;
+}
+
+/* Warning Text */
+.warning-text {
+    color: #ff832b;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+/* User Panel - Custom Component */
+.user-panel-content {
+    padding: 1.5rem;
+    min-width: 300px;
+}
+
+.user-panel-content h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.user-panel-content cds-text-input {
+    margin-bottom: 1rem;
+}
+
+.user-panel-content cds-button {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Utility Classes */
+.indent-class {
+    padding-left: 2rem;
+}
+
+.indent-class p {
+    margin: 0.5rem 0;
+}
+
+.half-width {
+    width: 50%;
+    border: 0;
+    border-top: 1px solid var(--cds-border-subtle);
+    margin: 1rem 0;
+}
+
+/* Made with Bob */

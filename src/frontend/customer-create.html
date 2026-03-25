@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Create Customer - CBSA</title>
+    
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+    
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page">
+        <!-- Banner -->
+        <cds-layer class="landing-page__heading landing-page__banner">
+            <cds-breadcrumb>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="customer-create.html">Create Customer</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+            </cds-breadcrumb>
+            <h1>Create new customer</h1>
+        </cds-layer>
+
+        <cds-grid class="cds--content">
+            <cds-column lg="8" md="6" sm="4">
+                <cds-stack gap="7">
+                    <cds-select id="title" label-text="Title">
+                        <cds-select-item value="Mr">Mr</cds-select-item>
+                        <cds-select-item value="Mrs">Mrs</cds-select-item>
+                        <cds-select-item value="Miss">Miss</cds-select-item>
+                        <cds-select-item value="Ms">Ms</cds-select-item>
+                        <cds-select-item value="Dr">Dr</cds-select-item>
+                        <cds-select-item value="Drs">Drs</cds-select-item>
+                        <cds-select-item value="Professor">Professor</cds-select-item>
+                        <cds-select-item value="Sir">Sir</cds-select-item>
+                        <cds-select-item value="Lady">Lady</cds-select-item>
+                        <cds-select-item value="Lord">Lord</cds-select-item>
+                    </cds-select>
+                    <cds-text-input 
+                        id="fullName" 
+                        label="Full name" 
+                        placeholder="Enter full name"
+                        required>
+                    </cds-text-input>
+                    <cds-text-input 
+                        id="addressLine1" 
+                        label="Address line 1" 
+                        placeholder="Enter address"
+                        required>
+                    </cds-text-input>
+                    <cds-text-input 
+                        id="city" 
+                        label="City" 
+                        placeholder="Enter city"
+                        required>
+                    </cds-text-input>
+                    <cds-date-picker>
+                        <cds-date-picker-input 
+                            id="dateOfBirth"
+                            kind="single" 
+                            label-text="Date of Birth"
+                            placeholder="dd/mm/yyyy">
+                        </cds-date-picker-input>
+                    </cds-date-picker>
+                    <cds-button id="submit-btn" type="submit" style="width:100%;">Submit</cds-button>
+                </cds-stack>
+            </cds-column>
+            <cds-column lg="8" md="2" sm="0">
+                <img class="page-image"
+                        src="assets/images/ibm-fireside-chat-trans-bus.png" 
+                        alt="customer">
+            </cds-column>
+        </cds-grid>
+    </div>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/date-picker.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, parseDate } from './js/utils.js';
+        import { config } from './config.js';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+            
+            // Handle form submission
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await createCustomer();
+            });
+        });
+        
+        async function createCustomer() {
+            // Get form values
+            const title = document.getElementById('title').value;
+            const fullName = document.getElementById('fullName').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const addressLine1 = document.getElementById('addressLine1').value;
+            const city = document.getElementById('city').value;
+            
+            // Validate required fields
+            if (!title || !fullName || !addressLine1 || !city) {
+                showErrorModal('Validation Error', 'Please fill in all required fields');
+                return;
+            }
+            
+            // Prepare data
+            const customerAddress = `${addressLine1}, ${city}`;
+            const customerName = `${title} ${fullName}`;
+            const formattedDOB = dateOfBirth ? parseDate(dateOfBirth) : '';
+            
+            const customerData = {
+                customerName: customerName,
+                customerAddress: customerAddress,
+                dateOfBirth: formattedDOB,
+                sortCode: config.defaults.sortCode
+            };
+            
+            // Show loading
+            showLoadingModal('Creating customer...');
+            
+            try {
+                const response = await api.customers.createCustomer(customerData);
+                hideLoadingModal();
+                
+                showSuccessModal(
+                    'Customer created successfully',
+                    `A customer profile for ${fullName} has been created. Customer ID: ${response.id}`,
+                    () => {
+                        window.location.href = 'customer-details.html';
+                    }
+                );
+            } catch (error) {
+                hideLoadingModal();
+                
+                if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', 'Failed to create customer. Please try again.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

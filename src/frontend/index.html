@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBSA - CICS Banking Sample Application</title>
+    
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+    
+    <!-- Main Content -->
+    <cds-layer class="cds--white layer landing-page">
+        <!-- Banner -->
+        <cds-layer class="landing-page__banner layer">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>
+                    Welcome to CICS Banking Sample Application
+                </h1>
+            </div>
+            <!-- Tabs Section -->
+            <cds-tabs value="about">
+                <cds-tab id="tab-about" target="panel-about" value="about">About</cds-tab>
+                <cds-tab id="tab-guide" target="panel-guide" value="guide">User Guide</cds-tab>
+            </cds-tabs>
+        </cds-layer>
+        <div class="cds--tab-content">
+            <!-- About Tab Panel -->
+            <div id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+                <cds-grid class="tabs-group-content">
+                    <cds-column lg="7" md="4" sm="4">
+                        <h2 class="landing-page__subheading">
+                            What is CICS Banking Sample Application (CBSA)?
+                        </h2>
+                        <p class="landing-page__p">
+                            CICS Banking Sample Application is an Open Source offering developed by the CICS Transaction Server
+                            CiP team. Any Open Source consumed can be found in the Notices.
+                        </p>
+                        <p class="landing-page__p">
+                            Click on the User icon
+                            <svg width="24" height="24" viewBox="0 0 32 32" style="vertical-align: middle;">
+                                <path d="M16,4a5,5,0,1,1-5,5,5,5,0,0,1,5-5m0-2a7,7,0,1,0,7,7A7,7,0,0,0,16,2Z"/>
+                                <path d="M26,30H24V25a5,5,0,0,0-5-5H13a5,5,0,0,0-5,5v5H6V25a7,7,0,0,1,7-7h6a7,7,0,0,1,7,7Z"/>
+                            </svg>
+                            on the top right corner. This offers a log in mechanism. This is not used by CBSA but is presented for use if required.
+                            Press TAB to move to SUBMIT and then press enter to activate.
+                        </p>
+                        <p class="landing-page__p">
+                            This will take you to the main part of the application.
+                        </p>
+                        <cds-button href="https://github.com/cicsdev/cics-banking-sample-application-cbsa" target="_blank">
+                            Learn more (GitHub)
+                        </cds-button>
+                    </cds-column>
+                    <cds-column lg="9" md="4" sm="4">
+                        <img class="page-image"
+                            src="assets/images/Use_cases_reduce_complexity.png"
+                            alt="CICS Bank Sample Application">
+                    </cds-column>
+                </cds-grid>
+            </div>
+            
+            <!-- User Guide Tab Panel -->
+            <div id="panel-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
+                <cds-grid class="tabs-group-content">
+                    <cds-column lg="7" md="4" sm="4" class="landing-page__tab-content">
+                        <h2 class="landing-page__subheading">
+                            To get started, you must be logged in.
+                        </h2>
+                        <p class="landing-page__p">
+                            Click on the User icon
+                            <svg width="24" height="24" viewBox="0 0 32 32" style="vertical-align: middle;">
+                                <path d="M16,4a5,5,0,1,1-5,5,5,5,0,0,1,5-5m0-2a7,7,0,1,0,7,7A7,7,0,0,0,16,2Z"/>
+                                <path d="M26,30H24V25a5,5,0,0,0-5-5H13a5,5,0,0,0-5,5v5H6V25a7,7,0,0,1,7-7h6a7,7,0,0,1,7,7Z"/>
+                            </svg>
+                            on the top right corner to enter your Username and Password and click
+                            'Submit' to log in. This is an example of what could be
+                            implemented. CBSA as shipped does not use these credentials
+                            and you can just press "Submit" leaving those fields blank.
+                        </p>
+                        <p class="landing-page__p">
+                            Once logged in, user can perform the functions listed below:
+                        </p>
+                        <div class="indent-class">
+                            <p>• Make payments</p>
+                            <p>• Create a new customer</p>
+                            <p>• Create a new account</p>
+                            <p>• View or update existing customer details</p>
+                            <p>• View or update existing account details</p>
+                            <p>• Delete an existing customer</p>
+                            <p>• Delete an existing account</p>
+                        </div>
+                    </cds-column>
+                    <cds-column lg="9" md="4" sm="4">
+                        <img class="landing-page__illo"
+                                src="assets/images/cics-ts-6_1.png"
+                                alt="CICS Transaction Server for z/OS">
+                    </cds-column>
+                </cds-grid>
+            </div>
+        </div>
+    </cds-layer>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/tabs.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    
+    <!-- Page Script -->
+    <script type="module">
+        import { createHomepageHeader } from './js/components/headers.js';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createHomepageHeader();
+            
+            // Handle tab switching
+            const tabs = document.querySelectorAll('cds-tab');
+            const panels = document.querySelectorAll('[role="tabpanel"]');
+            
+            // Show first tab by default
+            if (panels.length > 0) {
+                panels[0].removeAttribute('hidden');
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const targetId = tab.getAttribute('target');
+                    
+                    // Hide all panels
+                    panels.forEach(panel => panel.setAttribute('hidden', ''));
+                    
+                    // Show selected panel
+                    const targetPanel = document.getElementById(targetId);
+                    if (targetPanel) {
+                        targetPanel.removeAttribute('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

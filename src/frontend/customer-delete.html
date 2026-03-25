@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Delete Customer - CBSA</title>
+    
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+    
+    <!-- Main Content -->
+    <div class="landing-page">
+        <!-- Banner -->
+        <div class="cds--white landing-page__heading landing-page__banner">
+            <cds-breadcrumb>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="customer-delete.html">Delete Customer</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+            </cds-breadcrumb>
+            <h1>Delete Customer</h1>
+        </div>
+
+        <div class="cds--content">
+            <cds-stack gap="7">
+                <div>
+                    <cds-text-input 
+                        id="customerId" 
+                        label="Customer ID" 
+                        placeholder="Enter customer ID to delete">
+                    </cds-text-input>
+                    <br />
+                    <cds-button id="search-btn">Search</cds-button>
+                </div>
+                
+                <!-- Customer Details Section -->
+                <div id="details-section" style="display: none;">
+                    <h3>Customer Information</h3>
+                    <div id="customer-info"></div>
+                    <br>
+                    <cds-button id="delete-btn" kind="danger">Delete Customer</cds-button>
+                </div>
+            </cds-stack>
+        </div>
+    </div>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate } from './js/utils.js';
+        
+        let currentCustomer = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+            
+            // Handle search
+            document.getElementById('search-btn').addEventListener('click', searchCustomer);
+            document.getElementById('customerId').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchCustomer();
+            });
+            
+            // Handle delete
+            document.getElementById('delete-btn').addEventListener('click', confirmDelete);
+        });
+        
+        async function searchCustomer() {
+            const customerId = document.getElementById('customerId').value.trim();
+            
+            if (!customerId) {
+                showErrorModal('Validation Error', 'Please enter a customer ID');
+                return;
+            }
+            
+            showLoadingModal('Searching for customer...');
+            
+            try {
+                const customer = await api.customers.getCustomerByNumber(customerId);
+                currentCustomer = customer;
+                hideLoadingModal();
+                displayCustomerInfo(customer);
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', 'Customer not found or error loading data');
+            }
+        }
+        
+        function displayCustomerInfo(customer) {
+            const infoHTML = `
+                <table class="cds--data-table">
+                    <tbody>
+                        <tr>
+                            <th>Customer ID</th>
+                            <td>${customer.id}</td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>${customer.customerName}</td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td>${customer.customerAddress}</td>
+                        </tr>
+                        <tr>
+                            <th>Date of Birth</th>
+                            <td>${formatDate(customer.dateOfBirth)}</td>
+                        </tr>
+                        <tr>
+                            <th>Sort Code</th>
+                            <td>${customer.sortCode}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('customer-info').innerHTML = infoHTML;
+            document.getElementById('details-section').style.display = 'block';
+        }
+        
+        function confirmDelete() {
+            if (!currentCustomer) return;
+            
+            const modal = document.createElement('cds-modal');
+            modal.setAttribute('open', '');
+            modal.setAttribute('danger', '');
+            modal.innerHTML = `
+                <cds-modal-header>
+                    <cds-modal-heading>Confirm Deletion</cds-modal-heading>
+                </cds-modal-header>
+                <cds-modal-body>
+                    <p>Are you sure you want to delete customer "${currentCustomer.customerName}"?</p>
+                    <p>This action cannot be undone.</p>
+                </cds-modal-body>
+                <cds-modal-footer>
+                    <cds-modal-footer-button kind="secondary" data-modal-close>Cancel</cds-modal-footer-button>
+                    <cds-modal-footer-button kind="danger" id="confirm-delete-btn">Delete</cds-modal-footer-button>
+                </cds-modal-footer>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
+                modal.remove();
+                await deleteCustomer();
+            });
+            
+            modal.addEventListener('cds-modal-closed', () => {
+                modal.remove();
+            });
+        }
+        
+        async function deleteCustomer() {
+            if (!currentCustomer) return;
+            
+            showLoadingModal('Deleting customer...');
+            
+            try {
+                await api.customers.deleteCustomer(currentCustomer.id);
+                hideLoadingModal();
+                showSuccessModal(
+                    'Success', 
+                    'Customer deleted successfully',
+                    () => {
+                        window.location.reload();
+                    }
+                );
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', 'Failed to delete customer. The customer may have associated accounts.');
+            }
+        }
+    </script>
+</body>
+</html>

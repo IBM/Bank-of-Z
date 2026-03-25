@@ -1,0 +1,4198 @@
+{
+  "$defs": {
+    "AuxiliaryTempInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 200,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 10,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "records",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "AuxiliaryTempInputs",
+      "type": "object"
+    },
+    "AuxiliaryTraceConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 20,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 4,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "allocate": {
+          "default": true,
+          "description": "Allocate this data set",
+          "title": "allocate",
+          "type": "boolean"
+        },
+        "unit": {
+          "$ref": "#/$defs/SeqUnit",
+          "default": "MB",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "AuxiliaryTraceConfig",
+      "type": "object"
+    },
+    "AuxiliaryTraceInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable auxiliary trace",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "rolling": {
+          "default": false,
+          "description": "Enable rolling auxiliary trace between DFHAUXT and DFHBUXT",
+          "title": "rolling",
+          "type": "boolean"
+        },
+        "trace_a": {
+          "$ref": "#/$defs/AuxiliaryTraceConfig",
+          "description": "Configure the DFHAUXT data set",
+          "title": "trace_a"
+        },
+        "trace_b": {
+          "$ref": "#/$defs/AuxiliaryTraceConfig",
+          "description": "Configure the DFHBUXT data set",
+          "title": "trace_b"
+        }
+      },
+      "title": "AuxiliaryTraceInputs",
+      "type": "object"
+    },
+    "CicsCmciInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/ProviderOptions",
+          "description": "Provider for the CMCI server"
+        },
+        "port": {
+          "description": "TCP/IP port number allocated to the CMCI server",
+          "title": "port",
+          "type": "integer"
+        },
+        "authentication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CmciAuthOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Authentication method for CMCI JVM server authentication configuration",
+          "title": "authentication"
+        },
+        "address": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TCP/IP address for CMCI server",
+          "title": "address"
+        },
+        "ssl": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SslOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SSL configuration for CMCI server",
+          "title": "ssl"
+        },
+        "certificate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SSL certificate key alias",
+          "title": "certificate"
+        },
+        "ciphers": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name of the SSL cipher suite specification file",
+          "title": "ciphers"
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "title": "CicsCmciInputs",
+      "type": "object"
+    },
+    "CicsInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "hlq": {
+          "description": "High level qualifier for the CICS install",
+          "title": "hlq",
+          "type": "string"
+        },
+        "sdfhlic": {
+          "description": "Override CICS license data set name",
+          "title": "sdfhlic",
+          "type": "string"
+        },
+        "sdfhauth": {
+          "description": "Override SDFHAUTH data set name",
+          "title": "sdfhauth",
+          "type": "string"
+        },
+        "sdfhload": {
+          "description": "Override SDFHLOAD data set name",
+          "title": "sdfhload",
+          "type": "string"
+        }
+      },
+      "required": [
+        "hlq"
+      ],
+      "title": "CicsInputs",
+      "type": "object"
+    },
+    "CmciAuthOptions": {
+      "enum": [
+        "NO",
+        "BASIC",
+        "CERTIFICATE",
+        "AUTOREGISTER",
+        "AUTOMATIC"
+      ],
+      "title": "CmciAuthOptions",
+      "type": "string"
+    },
+    "ConsoleAutoinstall": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/ConsoleAutoinstallMode",
+          "default": "dfhtermc",
+          "description": "Mode for consoles autoinstall"
+        }
+      },
+      "title": "ConsoleAutoinstall",
+      "type": "object"
+    },
+    "ConsoleAutoinstallMode": {
+      "enum": [
+        "dfhtermc",
+        "yes",
+        "no",
+        "auto"
+      ],
+      "title": "ConsoleAutoinstallMode",
+      "type": "string"
+    },
+    "CpsmInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "hlq": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "High level qualifier for the CPSM install",
+          "title": "hlq"
+        },
+        "seyuauth": {
+          "description": "Override SEYUAUTH data set name",
+          "title": "seyuauth",
+          "type": "string"
+        },
+        "seyuload": {
+          "description": "Override SEYULOAD data set name",
+          "title": "seyuload",
+          "type": "string"
+        }
+      },
+      "title": "CpsmInputs",
+      "type": "object"
+    },
+    "CsdInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 4,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "MB",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        },
+        "existing": {
+          "default": false,
+          "description": "Use an existing CSD data set",
+          "title": "existing",
+          "type": "boolean"
+        },
+        "content": {
+          "description": "Add CICS definitions to the CSD dataset",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/CsdupScriptType"
+              },
+              {
+                "$ref": "#/$defs/ResourceBuilderType"
+              }
+            ]
+          },
+          "title": "content",
+          "type": "array"
+        }
+      },
+      "title": "CsdInputs",
+      "type": "object"
+    },
+    "CsdupScriptType": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "csdup_script",
+          "description": "Add CICS definitions to the CSD using a DFHCSDUP script",
+          "title": "type",
+          "type": "string"
+        },
+        "script": {
+          "description": "Location of CSDUP script",
+          "title": "script",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "script"
+      ],
+      "title": "CsdupScriptType",
+      "type": "object"
+    },
+    "DataSetList": {
+      "additionalProperties": false,
+      "properties": {
+        "top_data_sets": {
+          "description": "Data sets to add to the top of the concatenation",
+          "items": {
+            "type": "string"
+          },
+          "title": "top_data_sets",
+          "type": "array"
+        },
+        "data_sets": {
+          "description": "Data sets to add to the bottom of the concatenation",
+          "items": {
+            "type": "string"
+          },
+          "title": "data_sets",
+          "type": "array"
+        }
+      },
+      "title": "DataSetList",
+      "type": "object"
+    },
+    "DdConcat": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the DD card being specified",
+          "title": "name",
+          "type": "string"
+        },
+        "concat_dds": {
+          "description": "The DD statements for this concatenation",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/DsnDdConcatStatement"
+              },
+              {
+                "$ref": "#/$defs/InputDdConcatStatement"
+              }
+            ]
+          },
+          "title": "concat_dds",
+          "type": "array"
+        },
+        "type": {
+          "const": "concat",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "concat_dds",
+        "type"
+      ],
+      "title": "DdConcat",
+      "type": "object"
+    },
+    "Disposition": {
+      "enum": [
+        "OLD",
+        "SHR"
+      ],
+      "title": "Disposition",
+      "type": "string"
+    },
+    "DsnDd": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the DD card being specified",
+          "title": "name",
+          "type": "string"
+        },
+        "dsn": {
+          "description": "Data set name for this DD",
+          "title": "dsn",
+          "type": "string"
+        },
+        "disp": {
+          "$ref": "#/$defs/Disposition",
+          "default": "SHR",
+          "description": "Disposition for this DD card",
+          "title": "disp"
+        },
+        "type": {
+          "const": "data_set",
+          "default": "data_set",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        },
+        "record_format": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Record_Format"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Format",
+          "title": "record_format"
+        },
+        "record_length": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Length",
+          "title": "record_length"
+        },
+        "block_size": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Block Size",
+          "title": "block_size"
+        }
+      },
+      "required": [
+        "name",
+        "dsn"
+      ],
+      "title": "DsnDd",
+      "type": "object"
+    },
+    "DsnDdConcatStatement": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "default": "",
+          "title": "Name",
+          "type": "string"
+        },
+        "dsn": {
+          "description": "Data set name for this DD",
+          "title": "dsn",
+          "type": "string"
+        },
+        "disp": {
+          "$ref": "#/$defs/Disposition",
+          "default": "SHR",
+          "description": "Disposition for this DD card",
+          "title": "disp"
+        },
+        "type": {
+          "const": "data_set",
+          "default": "data_set",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        },
+        "record_format": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Record_Format"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Format",
+          "title": "record_format"
+        },
+        "record_length": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Length",
+          "title": "record_length"
+        },
+        "block_size": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Block Size",
+          "title": "block_size"
+        }
+      },
+      "required": [
+        "dsn"
+      ],
+      "title": "DsnDdConcatStatement",
+      "type": "object"
+    },
+    "DummyDd": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the DD card being specified",
+          "title": "name",
+          "type": "string"
+        },
+        "type": {
+          "const": "dummy",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "title": "DummyDd",
+      "type": "object"
+    },
+    "ExecParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Amount of central or virtual storage that the job requires",
+          "title": "region"
+        },
+        "memlimit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Limit on the total number of usable virtual pages above the bar",
+          "title": "memlimit"
+        }
+      },
+      "title": "ExecParameters",
+      "type": "object"
+    },
+    "Extensions": {
+      "additionalProperties": false,
+      "properties": {
+        "cics_cmci": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CicsCmciInputs"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Configure the CICS CMCI extension",
+          "title": "cics_cmci"
+        }
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "GlobalCatalogInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 5,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 1,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "MB",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "GlobalCatalogInputs",
+      "type": "object"
+    },
+    "InlineSourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Name of the JVM profile",
+          "title": "name",
+          "type": "string"
+        },
+        "source_type": {
+          "const": "inline",
+          "default": "inline",
+          "description": "Defines the source of the JVM profile as inline",
+          "title": "Source Type",
+          "type": "string"
+        },
+        "properties": {
+          "type": "string",
+          "description": "Properties of JVM profile for inline source type",
+          "title": "Properties"
+        }
+      },
+      "title": "InlineSourceType",
+      "type": "object"
+    },
+    "InputDd": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the DD card being specified",
+          "title": "name",
+          "type": "string"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            }
+          ],
+          "description": "The content of the DD card",
+          "title": "content"
+        },
+        "type": {
+          "const": "input",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "content",
+        "type"
+      ],
+      "title": "InputDd",
+      "type": "object"
+    },
+    "InputDdConcatStatement": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "default": "",
+          "title": "Name",
+          "type": "string"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            }
+          ],
+          "description": "The content of the DD card",
+          "title": "content"
+        },
+        "type": {
+          "const": "input",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "content",
+        "type"
+      ],
+      "title": "InputDdConcatStatement",
+      "type": "object"
+    },
+    "Installation": {
+      "additionalProperties": false,
+      "properties": {
+        "data_sets": {
+          "$ref": "#/$defs/InstallationDataSets",
+          "description": "CICS and CPSM data",
+          "title": "data_sets"
+        },
+        "dir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CICS installation directory",
+          "title": "dir"
+        },
+        "svc": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CICS SVC number",
+          "title": "svc"
+        },
+        "srbsvc": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SRB SVC number",
+          "title": "srbsvc"
+        }
+      },
+      "required": [
+        "data_sets"
+      ],
+      "title": "Installation",
+      "type": "object"
+    },
+    "InstallationDataSets": {
+      "additionalProperties": false,
+      "properties": {
+        "cics": {
+          "$ref": "#/$defs/CicsInputs",
+          "description": "CICS install data sets",
+          "title": "cics"
+        },
+        "cpsm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CpsmInputs"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CPSM install data sets",
+          "title": "cpsm"
+        }
+      },
+      "required": [
+        "cics"
+      ],
+      "title": "InstallationDataSets",
+      "type": "object"
+    },
+    "JclType": {
+      "enum": [
+        "JOB",
+        "PROC"
+      ],
+      "title": "JclType",
+      "type": "string"
+    },
+    "JobParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "memlimit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Limit on the total number of usable virtual pages above the bar",
+          "title": "memlimit"
+        },
+        "msgclass": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Output class to assign the job log",
+          "title": "msgclass"
+        },
+        "msglevel": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "JCL output listing options",
+          "title": "msglevel"
+        },
+        "output_class": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Class of the job",
+          "title": "output_class"
+        },
+        "programmer_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name of the person responsible for the job",
+          "title": "programmer_name"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Amount of central or virtual storage that the job requires",
+          "title": "region"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "User ID of the person submitting the job",
+          "title": "user"
+        }
+      },
+      "title": "JobParameters",
+      "type": "object"
+    },
+    "LeDataSets": {
+      "additionalProperties": false,
+      "properties": {
+        "sceecics": {
+          "description": "Override SCEECICS data set name",
+          "title": "sceecics",
+          "type": "string"
+        },
+        "sceerun": {
+          "description": "Override SCEERUN data set name",
+          "title": "sceerun",
+          "type": "string"
+        },
+        "sceerun2": {
+          "description": "Override SCEERUN2 data set name",
+          "title": "sceerun2",
+          "type": "string"
+        }
+      },
+      "title": "LeDataSets",
+      "type": "object"
+    },
+    "LocalCatalogInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 200,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 5,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "records",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "LocalCatalogInputs",
+      "type": "object"
+    },
+    "LocalRequestQueueInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 200,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 5,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "records",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "LocalRequestQueueInputs",
+      "type": "object"
+    },
+    "OutputDd": {
+      "properties": {
+        "name": {
+          "description": "The name of the DD card being specified",
+          "title": "name",
+          "type": "string"
+        },
+        "output_class": {
+          "description": "Specify the output class",
+          "title": "output_class",
+          "type": "string"
+        },
+        "type": {
+          "const": "output",
+          "description": "The type of DD statement being defined",
+          "title": "type",
+          "type": "string"
+        },
+        "record_format": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Record_Format"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Format",
+          "title": "record_format"
+        },
+        "record_length": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Record Length",
+          "title": "record_length"
+        },
+        "block_size": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the Block Size",
+          "title": "block_size"
+        }
+      },
+      "required": [
+        "name",
+        "output_class",
+        "type"
+      ],
+      "title": "OutputDd",
+      "type": "object"
+    },
+    "ProviderOptions": {
+      "enum": [
+        "CICS",
+        "JVMSERVER"
+      ],
+      "title": "ProviderOptions",
+      "type": "string"
+    },
+    "Record_Format": {
+      "enum": [
+        "F",
+        "FB",
+        "V",
+        "VB",
+        "U"
+      ],
+      "title": "Record_Format",
+      "type": "string"
+    },
+    "RegionInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "sysid": {
+          "description": "The SYSID for the CICS region known only to this region (1-4 characters)",
+          "title": "sysid",
+          "type": "string"
+        },
+        "applid": {
+          "description": "VTAM applid for the CICS region",
+          "title": "applid",
+          "type": "string"
+        },
+        "region_hlq": {
+          "description": "High level qualifier where the CICS region data sets are created",
+          "title": "region_hlq",
+          "type": "string"
+        },
+        "installation": {
+          "$ref": "#/$defs/Installation",
+          "description": "CICS installation information",
+          "title": "installation"
+        },
+        "region_dir": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Base directory for the region",
+          "title": "region_dir"
+        },
+        "volumes": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The volume(s) where the CICS region data sets are created",
+          "title": "volumes"
+        },
+        "le_hlq": {
+          "default": "CEE",
+          "description": "High level qualifier for the Language Environment data sets",
+          "title": "le_hlq",
+          "type": "string"
+        },
+        "jvm_profile_dir": {
+          "description": "Directory where JVM profiles are stored",
+          "title": "jvm_profile_dir",
+          "type": "string"
+        },
+        "global_catalog": {
+          "$ref": "#/$defs/GlobalCatalogInputs",
+          "description": "Configure the global catalog data set",
+          "title": "global_catalog"
+        },
+        "aux_trace": {
+          "$ref": "#/$defs/AuxiliaryTraceInputs",
+          "description": "Configure the auxiliary trace data sets",
+          "title": "aux_trace"
+        },
+        "aux_temp_storage": {
+          "$ref": "#/$defs/AuxiliaryTempInputs",
+          "description": "Configure the auxiliary temporary storage data set",
+          "title": "aux_temp_storage"
+        },
+        "local_catalog": {
+          "$ref": "#/$defs/LocalCatalogInputs",
+          "description": "Configure the local catalog data set",
+          "title": "local_catalog"
+        },
+        "td_intrapartition": {
+          "$ref": "#/$defs/TdIntrapartitionInputs",
+          "description": "Configure the TD Intrapartition data set",
+          "title": "td_intrapartition"
+        },
+        "local_request_queue": {
+          "$ref": "#/$defs/LocalRequestQueueInputs",
+          "description": "Configure the local request queue data set",
+          "title": "local_request_queue"
+        },
+        "csd": {
+          "$ref": "#/$defs/CsdInputs",
+          "description": "Configure the CSD data set",
+          "title": "csd"
+        },
+        "transaction_dump": {
+          "$ref": "#/$defs/TransactionDumpInputs",
+          "description": "Configure the transaction dump data sets",
+          "title": "transaction_dump"
+        },
+        "region_jcl": {
+          "$ref": "#/$defs/RegionJCLInputs",
+          "description": "Generated CICS region startup JCL configuration",
+          "title": "region_jcl"
+        },
+        "le_data_sets": {
+          "$ref": "#/$defs/LeDataSets",
+          "description": "Override the LE data set names",
+          "title": "le_data_sets"
+        },
+        "sit_parameters": {
+          "additionalProperties": false,
+          "description": "Specify the SIT overrides",
+          "title": "sit_parameters",
+          "properties": {
+            "adi": {
+              "default": null,
+              "description": "XRF(B)- alternate delay interval",
+              "title": "Adi",
+              "type": "integer"
+            },
+            "aibridge": {
+              "$ref": "#/$defs/aibridgeValue",
+              "default": null,
+              "description": "Bridge autoinstall URM "
+            },
+            "aicons": {
+              "$ref": "#/$defs/aiconsValue",
+              "default": null,
+              "description": "No autoinstall for z/OS consoles"
+            },
+            "aiexit": {
+              "default": null,
+              "description": "Autoinstall user program name",
+              "title": "Aiexit",
+              "type": "string"
+            },
+            "aildelay": {
+              "default": null,
+              "description": "Delete delay period for autoinstalled terminals ",
+              "title": "Aildelay",
+              "type": "integer"
+            },
+            "aiqmax": {
+              "default": null,
+              "description": "Maximum number of terminals queued for autoinstall",
+              "title": "Aiqmax",
+              "type": "integer"
+            },
+            "airdelay": {
+              "default": null,
+              "description": "Restart delay period for autoinstalled terminals",
+              "title": "Airdelay",
+              "type": "integer"
+            },
+            "akpfreq": {
+              "default": null,
+              "description": "Activity keypoint frequency",
+              "title": "Akpfreq",
+              "type": "integer"
+            },
+            "autconn": {
+              "default": null,
+              "description": "Autoconnect delay",
+              "title": "Autconn",
+              "type": "integer"
+            },
+            "autodst": {
+              "$ref": "#/$defs/autodstValue",
+              "default": null,
+              "description": "Language Environment automatic dynamic storage tuning"
+            },
+            "autoresettime": {
+              "$ref": "#/$defs/autoresettimeValue",
+              "default": null,
+              "description": "Time-of-day synchronization"
+            },
+            "auxtr": {
+              "$ref": "#/$defs/auxtrValue",
+              "default": null,
+              "description": "Auxiliary trace option"
+            },
+            "auxtrsw": {
+              "$ref": "#/$defs/auxtrswValue",
+              "default": null,
+              "description": "Auxiliary trace autoswitch facility "
+            },
+            "bms": {
+              "default": null,
+              "description": "Basic Mapping Support options",
+              "title": "Bms",
+              "type": "string"
+            },
+            "brmaxkeeptime": {
+              "default": null,
+              "description": "Keep time for bridge facilities",
+              "title": "Brmaxkeeptime",
+              "type": "integer"
+            },
+            "cdsasze": {
+              "default": null,
+              "description": "The size of CDSA",
+              "title": "Cdsasze",
+              "type": "integer"
+            },
+            "certexpirywarn": {
+              "default": null,
+              "description": "Whether CICS warns about expiring TLS certificates",
+              "title": "Certexpirywarn",
+              "type": "string"
+            },
+            "chkstrm": {
+              "$ref": "#/$defs/chkstrmValue",
+              "default": null,
+              "description": "Activation of terminal storage violation checking"
+            },
+            "chkstsk": {
+              "$ref": "#/$defs/chkstskValue",
+              "default": null,
+              "description": "Activation of task storage violation checking"
+            },
+            "cicssvc": {
+              "default": null,
+              "description": "The CICS SVC number ",
+              "title": "Cicssvc",
+              "type": "integer"
+            },
+            "cilock": {
+              "$ref": "#/$defs/cilockValue",
+              "default": null,
+              "description": "Do not keep control interval lock after read update "
+            },
+            "clintcp": {
+              "default": null,
+              "description": "Default client code page",
+              "title": "Clintcp",
+              "type": "string"
+            },
+            "clsdstp": {
+              "$ref": "#/$defs/clsdstpValue",
+              "default": null,
+              "description": "Notification for EXEC CICS ISSUE PASS command "
+            },
+            "clt": {
+              "default": null,
+              "description": "The command list table suffix",
+              "title": "Clt",
+              "type": "string"
+            },
+            "cmdprot": {
+              "$ref": "#/$defs/cmdprotValue",
+              "default": null,
+              "description": "EXEC CICS command storage checking"
+            },
+            "cmdsec": {
+              "$ref": "#/$defs/cmdsecValue",
+              "default": null,
+              "description": "API command security checking"
+            },
+            "confdata": {
+              "$ref": "#/$defs/confdataValue",
+              "default": null,
+              "description": "Redact sensitive data in dump and trace"
+            },
+            "conftxt": {
+              "$ref": "#/$defs/conftxtValue",
+              "default": null,
+              "description": "Prevent z/OS Communications Server from tracing user data"
+            },
+            "cpsmconn": {
+              "$ref": "#/$defs/cpsmconnValue",
+              "default": null,
+              "description": "Connect to CICSPlex SM"
+            },
+            "crlprofile": {
+              "default": null,
+              "description": "Name of profile that allows CICS to access certificate revocation lists",
+              "title": "Crlprofile",
+              "type": "string"
+            },
+            "csdacc": {
+              "$ref": "#/$defs/csdaccValue",
+              "default": null,
+              "description": "CSD access"
+            },
+            "csdbkup": {
+              "$ref": "#/$defs/csdbkupValue",
+              "default": null,
+              "description": "Backup type of CSD (STATIC or DYNAMIC)"
+            },
+            "csdbufnd": {
+              "default": null,
+              "description": "Number of data buffers for the CSD",
+              "title": "Csdbufnd",
+              "type": "integer"
+            },
+            "csdbufni": {
+              "default": null,
+              "description": "Number of index buffers for the CSD",
+              "title": "Csdbufni",
+              "type": "integer"
+            },
+            "csddisp": {
+              "$ref": "#/$defs/csddispValue",
+              "default": null,
+              "description": "CSD disposition for dynamic allocation"
+            },
+            "csddsn": {
+              "default": null,
+              "description": "CSD data set name for dynamic allocation",
+              "title": "Csddsn",
+              "type": "string"
+            },
+            "csdfrlog": {
+              "default": null,
+              "description": "Journal ID for CSD forward recovery",
+              "title": "Csdfrlog",
+              "type": "string"
+            },
+            "csdinteg": {
+              "$ref": "#/$defs/csdintegValue",
+              "default": null,
+              "description": "Read integrity for the CSD"
+            },
+            "csdjid": {
+              "default": null,
+              "description": "Journal ID for CSD auto journaling",
+              "title": "Csdjid",
+              "type": "string"
+            },
+            "csdlsrno": {
+              "default": null,
+              "description": "LSR pool number for the CSD",
+              "title": "Csdlsrno",
+              "type": "string"
+            },
+            "csdrecov": {
+              "$ref": "#/$defs/csdrecovValue",
+              "default": null,
+              "description": "CSD recoverable file option"
+            },
+            "csdrls": {
+              "$ref": "#/$defs/csdrlsValue",
+              "default": null,
+              "description": "Access CSD in RLS mode"
+            },
+            "csdstrno": {
+              "default": null,
+              "description": "CSD number of strings ",
+              "title": "Csdstrno",
+              "type": "integer"
+            },
+            "cwakey": {
+              "$ref": "#/$defs/cwakeyValue",
+              "default": null,
+              "description": "CWA storage key"
+            },
+            "dae": {
+              "$ref": "#/$defs/daeValue",
+              "default": null,
+              "description": "System dumps suppressed by z/OS DAE"
+            },
+            "datform": {
+              "$ref": "#/$defs/datformValue",
+              "default": null,
+              "description": "CSA date format"
+            },
+            "db2conn": {
+              "$ref": "#/$defs/db2connValue",
+              "default": null,
+              "description": "Connect to Db2\u00ae at CICS startup"
+            },
+            "dbctlcon": {
+              "$ref": "#/$defs/dbctlconValue",
+              "default": null,
+              "description": "Connect to DBCTL at CICS start"
+            },
+            "debugtool": {
+              "$ref": "#/$defs/debugtoolValue",
+              "default": null,
+              "description": "Access for debugging tools"
+            },
+            "dfltuser": {
+              "default": null,
+              "description": "Default user",
+              "title": "Dfltuser",
+              "type": "string"
+            },
+            "dip": {
+              "$ref": "#/$defs/dipValue",
+              "default": null,
+              "description": "Batch data interchange program"
+            },
+            "dismacp": {
+              "$ref": "#/$defs/dismacpValue",
+              "default": null,
+              "description": "Disable transactions terminating ASRD or ASRE"
+            },
+            "doccodepage": {
+              "default": null,
+              "description": "Default host code page",
+              "title": "Doccodepage",
+              "type": "string"
+            },
+            "dsalim": {
+              "default": null,
+              "description": "Upper limit of DSA in 24-bit storage",
+              "title": "Dsalim",
+              "type": "string"
+            },
+            "dshipidl": {
+              "default": null,
+              "description": "Time to delete idle shipped terminal definition",
+              "title": "Dshipidl",
+              "type": "integer"
+            },
+            "dshipint": {
+              "default": null,
+              "description": "Interval to delete shipped terminal definition",
+              "title": "Dshipint",
+              "type": "integer"
+            },
+            "dsrtpgm": {
+              "default": null,
+              "description": "Distributed routing program",
+              "title": "Dsrtpgm",
+              "type": "string"
+            },
+            "dtrpgm": {
+              "default": null,
+              "description": "Dynamic routing program",
+              "title": "Dtrpgm",
+              "type": "string"
+            },
+            "dtrtran": {
+              "default": null,
+              "description": "Default dynamic transaction routing transid",
+              "title": "Dtrtran",
+              "type": "string"
+            },
+            "dump": {
+              "$ref": "#/$defs/dumpValue",
+              "default": null,
+              "description": "Dump option"
+            },
+            "dumpds": {
+              "$ref": "#/$defs/dumpdsValue",
+              "default": null,
+              "description": "CICS dump data set opening option"
+            },
+            "dumpsw": {
+              "$ref": "#/$defs/dumpswValue",
+              "default": null,
+              "description": "Dump data set autoswitch option "
+            },
+            "duretry": {
+              "default": null,
+              "description": "SDUMP total retry time",
+              "title": "Duretry",
+              "type": "integer"
+            },
+            "ecdsasze": {
+              "default": null,
+              "description": "Size of the ECDSA",
+              "title": "Ecdsasze",
+              "type": "string"
+            },
+            "edsalim": {
+              "default": null,
+              "description": "Upper limit of DSA in 31-bit storage",
+              "title": "Edsalim",
+              "type": "string"
+            },
+            "eodi": {
+              "default": null,
+              "description": "End-of-data indicator for sequential devices",
+              "title": "Eodi",
+              "type": "string"
+            },
+            "epcdsasze": {
+              "default": null,
+              "description": "Size of the EPCDSA",
+              "title": "Epcdsasze",
+              "type": "string"
+            },
+            "epudsasze": {
+              "default": null,
+              "description": "Size of the EPUDSA",
+              "title": "Epudsasze",
+              "type": "string"
+            },
+            "erdsasze": {
+              "default": null,
+              "description": "Size of the ERDSA",
+              "title": "Erdsasze",
+              "type": "string"
+            },
+            "esdsasze": {
+              "default": null,
+              "description": "Size of the ESDSA",
+              "title": "Esdsasze",
+              "type": "string"
+            },
+            "esmexits": {
+              "$ref": "#/$defs/esmexitsValue",
+              "default": null,
+              "description": "External security manager exits"
+            },
+            "eudsasze": {
+              "default": null,
+              "description": "Size of the EUDSA",
+              "title": "Eudsasze",
+              "type": "string"
+            },
+            "fct": {
+              "default": null,
+              "description": "File control table option or suffix",
+              "title": "Fct",
+              "type": "string"
+            },
+            "fcqronly": {
+              "$ref": "#/$defs/fcqronlyValue",
+              "default": null,
+              "description": "Threadsafe file control runs on QR TCB"
+            },
+            "fepi": {
+              "$ref": "#/$defs/fepiValue",
+              "default": null,
+              "description": "Front-End Programming Interface"
+            },
+            "fips": {
+              "$ref": "#/$defs/fipsValue",
+              "default": null,
+              "description": "Whether CICS checks compliance to the FIPS standard."
+            },
+            "fldsep": {
+              "default": null,
+              "description": "End-of-field separator characters",
+              "title": "Fldsep",
+              "type": "string"
+            },
+            "fldstrt": {
+              "default": null,
+              "description": "Field start character for built-in function",
+              "title": "Fldstrt",
+              "type": "string"
+            },
+            "forceqr": {
+              "$ref": "#/$defs/forceqrValue",
+              "default": null,
+              "description": "Force QR for threadsafe programs"
+            },
+            "fsstaff": {
+              "$ref": "#/$defs/fsstaffValue",
+              "default": null,
+              "description": "Function-shipped START affinity option"
+            },
+            "ftimeout": {
+              "default": null,
+              "description": "File timeout",
+              "title": "Ftimeout",
+              "type": "integer"
+            },
+            "gmtext": {
+              "default": null,
+              "description": "Good-morning message text",
+              "title": "Gmtext",
+              "type": "string"
+            },
+            "gmtran": {
+              "default": null,
+              "description": "Initial transaction ",
+              "title": "Gmtran",
+              "type": "string"
+            },
+            "gntran": {
+              "default": null,
+              "description": "Signoff transaction and pseudo-conversation at the terminal",
+              "title": "Gntran",
+              "type": "string"
+            },
+            "grname": {
+              "default": null,
+              "description": "Generic resource name for CICS TORs",
+              "title": "Grname",
+              "type": "string"
+            },
+            "grplist": {
+              "default": null,
+              "description": "List name of CSD groups for startup",
+              "title": "Grplist",
+              "type": "string"
+            },
+            "gtftr": {
+              "$ref": "#/$defs/gtftrValue",
+              "default": null,
+              "description": "GTF trace option"
+            },
+            "hpo": {
+              "$ref": "#/$defs/hpoValue",
+              "default": null,
+              "description": "z/OS Communications Server High Performance Option (HPO)"
+            },
+            "httpserverhdr": {
+              "default": null,
+              "description": "Value set in the server header for an HTTP response",
+              "title": "Httpserverhdr",
+              "type": "string"
+            },
+            "httpusragenthdr": {
+              "default": null,
+              "description": "Value set in the user-agent header for an HTTP request",
+              "title": "Httpusragenthdr",
+              "type": "string"
+            },
+            "icp": {
+              "$ref": "#/$defs/icpValue",
+              "default": null,
+              "description": "Interval control program start option"
+            },
+            "icv": {
+              "default": null,
+              "description": "Region exit interval (milliseconds)",
+              "title": "Icv",
+              "type": "integer"
+            },
+            "icvr": {
+              "default": null,
+              "description": "Runaway task interval (milliseconds)",
+              "title": "Icvr",
+              "type": "integer"
+            },
+            "icvtsd": {
+              "default": null,
+              "description": "Terminal scan delay interval",
+              "title": "Icvtsd",
+              "type": "integer"
+            },
+            "infocenter": {
+              "default": null,
+              "description": "Location of IBM Documentation",
+              "title": "Infocenter",
+              "type": "string"
+            },
+            "initparm": {
+              "default": null,
+              "description": "Initialization parameters for programs",
+              "title": "Initparm",
+              "type": "string"
+            },
+            "intrdrjobuser": {
+              "$ref": "#/$defs/intrdrjobuserValue",
+              "default": null,
+              "description": "Default job user ID for a JOB card that is submitted by SPOOL commands to the internal reader"
+            },
+            "inttr": {
+              "$ref": "#/$defs/inttrValue",
+              "default": null,
+              "description": "CICS internal trace option"
+            },
+            "ircstrt": {
+              "$ref": "#/$defs/ircstrtValue",
+              "default": null,
+              "description": "Interregion communication start"
+            },
+            "isc": {
+              "$ref": "#/$defs/iscValue",
+              "default": null,
+              "description": "Intersystem communication option"
+            },
+            "jesdi": {
+              "default": null,
+              "description": "JES delay interval for XRF alternate",
+              "title": "Jesdi",
+              "type": "integer"
+            },
+            "jvmprofiledir": {
+              "default": null,
+              "description": "JVM profile directory",
+              "title": "Jvmprofiledir",
+              "type": "string"
+            },
+            "kerberosuser": {
+              "default": null,
+              "description": "User ID associated with the Kerberos service principal",
+              "title": "Kerberosuser",
+              "type": "string"
+            },
+            "keyring": {
+              "default": null,
+              "description": "Key ring to be used by SSL support",
+              "title": "Keyring",
+              "type": "string"
+            },
+            "lgdfint": {
+              "default": null,
+              "description": "Log defer interval in Log Manager",
+              "title": "Lgdfint",
+              "type": "integer"
+            },
+            "lgnmsg": {
+              "$ref": "#/$defs/lgnmsgValue",
+              "default": null,
+              "description": "Extract z/OS Communications Server logon data"
+            },
+            "llacopy": {
+              "$ref": "#/$defs/llacopyValue",
+              "default": null,
+              "description": "Use z/OS LLACOPY support"
+            },
+            "localccsid": {
+              "default": null,
+              "description": "Default CCSID for the local region",
+              "title": "Localccsid",
+              "type": "integer"
+            },
+            "lpa": {
+              "$ref": "#/$defs/lpaValue",
+              "default": null,
+              "description": "Use LPA option for CICS/user modules"
+            },
+            "maxopentcbs": {
+              "default": null,
+              "description": "Maximum number of L8 and L9 open TCBs",
+              "title": "Maxopentcbs",
+              "type": "integer"
+            },
+            "maxsockets": {
+              "default": null,
+              "description": "Maximum number of IP sockets",
+              "title": "Maxsockets",
+              "type": "integer"
+            },
+            "maxssltcbs": {
+              "default": null,
+              "description": "Limit on number of S8 SSL TCBs",
+              "title": "Maxssltcbs",
+              "type": "integer"
+            },
+            "maxtlslevel": {
+              "$ref": "#/$defs/maxtlslevelValue",
+              "default": null,
+              "description": "Maximum level of encryption for TLS"
+            },
+            "maxxptcbs": {
+              "default": null,
+              "description": "Maximum number of XP TCBs",
+              "title": "Maxxptcbs",
+              "type": "integer"
+            },
+            "mct": {
+              "default": null,
+              "description": "Monitoring control table option or suffix",
+              "title": "Mct",
+              "type": "string"
+            },
+            "mintlslevel": {
+              "$ref": "#/$defs/mintlslevelValue",
+              "default": null,
+              "description": "Minimum level of encryption for TLS"
+            },
+            "mn": {
+              "$ref": "#/$defs/mnValue",
+              "default": null,
+              "description": "CICS monitoring option "
+            },
+            "mnconv": {
+              "$ref": "#/$defs/mnconvValue",
+              "default": null,
+              "description": "Monitoring conversational task recording option "
+            },
+            "mnexc": {
+              "$ref": "#/$defs/mnexcValue",
+              "default": null,
+              "description": "Monitoring exception class option"
+            },
+            "mnfreq": {
+              "default": null,
+              "description": "Monitoring frequency period",
+              "title": "Mnfreq",
+              "type": "integer"
+            },
+            "mnidn": {
+              "$ref": "#/$defs/mnidnValue",
+              "default": null,
+              "description": "Monitoring identity class option"
+            },
+            "mnper": {
+              "$ref": "#/$defs/mnperValue",
+              "default": null,
+              "description": "Monitoring performance class option"
+            },
+            "mnres": {
+              "$ref": "#/$defs/mnresValue",
+              "default": null,
+              "description": "Monitoring resource class option"
+            },
+            "mnsync": {
+              "$ref": "#/$defs/mnsyncValue",
+              "default": null,
+              "description": "Monitoring syncpoint recording option"
+            },
+            "mntime": {
+              "$ref": "#/$defs/mntimeValue",
+              "default": null,
+              "description": "Monitoring timestamp (GMT or LOCAL)"
+            },
+            "mqconn": {
+              "$ref": "#/$defs/mqconnValue",
+              "default": null,
+              "description": "Connect to IBM MQ at startup"
+            },
+            "mrobtch": {
+              "default": null,
+              "description": "Number of MRO requests to batch ",
+              "title": "Mrobtch",
+              "type": "integer"
+            },
+            "mrofse": {
+              "$ref": "#/$defs/mrofseValue",
+              "default": null,
+              "description": "Extend lifetime of long-running mirror"
+            },
+            "mrolrm": {
+              "$ref": "#/$defs/mrolrmValue",
+              "default": null,
+              "description": "Long-running mirror task option "
+            },
+            "msgcase": {
+              "$ref": "#/$defs/msgcaseValue",
+              "default": null,
+              "description": "CICS messages in mixed case"
+            },
+            "msglvl": {
+              "$ref": "#/$defs/msglvlValue",
+              "default": null,
+              "description": "System console message level option"
+            },
+            "mxt": {
+              "default": null,
+              "description": "Maximum number of tasks in CICS ",
+              "title": "Mxt",
+              "type": "integer"
+            },
+            "natlang": {
+              "$ref": "#/$defs/natlangValue",
+              "default": null,
+              "description": "Supported national languages"
+            },
+            "ncpldft": {
+              "default": null,
+              "description": "Named counter default pool name",
+              "title": "Ncpldft",
+              "type": "string"
+            },
+            "newsit": {
+              "$ref": "#/$defs/newsitValue",
+              "default": null,
+              "description": "Load a specified SIT and enforce use of all system initialization parameters"
+            },
+            "nistsp800131a": {
+              "$ref": "#/$defs/nistsp800131aValue",
+              "default": null,
+              "description": "Whether CICS checks compliance to the NIST 800-131A standard"
+            },
+            "nonrlsrecov": {
+              "$ref": "#/$defs/nonrlsrecovValue",
+              "default": null,
+              "description": "Location of recovery options for non-RLS files"
+            },
+            "nqrnl": {
+              "$ref": "#/$defs/nqrnlValue",
+              "default": null,
+              "description": "RNL processing by z/OS global resource serialization"
+            },
+            "offsite": {
+              "$ref": "#/$defs/offsiteValue",
+              "default": null,
+              "description": "Restart in off-site recovery mode"
+            },
+            "opertim": {
+              "default": null,
+              "description": "Write to operator timeout (seconds)",
+              "title": "Opertim",
+              "type": "integer"
+            },
+            "opndlim": {
+              "default": null,
+              "description": "OPNDST/CLSDST request limit ",
+              "title": "Opndlim",
+              "type": "integer"
+            },
+            "oteltrace": {
+              "$ref": "#/$defs/oteltraceValue",
+              "default": null,
+              "description": "Turns support for OpenTelemetry on or off at the CICS region level "
+            },
+            "parmerr": {
+              "$ref": "#/$defs/parmerrValue",
+              "default": null,
+              "description": "System initialization parameter errors option"
+            },
+            "pcdsasze": {
+              "default": null,
+              "description": "Size of the PCDSA",
+              "title": "Pcdsasze",
+              "type": "integer"
+            },
+            "pdi": {
+              "default": null,
+              "description": "Primary delay interval - XRF active",
+              "title": "Pdi",
+              "type": "integer"
+            },
+            "pdir": {
+              "default": null,
+              "description": "DL/I PSB directory option or suffix",
+              "title": "Pdir",
+              "type": "string"
+            },
+            "pgaictlg": {
+              "$ref": "#/$defs/pgaictlgValue",
+              "default": null,
+              "description": "Autoinstalled program catalog state"
+            },
+            "pgaiexit": {
+              "default": null,
+              "description": "Program autoinstall exit program ",
+              "title": "Pgaiexit",
+              "type": "string"
+            },
+            "pgaipgm": {
+              "$ref": "#/$defs/pgaipgmValue",
+              "default": null,
+              "description": "Program autoinstall state"
+            },
+            "pgchain": {
+              "default": null,
+              "description": "BMS CHAIN command",
+              "title": "Pgchain",
+              "type": "string"
+            },
+            "pgcopy": {
+              "default": null,
+              "description": "BMS COPY command",
+              "title": "Pgcopy",
+              "type": "string"
+            },
+            "pgpurge": {
+              "default": null,
+              "description": "BMS PURGE command",
+              "title": "Pgpurge",
+              "type": "string"
+            },
+            "pgret": {
+              "default": null,
+              "description": "BMS RETURN command",
+              "title": "Pgret",
+              "type": "string"
+            },
+            "pltpi": {
+              "default": null,
+              "description": "Program list table PI option, name or suffix",
+              "title": "Pltpi",
+              "type": "string"
+            },
+            "pltpisec": {
+              "$ref": "#/$defs/pltpisecValue",
+              "default": null,
+              "description": "PLT security checks on PI programs"
+            },
+            "pltpiusr": {
+              "default": null,
+              "description": "PLT PI user ID is the CICS region user ID ",
+              "title": "Pltpiusr",
+              "type": "string"
+            },
+            "pltsd": {
+              "default": null,
+              "description": "Program list table option, name or suffix ",
+              "title": "Pltsd",
+              "type": "string"
+            },
+            "prgdlay": {
+              "default": null,
+              "description": "BMS purge delay interval",
+              "title": "Prgdlay",
+              "type": "integer"
+            },
+            "print": {
+              "$ref": "#/$defs/printValue",
+              "default": null,
+              "description": "Print key option"
+            },
+            "prtyage": {
+              "default": null,
+              "description": "Dispatcher priority aging value",
+              "title": "Prtyage",
+              "type": "integer"
+            },
+            "prvmod": {
+              "default": null,
+              "description": "Names of modules that are not to be used from the LPA",
+              "title": "Prvmod",
+              "type": "string"
+            },
+            "psbchk": {
+              "$ref": "#/$defs/psbchkValue",
+              "default": null,
+              "description": "PSB resource checking required"
+            },
+            "psdint": {
+              "default": null,
+              "description": "Persistent session delay interval",
+              "title": "Psdint",
+              "type": "integer"
+            },
+            "pstype": {
+              "$ref": "#/$defs/pstypeValue",
+              "default": null,
+              "description": "z/OS Communications Server single node persistent sessions"
+            },
+            "pudsasze": {
+              "default": null,
+              "description": "Size of the PUDSA",
+              "title": "Pudsasze",
+              "type": "string"
+            },
+            "pvdelay": {
+              "default": null,
+              "description": "Timeout value for LUIT table",
+              "title": "Pvdelay",
+              "type": "integer"
+            },
+            "quiestim": {
+              "default": null,
+              "description": "Timeout value for quiesce requests",
+              "title": "Quiestim",
+              "type": "integer"
+            },
+            "racfsync": {
+              "$ref": "#/$defs/racfsyncValue",
+              "default": null,
+              "description": "Listen for type 71 ENF events"
+            },
+            "ramax": {
+              "default": null,
+              "description": "Maximum I/O area for RECEIVE ANY",
+              "title": "Ramax",
+              "type": "integer"
+            },
+            "rapool": {
+              "default": null,
+              "description": "Maximum RECEIVE ANY request parameter lists",
+              "title": "Rapool",
+              "type": "string"
+            },
+            "rdsasze": {
+              "default": null,
+              "description": "Size of the RDSA",
+              "title": "Rdsasze",
+              "type": "string"
+            },
+            "rentpgm": {
+              "$ref": "#/$defs/rentpgmValue",
+              "default": null,
+              "description": "Reentrant program write protection"
+            },
+            "resoverrides": {
+              "default": null,
+              "description": "Resource overrides file name",
+              "title": "Resoverrides",
+              "type": "string"
+            },
+            "resp": {
+              "$ref": "#/$defs/respValue",
+              "default": null,
+              "description": "Logical unit response type"
+            },
+            "ressec": {
+              "$ref": "#/$defs/ressecValue",
+              "default": null,
+              "description": "Resource security check"
+            },
+            "rls": {
+              "$ref": "#/$defs/rlsValue",
+              "default": null,
+              "description": "RLS option"
+            },
+            "rlstolsr": {
+              "$ref": "#/$defs/rlstolsrValue",
+              "default": null,
+              "description": "RLS files in LSRPOOL build calculation"
+            },
+            "rmtran": {
+              "default": null,
+              "description": "XRF alternate recovery transaction ",
+              "title": "Rmtran",
+              "type": "string"
+            },
+            "rrms": {
+              "$ref": "#/$defs/rrmsValue",
+              "default": null,
+              "description": "Recoverable resource management services"
+            },
+            "rst": {
+              "default": null,
+              "description": "Recovery service table (XRF-DBCTL)",
+              "title": "Rst",
+              "type": "string"
+            },
+            "rstsignoff": {
+              "$ref": "#/$defs/rstsignoffValue",
+              "default": null,
+              "description": "XRF - remain signed-on after takeover "
+            },
+            "rstsigntime": {
+              "default": null,
+              "description": "XRF - sign off timeout value",
+              "title": "Rstsigntime",
+              "type": "integer"
+            },
+            "ruwapool": {
+              "$ref": "#/$defs/ruwapoolValue",
+              "default": null,
+              "description": "Allocating storage pool for Language Environment "
+            },
+            "sdsasze": {
+              "default": null,
+              "description": "Size of the SDSA",
+              "title": "Sdsasze",
+              "type": "string"
+            },
+            "sdtmemlimit": {
+              "default": null,
+              "description": "Cap on 64-bit storage for shared data tables to use for control information",
+              "title": "Sdtmemlimit",
+              "type": "string"
+            },
+            "sdtran": {
+              "default": null,
+              "description": "Shutdown transaction",
+              "title": "Sdtran",
+              "type": "string"
+            },
+            "sec": {
+              "$ref": "#/$defs/secValue",
+              "default": null,
+              "description": "External security manager option"
+            },
+            "secprfx": {
+              "default": null,
+              "description": "Security prefix for resource names ",
+              "title": "Secprfx",
+              "type": "string"
+            },
+            "securetcpip": {
+              "$ref": "#/$defs/securetcpipValue",
+              "default": null,
+              "description": "Enforce secure TCP/IP connections for IPCONN, TCPIPSERVICE, and client URIMAP resources."
+            },
+            "sit": {
+              "default": null,
+              "description": "Suffix of the system initialization table to load at the start of system initialization",
+              "title": "Sit",
+              "type": "string"
+            },
+            "skrxxxx": {
+              "default": null,
+              "description": "Single keystroke retrieval operation required",
+              "title": "Skrxxxx",
+              "type": "string"
+            },
+            "snpreset": {
+              "$ref": "#/$defs/snpresetValue",
+              "default": null,
+              "description": "ACEE option for preset userid terminals"
+            },
+            "snscope": {
+              "$ref": "#/$defs/snscopeValue",
+              "default": null,
+              "description": "Multiple CICS sessions per user ID"
+            },
+            "sotuning": {
+              "$ref": "#/$defs/sotuningValue",
+              "default": null,
+              "description": "Performance tuning for HTTP connections"
+            },
+            "spctr": {
+              "default": null,
+              "description": "Levels of special tracing for CICS as a whole",
+              "title": "Spctr",
+              "type": "string"
+            },
+            "spctrxx": {
+              "default": null,
+              "description": "Level of special tracing for a CICS component",
+              "title": "Spctrxx",
+              "type": "string"
+            },
+            "spool": {
+              "$ref": "#/$defs/spoolValue",
+              "default": null,
+              "description": "System spooling interface option"
+            },
+            "srbsvc": {
+              "default": null,
+              "description": "HPO Type 6 SVC number",
+              "title": "Srbsvc",
+              "type": "integer"
+            },
+            "srt": {
+              "default": null,
+              "description": "System recovery table option or suffix ",
+              "title": "Srt",
+              "type": "string"
+            },
+            "srvercp": {
+              "default": null,
+              "description": "Default server code page to be used by the DFHCNV data conversion table",
+              "title": "Srvercp",
+              "type": "string"
+            },
+            "sslcache": {
+              "$ref": "#/$defs/sslcacheValue",
+              "default": null,
+              "description": "SSL session ID caching"
+            },
+            "ssldelay": {
+              "default": null,
+              "description": "SSL timeout",
+              "title": "Ssldelay",
+              "type": "integer"
+            },
+            "start": {
+              "$ref": "#/$defs/startValue",
+              "default": null,
+              "description": "CICS system initialization option"
+            },
+            "starter": {
+              "$ref": "#/$defs/starterValue",
+              "default": null,
+              "description": "Starter ($ and #) suffixes option."
+            },
+            "stateod": {
+              "default": null,
+              "description": "Statistics end-of-day time",
+              "title": "Stateod",
+              "type": "integer"
+            },
+            "statint": {
+              "default": null,
+              "description": "System statistics interval time",
+              "title": "Statint",
+              "type": "integer"
+            },
+            "statrcd": {
+              "$ref": "#/$defs/statrcdValue",
+              "default": null,
+              "description": "Statistics recording status "
+            },
+            "stgprot": {
+              "$ref": "#/$defs/stgprotValue",
+              "default": null,
+              "description": "Storage protection facility "
+            },
+            "stgrcvy": {
+              "$ref": "#/$defs/stgrcvyValue",
+              "default": null,
+              "description": "Storage recovery option "
+            },
+            "stntr": {
+              "default": null,
+              "description": "Level of standard tracing for CICS as a whole",
+              "title": "Stntr",
+              "type": "string"
+            },
+            "stntrxx": {
+              "default": null,
+              "description": "Level of standard tracing for a CICS component",
+              "title": "Stntrxx",
+              "type": "string"
+            },
+            "subtsks": {
+              "$ref": "#/$defs/subtsksValue",
+              "default": null,
+              "description": "Number of concurrent mode TCBs "
+            },
+            "suffix": {
+              "default": null,
+              "description": "Suffix of this SIT ",
+              "title": "Suffix",
+              "type": "string"
+            },
+            "sydumax": {
+              "default": null,
+              "description": "Number of SYSDUMPs",
+              "title": "Sydumax",
+              "type": "integer"
+            },
+            "systr": {
+              "$ref": "#/$defs/systrValue",
+              "default": null,
+              "description": "Main system trace flag "
+            },
+            "takeovr": {
+              "$ref": "#/$defs/takeovrValue",
+              "default": null,
+              "description": "XRF alternate takeover option "
+            },
+            "tbexits": {
+              "default": null,
+              "description": "Backout exit programs ",
+              "title": "Tbexits",
+              "type": "string"
+            },
+            "tcp": {
+              "$ref": "#/$defs/tcpValue",
+              "default": null,
+              "description": "Terminal control program option or suffix"
+            },
+            "tcpip": {
+              "$ref": "#/$defs/tcpipValue",
+              "default": null,
+              "description": "TCP/IP support"
+            },
+            "tcsactn": {
+              "$ref": "#/$defs/tcsactnValue",
+              "default": null,
+              "description": "Terminal control shutdown action"
+            },
+            "tcswait": {
+              "default": null,
+              "description": "Terminal control shutdown wait",
+              "title": "Tcswait",
+              "type": "string"
+            },
+            "tct": {
+              "default": null,
+              "description": "Terminal control table option or suffix ",
+              "title": "Tct",
+              "type": "string"
+            },
+            "tctuakey": {
+              "$ref": "#/$defs/tctuakeyValue",
+              "default": null,
+              "description": "TCT user area storage key"
+            },
+            "tctualoc": {
+              "$ref": "#/$defs/tctualocValue",
+              "default": null,
+              "description": "Location of TCT user areas"
+            },
+            "td": {
+              "default": null,
+              "description": "Transient data buffers and strings ",
+              "title": "Td",
+              "type": "string"
+            },
+            "tdintra": {
+              "$ref": "#/$defs/tdintraValue",
+              "default": null,
+              "description": "Initial state of transient data queues"
+            },
+            "traniso": {
+              "$ref": "#/$defs/tranisoValue",
+              "default": null,
+              "description": "Transaction isolation "
+            },
+            "trap": {
+              "$ref": "#/$defs/trapValue",
+              "default": null,
+              "description": "FE global trap exit option "
+            },
+            "trdumax": {
+              "default": null,
+              "description": "Number of transaction dumps ",
+              "title": "Trdumax",
+              "type": "integer"
+            },
+            "trtabsz": {
+              "default": null,
+              "description": "Internal trace table size ",
+              "title": "Trtabsz",
+              "type": "integer"
+            },
+            "trtransz": {
+              "default": null,
+              "description": "Transaction dump trace table size",
+              "title": "Trtransz",
+              "type": "integer"
+            },
+            "trtranty": {
+              "$ref": "#/$defs/trtrantyValue",
+              "default": null,
+              "description": "Transaction dump trace option"
+            },
+            "ts": {
+              "default": null,
+              "description": "Temporary storage buffers and strings ",
+              "title": "Ts",
+              "type": "string"
+            },
+            "tsmainlimit": {
+              "default": null,
+              "description": "Upper limit of storage for temporary storage main queues",
+              "title": "Tsmainlimit",
+              "type": "string"
+            },
+            "tst": {
+              "default": null,
+              "description": "Temporary storage table option or suffix ",
+              "title": "Tst",
+              "type": "string"
+            },
+            "udsasze": {
+              "default": null,
+              "description": "Size of the UDSA",
+              "title": "Udsasze",
+              "type": "string"
+            },
+            "uownetql": {
+              "default": null,
+              "description": "Qualifier for NETUOWID",
+              "title": "Uownetql",
+              "type": "string"
+            },
+            "usertr": {
+              "$ref": "#/$defs/usertrValue",
+              "default": null,
+              "description": "Main user trace flag"
+            },
+            "usrdelay": {
+              "default": null,
+              "description": "Timeout value for user directory entries",
+              "title": "Usrdelay",
+              "type": "integer"
+            },
+            "ussconfig": {
+              "default": null,
+              "description": "The name and path of the root directory for CICS configuration files on z/OS UNIX",
+              "title": "Ussconfig",
+              "type": "string"
+            },
+            "usshome": {
+              "default": null,
+              "description": "The name and path of the root directory for CICS files on z/OS UNIX",
+              "title": "Usshome",
+              "type": "string"
+            },
+            "vtam": {
+              "$ref": "#/$defs/vtamValue",
+              "default": null,
+              "description": "z/OS Communications Server access method option"
+            },
+            "vtprefix": {
+              "default": null,
+              "description": "Client virtual terminal prefix",
+              "title": "Vtprefix",
+              "type": "string"
+            },
+            "webdelay": {
+              "default": null,
+              "description": "Web timer values",
+              "title": "Webdelay",
+              "type": "string"
+            },
+            "wlmhealth": {
+              "default": null,
+              "description": "Parameters on z/OS WLM Health API (IWM4HLTH) calls",
+              "title": "Wlmhealth",
+              "type": "string"
+            },
+            "wrkarea": {
+              "default": null,
+              "description": "Common work area (CWA) size ",
+              "title": "Wrkarea",
+              "type": "integer"
+            },
+            "xappc": {
+              "$ref": "#/$defs/xappcValue",
+              "default": null,
+              "description": "RACF class APPCLU required"
+            },
+            "xcfgroup": {
+              "default": null,
+              "description": "XCF group to use for MRO communications",
+              "title": "Xcfgroup",
+              "type": "string"
+            },
+            "xcmd": {
+              "default": null,
+              "description": "Command security checking",
+              "title": "Xcmd",
+              "type": "string"
+            },
+            "xdb2": {
+              "default": null,
+              "description": "Security check for DB2ENTRY resources",
+              "title": "Xdb2",
+              "type": "string"
+            },
+            "xdct": {
+              "default": null,
+              "description": "Security check for transient data queues",
+              "title": "Xdct",
+              "type": "string"
+            },
+            "xfct": {
+              "default": null,
+              "description": "Security check for files ",
+              "title": "Xfct",
+              "type": "string"
+            },
+            "xhfs": {
+              "$ref": "#/$defs/xhfsValue",
+              "default": null,
+              "description": "Security check for z/OS UNIX files"
+            },
+            "xjct": {
+              "default": null,
+              "description": "Security check for journals ",
+              "title": "Xjct",
+              "type": "string"
+            },
+            "xlt": {
+              "default": null,
+              "description": "Transaction list table option or suffix ",
+              "title": "Xlt",
+              "type": "string"
+            },
+            "xpct": {
+              "default": null,
+              "description": "Security check for started transactions ",
+              "title": "Xpct",
+              "type": "string"
+            },
+            "xppt": {
+              "default": null,
+              "description": "Security check for programs ",
+              "title": "Xppt",
+              "type": "string"
+            },
+            "xpsb": {
+              "default": null,
+              "description": "Security check for DL/I PSBs ",
+              "title": "Xpsb",
+              "type": "string"
+            },
+            "xptkt": {
+              "$ref": "#/$defs/xptktValue",
+              "default": null,
+              "description": "Security check for PassTicket"
+            },
+            "xres": {
+              "default": null,
+              "description": "Resource security check ",
+              "title": "Xres",
+              "type": "string"
+            },
+            "xrf": {
+              "$ref": "#/$defs/xrfValue",
+              "default": null,
+              "description": "Extended recovery feature (XRF) option"
+            },
+            "xtran": {
+              "default": null,
+              "description": "Security check for transaction-attach",
+              "title": "Xtran",
+              "type": "string"
+            },
+            "xtst": {
+              "default": null,
+              "description": "Security check for temporary storage queues",
+              "title": "Xtst",
+              "type": "string"
+            },
+            "xuser": {
+              "$ref": "#/$defs/xuserValue",
+              "default": null,
+              "description": "Surrogate user checking"
+            },
+            "zosmoninterval": {
+              "default": null,
+              "description": "Sampling interval for the CICS\u00ae z/OS\u00ae storage monitor task",
+              "title": "Zosmoninterval",
+              "type": "integer"
+            },
+            "zossosnewtcb": {
+              "$ref": "#/$defs/zossosnewtcbValue",
+              "default": null,
+              "description": "Response to a new open TCB that is being attached directly by CICS when the z/OS user region storage or extended user region storage is short on storage (SOS)"
+            },
+            "zossos24unalloc": {
+              "default": null,
+              "description": "SOS thresholds for unallocated z/OS user region storage and for the largest contiguous storage area available in it",
+              "title": "Zossos24Unalloc",
+              "type": "string"
+            },
+            "zossos31unalloc": {
+              "default": null,
+              "description": "SOS thresholds for unallocated z/OS extended user region storage and for the largest contiguous storage area available in it",
+              "title": "Zossos31Unalloc",
+              "type": "string"
+            },
+            "zossos64unalloc": {
+              "default": null,
+              "description": "SOS threshold for unallocated z/OS MEMLIMIT storage in the 64-bit addressing range",
+              "title": "Zossos64Unalloc",
+              "type": "integer"
+            }
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions",
+          "description": "Configure extensions",
+          "title": "extensions"
+        },
+        "console_autoinstall": {
+          "$ref": "#/$defs/ConsoleAutoinstall",
+          "description": "State of console autoinstall support",
+          "title": "console_autoinstall"
+        },
+        "jvm_profiles": {
+          "description": "List of JVM profiles to be created for this region",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/InlineSourceType"
+              },
+              {
+                "$ref": "#/$defs/SymlinkSourceType"
+              }
+            ]
+          },
+          "title": "jvm_profiles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sysid",
+        "applid",
+        "region_hlq",
+        "installation"
+      ],
+      "title": "RegionInputs",
+      "type": "object"
+    },
+    "RegionJCLInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "job_parameters": {
+          "$ref": "#/$defs/JobParameters",
+          "description": "Configure job parameters",
+          "title": "job_parameters"
+        },
+        "cics_exec_step_parameters": {
+          "$ref": "#/$defs/ExecParameters",
+          "description": "Extra EXEC parameters for the CICS job step",
+          "title": "cics_exec_step_parameters"
+        },
+        "dfhrpl": {
+          "$ref": "#/$defs/DataSetList",
+          "description": "DFHRPL concatenation configuration options",
+          "title": "dfhrpl"
+        },
+        "steplib": {
+          "$ref": "#/$defs/DataSetList",
+          "description": "STEPLIB concatenation configuration options",
+          "title": "steplib"
+        },
+        "dds": {
+          "description": "List of additional DD statements",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/DsnDd"
+              },
+              {
+                "$ref": "#/$defs/DdConcat"
+              },
+              {
+                "$ref": "#/$defs/InputDd"
+              },
+              {
+                "$ref": "#/$defs/OutputDd"
+              },
+              {
+                "$ref": "#/$defs/DummyDd"
+              }
+            ]
+          },
+          "title": "dds",
+          "type": "array"
+        },
+        "type": {
+          "$ref": "#/$defs/JclType",
+          "default": "JOB",
+          "description": "Specify whether the region should be started as a job or a procedure (proc)",
+          "title": "type"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SeqUnit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "RegionJCLInputs",
+      "type": "object"
+    },
+    "ResourceBuilderType": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "resource_builder",
+          "description": "Add CICS definitions to the CSD using resource builder",
+          "title": "type",
+          "type": "string"
+        },
+        "model": {
+          "description": "Location of the resource model yaml file",
+          "title": "model",
+          "type": "string"
+        },
+        "definitions": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Location(s) of the resource definition yaml files",
+          "title": "definitions"
+        },
+        "application_constraints": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Location of the application constraints yaml file",
+          "title": "application_constraints"
+        }
+      },
+      "required": [
+        "type",
+        "model",
+        "definitions"
+      ],
+      "title": "ResourceBuilderType",
+      "type": "object"
+    },
+    "SeqUnit": {
+      "enum": [
+        "MB",
+        "KB",
+        "MB",
+        "KB"
+      ],
+      "title": "SeqUnit",
+      "type": "string"
+    },
+    "SslOptions": {
+      "enum": [
+        "NO",
+        "YES",
+        "CLIENTAUTH",
+        "ATTLSAWARE"
+      ],
+      "title": "SslOptions",
+      "type": "string"
+    },
+    "SymlinkSourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "source_type": {
+          "const": "symlink",
+          "description": "Defines the source of the JVM profile as symlink",
+          "title": "Source Type",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the JVM profile",
+          "title": "name",
+          "type": "string"
+        },
+        "source_path": {
+          "description": "File path of JVM profile for symlink source type",
+          "title": "Source Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_type"
+      ],
+      "title": "SymlinkSourceType",
+      "type": "object"
+    },
+    "TdIntrapartitionInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 100,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 10,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "unit": {
+          "$ref": "#/$defs/VsamUnit",
+          "default": "records",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "TdIntrapartitionInputs",
+      "type": "object"
+    },
+    "TransactionDumpConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "dsn": {
+          "description": "Override the default data set name for this data set",
+          "title": "dsn",
+          "type": "string"
+        },
+        "primary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 20,
+          "description": "Set the primary storage extent for this data set",
+          "title": "primary_space"
+        },
+        "secondary_space": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 4,
+          "description": "Set the secondary storage extent for this data set",
+          "title": "secondary_space"
+        },
+        "allocate": {
+          "default": true,
+          "description": "Allocate this data set",
+          "title": "allocate",
+          "type": "boolean"
+        },
+        "unit": {
+          "$ref": "#/$defs/SeqUnit",
+          "default": "MB",
+          "description": "Unit for primary and secondary space allocation",
+          "title": "unit"
+        }
+      },
+      "title": "TransactionDumpConfig",
+      "type": "object"
+    },
+    "TransactionDumpInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Enable system dumps",
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "rolling": {
+          "default": false,
+          "description": "Enable rolling dumps between DFHDMPA and DFHDMPB",
+          "title": "rolling",
+          "type": "boolean"
+        },
+        "dump_a": {
+          "$ref": "#/$defs/TransactionDumpConfig",
+          "description": "Configure the DFHDMPA data set",
+          "title": "dump_a"
+        },
+        "dump_b": {
+          "$ref": "#/$defs/TransactionDumpConfig",
+          "description": "Configure the DFHDMPB data set",
+          "title": "dump_b"
+        }
+      },
+      "title": "TransactionDumpInputs",
+      "type": "object"
+    },
+    "VsamUnit": {
+      "enum": [
+        "KB",
+        "MB",
+        "records",
+        "MB",
+        "KB",
+        "records"
+      ],
+      "title": "VsamUnit",
+      "type": "string"
+    },
+    "aibridgeValue": {
+      "enum": [
+        "AUTO",
+        "YES"
+      ],
+      "title": "aibridgeValue",
+      "type": "string"
+    },
+    "aiconsValue": {
+      "enum": [
+        "NO",
+        "AUTO",
+        "YES"
+      ],
+      "title": "aiconsValue",
+      "type": "string"
+    },
+    "autodstValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "autodstValue",
+      "type": "string"
+    },
+    "autoresettimeValue": {
+      "enum": [
+        "IMMEDIATE",
+        "NO",
+        "YES"
+      ],
+      "title": "autoresettimeValue",
+      "type": "string"
+    },
+    "auxtrValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "auxtrValue",
+      "type": "string"
+    },
+    "auxtrswValue": {
+      "enum": [
+        "NO",
+        "ALL",
+        "NEXT"
+      ],
+      "title": "auxtrswValue",
+      "type": "string"
+    },
+    "chkstrmValue": {
+      "enum": [
+        "CURRENT",
+        "NONE"
+      ],
+      "title": "chkstrmValue",
+      "type": "string"
+    },
+    "chkstskValue": {
+      "enum": [
+        "CURRENT",
+        "NONE"
+      ],
+      "title": "chkstskValue",
+      "type": "string"
+    },
+    "cilockValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "cilockValue",
+      "type": "string"
+    },
+    "clsdstpValue": {
+      "enum": [
+        "NOTIFY",
+        "NONOTIFY"
+      ],
+      "title": "clsdstpValue",
+      "type": "string"
+    },
+    "cmdprotValue": {
+      "enum": [
+        "YES",
+        "NO"
+      ],
+      "title": "cmdprotValue",
+      "type": "string"
+    },
+    "cmdsecValue": {
+      "enum": [
+        "ASIS",
+        "ALWAYS"
+      ],
+      "title": "cmdsecValue",
+      "type": "string"
+    },
+    "confdataValue": {
+      "enum": [
+        "SHOW",
+        "HIDE"
+      ],
+      "title": "confdataValue",
+      "type": "string"
+    },
+    "conftxtValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "conftxtValue",
+      "type": "string"
+    },
+    "cpsmconnValue": {
+      "enum": [
+        "NO",
+        "CMAS",
+        "LMAS",
+        "WUI",
+        "SMSSJ"
+      ],
+      "title": "cpsmconnValue",
+      "type": "string"
+    },
+    "csdaccValue": {
+      "enum": [
+        "READWRITE",
+        "READONLY"
+      ],
+      "title": "csdaccValue",
+      "type": "string"
+    },
+    "csdbkupValue": {
+      "enum": [
+        "STATIC",
+        "DYNAMIC"
+      ],
+      "title": "csdbkupValue",
+      "type": "string"
+    },
+    "csddispValue": {
+      "enum": [
+        "OLD",
+        "SHR"
+      ],
+      "title": "csddispValue",
+      "type": "string"
+    },
+    "csdintegValue": {
+      "enum": [
+        "UNCOMMITTED",
+        "CONSISTENT",
+        "REPEATABLE"
+      ],
+      "title": "csdintegValue",
+      "type": "string"
+    },
+    "csdrecovValue": {
+      "enum": [
+        "NONE",
+        "ALL",
+        "BACKOUTONLY"
+      ],
+      "title": "csdrecovValue",
+      "type": "string"
+    },
+    "csdrlsValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "csdrlsValue",
+      "type": "string"
+    },
+    "cwakeyValue": {
+      "enum": [
+        "USER",
+        "CICS"
+      ],
+      "title": "cwakeyValue",
+      "type": "string"
+    },
+    "daeValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "daeValue",
+      "type": "string"
+    },
+    "datformValue": {
+      "enum": [
+        "MMDDYY",
+        "DDMMYY",
+        "YYMMDD"
+      ],
+      "title": "datformValue",
+      "type": "string"
+    },
+    "db2connValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "db2connValue",
+      "type": "string"
+    },
+    "dbctlconValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "dbctlconValue",
+      "type": "string"
+    },
+    "debugtoolValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "debugtoolValue",
+      "type": "string"
+    },
+    "dipValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "dipValue",
+      "type": "string"
+    },
+    "dismacpValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "dismacpValue",
+      "type": "string"
+    },
+    "dumpValue": {
+      "enum": [
+        "NO",
+        "YES",
+        "TABLEONLY"
+      ],
+      "title": "dumpValue",
+      "type": "string"
+    },
+    "dumpdsValue": {
+      "enum": [
+        "AUTO",
+        "A",
+        "B"
+      ],
+      "title": "dumpdsValue",
+      "type": "string"
+    },
+    "dumpswValue": {
+      "enum": [
+        "NO",
+        "NEXT",
+        "ALL"
+      ],
+      "title": "dumpswValue",
+      "type": "string"
+    },
+    "esmexitsValue": {
+      "enum": [
+        "NOINSTLN",
+        "INSTLN"
+      ],
+      "title": "esmexitsValue",
+      "type": "string"
+    },
+    "fcqronlyValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "fcqronlyValue",
+      "type": "string"
+    },
+    "fepiValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "fepiValue",
+      "type": "string"
+    },
+    "fipsValue": {
+      "enum": [
+        "NOCHECK",
+        "1403"
+      ],
+      "title": "fipsValue",
+      "type": "string"
+    },
+    "forceqrValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "forceqrValue",
+      "type": "string"
+    },
+    "fsstaffValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "fsstaffValue",
+      "type": "string"
+    },
+    "gtftrValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "gtftrValue",
+      "type": "string"
+    },
+    "hpoValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "hpoValue",
+      "type": "string"
+    },
+    "icpValue": {
+      "enum": [
+        "COLD"
+      ],
+      "title": "icpValue",
+      "type": "string"
+    },
+    "intrdrjobuserValue": {
+      "enum": [
+        "TASK",
+        "REGION"
+      ],
+      "title": "intrdrjobuserValue",
+      "type": "string"
+    },
+    "inttrValue": {
+      "enum": [
+        "ON",
+        "OFF"
+      ],
+      "title": "inttrValue",
+      "type": "string"
+    },
+    "ircstrtValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "ircstrtValue",
+      "type": "string"
+    },
+    "iscValue": {
+      "enum": [
+        "YES",
+        "NO"
+      ],
+      "title": "iscValue",
+      "type": "string"
+    },
+    "lgnmsgValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "lgnmsgValue",
+      "type": "string"
+    },
+    "llacopyValue": {
+      "enum": [
+        "NO",
+        "YES",
+        "NEWCOPY"
+      ],
+      "title": "llacopyValue",
+      "type": "string"
+    },
+    "lpaValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "lpaValue",
+      "type": "string"
+    },
+    "maxtlslevelValue": {
+      "enum": [
+        "TLS11",
+        "TLS12",
+        "TLS13"
+      ],
+      "title": "maxtlslevelValue",
+      "type": "string"
+    },
+    "mintlslevelValue": {
+      "enum": [
+        "TLS11",
+        "TLS12",
+        "TLS13"
+      ],
+      "title": "mintlslevelValue",
+      "type": "string"
+    },
+    "mnValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "mnValue",
+      "type": "string"
+    },
+    "mnconvValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "mnconvValue",
+      "type": "string"
+    },
+    "mnexcValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "mnexcValue",
+      "type": "string"
+    },
+    "mnidnValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "mnidnValue",
+      "type": "string"
+    },
+    "mnperValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "mnperValue",
+      "type": "string"
+    },
+    "mnresValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "mnresValue",
+      "type": "string"
+    },
+    "mnsyncValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "mnsyncValue",
+      "type": "string"
+    },
+    "mntimeValue": {
+      "enum": [
+        "GMT",
+        "LOCAL"
+      ],
+      "title": "mntimeValue",
+      "type": "string"
+    },
+    "mqconnValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "mqconnValue",
+      "type": "string"
+    },
+    "mrofseValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "mrofseValue",
+      "type": "string"
+    },
+    "mrolrmValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "mrolrmValue",
+      "type": "string"
+    },
+    "msgcaseValue": {
+      "enum": [
+        "MIXED",
+        "UPPER"
+      ],
+      "title": "msgcaseValue",
+      "type": "string"
+    },
+    "msglvlValue": {
+      "enum": [
+        1,
+        0
+      ],
+      "title": "msglvlValue",
+      "type": "integer"
+    },
+    "natlangValue": {
+      "enum": [
+        "E",
+        "C",
+        "K"
+      ],
+      "title": "natlangValue",
+      "type": "string"
+    },
+    "newsitValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "newsitValue",
+      "type": "string"
+    },
+    "nistsp800131aValue": {
+      "enum": [
+        "NOCHECK",
+        "CHECK"
+      ],
+      "title": "nistsp800131aValue",
+      "type": "string"
+    },
+    "nonrlsrecovValue": {
+      "enum": [
+        "VSAMCAT",
+        "FILEDEF"
+      ],
+      "title": "nonrlsrecovValue",
+      "type": "string"
+    },
+    "nqrnlValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "nqrnlValue",
+      "type": "string"
+    },
+    "offsiteValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "offsiteValue",
+      "type": "string"
+    },
+    "oteltraceValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "oteltraceValue",
+      "type": "string"
+    },
+    "parmerrValue": {
+      "enum": [
+        "INTERACT",
+        "IGNORE",
+        "ABEND"
+      ],
+      "title": "parmerrValue",
+      "type": "string"
+    },
+    "pgaictlgValue": {
+      "enum": [
+        "MODIFY",
+        "NONE",
+        "ALL"
+      ],
+      "title": "pgaictlgValue",
+      "type": "string"
+    },
+    "pgaipgmValue": {
+      "enum": [
+        "INACTIVE",
+        "ACTIVE"
+      ],
+      "title": "pgaipgmValue",
+      "type": "string"
+    },
+    "pltpisecValue": {
+      "enum": [
+        "NONE",
+        "CMDSEC",
+        "RESSEC",
+        "ALL"
+      ],
+      "title": "pltpisecValue",
+      "type": "string"
+    },
+    "printValue": {
+      "enum": [
+        "NO",
+        "YES",
+        "PA1",
+        "PA2",
+        "PA3"
+      ],
+      "title": "printValue",
+      "type": "string"
+    },
+    "psbchkValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "psbchkValue",
+      "type": "string"
+    },
+    "pstypeValue": {
+      "enum": [
+        "SNPS",
+        "MNPS",
+        "NOPS"
+      ],
+      "title": "pstypeValue",
+      "type": "string"
+    },
+    "racfsyncValue": {
+      "enum": [
+        "NO",
+        "YES",
+        "CPSM"
+      ],
+      "title": "racfsyncValue",
+      "type": "string"
+    },
+    "rentpgmValue": {
+      "enum": [
+        "PROTECT",
+        "NOPROTECT"
+      ],
+      "title": "rentpgmValue",
+      "type": "string"
+    },
+    "respValue": {
+      "enum": [
+        "FME",
+        "RRN"
+      ],
+      "title": "respValue",
+      "type": "string"
+    },
+    "ressecValue": {
+      "enum": [
+        "ASIS",
+        "ALWAYS"
+      ],
+      "title": "ressecValue",
+      "type": "string"
+    },
+    "rlsValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "rlsValue",
+      "type": "string"
+    },
+    "rlstolsrValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "rlstolsrValue",
+      "type": "string"
+    },
+    "rrmsValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "rrmsValue",
+      "type": "string"
+    },
+    "rstsignoffValue": {
+      "enum": [
+        "NOFORCE",
+        "FORCE"
+      ],
+      "title": "rstsignoffValue",
+      "type": "string"
+    },
+    "ruwapoolValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "ruwapoolValue",
+      "type": "string"
+    },
+    "secValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "secValue",
+      "type": "string"
+    },
+    "securetcpipValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "securetcpipValue",
+      "type": "string"
+    },
+    "snpresetValue": {
+      "enum": [
+        "UNIQUE",
+        "SHARED"
+      ],
+      "title": "snpresetValue",
+      "type": "string"
+    },
+    "snscopeValue": {
+      "enum": [
+        "NONE",
+        "CICS",
+        "MVSIMAGE",
+        "SYSPLEX"
+      ],
+      "title": "snscopeValue",
+      "type": "string"
+    },
+    "sotuningValue": {
+      "enum": [
+        "YES",
+        520
+      ],
+      "title": "sotuningValue"
+    },
+    "spoolValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "spoolValue",
+      "type": "string"
+    },
+    "sslcacheValue": {
+      "enum": [
+        "CICS",
+        "SYSPLEX"
+      ],
+      "title": "sslcacheValue",
+      "type": "string"
+    },
+    "startValue": {
+      "enum": [
+        "INITIAL",
+        "AUTO",
+        "COLD",
+        "STANDBY",
+        "(INITIAL, ALL)",
+        "(AUTO, ALL)",
+        "(COLD, ALL)",
+        "(STANDBY, ALL)"
+      ],
+      "title": "startValue",
+      "type": "string"
+    },
+    "starterValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "starterValue",
+      "type": "string"
+    },
+    "statrcdValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "statrcdValue",
+      "type": "string"
+    },
+    "stgprotValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "stgprotValue",
+      "type": "string"
+    },
+    "stgrcvyValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "stgrcvyValue",
+      "type": "string"
+    },
+    "subtsksValue": {
+      "enum": [
+        0,
+        1
+      ],
+      "title": "subtsksValue",
+      "type": "integer"
+    },
+    "systrValue": {
+      "enum": [
+        "ON",
+        "OFF"
+      ],
+      "title": "systrValue",
+      "type": "string"
+    },
+    "takeovrValue": {
+      "enum": [
+        "MANUAL",
+        "AUTO",
+        "COMMAND"
+      ],
+      "title": "takeovrValue",
+      "type": "string"
+    },
+    "tcpValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "tcpValue",
+      "type": "string"
+    },
+    "tcpipValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "tcpipValue",
+      "type": "string"
+    },
+    "tcsactnValue": {
+      "enum": [
+        "NONE",
+        "UNBIND",
+        "FORCE"
+      ],
+      "title": "tcsactnValue",
+      "type": "string"
+    },
+    "tctuakeyValue": {
+      "enum": [
+        "USER",
+        "CICS"
+      ],
+      "title": "tctuakeyValue",
+      "type": "string"
+    },
+    "tctualocValue": {
+      "enum": [
+        "BELOW",
+        "ANY"
+      ],
+      "title": "tctualocValue",
+      "type": "string"
+    },
+    "tdintraValue": {
+      "enum": [
+        "NOEMPTY",
+        "EMPTY"
+      ],
+      "title": "tdintraValue",
+      "type": "string"
+    },
+    "tranisoValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "tranisoValue",
+      "type": "string"
+    },
+    "trapValue": {
+      "enum": [
+        "OFF",
+        "ON"
+      ],
+      "title": "trapValue",
+      "type": "string"
+    },
+    "trtrantyValue": {
+      "enum": [
+        "TRAN",
+        "ALL"
+      ],
+      "title": "trtrantyValue",
+      "type": "string"
+    },
+    "usertrValue": {
+      "enum": [
+        "ON",
+        "OFF"
+      ],
+      "title": "usertrValue",
+      "type": "string"
+    },
+    "vtamValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "vtamValue",
+      "type": "string"
+    },
+    "xappcValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "xappcValue",
+      "type": "string"
+    },
+    "xhfsValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "xhfsValue",
+      "type": "string"
+    },
+    "xptktValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "xptktValue",
+      "type": "string"
+    },
+    "xrfValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "xrfValue",
+      "type": "string"
+    },
+    "xuserValue": {
+      "enum": [
+        "NO",
+        "YES"
+      ],
+      "title": "xuserValue",
+      "type": "string"
+    },
+    "zossosnewtcbValue": {
+      "enum": [
+        "DELAY",
+        "NODELAY"
+      ],
+      "title": "zossosnewtcbValue",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cics_region": {
+      "$ref": "#/$defs/RegionInputs",
+      "description": "CICS Region configuration",
+      "title": "cics_region"
+    },
+    "vars": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "default": null,
+      "description": "Variables to be defined and used within this file",
+      "title": "vars",
+      "type": "object"
+    }
+  },
+  "required": [
+    "cics_region"
+  ],
+  "title": "Configuration file for zconfig",
+  "type": "object"
+}

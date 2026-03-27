@@ -1,5 +1,23 @@
-
 #!/bin/bash
+
+#########################################################
+# Configuration Library
+# Provides functions for reading configuration from
+# settings.json and config.yaml files
+#########################################################
+
+# Function to extract value from settings.json
+# Usage: get_setting_value <key> [settings_file]
+get_setting_value() {
+    local key=$1
+    local settings_file=${2:-".vscode/settings.json"}
+    
+    if [ -f "$settings_file" ]; then
+        # Extract value using grep and sed (handles both quoted strings and unquoted values)
+        local value=$(grep "\"$key\"" "$settings_file" | sed -E 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"?([^",}]+)"?.*/\1/' | tr -d ' ')
+        echo "$value"
+    fi
+}
 
 # Function to parse YAML config - reads a key within a specific section
 # Usage: get_section_value <section> <key>
@@ -31,7 +49,6 @@ get_section_value() {
     ' "$CONFIG_FILE"
 }
 
-
 # Function to expand variables in config values
 expand_vars() {
     local value=$1
@@ -52,6 +69,5 @@ expand_vars() {
 
     echo "$value"
 }
-
 
 # Made with Bob

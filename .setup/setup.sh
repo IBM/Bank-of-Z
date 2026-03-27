@@ -8,44 +8,15 @@
 
 set -e  # Exit on error
 
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/config.yaml"
 
-. $SCRIPT_DIR/global.sh
-
-# Function to print colored messages
-print_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-print_stage() {
-    echo ""
-    echo -e "${GREEN}========================================${NC}"
-    echo -e "${GREEN}$1${NC}"
-    echo -e "${GREEN}========================================${NC}"
-    echo ""
-}
+# Source library scripts
+LIB_DIR="$SCRIPT_DIR/lib"
+source "$LIB_DIR/colors.sh"
+source "$LIB_DIR/config.sh"
+source "$LIB_DIR/prerequisites.sh"
 
 # Function to parse YAML config (simple parser for our needs)
 get_config_value() {
@@ -93,25 +64,6 @@ upload_directory_recursive() {
     return 0
 }
 
-# Check if Zowe CLI is installed
-check_zowe_cli() {
-    print_info "Checking Zowe CLI installation..."
-    if ! command -v zowe &> /dev/null; then
-        print_error "Zowe CLI is not installed or not in PATH"
-        print_info "Please install Zowe CLI: npm install -g @zowe/cli"
-        exit 1
-    fi
-    print_success "Zowe CLI is installed"
-    
-    # Check if RSE API plugin is installed
-    print_info "Checking Zowe RSE API plugin..."
-    if ! zowe rse-api-for-zowe-cli --help &> /dev/null; then
-        print_warning "Zowe RSE API plugin may not be installed"
-        print_info "Install with: zowe plugins install @zowe/rse-api-for-zowe-cli"
-    else
-        print_success "Zowe RSE API plugin is available"
-    fi
-}
 
 # Load configuration
 load_config() {

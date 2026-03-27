@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=./cics_region_0.1.2.schema.json
+vars:
+  applid: "CICSBOZ"
+  sysid: "CBOZ"
+  user_id: "IBMUSER"
+  user_id_lower: "ibmuser"
+  cmci_port: "27100"
+
+cics_region:
+  applid: "{{ vars.applid }}"
+  sysid: "{{ vars.sysid }}"
+
+  csd:
+    content:
+      - type: resource_builder
+        model: ./resource-model.yaml
+        definitions:
+          - ./cbsa-definitions.yaml
+
+  installation:
+    data_sets:
+      cics:
+        sdfhlic: CICSTS63.SDFHLIC
+        hlq: CICSTS63.CICS
+      cpsm:
+        hlq: CICSTS63.CPSM
+    dir: /usr/lpp/cicsts/cicsts63
+
+  region_hlq: "{{ vars.user_id }}.BOZ.{{ vars.applid }}"
+
+  region_jcl:
+    type: JOB
+    job_parameters:
+      region: 0M
+    steplib:
+      top_data_sets:
+        - DB2V13.SDSNLOAD
+        - DB2V13.SDSNEXIT
+
+  sit_parameters:
+    start: INITIAL
+    grplist: DFHLIST,CBSALIST
+    gmtext: SMSS Region provisioned with zconfig
+    sec: "NO"
+    db2conn: "YES"
+    securetcpip: "NO"
+
+  extensions:
+    cics_cmci:
+      provider: JVMSERVER
+      port: "{{ vars.cmci_port }}"
+      authentication: "NO"
+      ssl: "NO"
+
+  jvm_profile_dir: "/u/{{ vars.user_id_lower }}/{{ vars.applid }}/JVMProfiles"
+  jvm_profiles:
+    - name: EYUSMSSJ
+      source_type: inline
+      properties: |
+        JAVA_HOME=/usr/lpp/java/java21/current_64
+        WORK_DIR=.
+        -Xms128M
+        -Xmx1G
+        -Xmso1M
+        -Dfile.encoding=ISO-8859-1
+        WLP_INSTALL_DIR=/usr/lpp/cicsts/cicsts63/wlp
+        STDOUT=//DD:JVMOUT
+        STDERR=//DD:JVMERR
+        JVMTRACE=//DD:JVMTRACE
+        JVMLOG=//DD:JVMLOG
+        -Xgcpolicy:gencon
+        -Xscmx128M
+        -Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
+        _BPXK_DISABLE_SHLIB=YES
+        -Dcom.ibm.tools.attach.enable=no

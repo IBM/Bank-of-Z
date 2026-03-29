@@ -31,12 +31,18 @@ This directory contains the setup scripts and configuration for preparing a z/OS
 
 Edit [`config.yaml`](config.yaml) to customize your environment:
 
-- **pipeline_script.workspace**: USS directory for pipeline workspace (default: `/u/$USER/sandbox`)
-- **pipeline_script.application**: Application name (default: `MortgageApplication`)
-- **pipeline_script.tmphlq**: Temporary high-level qualifier for datasets
 - **repositories**: Git repositories to clone
 - **zbuilder**: zBuilder framework configuration
 - **pipeline_script**: Pipeline simulation script configuration
+- **pipeline_script.workspace**: USS directory for pipeline workspace (default: `/u/$USER/sandbox`)
+- **pipeline_script.application**: Application name (default: `MortgageApplication`)
+- **pipeline_script.tmphlq**: Temporary high-level qualifier for datasets
+- **pipeline_script.run_deploy**: Enable Wazi Deploy step (default false)
+- **pipeline_script.target_hlq**: Bank of Z high-level qualifier for datasets
+- **pipeline_script.java_home**: Java Home on the target
+- **pipeline_script.dbb_hlq**:  DBB build HLQ
+- **pipeline_script.dbb_hlq**: Bank of Z target HLQ for Wazi Deploy
+- **pipeline_script.target_hlq**: Java Home on the target
 
 ## Files
 

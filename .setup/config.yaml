@@ -17,9 +17,10 @@ zbuilder:
   
   # Target USS directory for upload
   target_dir: $PIPELINE_WORKSPACE/zBuilder
-  
-  # Languages configuration file
-  languages_config: build/languages/Languages.yaml
+
+  # Java home (min version 17)
+  java_home: /usr/lpp/java/java21/current_64
+
 
 # Pipeline simulation script
 pipeline_script:
@@ -31,5 +32,14 @@ pipeline_script:
   
   # workspace directory
   workspace: $PIPELINE_WORKSPACE/workspace
+  
+  # DBB build HLQ
+  dbb_hlq: BANKZ.BOZ.BLD
+  
+  # Enablde Wazi Deploy
+  dbb_hlq: false
+  
+  # Bank of Z target HLQ for Wazi Deploy
+  target_hlq: CBSA.CICSBSA
 
 # Made with Bob

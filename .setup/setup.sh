@@ -167,6 +167,9 @@ stage1_initialize_workspace() {
     print_info "Creating workspace directory: $PIPELINE_WORKSPACE"
     zowe rse-api-for-zowe-cli create uss-directory "$PIPELINE_WORKSPACE"
     
+    rm -rf $HOME/.dbb
+    print_success "DBB metadata cache purged"
+    
     print_success "Workspace directory initialized: $PIPELINE_WORKSPACE"
 }
 

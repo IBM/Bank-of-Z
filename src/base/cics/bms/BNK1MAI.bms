@@ -26,7 +26,7 @@ BNK1ME   DFHMDI SIZE=(24,80),                                          *
          DFHMDF POS=(1,1),LENGTH=7,INITIAL='BNK1MA ',                  *
                ATTRB=(PROT,NORM),COLOR=BLUE
 COMPANY  DFHMDF POS=(1,20),LENGTH=43,ATTRB=(NORM,PROT),COLOR=RED,      *
-               INITIAL='CICS Banking Sample Application - Main Menu.'
+               INITIAL='CICS Banking Sample Application - Main Menx.'
 ***********************************************************************
          DFHMDF POS=(3,1),LENGTH=36,ATTRB=(NORM,PROT),COLOR=TURQUOISE, *
                INITIAL='Select an option. Then press Enter.'

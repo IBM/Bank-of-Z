@@ -37,7 +37,7 @@ pipeline_script:
   dbb_hlq: BANKZ.BOZ.BLD
   
   # Enablde Wazi Deploy
-  dbb_hlq: false
+  run_deploy: false
   
   # Bank of Z target HLQ for Wazi Deploy
   target_hlq: CBSA.CICSBSA

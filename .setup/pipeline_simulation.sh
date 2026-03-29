@@ -110,11 +110,15 @@ if [ $rc -ne 0 ]; then
 fi
 
 if [ "$(echo "$RUN_DEPLOY" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
-    
+
     # Use zDeploy Framework (no CBS for now)
     #wazideploy-generate.sh -w  $application/$branchName/${buildImplementation}build_$timestamp -a $application -b $branchName -P release -R $release -I $timestamp
 
+    # Set the DBB environment variables
     . /global/opt/pyenv/gdp/bin/activate
+    export ZOAU_HOME=/usr/lpp/IBM/zoautil
+    export PATH=$ZOAU_HOME/bin:$PATH
+    export LIBPATH=$ZOAU_HOME/lib:$LIBPATH
 
     cd $PIPELINE_WORKSPACE
     # Set the Wazi Deploy zBuilder environment variables

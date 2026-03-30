@@ -25,7 +25,7 @@ This project provides two VS Code custom tasks:
 
 ### 2. Configure Your Environment
 
-Edit [`.setup/config.yaml`](.setup/config.yaml) to match your environment:
+Edit [`../.setup/config.yaml`](../.setup/config.yaml) to match your environment:
 
 ```yaml
 pipeline_script:
@@ -83,35 +83,56 @@ The setup task performs three main stages:
 ### config.yaml Structure
 
 ```yaml
-pipeline_script:
-  workspace: /u/$USER/sandbox      # USS workspace directory
-  application: Bank-of-z # Application name
-  branch: main                     # Git branch
-  tmphlq: DBEHM                   # Dataset HLQ
-
+---
+#########################################################
+# Setup Configuration for Pipeline Simulation
+#########################################################
+version: 1.0.0
+ 
+# Git repositories to clone
 repositories:
-  - name: dbb                      # Repository name
+  - name: dbb
     url: https://github.com/IBM/dbb.git
-    target_dir: dbb                # Target directory on USS
+    target_dir: dbb
 
+# zBuilder framework configuration
 zbuilder:
-  source_dir: build                # Local source directory
-  target_dir: /u/$USER/sandbox/zBuilder  # USS target
-  languages_config: build/languages/Languages.yaml
+  # Local source directory (relative to .setup)
+  source_dir: build
+  
+  # Target USS directory for upload
+  target_dir: $PIPELINE_WORKSPACE/zBuilder
 
+  # Java home (min version 17)
+  java_home: /usr/lpp/java/java21/current_64
+
+
+# Pipeline simulation script
 pipeline_script:
-  source: pipeline_simulation.sh   # Local script
-  target: /u/$USER/sandbox/pipeline_simulation.sh  # USS target
+  # Target USS location
+  target: $PIPELINE_WORKSPACE/pipeline_simulation.sh
 
-zowe:
-  # Optional: specify a Zowe profile name
-  # profile: your-profile-name
+  # Local source file
+  source: pipeline_simulation.sh
+  
+  # workspace directory
+  workspace: $PIPELINE_WORKSPACE/workspace
+  
+  # DBB build HLQ
+  dbb_hlq: BANKZ.BOZ.BLD
+  
+  # Enablde Wazi Deploy
+  dbb_hlq: false
+  
+  # Bank of Z target HLQ for Wazi Deploy
+  target_hlq: CBSA.CICSBSA
 ```
 
 ### Environment Variables
 
 The setup script automatically expands these variables:
 - `$USER` - Current username
+- `$PIPELINE_WORKSPACE` - Pipeline workspace
 - Other environment variables can be added as needed
 
 ## VS Code Tasks
@@ -156,7 +177,7 @@ The setup script automatically expands these variables:
 
 ### Modifying the Pipeline Script
 
-Edit [`.setup/pipeline_simulation.sh`](.setup/pipeline_simulation.sh):
+Edit [`../.setup/pipeline_simulation.sh`](../.setup/pipeline_simulation.sh):
 
 ```bash
 # Customize these variables
@@ -170,7 +191,7 @@ After modifications, re-run the setup task to upload changes.
 
 ### Adding Custom Datasets
 
-Edit [`.setup/build/languages/Languages.yaml`](.setup/build/languages/Languages.yaml):
+Edit [`../.setup/build/datasets.yaml`](../.setup/build/datasets.yaml):
 
 ```yaml
 variables:
@@ -183,7 +204,7 @@ variables:
 
 ### Adding Additional Repositories
 
-Edit [`.setup/config.yaml`](.setup/config.yaml):
+Edit [`../.setup/config.yaml`](../.setup/config.yaml):
 
 ```yaml
 repositories:
@@ -195,7 +216,7 @@ repositories:
     target_dir: custom-repo
 ```
 
-Then update [`.setup/setup.sh`](.setup/setup.sh) to handle the new repository.
+Then update [`../.setup/setup.sh`](../.setup/setup.sh) to handle the new repository.
 
 ## Troubleshooting
 
@@ -275,15 +296,15 @@ Bank-of-Z/
 │   ├── README.md                # Setup directory documentation
 │   └── build/                   # zBuilder framework
 │       ├── dbb-build.yaml
+│       ├── datasets.yaml
 │       ├── groovy/
 │       └── languages/
-│           ├── Languages.yaml   # Dataset configurations
+│           ├── Languages.yaml
 │           ├── Cobol.yaml
 │           ├── BMS.yaml
 │           └── ...
 ├── .vscode/
 │   └── tasks.json               # VS Code task definitions
-├── Setup Capabilities.md        # Original requirements
 └── SETUP_GUIDE.md              # This file
 ```
 
@@ -306,6 +327,9 @@ After successful setup:
 4. **Run the pipeline simulation** using the VS Code task
 
 5. **Monitor the build output** in the VS Code terminal
+
+## Grub integration
+The `run_grub_pipeline.sh` can be used as build script for Grub. But only full DBB build is possible for now.
 
 ## Additional Resources
 

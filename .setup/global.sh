@@ -1,11 +1,11 @@
 
-#!/bin/bash
+#!/bin/sh
 
 # Function to parse YAML config - reads a key within a specific section
 # Usage: get_section_value <section> <key>
 get_section_value() {
-    local section=$1
-    local key=$2
+    section=$1
+    key=$2
 
     awk -v section="$section" -v key="$key" '
         # Detect section header (no leading spaces)
@@ -34,24 +34,22 @@ get_section_value() {
 
 # Function to expand variables in config values
 expand_vars() {
-    local value=$1
+    value=$1
 
     # Replace $USER with actual username
-    value="${value//\$USER/$USER}"
+    value=$(echo "$value" | sed "s|\$USER|$USER|g")
 
     # Replace $PIPELINE_WORKSPACE
-    value="${value//\$PIPELINE_WORKSPACE/$PIPELINE_WORKSPACE}"
+    value=$(echo "$value" | sed "s|\$PIPELINE_WORKSPACE|$PIPELINE_WORKSPACE|g")
 
     # Replace ${global.<key>} with value from [global] section in config
-    while [[ "$value" =~ \$\{global\.([a-zA-Z_]+)\} ]]; do
-        local key="${BASH_REMATCH[1]}"
-        local resolved
+    while echo "$value" | grep -q '\${global\.[a-zA-Z_]*}'; do
+        key=$(echo "$value" | sed 's/.*\${global\.\([a-zA-Z_]*\)}.*/\1/')
         resolved=$(get_section_value "global" "$key")
-        value="${value//\$\{global\.${key}\}/$resolved}"
+        value=$(echo "$value" | sed "s|\${global\.${key}}|$resolved|g")
     done
 
     echo "$value"
 }
-
 
 # Made with Bob

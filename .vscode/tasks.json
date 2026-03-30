@@ -71,7 +71,8 @@
         {
             "id": "sandbox",
             "type": "promptString",
-            "description": "Sandbox location"
+            "description": "Sandbox location",
+            "default": "/usr/local/sandboxes/bank-of-z"
         }
     ]
 }

@@ -40,6 +40,6 @@ pipeline_script:
   run_deploy: false
   
   # Bank of Z target HLQ for Wazi Deploy
-  target_hlq: CBSA.CICSBSA
+  target_hlq: BANKZ.BOZ.TEST
 
 # Made with Bob

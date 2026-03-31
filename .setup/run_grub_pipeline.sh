@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+#!/bin/env bash
+=======
 #!/bin/sh
+>>>>>>> 89af9ac11432be1bbea8400892acea1c2649271d
 
 #########################################################
 # Run Pipeline Simulation Script

@@ -1,0 +1,4968 @@
+{
+  "copyright": [
+    "*----------------------------------------------------------------*",
+    "*  Copyright IBM Corp. 2021, 2025                                *",
+    "*----------------------------------------------------------------*"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://www.ibm.com/xmlns/prod/cics/resourcedefinitions",
+  "title": "Permissive application",
+  "resourceDefinitionsVersion": "cicsts-6.3.0",
+  "description": "Schema that describes the structure of a CICS resource definition document.",
+  "type": "object",
+  "properties": {
+    "resourceDefinitions": {
+      "$ref": "#/definitions/resourceTypes"
+    }
+  },
+  "required": [
+    "resourceDefinitions"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "resourceTypes": {
+      "description": "Resources to be defined are list items after the resourceDefintions mapping.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tcpipservice": {
+            "$ref": "#/definitions/tcpipserviceUDTDefinition"
+          },
+          "tdqueue": {
+            "$ref": "#/definitions/tdqueueUDTDefinition"
+          },
+          "processtype": {
+            "$ref": "#/definitions/processtypeUDTDefinition"
+          },
+          "enqmodel": {
+            "$ref": "#/definitions/enqmodelUDTDefinition"
+          },
+          "program": {
+            "$ref": "#/definitions/programUDTDefinition"
+          },
+          "mapset": {
+            "$ref": "#/definitions/mapsetUDTDefinition"
+          },
+          "jvmserver": {
+            "$ref": "#/definitions/jvmserverUDTDefinition"
+          },
+          "mqmonitor": {
+            "$ref": "#/definitions/mqmonitorUDTDefinition"
+          },
+          "tsmodel": {
+            "$ref": "#/definitions/tsmodelUDTDefinition"
+          },
+          "db2entry": {
+            "$ref": "#/definitions/db2entryUDTDefinition"
+          },
+          "library": {
+            "$ref": "#/definitions/libraryUDTDefinition"
+          },
+          "file": {
+            "$ref": "#/definitions/fileUDTDefinition"
+          },
+          "ipconn": {
+            "$ref": "#/definitions/ipconnUDTDefinition"
+          },
+          "typeterm": {
+            "$ref": "#/definitions/typetermUDTDefinition"
+          },
+          "connection": {
+            "$ref": "#/definitions/connectionUDTDefinition"
+          },
+          "bundle": {
+            "$ref": "#/definitions/bundleUDTDefinition"
+          },
+          "sessions": {
+            "$ref": "#/definitions/sessionsUDTDefinition"
+          },
+          "dumpcode": {
+            "$ref": "#/definitions/dumpcodeUDTDefinition"
+          },
+          "profile": {
+            "$ref": "#/definitions/profileUDTDefinition"
+          },
+          "terminal": {
+            "$ref": "#/definitions/terminalUDTDefinition"
+          },
+          "journalmodel": {
+            "$ref": "#/definitions/journalmodelUDTDefinition"
+          },
+          "doctemplate": {
+            "$ref": "#/definitions/doctemplateUDTDefinition"
+          },
+          "urimap": {
+            "$ref": "#/definitions/urimapUDTDefinition"
+          },
+          "pipeline": {
+            "$ref": "#/definitions/pipelineUDTDefinition"
+          },
+          "tranclass": {
+            "$ref": "#/definitions/tranclassUDTDefinition"
+          },
+          "partner": {
+            "$ref": "#/definitions/partnerUDTDefinition"
+          },
+          "mqconn": {
+            "$ref": "#/definitions/mqconnUDTDefinition"
+          },
+          "db2conn": {
+            "$ref": "#/definitions/db2connUDTDefinition"
+          },
+          "partitionset": {
+            "$ref": "#/definitions/partitionsetUDTDefinition"
+          },
+          "atomservice": {
+            "$ref": "#/definitions/atomserviceUDTDefinition"
+          },
+          "webservice": {
+            "$ref": "#/definitions/webserviceUDTDefinition"
+          },
+          "db2tran": {
+            "$ref": "#/definitions/db2tranUDTDefinition"
+          },
+          "transaction": {
+            "$ref": "#/definitions/transactionUDTDefinition"
+          },
+          "lsrpool": {
+            "$ref": "#/definitions/lsrpoolUDTDefinition"
+          }
+        },
+        "additionalProperties": false,
+        "maxProperties": 1
+      }
+    },
+    "jvmserverUDTDefinition": {
+      "description": "JVMSVDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "JVMSERVER resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "jvmprofile": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "lerunopts": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "threadlimit": {
+          "description": "Specify a integer in the range 1 to 256.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "pipelineUDTDefinition": {
+      "description": "PIPELINE",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PIPELINE resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "configfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "respwait": {
+          "description": "Specify either the string \"DEFT\" or a single integer in the range 0 to 9999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            },
+            {
+              "type": "string",
+              "const": "DEFT"
+            }
+          ]
+        },
+        "shelf": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "wsdir": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "enqmodelUDTDefinition": {
+      "description": "ENQMODEL",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "ENQMODEL resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "enqname": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>*].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>*]+$",
+          "maxLength": 255
+        },
+        "enqscope": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "db2tranUDTDefinition": {
+      "description": "DB2TDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "DB2TRAN resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "entry": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "transid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>+]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>+]+[*]?|[*])$",
+          "maxLength": 4
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "db2entryUDTDefinition": {
+      "description": "DB2EDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "DB2ENTRY resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "accountrec": {
+          "description": "Specify a value from the following list: NONE | TXID | TASK | UOW.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "TXID",
+            "TASK",
+            "UOW"
+          ]
+        },
+        "authid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "authtype": {
+          "description": "Specify a value from the following list: USERID | OPID | GROUP | SIGN | TERM | TX.",
+          "type": "string",
+          "enum": [
+            "USERID",
+            "OPID",
+            "GROUP",
+            "SIGN",
+            "TERM",
+            "TX"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "drollback": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "plan": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "planexitname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "priority": {
+          "description": "Specify a value from the following list: HIGH | EQUAL | LOW.",
+          "type": "string",
+          "enum": [
+            "HIGH",
+            "EQUAL",
+            "LOW"
+          ]
+        },
+        "protectnum": {
+          "description": "Specify a integer in the range 0 to 2000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "sharelocks": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "threadlimit": {
+          "description": "Specify a integer in the range 0 to 2000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "threadwait": {
+          "description": "Specify a value from the following list: POOL | \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "POOL",
+            "YES",
+            "NO"
+          ]
+        },
+        "transid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>+]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>+]+[*]?|[*])$",
+          "maxLength": 4
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "db2connUDTDefinition": {
+      "description": "DB2CDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "DB2CONN resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "accountrec": {
+          "description": "Specify a value from the following list: NONE | TXID | TASK | UOW.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "TXID",
+            "TASK",
+            "UOW"
+          ]
+        },
+        "authid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "authtype": {
+          "description": "Specify a value from the following list: USERID | OPID | GROUP | SIGN | TERM | TX.",
+          "type": "string",
+          "enum": [
+            "USERID",
+            "OPID",
+            "GROUP",
+            "SIGN",
+            "TERM",
+            "TX"
+          ]
+        },
+        "comauthid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "comauthtype": {
+          "description": "Specify a value from the following list: USERID | OPID | GROUP | SIGN | TERM | TX.",
+          "type": "string",
+          "enum": [
+            "USERID",
+            "OPID",
+            "GROUP",
+            "SIGN",
+            "TERM",
+            "TX"
+          ]
+        },
+        "comthreadlim": {
+          "description": "Specify a integer in the range 0 to 2000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "connecterror": {
+          "description": "Specify a value from the following list: SQLCODE | ABEND.",
+          "type": "string",
+          "enum": [
+            "SQLCODE",
+            "ABEND"
+          ]
+        },
+        "db2groupid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "db2id": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "drollback": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "msgqueue1": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "msgqueue2": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "msgqueue3": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "nontermrel": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "plan": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "planexitname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "priority": {
+          "description": "Specify a value from the following list: HIGH | EQUAL | LOW.",
+          "type": "string",
+          "enum": [
+            "HIGH",
+            "EQUAL",
+            "LOW"
+          ]
+        },
+        "purgecycle": {
+          "description": "Specify two integers in the range 0 to 59 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,2},[0-9]{1,2}$"
+        },
+        "resyncmember": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "reuselimit": {
+          "description": "Specify a integer in the range 0 to 10000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "signid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "standbymode": {
+          "description": "Specify a value from the following list: RECONNECT | CONNECT | NOCONNECT.",
+          "type": "string",
+          "enum": [
+            "RECONNECT",
+            "CONNECT",
+            "NOCONNECT"
+          ]
+        },
+        "statsqueue": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "tcblimit": {
+          "description": "Specify a integer in the range 4 to 2000.",
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 2000
+        },
+        "threaderror": {
+          "description": "Specify a value from the following list: N906D | N906 | ABEND.",
+          "type": "string",
+          "enum": [
+            "N906D",
+            "N906",
+            "ABEND"
+          ]
+        },
+        "threadlimit": {
+          "description": "Specify a integer in the range 3 to 2000.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 2000
+        },
+        "threadwait": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "libraryUDTDefinition": {
+      "description": "LIBDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "LIBRARY resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "critical": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "dsname01": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname02": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname03": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname04": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname05": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname06": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname07": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname08": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname09": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname10": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname11": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname12": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname13": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname14": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname15": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "dsname16": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#.\\-]+$",
+          "maxLength": 44
+        },
+        "ranking": {
+          "description": "Specify a integer in the range 1 to 99.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "urimapUDTDefinition": {
+      "description": "URIMPDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "URIMAP resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "analyzer": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "atomservice": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "authenticate": {
+          "description": "Specify a value from the following list: \"NO\" | BASIC.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "BASIC"
+          ]
+        },
+        "certificate": {
+          "description": "Specify a string of between 1 and 32 characters.",
+          "type": "string",
+          "maxLength": 32
+        },
+        "characterset": {
+          "description": "Specify a string of between 1 and 40 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 40
+        },
+        "ciphers": {
+          "description": "Specify a string of between 1 and 56 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 56
+        },
+        "converter": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "hfsfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+[*]?|[*])$",
+          "maxLength": 255
+        },
+        "host": {
+          "description": "Specify a string of between 1 and 116 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>] or a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+|[*])$",
+          "maxLength": 116
+        },
+        "hostcodepage": {
+          "description": "Specify a string of between 1 and 10 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 10
+        },
+        "location": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+[*]?|[*])$",
+          "maxLength": 255
+        },
+        "mediatype": {
+          "description": "Specify a string of between 1 and 56 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>+*].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>+*]+$",
+          "maxLength": 56
+        },
+        "path": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>*].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>*]+$",
+          "maxLength": 255
+        },
+        "pipeline": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "port": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 65535.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "program": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "redirecttype": {
+          "description": "Specify a value from the following list: NONE | TEMPORARY | PERMANENT.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "TEMPORARY",
+            "PERMANENT"
+          ]
+        },
+        "scheme": {
+          "description": "Specify a value from the following list: HTTP | HTTPS | IIOP | JMS.",
+          "type": "string",
+          "enum": [
+            "HTTP",
+            "HTTPS",
+            "IIOP",
+            "JMS"
+          ]
+        },
+        "socketclose": {
+          "description": "Specify a time interval (format hhmmss) in the range 0 to 240000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 240000
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "tcpipservice": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "templatename": {
+          "description": "Specify a string of between 1 and 48 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+[*]?|[*])$",
+          "maxLength": 48
+        },
+        "transaction": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "usage": {
+          "description": "Specify a value from the following list: SERVER | CLIENT | PIPELINE | ATOM | JVMSERVER.",
+          "type": "string",
+          "enum": [
+            "SERVER",
+            "CLIENT",
+            "PIPELINE",
+            "ATOM",
+            "JVMSERVER"
+          ]
+        },
+        "userid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "webservice": {
+          "description": "Specify a string of between 1 and 32 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 32
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "tcpipserviceUDTDefinition": {
+      "description": "TCPDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TCPIPSERVICE resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "attachsec": {
+          "description": "Specify a value from the following list: LOCAL | VERIFY.",
+          "type": "string",
+          "enum": [
+            "LOCAL",
+            "VERIFY"
+          ]
+        },
+        "authenticate": {
+          "description": "Specify a value from the following list: \"NO\" | BASIC | CERTIFICATE | AUTOREGISTER | AUTOMATIC.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "BASIC",
+            "CERTIFICATE",
+            "AUTOREGISTER",
+            "AUTOMATIC"
+          ]
+        },
+        "backlog": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "certificate": {
+          "description": "Specify a string of between 1 and 56 characters.",
+          "type": "string",
+          "maxLength": 56
+        },
+        "ciphers": {
+          "description": "Specify a string of between 1 and 56 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 56
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "host": {
+          "description": "Specify a string of between 1 and 116 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 116
+        },
+        "ipaddress": {
+          "description": "Specify a string of between 1 and 15 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 15
+        },
+        "maxdatalen": {
+          "description": "Specify a integer in the range 3 to 524288.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 524288
+        },
+        "maxpersist": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 0 to 65535.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "optionspgm": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "portnumber": {
+          "description": "Specify a integer in the range 1 to 65535.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "protocol": {
+          "description": "Specify a value from the following list: HTTP | ECI | USER | IPIC.",
+          "type": "string",
+          "enum": [
+            "HTTP",
+            "ECI",
+            "USER",
+            "IPIC"
+          ]
+        },
+        "realm": {
+          "description": "Specify a string of between 1 and 56 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>Â¢+*'() ].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>Â¢+*'() ]+$",
+          "maxLength": 56
+        },
+        "socketclose": {
+          "description": "Specify either the string \"NO\" or a time interval (format hhmmss) in the range 0 to 240000.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 240000
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "speciftcps": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "ssl": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\" | CLIENTAUTH | ATTLSAWARE.",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO",
+            "CLIENTAUTH",
+            "ATTLSAWARE"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: OPEN | CLOSED.",
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        "transaction": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "urm": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "tdqueueUDTDefinition": {
+      "description": "TDQDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TDQUEUE resource names are a string between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "atifacility": {
+          "description": "Specify a value from the following list: TERMINAL | FILE | SYSTEM.",
+          "type": "string",
+          "enum": [
+            "TERMINAL",
+            "FILE",
+            "SYSTEM"
+          ]
+        },
+        "blockformat": {
+          "description": "Specify a value from the following list: BLOCKED | UNBLOCKED.",
+          "type": "string",
+          "enum": [
+            "BLOCKED",
+            "UNBLOCKED"
+          ]
+        },
+        "blocksize": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "databuffers": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "ddname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "disposition": {
+          "description": "Specify a value from the following list: SHR | OLD | MOD.",
+          "type": "string",
+          "enum": [
+            "SHR",
+            "OLD",
+            "MOD"
+          ]
+        },
+        "dsname": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#&.-%].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#&.\\-%]+$",
+          "maxLength": 44
+        },
+        "erroroption": {
+          "description": "Specify a value from the following list: IGNORE | SKIP.",
+          "type": "string",
+          "enum": [
+            "IGNORE",
+            "SKIP"
+          ]
+        },
+        "facilityid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#Â¢./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#Â¢./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "indirectname": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "jobuserid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "opentime": {
+          "description": "Specify a value from the following list: INITIAL | DEFERRED.",
+          "type": "string",
+          "enum": [
+            "INITIAL",
+            "DEFERRED"
+          ]
+        },
+        "printcontrol": {
+          "description": "Specify a value from the following list: A | M.",
+          "type": "string",
+          "enum": [
+            "A",
+            "M"
+          ]
+        },
+        "recordformat": {
+          "description": "Specify a value from the following list: FIXED | VARIABLE.",
+          "type": "string",
+          "enum": [
+            "FIXED",
+            "VARIABLE"
+          ]
+        },
+        "recordsize": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "recovstatus": {
+          "description": "Specify a value from the following list: \"NO\" | PHYSICAL | LOGICAL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "PHYSICAL",
+            "LOGICAL"
+          ]
+        },
+        "remotelength": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "rewind": {
+          "description": "Specify a value from the following list: LEAVE | REREAD.",
+          "type": "string",
+          "enum": [
+            "LEAVE",
+            "REREAD"
+          ]
+        },
+        "sysoutclass": {
+          "description": "Specify a single character value from the character set [A-Z0-9$@#] or a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Z0-9$@#]+|[*])$",
+          "maxLength": 1
+        },
+        "transid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "triggerlevel": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "type": {
+          "description": "Specify a value from the following list: EXTRA | INTRA | INDIRECT.",
+          "type": "string",
+          "enum": [
+            "EXTRA",
+            "INTRA",
+            "INDIRECT"
+          ]
+        },
+        "typefile": {
+          "description": "Specify a value from the following list: INPUT | OUTPUT | RDBACK.",
+          "type": "string",
+          "enum": [
+            "INPUT",
+            "OUTPUT",
+            "RDBACK"
+          ]
+        },
+        "userid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "wait": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "waitaction": {
+          "description": "Specify a value from the following list: QUEUE | REJECT.",
+          "type": "string",
+          "enum": [
+            "QUEUE",
+            "REJECT"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "sessionsUDTDefinition": {
+      "description": "SESSDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "SESSIONS resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "autoconnect": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | ALL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "ALL"
+          ]
+        },
+        "buildchain": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "connection": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "discreq": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "ioarealen": {
+          "description": "Specify two integers in the range 0 to 32767 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,5},[0-9]{1,5}$"
+        },
+        "maximum": {
+          "description": "Specify two integers in the range 0 to 999 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,3},[0-9]{1,3}$"
+        },
+        "modename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "nepclass": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "netnameq": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#./\\-_%&Â¢?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#./\\-_%&Â¢?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "protocol": {
+          "description": "Specify a value from the following list: APPC | LU61 | EXCI.",
+          "type": "string",
+          "enum": [
+            "APPC",
+            "LU61",
+            "EXCI"
+          ]
+        },
+        "receivecount": {
+          "description": "Specify a integer in the range 1 to 999.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
+        },
+        "receivepfx": {
+          "description": "Specify a string of between 1 and 2 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 2
+        },
+        "receivesize": {
+          "description": "Specify a integer in the range 1 to 30720.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30720
+        },
+        "recovoption": {
+          "description": "Specify a value from the following list: SYSDEFAULT | CLEARCONV | RELEASESESS | UNCONDREL | NONE.",
+          "type": "string",
+          "enum": [
+            "SYSDEFAULT",
+            "CLEARCONV",
+            "RELEASESESS",
+            "UNCONDREL",
+            "NONE"
+          ]
+        },
+        "relreq": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "sendcount": {
+          "description": "Specify a integer in the range 1 to 999.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
+        },
+        "sendpfx": {
+          "description": "Specify a string of between 1 and 2 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 2
+        },
+        "sendsize": {
+          "description": "Specify a integer in the range 1 to 30720.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30720
+        },
+        "sessname": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "sesspriority": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "userarealen": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "userid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "connectionUDTDefinition": {
+      "description": "CONNDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "CONNECTION resource names are a string between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "accessmethod": {
+          "description": "Specify a value from the following list: VTAM | IRC | INDIRECT | XM.",
+          "type": "string",
+          "enum": [
+            "VTAM",
+            "IRC",
+            "INDIRECT",
+            "XM"
+          ]
+        },
+        "attachsec": {
+          "description": "Specify a value from the following list: LOCAL | IDENTIFY | VERIFY | PERSISTENT | MIXIDPE.",
+          "type": "string",
+          "enum": [
+            "LOCAL",
+            "IDENTIFY",
+            "VERIFY",
+            "PERSISTENT",
+            "MIXIDPE"
+          ]
+        },
+        "autoconnect": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | ALL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "ALL"
+          ]
+        },
+        "bindsecurity": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "conntype": {
+          "description": "Specify a value from the following list: GENERIC | SPECIFIC.",
+          "type": "string",
+          "enum": [
+            "GENERIC",
+            "SPECIFIC"
+          ]
+        },
+        "datastream": {
+          "description": "Specify a value from the following list: USER | 3270 | SCS | STRFIELD | LMS.",
+          "type": "string",
+          "enum": [
+            "USER",
+            "3270",
+            "SCS",
+            "STRFIELD",
+            "LMS"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "indsys": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "inservice": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "maxqtime": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 0 to 9999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "netname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "protocol": {
+          "description": "Specify a value from the following list: APPC | LU61 | EXCI.",
+          "type": "string",
+          "enum": [
+            "APPC",
+            "LU61",
+            "EXCI"
+          ]
+        },
+        "psrecovery": {
+          "description": "Specify a value from the following list: SYSDEFAULT | NONE.",
+          "type": "string",
+          "enum": [
+            "SYSDEFAULT",
+            "NONE"
+          ]
+        },
+        "queuelimit": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 0 to 9999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "recordformat": {
+          "description": "Specify a value from the following list: U | VB.",
+          "type": "string",
+          "enum": [
+            "U",
+            "VB"
+          ]
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "remotesysnet": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "securityname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "singlesess": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "usedfltuser": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "xlnaction": {
+          "description": "Specify a value from the following list: KEEP | FORCE.",
+          "type": "string",
+          "enum": [
+            "KEEP",
+            "FORCE"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "journalmodelUDTDefinition": {
+      "description": "JRNMDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "JOURNALMODEL resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "journalname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#+%]. The value may end with a single wildcard character '*'.",
+          "type": "string",
+          "pattern": "^([A-Z0-9$@#+%]+[*]?|[*])$",
+          "maxLength": 8
+        },
+        "streamname": {
+          "description": "Specify a string of between 1 and 26 characters from the character set [A-Z0-9$@#&.-].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#&.\\-]+$",
+          "maxLength": 26
+        },
+        "type": {
+          "description": "Specify a value from the following list: MVS | SMF | DUMMY.",
+          "type": "string",
+          "enum": [
+            "MVS",
+            "SMF",
+            "DUMMY"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "fileUDTDefinition": {
+      "description": "FILEDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "FILE resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "add": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "backuptype": {
+          "description": "Specify a value from the following list: STATIC | DYNAMIC.",
+          "type": "string",
+          "enum": [
+            "STATIC",
+            "DYNAMIC"
+          ]
+        },
+        "browse": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "cfdtpool": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "databuffers": {
+          "description": "Specify a integer in the range 2 to 32767.",
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 32767
+        },
+        "delete": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "disposition": {
+          "description": "Specify a value from the following list: SHARE | OLD.",
+          "type": "string",
+          "enum": [
+            "SHARE",
+            "OLD"
+          ]
+        },
+        "dsname": {
+          "description": "Specify a string of between 1 and 44 characters from the character set [A-Z0-9$@#&.-%].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#&.\\-%]+$",
+          "maxLength": 44
+        },
+        "dsnsharing": {
+          "description": "Specify a value from the following list: ALLREQS | MODIFYREQS.",
+          "type": "string",
+          "enum": [
+            "ALLREQS",
+            "MODIFYREQS"
+          ]
+        },
+        "fwdrecovlog": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 99.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "indexbuffers": {
+          "description": "Specify a integer in the range 1 to 32767.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32767
+        },
+        "jnladd": {
+          "description": "Specify a value from the following list: NONE | BEFORE | AFTER | ALL.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "BEFORE",
+            "AFTER",
+            "ALL"
+          ]
+        },
+        "jnlread": {
+          "description": "Specify a value from the following list: NONE | UPDATEONLY | READONLY | ALL.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "UPDATEONLY",
+            "READONLY",
+            "ALL"
+          ]
+        },
+        "jnlsyncread": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "jnlsyncwrite": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "jnlupdate": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "journal": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 99.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "keylength": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "load": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "lsrpoolnum": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "maxnumrecs": {
+          "description": "Specify either the string \"NOLIMIT\" or a single integer in the range 1 to 99999999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            {
+              "type": "string",
+              "const": "NOLIMIT"
+            }
+          ]
+        },
+        "nsrgroup": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "opentime": {
+          "description": "Specify a value from the following list: FIRSTREF | STARTUP.",
+          "type": "string",
+          "enum": [
+            "FIRSTREF",
+            "STARTUP"
+          ]
+        },
+        "read": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "readinteg": {
+          "description": "Specify a value from the following list: UNCOMMITTED | CONSISTENT | REPEATABLE.",
+          "type": "string",
+          "enum": [
+            "UNCOMMITTED",
+            "CONSISTENT",
+            "REPEATABLE"
+          ]
+        },
+        "recordformat": {
+          "description": "Specify a value from the following list: V | F.",
+          "type": "string",
+          "enum": [
+            "V",
+            "F"
+          ]
+        },
+        "recordsize": {
+          "description": "Specify a integer in the range 1 to 32767.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32767
+        },
+        "recovery": {
+          "description": "Specify a value from the following list: NONE | BACKOUTONLY | ALL.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "BACKOUTONLY",
+            "ALL"
+          ]
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "rlsaccess": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED | UNENABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED",
+            "UNENABLED"
+          ]
+        },
+        "strings": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "table": {
+          "description": "Specify a value from the following list: \"NO\" | CICS | USER | CF.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "CICS",
+            "USER",
+            "CF"
+          ]
+        },
+        "tablename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "update": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "updatemodel": {
+          "description": "Specify a value from the following list: CONTENTION | LOCKING.",
+          "type": "string",
+          "enum": [
+            "CONTENTION",
+            "LOCKING"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "mapsetUDTDefinition": {
+      "description": "mapset",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "MAPSET resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "resident": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "usage": {
+          "description": "Specify a value from the following list: NORMAL | TRANSIENT.",
+          "type": "string",
+          "enum": [
+            "NORMAL",
+            "TRANSIENT"
+          ]
+        },
+        "uselpacopy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "programUDTDefinition": {
+      "description": "program",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PROGRAM resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "api": {
+          "description": "Specify a value from the following list: CICSAPI | OPENAPI.",
+          "type": "string",
+          "enum": [
+            "CICSAPI",
+            "OPENAPI"
+          ]
+        },
+        "cedf": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "concurrency": {
+          "description": "Specify a value from the following list: QUASIRENT | THREADSAFE | REQUIRED.",
+          "type": "string",
+          "enum": [
+            "QUASIRENT",
+            "THREADSAFE",
+            "REQUIRED"
+          ]
+        },
+        "datalocation": {
+          "description": "Specify a value from the following list: BELOW | ANY.",
+          "type": "string",
+          "enum": [
+            "BELOW",
+            "ANY"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "dynamic": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "execkey": {
+          "description": "Specify a value from the following list: USER | CICS.",
+          "type": "string",
+          "enum": [
+            "USER",
+            "CICS"
+          ]
+        },
+        "executionset": {
+          "description": "Specify a value from the following list: FULLAPI | DPLSUBSET.",
+          "type": "string",
+          "enum": [
+            "FULLAPI",
+            "DPLSUBSET"
+          ]
+        },
+        "jvm": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "jvmclass": {
+          "description": "Specify a string of between 1 and 255 characters.",
+          "type": "string",
+          "maxLength": 255
+        },
+        "jvmserver": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "language": {
+          "description": "Specify a value from the following list: COBOL | ASSEMBLER | LE370 | C | PLI.",
+          "type": "string",
+          "enum": [
+            "COBOL",
+            "ASSEMBLER",
+            "LE370",
+            "C",
+            "PLI"
+          ]
+        },
+        "reload": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "resident": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "transid": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "usage": {
+          "description": "Specify a value from the following list: NORMAL | TRANSIENT.",
+          "type": "string",
+          "enum": [
+            "NORMAL",
+            "TRANSIENT"
+          ]
+        },
+        "uselpacopy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "transactionUDTDefinition": {
+      "description": "transaction",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TRANSACTION resource names are a string between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "action": {
+          "description": "Specify a value from the following list: BACKOUT | COMMIT.",
+          "type": "string",
+          "enum": [
+            "BACKOUT",
+            "COMMIT"
+          ]
+        },
+        "alias": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "brexit": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "cmdsec": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "confdata": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "dtimout": {
+          "description": "Specify either the string \"NO\" or a time interval (format mmss) in the range 1 to 6800.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6800
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "dump": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "dynamic": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "isolate": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "localq": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "otelemit": {
+          "description": "Specify a value from the following list: NOEMIT | TASKEND.",
+          "type": "string",
+          "enum": [
+            "NOEMIT",
+            "TASKEND"
+          ]
+        },
+        "otelprop": {
+          "description": "Specify a value from the following list: NOPROP | PROPONLY.",
+          "type": "string",
+          "enum": [
+            "NOPROP",
+            "PROPONLY"
+          ]
+        },
+        "otstimeout": {
+          "description": "Specify either the string \"NO\" or a time interval (format hhmmss) in the range 0 to 240000.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 240000
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "partitionset": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "priority": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "profile": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "program": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "ressec": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "restart": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "routable": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "runaway": {
+          "description": "Specify either the string \"SYSTEM\" or a single integer in the range 0 to 2700000.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2700000
+            },
+            {
+              "type": "string",
+              "const": "SYSTEM"
+            }
+          ]
+        },
+        "shutdown": {
+          "description": "Specify a value from the following list: DISABLED | ENABLED.",
+          "type": "string",
+          "enum": [
+            "DISABLED",
+            "ENABLED"
+          ]
+        },
+        "spurge": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "storageclear": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "taskdatakey": {
+          "description": "Specify a value from the following list: USER | CICS.",
+          "type": "string",
+          "enum": [
+            "USER",
+            "CICS"
+          ]
+        },
+        "taskdataloc": {
+          "description": "Specify a value from the following list: BELOW | ANY.",
+          "type": "string",
+          "enum": [
+            "BELOW",
+            "ANY"
+          ]
+        },
+        "taskreq": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "tpname": {
+          "description": "Specify a string of between 1 and 64 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 64
+        },
+        "tpurge": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "trace": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "tranclass": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "trprof": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "twasize": {
+          "description": "Specify a integer in the range 0 to 32767.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32767
+        },
+        "wait": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "waittime": {
+          "description": "Specify three integers in the range 0 to 99 separated by commas, i.e. nn,nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,2},[0-9]{1,2},[0-9]{1,2}$"
+        },
+        "xtpname": {
+          "description": "Specify a string of between 1 and 128 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 128
+        },
+        "xtranid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "atomserviceUDTDefinition": {
+      "description": "ATOMDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "ATOMSERVICE resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "atomtype": {
+          "description": "Specify a value from the following list: FEED | SERVICE | COLLECTION | CATEGORY.",
+          "type": "string",
+          "enum": [
+            "FEED",
+            "SERVICE",
+            "COLLECTION",
+            "CATEGORY"
+          ]
+        },
+        "bindfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "configfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "resourcename": {
+          "description": "Specify a string of between 1 and 16 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 16
+        },
+        "resourcetype": {
+          "description": "Specify a value from the following list: TSQUEUE | FILE | PROGRAM.",
+          "type": "string",
+          "enum": [
+            "TSQUEUE",
+            "FILE",
+            "PROGRAM"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "bundleUDTDefinition": {
+      "description": "BUNDDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "BUNDLE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "basescope": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "bundledir": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "doctemplateUDTDefinition": {
+      "description": "DOCTDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "DOCTEMPLATE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "appendcrlf": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "ddname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "exitpgm": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "file": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "hfsfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "membername": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "program": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "tdqueue": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "templatename": {
+          "description": "Specify a string of between 1 and 48 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 48
+        },
+        "tsqueue": {
+          "description": "Specify a string of between 1 and 16 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 16
+        },
+        "type": {
+          "description": "Specify a value from the following list: BINARY | EBCDIC.",
+          "type": "string",
+          "enum": [
+            "BINARY",
+            "EBCDIC"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "dumpcodeUDTDefinition": {
+      "description": "DUMPCODE",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "DUMPCODE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "daeoption": {
+          "description": "Specify a value from the following list: DAE | NODAE.",
+          "type": "string",
+          "enum": [
+            "DAE",
+            "NODAE"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "dsplist": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>*].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>*]+$",
+          "maxLength": 255
+        },
+        "dumpaction": {
+          "description": "Specify a value from the following list: TRANDUMP | SYSDUMP | BOTH | NONE.",
+          "type": "string",
+          "enum": [
+            "TRANDUMP",
+            "SYSDUMP",
+            "BOTH",
+            "NONE"
+          ]
+        },
+        "dumpscope": {
+          "description": "Specify a value from the following list: LOCAL | RELATED.",
+          "type": "string",
+          "enum": [
+            "LOCAL",
+            "RELATED"
+          ]
+        },
+        "joblist": {
+          "description": "Specify a string of between 1 and 134 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>*].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>*]+$",
+          "maxLength": 134
+        },
+        "maximum": {
+          "description": "Specify a integer in the range 0 to 999.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "shutoption": {
+          "description": "Specify a value from the following list: NOSHUTDOWN | SHUTDOWN.",
+          "type": "string",
+          "enum": [
+            "NOSHUTDOWN",
+            "SHUTDOWN"
+          ]
+        },
+        "type": {
+          "description": "Specify a value from the following list: TRAN | SYSTEM.",
+          "type": "string",
+          "enum": [
+            "TRAN",
+            "SYSTEM"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "ipconnUDTDefinition": {
+      "description": "IPCODEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "IPCONN resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "applid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "autoconnect": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "certificate": {
+          "description": "Specify a string of between 1 and 32 characters.",
+          "type": "string",
+          "maxLength": 32
+        },
+        "ciphers": {
+          "description": "Specify a string of between 1 and 56 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 56
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "ha": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "host": {
+          "description": "Specify a string of between 1 and 116 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 116
+        },
+        "idprop": {
+          "description": "Specify a value from the following list: NOTALLOWED | OPTIONAL | REQUIRED.",
+          "type": "string",
+          "enum": [
+            "NOTALLOWED",
+            "OPTIONAL",
+            "REQUIRED"
+          ]
+        },
+        "inservice": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "linkauth": {
+          "description": "Specify a value from the following list: SECUSER | CERTUSER.",
+          "type": "string",
+          "enum": [
+            "SECUSER",
+            "CERTUSER"
+          ]
+        },
+        "maxqtime": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 0 to 9999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "mirrorlife": {
+          "description": "Specify a value from the following list: REQUEST | TASK | UOW.",
+          "type": "string",
+          "enum": [
+            "REQUEST",
+            "TASK",
+            "UOW"
+          ]
+        },
+        "networkid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "port": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 65535.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "queuelimit": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 0 to 9999.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "receivecount": {
+          "description": "Specify a integer in the range 1 to 999.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
+        },
+        "securityname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "sendcount": {
+          "description": "Specify a integer in the range 0 to 999.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "ssl": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | ATTLSAWARE.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "ATTLSAWARE"
+          ]
+        },
+        "tcpipservice": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "userauth": {
+          "description": "Specify a value from the following list: LOCAL | IDENTIFY | VERIFY | DEFAULTUSER.",
+          "type": "string",
+          "enum": [
+            "LOCAL",
+            "IDENTIFY",
+            "VERIFY",
+            "DEFAULTUSER"
+          ]
+        },
+        "xlnaction": {
+          "description": "Specify a value from the following list: KEEP | FORCE.",
+          "type": "string",
+          "enum": [
+            "KEEP",
+            "FORCE"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "lsrpoolUDTDefinition": {
+      "description": "LSRDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "LSRPOOL resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "data12k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data16k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data1k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data20k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data24k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data28k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data2k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data32k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data4k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data512": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "data8k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "hsdata12k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata16k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata20k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata24k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata28k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata32k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata4k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsdata8k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex12k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex16k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex20k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex24k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex28k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex32k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex4k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "hsindex8k": {
+          "description": "Specify a integer in the range 0 to 16777215.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16777215
+        },
+        "index12k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index16k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index1k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index20k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index24k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index28k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index2k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index32k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index4k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index512": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "index8k": {
+          "description": "Specify a integer in the range 3 to 32767.",
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 32767
+        },
+        "lsrpoolnum": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        },
+        "maxkeylength": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "sharelimit": {
+          "description": "Specify a integer in the range 1 to 100.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "strings": {
+          "description": "Specify a integer in the range 1 to 255.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "mqconnUDTDefinition": {
+      "description": "MQCONDEF",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "MQCONN resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "initqname": {
+          "description": "Specify a string of between 1 and 48 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 48
+        },
+        "mqname": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "resyncmember": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\" | GROUPRESYNC.",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO",
+            "GROUPRESYNC"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "mqmonitorUDTDefinition": {
+      "description": "MQMONITOR",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "MQMONITOR resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "autostart": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "mondata": {
+          "description": "Specify a string of between 1 and 200 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 200
+        },
+        "monuserid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "qname": {
+          "description": "Specify a string of between 1 and 48 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 48
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "transaction": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "userid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "partitionsetUDTDefinition": {
+      "description": "PARTITIONSET",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PARTITIONSET resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "resident": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        },
+        "usage": {
+          "description": "Specify a value from the following list: NORMAL | TRANSIENT.",
+          "type": "string",
+          "enum": [
+            "NORMAL",
+            "TRANSIENT"
+          ]
+        },
+        "uselpacopy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "partnerUDTDefinition": {
+      "description": "PARTNER",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PARTNER resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "netname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "network": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "profile": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "tpname": {
+          "description": "Specify a string of between 1 and 64 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 64
+        },
+        "xtpname": {
+          "description": "Specify a string of between 1 and 128 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "processtypeUDTDefinition": {
+      "description": "PROCESSTYPE",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PROCESSTYPE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "auditlevel": {
+          "description": "Specify a value from the following list: OFF | PROCESS | ACTIVITY | FULL.",
+          "type": "string",
+          "enum": [
+            "OFF",
+            "PROCESS",
+            "ACTIVITY",
+            "FULL"
+          ]
+        },
+        "auditlog": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "file": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "status": {
+          "description": "Specify a value from the following list: ENABLED | DISABLED.",
+          "type": "string",
+          "enum": [
+            "ENABLED",
+            "DISABLED"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "profileUDTDefinition": {
+      "description": "PROFILE",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "PROFILE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "chaincontrol": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "dvsuprt": {
+          "description": "Specify a value from the following list: ALL | NONVTAM | VTAM.",
+          "type": "string",
+          "enum": [
+            "ALL",
+            "NONVTAM",
+            "VTAM"
+          ]
+        },
+        "facilitylike": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "inbfmh": {
+          "description": "Specify a value from the following list: \"NO\" | ALL | DIP | EODS.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "ALL",
+            "DIP",
+            "EODS"
+          ]
+        },
+        "journal": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 99.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "logrec": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "modename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "msginteg": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "msgjrnl": {
+          "description": "Specify a value from the following list: \"NO\" | INPUT | OUTPUT | INOUT.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "INPUT",
+            "OUTPUT",
+            "INOUT"
+          ]
+        },
+        "nepclass": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "onewte": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "printercomp": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "raq": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "rtimout": {
+          "description": "Specify either the string \"NO\" or a time interval (format mmss) in the range 1 to 7000.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7000
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "scrnsize": {
+          "description": "Specify a value from the following list: DEFAULT | ALTERNATE.",
+          "type": "string",
+          "enum": [
+            "DEFAULT",
+            "ALTERNATE"
+          ]
+        },
+        "uctran": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "terminalUDTDefinition": {
+      "description": "TERMINAL",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TERMINAL resource names are a string between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "altprintcopy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "altprinter": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "attachsec": {
+          "description": "Specify a value from the following list: LOCAL | IDENTIFY | VERIFY | PERSISTENT | MIXIDPE.",
+          "type": "string",
+          "enum": [
+            "LOCAL",
+            "IDENTIFY",
+            "VERIFY",
+            "PERSISTENT",
+            "MIXIDPE"
+          ]
+        },
+        "autinstmodel": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | ONLY.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "ONLY"
+          ]
+        },
+        "autinstname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "bindsecurity": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "consname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "inservice": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "modename": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "natlang": {
+          "description": "Specify a single character value from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 1
+        },
+        "netname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "pool": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "printer": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "printercopy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "remotename": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "remotesysnet": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "securityname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "solicited": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "tasklimit": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 32767.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32767
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        },
+        "termpriority": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "transaction": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 4
+        },
+        "typeterm": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "usedfltuser": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "userid": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#] or for autoinstalled consoles the special values *FIRST or *EVERY.",
+          "type": "string",
+          "pattern": "^([A-Z0-9$@#]+|\\*EVERY|\\*FIRST)$",
+          "maxLength": 8
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "tranclassUDTDefinition": {
+      "description": "TRANCLASS",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TRANCLASS resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "maxactive": {
+          "description": "Specify a integer in the range 0 to 999.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "purgeaction": {
+          "description": "Specify a value from the following list: ABEND | DISCARD.",
+          "type": "string",
+          "enum": [
+            "ABEND",
+            "DISCARD"
+          ]
+        },
+        "purgethresh": {
+          "description": "Specify either the string \"NO\" or a single integer in the range 1 to 1000000.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000
+            },
+            {
+              "type": "string",
+              "const": "NO"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "maxactive",
+        "name"
+      ]
+    },
+    "tsmodelUDTDefinition": {
+      "description": "TSMODEL",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TSMODEL resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "expiryintmin": {
+          "description": "Specify a integer in the range 0 to 900000.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 900000
+        },
+        "location": {
+          "description": "Specify a value from the following list: AUXILIARY | MAIN.",
+          "type": "string",
+          "enum": [
+            "AUXILIARY",
+            "MAIN"
+          ]
+        },
+        "poolname": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#_].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#_]+$",
+          "maxLength": 8
+        },
+        "prefix": {
+          "description": "Specify a string of between 1 and 16 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>+].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>+]+$",
+          "maxLength": 16
+        },
+        "recovery": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "remoteprefix": {
+          "description": "Specify a string of between 1 and 16 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>+].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>+]+$",
+          "maxLength": 16
+        },
+        "remotesystem": {
+          "description": "Specify a string of between 1 and 4 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 4
+        },
+        "security": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "xprefix": {
+          "description": "Specify a string of between 1 and 32 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 32
+        },
+        "xremotepfx": {
+          "description": "Specify a string of between 1 and 32 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 32
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "typetermUDTDefinition": {
+      "description": "TYPETERM",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "TYPETERM resource names are a string between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "altpage": {
+          "description": "Specify two integers in the range 0 to 255 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,3},[0-9]{1,3}$"
+        },
+        "altscreen": {
+          "description": "Specify two integers in the range 0 to 255 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,3},[0-9]{1,3}$"
+        },
+        "altsuffix": {
+          "description": "Specify a single character value from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 1
+        },
+        "aplkybd": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "apltext": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "ascii": {
+          "description": "Specify a value from the following list: \"NO\" | 7 | 8.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "7",
+            "8"
+          ]
+        },
+        "ati": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "audiblealarm": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "autoconnect": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | ALL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "ALL"
+          ]
+        },
+        "autopage": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "backtrans": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "bracket": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "buildchain": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "cgcsgid": {
+          "description": "Specify two integers in the range 0 to 65535 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,5},[0-9]{1,5}$"
+        },
+        "color": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "copy": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "createsess": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "defscreen": {
+          "description": "Specify two integers in the range 0 to 255 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,3},[0-9]{1,3}$"
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "device": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "discreq": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "dualcasekybd": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "errcolor": {
+          "description": "Specify a value from the following list: \"NO\" | BLUE | RED | PINK | GREEN | TURQUOISE | YELLOW | NEUTRAL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "BLUE",
+            "RED",
+            "PINK",
+            "GREEN",
+            "TURQUOISE",
+            "YELLOW",
+            "NEUTRAL"
+          ]
+        },
+        "errhilight": {
+          "description": "Specify a value from the following list: \"NO\" | BLINK | REVERSE | UNDERLINE.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "BLINK",
+            "REVERSE",
+            "UNDERLINE"
+          ]
+        },
+        "errintensify": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "errlastline": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "extendedds": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "fmhparm": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "formfeed": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "hilight": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "horizform": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "ioarealen": {
+          "description": "Specify two integers in the range 0 to 32767 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,5},[0-9]{1,5}$"
+        },
+        "katakana": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "ldclist": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "lightpen": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "logmode": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "logonmsg": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "msrcontrol": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "nepclass": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "obformat": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "oboperid": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "outline": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "pagesize": {
+          "description": "Specify two integers in the range 0 to 255 separated by commas, i.e. nn,nn.",
+          "type": "string",
+          "pattern": "^[0-9]{1,3},[0-9]{1,3}$"
+        },
+        "partitions": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "printadapter": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "progsymbols": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "query": {
+          "description": "Specify a value from the following list: \"NO\" | COLD | ALL.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "COLD",
+            "ALL"
+          ]
+        },
+        "receivesize": {
+          "description": "Specify a integer in the range 0 to 30720.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30720
+        },
+        "recovnotify": {
+          "description": "Specify a value from the following list: NONE | MESSAGE | TRANSACTION.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "MESSAGE",
+            "TRANSACTION"
+          ]
+        },
+        "recovoption": {
+          "description": "Specify a value from the following list: SYSDEFAULT | CLEARCONV | RELEASESESS | UNCONDREL | NONE.",
+          "type": "string",
+          "enum": [
+            "SYSDEFAULT",
+            "CLEARCONV",
+            "RELEASESESS",
+            "UNCONDREL",
+            "NONE"
+          ]
+        },
+        "relreq": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "routedmsgs": {
+          "description": "Specify a value from the following list: ALL | NONE | SPECIFIC.",
+          "type": "string",
+          "enum": [
+            "ALL",
+            "NONE",
+            "SPECIFIC"
+          ]
+        },
+        "rstsignoff": {
+          "description": "Specify a value from the following list: NOFORCE | FORCE.",
+          "type": "string",
+          "enum": [
+            "NOFORCE",
+            "FORCE"
+          ]
+        },
+        "sendsize": {
+          "description": "Specify a integer in the range 0 to 30720.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30720
+        },
+        "sessiontype": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "shippable": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "signoff": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\" | LOGOFF.",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO",
+            "LOGOFF"
+          ]
+        },
+        "sosi": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "termmodel": {
+          "description": "Specify a single character value from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 1
+        },
+        "textkybd": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "textprint": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "tti": {
+          "description": "Specify a value from the following list: \"YES\" | \"NO\".",
+          "type": "string",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "uctran": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\" | TRANID.",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES",
+            "TRANID"
+          ]
+        },
+        "userarealen": {
+          "description": "Specify a integer in the range 0 to 255.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "validation": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "verticalform": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    },
+    "webserviceUDTDefinition": {
+      "description": "WEBSERVICE",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "WEBSERVICE resource names are a string between 1 and 8 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 8
+        },
+        "group": {
+          "description": "RDO group names are strings between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "archivefile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "description": {
+          "description": "Specify a string of between 1 and 58 characters.",
+          "type": "string",
+          "maxLength": 58
+        },
+        "pipeline": {
+          "description": "Specify a string of between 1 and 8 characters from the character set [A-Z0-9$@#].",
+          "type": "string",
+          "pattern": "^[A-Z0-9$@#]+$",
+          "maxLength": 8
+        },
+        "validation": {
+          "description": "Specify a value from the following list: \"NO\" | \"YES\".",
+          "type": "string",
+          "enum": [
+            "NO",
+            "YES"
+          ]
+        },
+        "wsbind": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        },
+        "wsdlfile": {
+          "description": "Specify a string of between 1 and 255 characters from the character set [A-Za-z0-9$@#./-_%&?!:|\"=Â¬,;<>].",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9$@#./\\-_%&?!:|\"=Â¬,;<>]+$",
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "group",
+        "name"
+      ]
+    }
+  }
+}

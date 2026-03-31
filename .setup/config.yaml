@@ -42,4 +42,9 @@ pipeline_script:
   # Bank of Z target HLQ for Wazi Deploy
   target_hlq: BANKZ.BOZ.TEST
 
+zconfig:
+  # zconfig home folder
+  zconfig_home: /u/ibmuser/zconfig # FIXME ~ not working
+  zcb_home: /u/ibmuser/zrb/cics-resource-builder-1.0.6 # FIXME ~ not working
+  
 # Made with Bob

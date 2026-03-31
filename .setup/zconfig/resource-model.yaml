@@ -1,0 +1,1449 @@
+schemaVersion: resourceModel/1.0
+application:
+  name: Permissive application
+
+  constraints:
+    - id: all-groups
+      pattern: ".*"
+
+  configuration:
+    - list:
+        name: CBSALIST
+        group:
+          constraintId: all-groups
+
+resourceModel:
+  target: cicsts-6.3.0
+  defines:
+    - id: jvmserver
+      description: JVMSVDEF
+      type: jvmserver
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          jvmprofile:
+            required: false
+          lerunopts:
+            required: false
+          status:
+            required: false
+          threadlimit:
+            required: false
+    - id: pipeline
+      description: PIPELINE
+      type: pipeline
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          configfile:
+            required: false
+          respwait:
+            required: false
+          shelf:
+            required: false
+          status:
+            required: false
+          wsdir:
+            required: false
+    - id: enqmodel
+      description: ENQMODEL
+      type: enqmodel
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          enqname:
+            required: false
+          enqscope:
+            required: false
+          status:
+            required: false
+    - id: db2tran
+      description: DB2TDEF
+      type: db2tran
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          entry:
+            required: false
+          transid:
+            required: false
+    - id: db2entry
+      description: DB2EDEF
+      type: db2entry
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          accountrec:
+            required: false
+          authid:
+            required: false
+          authtype:
+            required: false
+          description:
+            required: false
+          drollback:
+            required: false
+          plan:
+            required: false
+          planexitname:
+            required: false
+          priority:
+            required: false
+          protectnum:
+            required: false
+          sharelocks:
+            required: false
+          threadlimit:
+            required: false
+          threadwait:
+            required: false
+          transid:
+            required: false
+    - id: db2conn
+      description: DB2CDEF
+      type: db2conn
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          accountrec:
+            required: false
+          authid:
+            required: false
+          authtype:
+            required: false
+          comauthid:
+            required: false
+          comauthtype:
+            required: false
+          comthreadlim:
+            required: false
+          connecterror:
+            required: false
+          db2groupid:
+            required: false
+          db2id:
+            required: false
+          description:
+            required: false
+          drollback:
+            required: false
+          msgqueue1:
+            required: false
+          msgqueue2:
+            required: false
+          msgqueue3:
+            required: false
+          nontermrel:
+            required: false
+          plan:
+            required: false
+          planexitname:
+            required: false
+          priority:
+            required: false
+          purgecycle:
+            required: false
+          resyncmember:
+            required: false
+          reuselimit:
+            required: false
+          signid:
+            required: false
+          standbymode:
+            required: false
+          statsqueue:
+            required: false
+          tcblimit:
+            required: false
+          threaderror:
+            required: false
+          threadlimit:
+            required: false
+          threadwait:
+            required: false
+    - id: library
+      description: LIBDEF
+      type: library
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          critical:
+            required: false
+          description:
+            required: false
+          dsname01:
+            required: false
+          dsname02:
+            required: false
+          dsname03:
+            required: false
+          dsname04:
+            required: false
+          dsname05:
+            required: false
+          dsname06:
+            required: false
+          dsname07:
+            required: false
+          dsname08:
+            required: false
+          dsname09:
+            required: false
+          dsname10:
+            required: false
+          dsname11:
+            required: false
+          dsname12:
+            required: false
+          dsname13:
+            required: false
+          dsname14:
+            required: false
+          dsname15:
+            required: false
+          dsname16:
+            required: false
+          ranking:
+            required: false
+          status:
+            required: false
+    - id: urimap
+      description: URIMPDEF
+      type: urimap
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          analyzer:
+            required: false
+          atomservice:
+            required: false
+          authenticate:
+            required: false
+          certificate:
+            required: false
+          characterset:
+            required: false
+          ciphers:
+            required: false
+          converter:
+            required: false
+          description:
+            required: false
+          hfsfile:
+            required: false
+          host:
+            required: false
+          hostcodepage:
+            required: false
+          location:
+            required: false
+          mediatype:
+            required: false
+          path:
+            required: false
+          pipeline:
+            required: false
+          port:
+            required: false
+          program:
+            required: false
+          redirecttype:
+            required: false
+          scheme:
+            required: false
+          socketclose:
+            required: false
+          status:
+            required: false
+          tcpipservice:
+            required: false
+          templatename:
+            required: false
+          transaction:
+            required: false
+          usage:
+            required: false
+          userid:
+            required: false
+          webservice:
+            required: false
+    - id: tcpipservice
+      description: TCPDEF
+      type: tcpipservice
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          attachsec:
+            required: false
+          authenticate:
+            required: false
+          backlog:
+            required: false
+          certificate:
+            required: false
+          ciphers:
+            required: false
+          description:
+            required: false
+          host:
+            required: false
+          ipaddress:
+            required: false
+          maxdatalen:
+            required: false
+          maxpersist:
+            required: false
+          optionspgm:
+            required: false
+          portnumber:
+            required: false
+          protocol:
+            required: false
+          realm:
+            required: false
+          socketclose:
+            required: false
+          speciftcps:
+            required: false
+          ssl:
+            required: false
+          status:
+            required: false
+          transaction:
+            required: false
+          urm:
+            required: false
+    - id: tdqueue
+      description: TDQDEF
+      type: tdqueue
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          atifacility:
+            required: false
+          blockformat:
+            required: false
+          blocksize:
+            required: false
+          databuffers:
+            required: false
+          ddname:
+            required: false
+          description:
+            required: false
+          disposition:
+            required: false
+          dsname:
+            required: false
+          erroroption:
+            required: false
+          facilityid:
+            required: false
+          indirectname:
+            required: false
+          jobuserid:
+            required: false
+          opentime:
+            required: false
+          printcontrol:
+            required: false
+          recordformat:
+            required: false
+          recordsize:
+            required: false
+          recovstatus:
+            required: false
+          remotelength:
+            required: false
+          remotename:
+            required: false
+          remotesystem:
+            required: false
+          rewind:
+            required: false
+          sysoutclass:
+            required: false
+          transid:
+            required: false
+          triggerlevel:
+            required: false
+          type:
+            required: false
+          typefile:
+            required: false
+          userid:
+            required: false
+          wait:
+            required: false
+          waitaction:
+            required: false
+    - id: sessions
+      description: SESSDEF
+      type: sessions
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          autoconnect:
+            required: false
+          buildchain:
+            required: false
+          connection:
+            required: false
+          description:
+            required: false
+          discreq:
+            required: false
+          ioarealen:
+            required: false
+          maximum:
+            required: false
+          modename:
+            required: false
+          nepclass:
+            required: false
+          netnameq:
+            required: false
+          protocol:
+            required: false
+          receivecount:
+            required: false
+          receivepfx:
+            required: false
+          receivesize:
+            required: false
+          recovoption:
+            required: false
+          relreq:
+            required: false
+          sendcount:
+            required: false
+          sendpfx:
+            required: false
+          sendsize:
+            required: false
+          sessname:
+            required: false
+          sesspriority:
+            required: false
+          userarealen:
+            required: false
+          userid:
+            required: false
+    - id: connection
+      description: CONNDEF
+      type: connection
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          accessmethod:
+            required: false
+          attachsec:
+            required: false
+          autoconnect:
+            required: false
+          bindsecurity:
+            required: false
+          conntype:
+            required: false
+          datastream:
+            required: false
+          description:
+            required: false
+          indsys:
+            required: false
+          inservice:
+            required: false
+          maxqtime:
+            required: false
+          netname:
+            required: false
+          protocol:
+            required: false
+          psrecovery:
+            required: false
+          queuelimit:
+            required: false
+          recordformat:
+            required: false
+          remotename:
+            required: false
+          remotesysnet:
+            required: false
+          remotesystem:
+            required: false
+          securityname:
+            required: false
+          singlesess:
+            required: false
+          usedfltuser:
+            required: false
+          xlnaction:
+            required: false
+    - id: journalmodel
+      description: JRNMDEF
+      type: journalmodel
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          type:
+            required: false
+          journalname:
+            required: false
+          description:
+            required: false
+          streamname:
+            required: false
+    - id: file
+      description: FILEDEF
+      type: file
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          dsname:
+            required: false
+          add:
+            required: false
+          browse:
+            required: false
+          delete:
+            required: false
+          read:
+            required: false
+          update:
+            required: false
+          backuptype:
+            required: false
+          cfdtpool:
+            required: false
+          databuffers:
+            required: false
+          description:
+            required: false
+          disposition:
+            required: false
+          dsnsharing:
+            required: false
+          fwdrecovlog:
+            required: false
+          indexbuffers:
+            required: false
+          jnladd:
+            required: false
+          jnlread:
+            required: false
+          jnlsyncread:
+            required: false
+          jnlsyncwrite:
+            required: false
+          jnlupdate:
+            required: false
+          journal:
+            required: false
+          keylength:
+            required: false
+          load:
+            required: false
+          lsrpoolnum:
+            required: false
+          maxnumrecs:
+            required: false
+          nsrgroup:
+            required: false
+          opentime:
+            required: false
+          readinteg:
+            required: false
+          recordformat:
+            required: false
+          recordsize:
+            required: false
+          recovery:
+            required: false
+          remotename:
+            required: false
+          remotesystem:
+            required: false
+          rlsaccess:
+            required: false
+          status:
+            required: false
+          strings:
+            required: false
+          table:
+            required: false
+          tablename:
+            required: false
+          updatemodel:
+            required: false
+    - id: mapset
+      description: mapset
+      type: mapset
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          resident:
+            required: false
+          status:
+            required: false
+          usage:
+            required: false
+          uselpacopy:
+            required: false
+    - id: program
+      description: program
+      type: program
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          concurrency:
+            required: false
+          language:
+            required: false
+          api:
+            required: false
+          cedf:
+            required: false
+          datalocation:
+            required: false
+          description:
+            required: false
+          dynamic:
+            required: false
+          execkey:
+            required: false
+          executionset:
+            required: false
+          jvm:
+            required: false
+          jvmclass:
+            required: false
+          jvmserver:
+            required: false
+          reload:
+            required: false
+          remotename:
+            required: false
+          remotesystem:
+            required: false
+          resident:
+            required: false
+          status:
+            required: false
+          transid:
+            required: false
+          usage:
+            required: false
+          uselpacopy:
+            required: false
+    - id: transaction
+      description: transaction
+      type: transaction
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          program:
+            required: false
+          tpurge:
+            required: false
+          action:
+            required: false
+          alias:
+            required: false
+          brexit:
+            required: false
+          cmdsec:
+            required: false
+          confdata:
+            required: false
+          description:
+            required: false
+          dtimout:
+            required: false
+          dump:
+            required: false
+          dynamic:
+            required: false
+          isolate:
+            required: false
+          localq:
+            required: false
+          otelemit:
+            required: false
+          otelprop:
+            required: false
+          otstimeout:
+            required: false
+          partitionset:
+            required: false
+          priority:
+            required: false
+          profile:
+            required: false
+          remotename:
+            required: false
+          remotesystem:
+            required: false
+          ressec:
+            required: false
+          restart:
+            required: false
+          routable:
+            required: false
+          runaway:
+            required: false
+          shutdown:
+            required: false
+          spurge:
+            required: false
+          status:
+            required: false
+          storageclear:
+            required: false
+          taskdatakey:
+            required: false
+          taskdataloc:
+            required: false
+          taskreq:
+            required: false
+          tpname:
+            required: false
+          trace:
+            required: false
+          tranclass:
+            required: false
+          trprof:
+            required: false
+          twasize:
+            required: false
+          wait:
+            required: false
+          waittime:
+            required: false
+          xtpname:
+            required: false
+          xtranid:
+            required: false
+    - id: atomservice
+      description: ATOMDEF
+      type: atomservice
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          atomtype:
+            required: false
+          bindfile:
+            required: false
+          configfile:
+            required: false
+          description:
+            required: false
+          resourcename:
+            required: false
+          resourcetype:
+            required: false
+          status:
+            required: false
+    - id: bundle
+      description: BUNDDEF
+      type: bundle
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          basescope:
+            required: false
+          bundledir:
+            required: false
+          description:
+            required: false
+          status:
+            required: false
+    - id: doctemplate
+      description: DOCTDEF
+      type: doctemplate
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          appendcrlf:
+            required: false
+          ddname:
+            required: false
+          description:
+            required: false
+          exitpgm:
+            required: false
+          file:
+            required: false
+          hfsfile:
+            required: false
+          membername:
+            required: false
+          program:
+            required: false
+          tdqueue:
+            required: false
+          templatename:
+            required: false
+          tsqueue:
+            required: false
+          type:
+            required: false
+    - id: dumpcode
+      description: DUMPCODE
+      type: dumpcode
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          daeoption:
+            required: false
+          description:
+            required: false
+          dsplist:
+            required: false
+          dumpaction:
+            required: false
+          dumpscope:
+            required: false
+          joblist:
+            required: false
+          maximum:
+            required: false
+          shutoption:
+            required: false
+          type:
+            required: false
+    - id: ipconn
+      description: IPCODEF
+      type: ipconn
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          applid:
+            required: false
+          autoconnect:
+            required: false
+          certificate:
+            required: false
+          ciphers:
+            required: false
+          description:
+            required: false
+          ha:
+            required: false
+          host:
+            required: false
+          idprop:
+            required: false
+          inservice:
+            required: false
+          linkauth:
+            required: false
+          maxqtime:
+            required: false
+          mirrorlife:
+            required: false
+          networkid:
+            required: false
+          port:
+            required: false
+          queuelimit:
+            required: false
+          receivecount:
+            required: false
+          securityname:
+            required: false
+          sendcount:
+            required: false
+          ssl:
+            required: false
+          tcpipservice:
+            required: false
+          userauth:
+            required: false
+          xlnaction:
+            required: false
+    - id: lsrpool
+      description: LSRDEF
+      type: lsrpool
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          data12k:
+            required: false
+          data16k:
+            required: false
+          data1k:
+            required: false
+          data20k:
+            required: false
+          data24k:
+            required: false
+          data28k:
+            required: false
+          data2k:
+            required: false
+          data32k:
+            required: false
+          data4k:
+            required: false
+          data512:
+            required: false
+          data8k:
+            required: false
+          description:
+            required: false
+          hsdata12k:
+            required: false
+          hsdata16k:
+            required: false
+          hsdata20k:
+            required: false
+          hsdata24k:
+            required: false
+          hsdata28k:
+            required: false
+          hsdata32k:
+            required: false
+          hsdata4k:
+            required: false
+          hsdata8k:
+            required: false
+          hsindex12k:
+            required: false
+          hsindex16k:
+            required: false
+          hsindex20k:
+            required: false
+          hsindex24k:
+            required: false
+          hsindex28k:
+            required: false
+          hsindex32k:
+            required: false
+          hsindex4k:
+            required: false
+          hsindex8k:
+            required: false
+          index12k:
+            required: false
+          index16k:
+            required: false
+          index1k:
+            required: false
+          index20k:
+            required: false
+          index24k:
+            required: false
+          index28k:
+            required: false
+          index2k:
+            required: false
+          index32k:
+            required: false
+          index4k:
+            required: false
+          index512:
+            required: false
+          index8k:
+            required: false
+          lsrpoolnum:
+            required: false
+          maxkeylength:
+            required: false
+          sharelimit:
+            required: false
+          strings:
+            required: false
+    - id: mqconn
+      description: MQCONDEF
+      type: mqconn
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          initqname:
+            required: false
+          mqname:
+            required: false
+          resyncmember:
+            required: false
+    - id: mqmonitor
+      description: MQMONITOR
+      type: mqmonitor
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          autostart:
+            required: false
+          description:
+            required: false
+          mondata:
+            required: false
+          monuserid:
+            required: false
+          qname:
+            required: false
+          status:
+            required: false
+          transaction:
+            required: false
+          userid:
+            required: false
+    - id: partitionset
+      description: PARTITIONSET
+      type: partitionset
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          resident:
+            required: false
+          status:
+            required: false
+          usage:
+            required: false
+          uselpacopy:
+            required: false
+    - id: partner
+      description: PARTNER
+      type: partner
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          netname:
+            required: false
+          network:
+            required: false
+          profile:
+            required: false
+          tpname:
+            required: false
+          xtpname:
+            required: false
+    - id: processtype
+      description: PROCESSTYPE
+      type: processtype
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          auditlevel:
+            required: false
+          auditlog:
+            required: false
+          description:
+            required: false
+          file:
+            required: false
+          status:
+            required: false
+    - id: profile
+      description: PROFILE
+      type: profile
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          chaincontrol:
+            required: false
+          description:
+            required: false
+          dvsuprt:
+            required: false
+          facilitylike:
+            required: false
+          inbfmh:
+            required: false
+          journal:
+            required: false
+          logrec:
+            required: false
+          modename:
+            required: false
+          msginteg:
+            required: false
+          msgjrnl:
+            required: false
+          nepclass:
+            required: false
+          onewte:
+            required: false
+          printercomp:
+            required: false
+          raq:
+            required: false
+          rtimout:
+            required: false
+          scrnsize:
+            required: false
+          uctran:
+            required: false
+    - id: terminal
+      description: TERMINAL
+      type: terminal
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          altprintcopy:
+            required: false
+          altprinter:
+            required: false
+          attachsec:
+            required: false
+          autinstmodel:
+            required: false
+          autinstname:
+            required: false
+          bindsecurity:
+            required: false
+          consname:
+            required: false
+          description:
+            required: false
+          inservice:
+            required: false
+          modename:
+            required: false
+          natlang:
+            required: false
+          netname:
+            required: false
+          pool:
+            required: false
+          printer:
+            required: false
+          printercopy:
+            required: false
+          remotename:
+            required: false
+          remotesysnet:
+            required: false
+          remotesystem:
+            required: false
+          securityname:
+            required: false
+          solicited:
+            required: false
+          tasklimit:
+            required: false
+          termpriority:
+            required: false
+          transaction:
+            required: false
+          typeterm:
+            required: false
+          usedfltuser:
+            required: false
+          userid:
+            required: false
+    - id: tranclass
+      description: TRANCLASS
+      type: tranclass
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          maxactive:
+            required: true
+          purgeaction:
+            required: false
+          purgethresh:
+            required: false
+    - id: tsmodel
+      description: TSMODEL
+      type: tsmodel
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          description:
+            required: false
+          expiryintmin:
+            required: false
+          location:
+            required: false
+          poolname:
+            required: false
+          prefix:
+            required: false
+          recovery:
+            required: false
+          remoteprefix:
+            required: false
+          remotesystem:
+            required: false
+          security:
+            required: false
+          xprefix:
+            required: false
+          xremotepfx:
+            required: false
+    - id: typeterm
+      description: TYPETERM
+      type: typeterm
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          altpage:
+            required: false
+          altscreen:
+            required: false
+          altsuffix:
+            required: false
+          aplkybd:
+            required: false
+          apltext:
+            required: false
+          ascii:
+            required: false
+          ati:
+            required: false
+          audiblealarm:
+            required: false
+          autoconnect:
+            required: false
+          autopage:
+            required: false
+          backtrans:
+            required: false
+          bracket:
+            required: false
+          buildchain:
+            required: false
+          cgcsgid:
+            required: false
+          color:
+            required: false
+          copy:
+            required: false
+          createsess:
+            required: false
+          defscreen:
+            required: false
+          description:
+            required: false
+          device:
+            required: false
+          discreq:
+            required: false
+          dualcasekybd:
+            required: false
+          errcolor:
+            required: false
+          errhilight:
+            required: false
+          errintensify:
+            required: false
+          errlastline:
+            required: false
+          extendedds:
+            required: false
+          fmhparm:
+            required: false
+          formfeed:
+            required: false
+          hilight:
+            required: false
+          horizform:
+            required: false
+          ioarealen:
+            required: false
+          katakana:
+            required: false
+          ldclist:
+            required: false
+          lightpen:
+            required: false
+          logmode:
+            required: false
+          logonmsg:
+            required: false
+          msrcontrol:
+            required: false
+          nepclass:
+            required: false
+          obformat:
+            required: false
+          oboperid:
+            required: false
+          outline:
+            required: false
+          pagesize:
+            required: false
+          partitions:
+            required: false
+          printadapter:
+            required: false
+          progsymbols:
+            required: false
+          query:
+            required: false
+          receivesize:
+            required: false
+          recovnotify:
+            required: false
+          recovoption:
+            required: false
+          relreq:
+            required: false
+          routedmsgs:
+            required: false
+          rstsignoff:
+            required: false
+          sendsize:
+            required: false
+          sessiontype:
+            required: false
+          shippable:
+            required: false
+          signoff:
+            required: false
+          sosi:
+            required: false
+          termmodel:
+            required: false
+          textkybd:
+            required: false
+          textprint:
+            required: false
+          tti:
+            required: false
+          uctran:
+            required: false
+          userarealen:
+            required: false
+          validation:
+            required: false
+          verticalform:
+            required: false
+    - id: webservice
+      description: WEBSERVICE
+      type: webservice
+      attributes:
+        public:
+          name:
+            required: true
+          group:
+            required: true
+          archivefile:
+            required: false
+          description:
+            required: false
+          pipeline:
+            required: false
+          validation:
+            required: false
+          wsbind:
+            required: false
+          wsdlfile:
+            required: false

@@ -1,5 +1,4 @@
-
-#!/bin/sh
+#!/bin/env bash
 
 # Function to parse YAML config - reads a key within a specific section
 # Usage: get_section_value <section> <key>
@@ -31,7 +30,6 @@ get_section_value() {
     ' "$CONFIG_FILE"
 }
 
-
 # Function to expand variables in config values
 expand_vars() {
     value=$1
@@ -41,6 +39,12 @@ expand_vars() {
 
     # Replace $PIPELINE_WORKSPACE
     value=$(echo "$value" | sed "s|\$PIPELINE_WORKSPACE|$PIPELINE_WORKSPACE|g")
+
+    # Replace $CICS_CMCI_USER
+    value="${value//\$CICS_CMCI_USER/$CICS_CMCI_USER}"
+
+    # Replace $CICS_CMCI_PASSWORD
+    value="${value//\$CICS_CMCI_PASSWORD/$CICS_CMCI_PASSWORD}"
 
     # Replace ${global.<key>} with value from [global] section in config
     while echo "$value" | grep -q '\${global\.[a-zA-Z_]*}'; do

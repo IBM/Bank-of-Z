@@ -1,7 +1,7 @@
-# CBSA src
+# BANKZ src
 <!--
  Copyright IBM Corp. 2023                                      -->
-This contains all the source required for CBSA.
+This contains all the source required for BANKZ.
 
 * base contains COBOL and BMS map source and copybooks
 

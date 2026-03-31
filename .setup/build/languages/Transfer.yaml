@@ -20,7 +20,7 @@ tasks:
     # Can be used for JCL, PROC, CNTL, REXX and any other type of source code which needs
     # to be packaged and processed by the pipeline. 
     sources: 
-      - "**.jcl"
+      - ".setup/jcl/*.jcl"
       - "**.proc"
       - "**.cntl"
       - "**.rexx"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 #########################################################
 # Run Pipeline Simulation Script
@@ -8,37 +8,22 @@
 
 set -e  # Exit on error
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$SCRIPT_DIR/config.yaml"
+
+# Source library scripts
+LIB_DIR="$SCRIPT_DIR/lib"
+source "$LIB_DIR/colors.sh"
+source "$LIB_DIR/config.sh"
+
+# Check for .env file
 if [ ! -f $SCRIPT_DIR/.env ]; then
   echo -e "${RED}[ERROR] The .env file does not exist. Please run Setup Pipeline Environment before.${NC}"
   exit 1
 fi
 
-CONFIG_FILE="$SCRIPT_DIR/config.yaml"
-
-. $SCRIPT_DIR/global.sh
-. $SCRIPT_DIR/.env
-
-# Function to print colored messages
-print_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+source "$SCRIPT_DIR/.env"
 
 # Parse command line arguments
 GIT_REPO=${1:-""}

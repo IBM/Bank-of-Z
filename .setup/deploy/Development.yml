@@ -52,7 +52,7 @@ default_db2_package: "BANKZPACK"
 default_db2_plan: "BANKZPLN"
 default_db2_qualifier: "IBMUSER"
 default_db2_subsys: "DBD1"
-default_db2_plan_pklist: "*.BANKZPACK.*"
+default_db2_plan_pklist: "NULLID.*,BANKZPACK.*"
 default_db2_action: "REPLACE"
 
 # load shared configuration

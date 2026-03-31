@@ -15,7 +15,7 @@ cics_region:
       - type: resource_builder
         model: ./resource-model.yaml
         definitions:
-          - ./cbsa-definitions.yaml
+          - ./bank-of-z-definitions.yaml
 
   installation:
     data_sets:

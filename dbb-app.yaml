@@ -16,7 +16,7 @@
 
 version: 1.0.0
 application:
-  name: cbsa-zos-native
+  name: bank-of-z-zos-native
 
   tasks:
 

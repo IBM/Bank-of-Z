@@ -3,7 +3,7 @@ resourceDefinitions:
         # FILE Definitions
         - file:
                   name: CUSTOMER
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Bank Customer VSAM
                   dsname: BANKZ.BOZ.BLD.CUSTOMER
                   rlsaccess: "NO"
@@ -39,7 +39,7 @@ resourceDefinitions:
                   backuptype: STATIC
         - file:
                   name: ABNDFILE
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Abend file VSAM
                   dsname: BANKZ.BOZ.BLD.ABNDFILE
                   rlsaccess: "NO"
@@ -77,7 +77,7 @@ resourceDefinitions:
         # MAPSET Definitions
         - mapset:
                   name: BNK1ACC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Inquire Account for Customer
                   resident: "NO"
                   usage: NORMAL
@@ -85,7 +85,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1B2M
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Transfer Between Accounts
                   resident: "NO"
                   usage: NORMAL
@@ -93,7 +93,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1CAM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Account
                   resident: "NO"
                   usage: NORMAL
@@ -101,7 +101,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1CCM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Customer
                   resident: "NO"
                   usage: NORMAL
@@ -109,7 +109,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1CDM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Credit/Debit Account
                   resident: "NO"
                   usage: NORMAL
@@ -117,7 +117,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1DAM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Account
                   resident: "NO"
                   usage: NORMAL
@@ -125,7 +125,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1DCM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Customer
                   resident: "NO"
                   usage: NORMAL
@@ -133,7 +133,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1MAI
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online 3270 BMS Main Menu
                   resident: "NO"
                   usage: NORMAL
@@ -141,7 +141,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1TFM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Transfer Funds Account
                   resident: "NO"
                   usage: NORMAL
@@ -149,7 +149,7 @@ resourceDefinitions:
                   status: ENABLED
         - mapset:
                   name: BNK1UAM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Update Account
                   resident: "NO"
                   usage: NORMAL
@@ -159,7 +159,7 @@ resourceDefinitions:
         # PROGRAM Definitions
         - program:
                   name: BNKMENU
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online 3270 BMS Main Menu
                   language: COBOL
                   reload: "NO"
@@ -177,7 +177,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1B2B
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Bank to Bank Transfer
                   language: COBOL
                   reload: "NO"
@@ -195,7 +195,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1CAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Account
                   language: COBOL
                   reload: "NO"
@@ -213,7 +213,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1CCA
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Customer Lookup
                   language: COBOL
                   reload: "NO"
@@ -231,7 +231,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1CCS
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Customer
                   language: COBOL
                   reload: "NO"
@@ -249,7 +249,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1CRA
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Credit/Debit Account
                   language: COBOL
                   reload: "NO"
@@ -267,7 +267,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1DAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Account
                   language: COBOL
                   reload: "NO"
@@ -285,7 +285,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1DCS
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Customer
                   language: COBOL
                   reload: "NO"
@@ -303,7 +303,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1TFN
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Transfer Funds Account
                   language: COBOL
                   reload: "NO"
@@ -321,7 +321,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: BNK1UAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Update Account
                   language: COBOL
                   reload: "NO"
@@ -339,7 +339,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRDTAGY1
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Credit Check pgm 1
                   language: COBOL
                   reload: "NO"
@@ -357,7 +357,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRDTAGY2
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Credit Check pgm 2
                   language: COBOL
                   reload: "NO"
@@ -375,7 +375,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRDTAGY3
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Credit Check pgm 3
                   language: COBOL
                   reload: "NO"
@@ -393,7 +393,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRDTAGY4
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Credit Check pgm 4
                   language: COBOL
                   reload: "NO"
@@ -411,7 +411,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRDTAGY5
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Credit Check pgm 5
                   language: COBOL
                   reload: "NO"
@@ -429,7 +429,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CREACC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Account
                   language: COBOL
                   reload: "NO"
@@ -447,7 +447,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: DELACC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Delete Account
                   language: COBOL
                   reload: "NO"
@@ -465,7 +465,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: CRECUST
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Customer
                   language: COBOL
                   reload: "NO"
@@ -483,7 +483,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: DELCUS
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Delete Customer
                   language: COBOL
                   reload: "NO"
@@ -501,7 +501,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: DBCRFUN
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Credit/Debit Account
                   language: COBOL
                   reload: "NO"
@@ -519,7 +519,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: INQACC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Account
                   language: COBOL
                   reload: "NO"
@@ -537,7 +537,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: ABNDPROC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: ABND HANDLING ROUTINE
                   language: COBOL
                   reload: "NO"
@@ -555,7 +555,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: INQACCTY
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Account Type
                   language: COBOL
                   reload: "NO"
@@ -573,7 +573,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: INQACCCU
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Inquire Account for Customer
                   language: COBOL
                   reload: "NO"
@@ -591,7 +591,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: INQCUST
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Customer
                   language: COBOL
                   reload: "NO"
@@ -609,7 +609,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: UPDACC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Update Account
                   language: COBOL
                   reload: "NO"
@@ -627,7 +627,7 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: XFRFUN
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Transfer Funds Account
                   language: COBOL
                   reload: "NO"
@@ -645,21 +645,21 @@ resourceDefinitions:
                   jvm: "NO"
         - program:
                   name: GETCOMPY
-                  group: CBSAGRP
+                  group: BANKZGRP
                   language: COBOL
                   concurrency: THREADSAFE
                   api: CICSAPI
                   datalocation: ANY
         - program:
                   name: GETSCODE
-                  group: CBSAGRP
+                  group: BANKZGRP
                   language: COBOL
                   concurrency: THREADSAFE
                   api: CICSAPI
                   datalocation: ANY
         - program:
                   name: UPDCUST
-                  group: CBSAGRP
+                  group: BANKZGRP
                   language: COBOL
                   concurrency: THREADSAFE
                   api: CICSAPI
@@ -668,7 +668,7 @@ resourceDefinitions:
         # TRANSACTION Definitions
         - transaction:
                   name: OCR1
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Txn to Credit Agency 1
                   program: CRDTAGY1
                   twasize: 0
@@ -699,7 +699,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCR2
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Txn to Credit Agency 2
                   program: CRDTAGY2
                   twasize: 0
@@ -730,7 +730,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCR3
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Txn to Credit Agency 3
                   program: CRDTAGY3
                   twasize: 0
@@ -761,7 +761,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCR4
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Txn to Credit Agency 4
                   program: CRDTAGY4
                   twasize: 0
@@ -792,7 +792,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCR5
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Txn to Credit Agency 5
                   program: CRDTAGY5
                   twasize: 0
@@ -823,7 +823,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Account
                   program: BNK1CAC
                   twasize: 0
@@ -854,7 +854,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCCA
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Inquire Account for Customer
                   program: BNK1CCA
                   twasize: 0
@@ -885,7 +885,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCCS
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Create Customer
                   program: BNK1CCS
                   twasize: 0
@@ -916,7 +916,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OCRA
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Credit/Debit Account
                   program: BNK1CRA
                   twasize: 0
@@ -947,7 +947,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: ODAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Account
                   program: BNK1DAC
                   twasize: 0
@@ -978,7 +978,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: ODCS
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Display Customer
                   program: BNK1DCS
                   twasize: 0
@@ -1009,7 +1009,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OMEN
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online 3270 BMS Main Menu
                   program: BNKMENU
                   twasize: 0
@@ -1040,7 +1040,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OTFN
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Transfer Funds Account
                   program: BNK1TFN
                   twasize: 0
@@ -1071,7 +1071,7 @@ resourceDefinitions:
                   cmdsec: "NO"
         - transaction:
                   name: OUAC
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: BANK Online Update Account
                   program: BNK1UAC
                   twasize: 0
@@ -1104,7 +1104,7 @@ resourceDefinitions:
         # TCPIPSERVICE Definition
         - tcpipservice:
                   name: ZOSEE
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: ZOS CONNECT EE TCPIPS
                   portnumber: 27114
                   protocol: IPIC
@@ -1118,26 +1118,26 @@ resourceDefinitions:
         # JVM Server Definition
         - jvmserver:
                   name: ZOSCNJVM
-                  group: CBSAGRP
+                  group: BANKZGRP
                   jvmprofile: zosconn
 
         # DB2CONN Definition
         - db2conn:
                   name: DBD1
-                  group: CBSAGRP
+                  group: BANKZGRP
                   connecterror: SQLCODE
                   db2id: DBD1
                   msgqueue1: CSMT
-                  plan: CBSAPLAN
+                  plan: BANKZPLAN
 
         # DB2ENTRY Definition
         - db2entry:
-                  name: CBSA
-                  group: CBSAGRP
+                  name: BANKZ
+                  group: BANKZGRP
                   accountrec: NONE
                   authtype: USERID
                   drollback: "YES"
-                  plan: CBSAPLAN
+                  plan: BANKZPLAN
                   priority: HIGH
                   protectnum: 0
                   threadlimit: 10
@@ -1146,47 +1146,47 @@ resourceDefinitions:
         # DB2TRAN Definitions
         - db2tran:
                   name: OCAC
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OCAC
         - db2tran:
                   name: OCCA
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OCCA
         - db2tran:
                   name: OCCS
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OCCS
         - db2tran:
                   name: OCRA
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OCRA
         - db2tran:
                   name: ODAC
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: ODAC
         - db2tran:
                   name: ODCS
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: ODCS
         - db2tran:
                   name: OTFN
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OTFN
         - db2tran:
                   name: OUAC
-                  group: CBSAGRP
-                  entry: CBSA
+                  group: BANKZGRP
+                  entry: BANKZ
                   transid: OUAC
 
         # LIBRARY Definition
         - library:
-                  name: CBSA
-                  group: CBSAGRP
+                  name: BANKZ
+                  group: BANKZGRP
                   dsname01: BANKZ.BOZ.BLD.LOAD

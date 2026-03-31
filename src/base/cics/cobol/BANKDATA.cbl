@@ -675,7 +675,7 @@
       *
       D    DISPLAY 'Updating CONTROL table with customer count'
            MOVE SPACES TO HV-CONTROL-NAME
-           STRING 'CBSACUST' DELIMITED BY SIZE
+           STRING 'BANKZCUST' DELIMITED BY SIZE
                   SORTCODE DELIMITED BY SIZE
                   '  ' DELIMITED BY SIZE
               INTO HV-CONTROL-NAME
@@ -1543,7 +1543,7 @@
       * Set to 1 since test data already has customer 0000000001
       *
            MOVE SPACES TO HV-CONTROL-NAME
-           STRING 'CBSACUST' DELIMITED BY SIZE
+           STRING 'BANKZCUST' DELIMITED BY SIZE
                   SORTCODE DELIMITED BY SIZE
                   '  ' DELIMITED BY SIZE
               INTO HV-CONTROL-NAME
@@ -1574,7 +1574,7 @@
       * (0005OCCS through 0009OCCS)
       *
            MOVE SPACES TO HV-CONTROL-NAME
-           MOVE 'CBSACUST0005OCCS  ' TO HV-CONTROL-NAME
+           MOVE 'BANKZCUST0005OCCS  ' TO HV-CONTROL-NAME
            MOVE 0 TO HV-CONTROL-VALUE-NUM
            MOVE SPACES TO HV-CONTROL-VALUE-STR
 
@@ -1595,7 +1595,7 @@
                       WS-SQLCODE-DISPLAY
            END-IF
 
-           MOVE 'CBSACUST0006OCCS  ' TO HV-CONTROL-NAME
+           MOVE 'BANKZCUST0006OCCS  ' TO HV-CONTROL-NAME
            MOVE 0 TO HV-CONTROL-VALUE-NUM
 
            EXEC SQL
@@ -1615,7 +1615,7 @@
                       WS-SQLCODE-DISPLAY
            END-IF
 
-           MOVE 'CBSACUST0007OCCS  ' TO HV-CONTROL-NAME
+           MOVE 'BANKZCUST0007OCCS  ' TO HV-CONTROL-NAME
            MOVE 0 TO HV-CONTROL-VALUE-NUM
 
            EXEC SQL
@@ -1635,7 +1635,7 @@
                       WS-SQLCODE-DISPLAY
            END-IF
 
-           MOVE 'CBSACUST0008OCCS  ' TO HV-CONTROL-NAME
+           MOVE 'BANKZCUST0008OCCS  ' TO HV-CONTROL-NAME
            MOVE 0 TO HV-CONTROL-VALUE-NUM
 
            EXEC SQL
@@ -1655,7 +1655,7 @@
                       WS-SQLCODE-DISPLAY
            END-IF
 
-           MOVE 'CBSACUST0009OCCS  ' TO HV-CONTROL-NAME
+           MOVE 'BANKZCUST0009OCCS  ' TO HV-CONTROL-NAME
            MOVE 0 TO HV-CONTROL-VALUE-NUM
 
            EXEC SQL

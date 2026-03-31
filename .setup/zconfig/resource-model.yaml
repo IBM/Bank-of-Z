@@ -8,7 +8,7 @@ application:
 
   configuration:
     - list:
-        name: CBSALIST
+        name: BANKZLIST
         group:
           constraintId: all-groups
 

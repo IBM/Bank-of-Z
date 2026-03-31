@@ -133,7 +133,7 @@ if [ "$(echo "$RUN_DEPLOY" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
     fi
 
     # zDeploy framework target hlq
-    export TARGET_HLQ=${TARGET_HLQ:-CBSA.CICSBSA}
+    export TARGET_HLQ=${TARGET_HLQ:-BANKZ.CICSBANKZ}
 
     # Locations of evidences
     evidenceDir=$PIPELINE_WORKSPACE/$application/evidences

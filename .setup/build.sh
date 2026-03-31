@@ -123,7 +123,7 @@ cd $WORKSPACE_DIR/.setup/zconfig
 zconfig apply cics-region.yaml
 echo ""
 # Start CICS region
-job_id=$(jsub IBMUSER.BOZ.CICSBOZ.DFHSTART)
+job_id=$(jsub BANKZ.BOZ.CICSBOZ.DFHSTART)
 echo "CICS Region Job ID: $job_id"
 echo ""
 

@@ -1314,6 +1314,11 @@
           "description": "Override the LE data set names",
           "title": "le_data_sets"
         },
+        "console_autoinstall": {
+          "$ref": "#/$defs/ConsoleAutoinstall",
+          "description": "State of console autoinstall support",
+          "title": "console_autoinstall"
+        },
         "sit_parameters": {
           "additionalProperties": false,
           "description": "Specify the SIT overrides",
@@ -2822,11 +2827,6 @@
           "description": "Configure extensions",
           "title": "extensions"
         },
-        "console_autoinstall": {
-          "$ref": "#/$defs/ConsoleAutoinstall",
-          "description": "State of console autoinstall support",
-          "title": "console_autoinstall"
-        },
         "jvm_profiles": {
           "description": "List of JVM profiles to be created for this region",
           "items": {
@@ -3039,13 +3039,22 @@
           "type": "string"
         },
         "source_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
           "description": "File path of JVM profile for symlink source type",
-          "title": "Source Path",
-          "type": "string"
+          "title": "Source Path"
         }
       },
       "required": [
-        "source_type"
+        "source_type",
+        "name"
       ],
       "title": "SymlinkSourceType",
       "type": "object"

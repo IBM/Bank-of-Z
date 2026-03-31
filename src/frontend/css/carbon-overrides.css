@@ -1,0 +1,17 @@
+/*
+ *
+ *    Copyright IBM Corp. 2023
+ *
+ */
+
+/* Carbon Design System Customizations */
+/* Using Carbon's default white (light) theme */
+
+/* Button customizations */
+cds-button[kind="ghost"] {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+/* Made with Bob */

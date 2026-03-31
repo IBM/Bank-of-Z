@@ -1,0 +1,25 @@
+{
+  "name": "cbsa-vanilla-static",
+  "version": "2.0.0",
+  "description": "CICS Banking Sample Application - Vanilla JavaScript Frontend with Static HTML Pages and Zero Dependencies",
+  "private": true,
+  "repository": "git@github.ibm.com:BondZ-JumpStart/Carbon-React.git",
+  "bugs": "https://github.ibm.com/BondZ-JumpStart/Carbon-React/issues",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "node server.js"
+  },
+  "keywords": [
+    "cics",
+    "banking",
+    "vanilla-javascript",
+    "carbon-design-system",
+    "zero-dependencies",
+    "static-html"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

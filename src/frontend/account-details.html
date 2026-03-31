@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Account Details - CBSA</title>
+
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <div class="cds--content landing-page">
+        <!-- Banner -->
+        <div class="cds--white landing-page__banner">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="account-details.html">Account Details</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>View/Update Account Details</h1>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="cds--row">
+            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
+                <div class="search-section">
+                    <cds-text-input id="accountId" label="Account Number" placeholder="Enter account number">
+                    </cds-text-input>
+                    <cds-button id="search-btn">Search</cds-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Details Section -->
+        <div id="details-section" class="cds--row" style="display: none;">
+            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
+                <h3>Account Information</h3>
+                <form id="account-form">
+                    <div class="cds--row">
+                        <div class="cds--col-md-4 cds--col-lg-4">
+                            <cds-text-input id="accountNumber" label="Account Number" readonly></cds-text-input>
+                            <cds-text-input id="customerNumber" label="Customer Number" readonly></cds-text-input>
+                            <cds-text-input id="accountType" label="Account Type" readonly></cds-text-input>
+                        </div>
+                        <div class="cds--col-md-4 cds--col-lg-4">
+                            <cds-number-input id="actualBalance" label="Balance" step="0.01"></cds-number-input>
+                            <cds-number-input id="interestRate" label="Interest Rate (%)"
+                                step="0.01"></cds-number-input>
+                            <cds-number-input id="overdraft" label="Overdraft Limit" step="100"></cds-number-input>
+                        </div>
+                    </div>
+                    <br>
+                    <cds-button id="update-btn">Update Account</cds-button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/dropdown.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/number-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+
+        let currentAccount = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+
+            // Check for account ID in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const accountId = urlParams.get('id');
+            if (accountId) {
+                document.getElementById('accountId').value = accountId;
+                searchAccount();
+            }
+
+            // Handle search
+            document.getElementById('search-btn').addEventListener('click', searchAccount);
+            document.getElementById('accountId').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchAccount();
+            });
+
+            // Handle update
+            document.getElementById('update-btn').addEventListener('click', updateAccount);
+        });
+
+        async function searchAccount() {
+            const accountId = document.getElementById('accountId').value.trim();
+
+            if (!accountId) {
+                showErrorModal('Validation Error', 'Please enter an account number');
+                return;
+            }
+
+            showLoadingModal('Searching for account...');
+
+            try {
+                const account = await api.accounts.getAccountByNumber(accountId);
+                currentAccount = account;
+                hideLoadingModal();
+                displayAccountDetails(account);
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', 'Account not found or error loading data');
+            }
+        }
+
+        function displayAccountDetails(account) {
+            document.getElementById('accountNumber').value = account.id || account.accountNumber || '';
+            document.getElementById('customerNumber').value = account.customerNumber || '';
+            document.getElementById('accountType').value = account.accountType || '';
+            document.getElementById('actualBalance').value = account.actualBalance || 0;
+            document.getElementById('interestRate').value = account.interestRate || 0;
+            document.getElementById('overdraft').value = account.overdraft || 0;
+
+            document.getElementById('details-section').style.display = 'block';
+        }
+
+        async function updateAccount() {
+            if (!currentAccount) return;
+
+            const updatedData = {
+                ...currentAccount,
+                actualBalance: parseFloat(document.getElementById('actualBalance').value) || 0,
+                interestRate: document.getElementById('interestRate').value || '0',
+                overdraft: document.getElementById('overdraft').value || '0'
+            };
+
+            showLoadingModal('Updating account...');
+
+            try {
+                await api.accounts.updateAccount(currentAccount.id || currentAccount.accountNumber, updatedData);
+                hideLoadingModal();
+                showSuccessModal('Success', 'Account updated successfully');
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', 'Failed to update account');
+            }
+        }
+    </script>
+</body>
+
+</html>

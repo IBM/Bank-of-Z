@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Customer Details - CBSA</title>
+    
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+    
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page layer">
+        <!-- Banner -->
+        <cds-layer class="layer landing-page__heading landing-page__banner">
+            <cds-breadcrumb>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="customer-details.html">Customer Details</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+            </cds-breadcrumb>
+            <h1>View Customer Details</h1>
+        </cds-layer>
+        
+        <div class="cds--content">
+            <!-- Error/Notification Container at top of page -->
+            <div id="notification-container"></div>
+            
+            <cds-stack gap="7">
+                <h2>Search for Customer</h2>
+                
+                <!-- Search Section -->
+                <cds-form id="search-form" class="form-constrained">
+                    <cds-text-input
+                        id="searchCustomerId"
+                        label="Customer ID"
+                        helper-text="Enter the Customer ID to view details">
+                    </cds-text-input>
+                    <br />
+                    <cds-text-input
+                        id="searchCustomerName"
+                        label="Customer Name"
+                        helper-text="Alternatively, search for the customer by name">
+                    </cds-text-input>
+                    <br />
+                    <cds-button id="search-btn">Search</cds-button>
+                </cds-form>
+                    
+                <!-- Customer Details Section -->
+                <cds-layer class="layer cds--content" id="details-section" style="display: none;">
+                    <h3>Customer Information</h3>
+
+                    <cds-form id="customer-form" class="form-constrained">
+                        <cds-text-input id="customerId" label="Customer ID" readonly></cds-text-input>
+                        <cds-text-input id="customerName" label="Customer Name"></cds-text-input>
+                        <cds-text-input id="customerAddress" label="Address"></cds-text-input>
+                        <cds-text-input id="dateOfBirth" label="Date of Birth"></cds-text-input>
+                        <cds-text-input id="sortCode" label="Sort Code" readonly></cds-text-input>
+                        <cds-text-input id="customerCreditScore" label="Credit Score" readonly></cds-text-input>
+                        <cds-text-input id="customerCreditScoreReviewDate" label="Credit Score Review Date" readonly></cds-text-input>
+                        <br>
+                        <cds-button id="update-btn">Update Customer</cds-button>
+                    </cds-form>
+                    
+                    <br><br>
+                    <h3>Customer Accounts</h3>
+                    <div id="accounts-table"></div>
+                </cds-layer>
+            </cds-stack>
+        </div>
+    </cds-layer>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/date-picker.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/notification.min.js"></script>
+    
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, formatCurrency, parseDate } from './js/utils.js';
+        
+        let currentCustomer = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+            
+            // Handle search button click
+            document.getElementById('search-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await searchCustomer();
+            });
+            
+            // Handle Enter key in search fields
+            document.getElementById('searchCustomerId').addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    await searchCustomer();
+                }
+            });
+            
+            document.getElementById('searchCustomerName').addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    await searchCustomer();
+                }
+            });
+            
+            // Handle update
+            document.getElementById('update-btn').addEventListener('click', updateCustomer);
+        });
+        
+        async function searchCustomer() {
+            const customerId = document.getElementById('searchCustomerId').value.trim();
+            const customerName = document.getElementById('searchCustomerName').value.trim();
+            
+            // Clear any previous notifications
+            clearNotification();
+            
+            if (!customerId && !customerName) {
+                displayNotification('error', 'Validation Error', 'Please enter either a customer ID or name');
+                return;
+            }
+            
+            if (customerId && customerName) {
+                displayNotification('error', 'Validation Error', 'Please enter either customer ID or name, not both');
+                return;
+            }
+            
+            // If customer ID is provided, search by ID
+            if (customerId) {
+                await searchByCustomerId(customerId);
+            } else {
+                // Search by name
+                await searchByCustomerName(customerName);
+            }
+        }
+        
+        function displayNotification(kind, title, message) {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = `
+                <cds-inline-notification kind="${kind}" title="${title}" subtitle="${message}" hide-close-button></cds-inline-notification>
+                <br />
+            `;
+            // Scroll to top to ensure notification is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function clearNotification() {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = '';
+        }
+        
+        async function searchByCustomerId(customerId) {
+            displayLoading('Searching for customer...');
+            
+            try {
+                const customer = await api.customers.getCustomerByNumber(customerId);
+                currentCustomer = customer;
+                displayCustomerDetails(customer);
+                
+                // Load customer accounts
+                loadCustomerAccounts(customerId);
+            } catch (error) {
+                displayNotification('error', 'Error', 'Customer not found or error loading data');
+            }
+        }
+        
+        async function searchByCustomerName(name) {
+            displayLoading('Searching for customers...');
+            
+            try {
+                const response = await api.customers.searchCustomersByName(name);
+                const customers = response.customers || [];
+                
+                if (customers.length === 0) {
+                    displayNotification('error', 'No Results', 'No customers found with that name');
+                    document.getElementById('details-section').style.display = 'none';
+                } else if (customers.length === 1) {
+                    // Only one result, display it directly
+                    currentCustomer = customers[0];
+                    displayCustomerDetails(customers[0]);
+                    loadCustomerAccounts(customers[0].id);
+                } else {
+                    // Multiple results, show selection table
+                    displayCustomerSearchResults(customers);
+                }
+            } catch (error) {
+                displayNotification('error', 'Error', 'Error searching for customers');
+                document.getElementById('details-section').style.display = 'none';
+            }
+        }
+        
+        function displayLoading(message) {
+            clearNotification();
+            const detailsSection = document.getElementById('details-section');
+            detailsSection.style.display = 'block';
+            detailsSection.innerHTML = `
+                <cds-loading>${message}</cds-loading>
+            `;
+        }
+        
+        function displayCustomerSearchResults(customers) {
+            const detailsSection = document.getElementById('details-section');
+            detailsSection.style.display = 'block';
+            
+            let tableRows = '';
+            customers.forEach(customer => {
+                tableRows += `
+                    <tr class="customer-row" data-customer-id="${customer.id}" style="cursor: pointer;">
+                        <td>${customer.id}</td>
+                        <td>${customer.customerName}</td>
+                        <td>${customer.customerAddress || ''}</td>
+                    </tr>
+                `;
+            });
+            
+            detailsSection.innerHTML = `
+                <h3>Search Results - Select a Customer</h3>
+                <p>Found ${customers.length} customers. Click on a row to view details.</p>
+                <table class="cds--data-table cds--data-table--zebra">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            `;
+            
+            // Add click handlers to rows
+            const rows = detailsSection.querySelectorAll('.customer-row');
+            rows.forEach(row => {
+                row.addEventListener('click', () => {
+                    const customerId = row.getAttribute('data-customer-id');
+                    const selectedCustomer = customers.find(c => c.id === customerId);
+                    if (selectedCustomer) {
+                        currentCustomer = selectedCustomer;
+                        displayCustomerDetails(selectedCustomer);
+                        loadCustomerAccounts(selectedCustomer.id);
+                    }
+                });
+            });
+        }
+        
+        function displayCustomerDetails(customer) {
+            const detailsSection = document.getElementById('details-section');
+            detailsSection.style.display = 'block';
+            
+            // Restore the proper HTML structure
+            detailsSection.innerHTML = `
+                <h3>Customer Information</h3>
+
+                <div class="form-constrained">
+                    <cds-form id="customer-form">
+                        <cds-text-input id="customerId" label="Customer ID" readonly value="${customer.id || ''}"></cds-text-input>
+                        <cds-text-input id="customerName" label="Customer Name" value="${customer.customerName || ''}"></cds-text-input>
+                        <cds-text-input id="customerAddress" label="Address" value="${customer.customerAddress || ''}"></cds-text-input>
+                        <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formatDate(customer.dateOfBirth) || ''}"></cds-text-input>
+                        <cds-text-input id="sortCode" label="Sort Code" readonly value="${customer.sortCode || ''}"></cds-text-input>
+                        <cds-text-input id="customerCreditScore" label="Credit Score" readonly value="${customer.customerCreditScore || ''}"></cds-text-input>
+                        <cds-text-input id="customerCreditScoreReviewDate" label="Credit Score Review Date" readonly value="${formatDate(customer.customerCreditScoreReviewDate) || ''}"></cds-text-input>
+                        <br>
+                        <cds-button id="update-btn">Update Customer</cds-button>
+                    </cds-form>
+                </div>
+                
+                <br><br>
+                <h3>Customer Accounts</h3>
+                <div id="accounts-table"></div>
+            `;
+            
+            // Re-attach the update button event listener
+            document.getElementById('update-btn').addEventListener('click', updateCustomer);
+        }
+        
+        async function loadCustomerAccounts(customerId) {
+            try {
+                const response = await api.accounts.getAccountsByCustomerNumber(customerId);
+                const accounts = response.accounts || response;
+                displayAccountsTable(accounts);
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                document.getElementById('accounts-table').innerHTML = '<p>No accounts found or error loading accounts</p>';
+            }
+        }
+        
+        function displayAccountsTable(accounts) {
+            if (!accounts || accounts.length === 0) {
+                document.getElementById('accounts-table').innerHTML = '<p>No accounts found for this customer</p>';
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="cds--data-table">
+                    <thead>
+                        <tr>
+                            <th>Account Number</th>
+                            <th>Account Type</th>
+                            <th>Balance</th>
+                            <th>Interest Rate</th>
+                            <th>Overdraft</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            accounts.forEach(account => {
+                tableHTML += `
+                    <tr>
+                        <td>${account.id || account.accountNumber || 'N/A'}</td>
+                        <td>${account.accountType || 'N/A'}</td>
+                        <td>${formatCurrency(account.actualBalance || 0)}</td>
+                        <td>${account.interestRate || 0}%</td>
+                        <td>${formatCurrency(account.overdraft || 0)}</td>
+                        <td>
+                            <a href="account-details.html?id=${account.id || account.accountNumber}">View</a>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('accounts-table').innerHTML = tableHTML;
+        }
+        
+        async function updateCustomer() {
+            if (!currentCustomer) return;
+            
+            const dateValue = document.getElementById('dateOfBirth').value.trim();
+            const formattedDate = parseDate(dateValue);
+            
+            if (!formattedDate) {
+                showErrorModal('Validation Error', 'Invalid date format. Please use DD/MM/YYYY');
+                return;
+            }
+            
+            const updatedData = {
+                customerName: document.getElementById('customerName').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                dateOfBirth: formattedDate,
+                sortCode: currentCustomer.sortCode,
+                creditScore: currentCustomer.customerCreditScore
+            };
+            
+            showLoadingModal('Updating customer...');
+            
+            try {
+                await api.customers.updateCustomer(currentCustomer.id, updatedData);
+                hideLoadingModal();
+                showSuccessModal('Success', 'Customer updated successfully');
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', 'Failed to update customer');
+            }
+        }
+    </script>
+</body>
+</html>

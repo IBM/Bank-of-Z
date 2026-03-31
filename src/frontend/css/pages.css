@@ -1,0 +1,105 @@
+/*
+ *
+ *    Copyright IBM Corp. 2023
+ *
+ */
+
+/* Landing Page Styles */
+.layer {
+    background:var(--cds-layer-background);
+}
+
+cds-layer {
+    background:var(--cds-layer-background);
+}
+
+.cbsa-form-grid > div {
+    row-gap: 1rem;
+}
+
+.landing-page {
+    margin-top: 3rem;
+}
+
+.landing-page__banner {
+    padding-left: 1.5rem;
+}
+
+.landing-page__heading {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.landing-page__heading > h1 {
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.landing-page__subheading {
+    font-size: 1.75rem;
+    font-weight: 400;
+}
+
+.landing-page__p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 1rem 0;
+}
+
+.page-image {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Tabs */
+.tabs-group {
+    border-bottom: 1px solid var(--cds-border-subtle);
+	background-color: var(--cds-layer-01);
+}
+
+.tabs-group-content {
+    padding: 2rem 0;
+}
+
+/* Responsive Control Panel */
+@media (max-width: 1055px) {
+    .control-panel-parent {
+        flex-direction: column;
+    }
+}
+
+/* Customer/Account Forms */
+.customer-form,
+.account-form {
+    background-color: var(--cds-layer);
+    padding: 2rem;
+    border-radius: 4px;
+}
+
+/* Form Width Constraint */
+.form-constrained {
+    max-width: 600px;
+    display: block;
+}
+
+/* Error Page */
+.error-page {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.error-page h1 {
+    font-size: 3rem;
+    color: var(--cds-danger);
+    margin-bottom: 1rem;
+}
+
+.error-page p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Made with Bob */

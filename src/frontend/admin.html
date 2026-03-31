@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Control Panel - CBSA</title>
+    
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+    
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page">
+        <!-- Banner -->
+        <cds-layer class="layer landing-page__banner">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>
+                    Welcome to CICS Banking Sample Application
+                </h1>
+            </div>
+        </cds-layer>
+                    
+        <cds-grid class="cds--content">
+            <cds-column lg="8" md="4" sm="2">
+                <h5>User Services</h5>
+                
+                <cds-button kind="ghost" href="customer-create.html">
+                    Create a new customer
+                </cds-button>
+                <hr class="half-width">
+                
+                <cds-button kind="ghost" href="customer-delete.html">
+                    Delete existing customer
+                </cds-button>
+                <hr class="half-width">
+                
+                <cds-button kind="ghost" href="customer-details.html">
+                    View/Update customer details (and see their accounts)
+                </cds-button>
+                <hr class="half-width">
+                
+                <h5>Account Services</h5>
+                
+                <cds-button kind="ghost" href="account-create.html">
+                    Create a New Account
+                </cds-button>
+                <hr class="half-width">
+                
+                <cds-button kind="ghost" href="account-delete.html">
+                    Delete existing account
+                </cds-button>
+                <hr class="half-width">
+                
+                <cds-button kind="ghost" href="account-details.html">
+                    View/Update account details
+                </cds-button>
+                <hr class="half-width">
+            </cds-column>
+            <cds-column lg="8" md="4" sm="2" class="control-panel-right-child">
+                <img class="page-image"
+                        src="assets/images/promo-band-illustration-1920x1080-2x.png"
+                        alt="Carbon illustration">
+            </cds-column>
+        </cds-grid>
+    </div>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/tabs.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+            
+            // Show the functions panel
+            const panel = document.getElementById('panel-functions');
+            if (panel) {
+                panel.removeAttribute('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

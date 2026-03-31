@@ -18,6 +18,10 @@ set -e
 # Get the directory where this script is located (the cloned workspace)
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# Global configureation file
+CONFIG_FILE="$WORKSPACE_DIR/.setup/config.yaml"
+chtag -t -c ISO8859-1 $CONFIG_FILE
+
 # Source library scripts
 LIB_DIR="$WORKSPACE_DIR/.setup/lib"
 source "$LIB_DIR/colors.sh"
@@ -40,9 +44,6 @@ fi
 
 print_info "Workspace directory: $WORKSPACE_DIR"
 
-# Global configureation file
-CONFIG_FILE="$WORKSPACE_DIR/.setup/config.yaml"
-chtag -t -c ISO8859-1 $CONFIG_FILE
 
 # Application name (extracted from workspace directory name)
 APPLICATION=$(basename "$WORKSPACE_DIR")
@@ -128,12 +129,12 @@ job_id=$(jsub BANKZ.BOZ.CICSBOZ.DFHSTART)
 echo "CICS Region Job ID: $job_id"
 echo ""
 
-jsub -f "$WORKSPACE_DIR/Db2-drop.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"
 sleep 3
-jsub -f "$WORKSPACE_DIR/Db2-create.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl"
 sleep 3
-jsub -f "$WORKSPACE_DIR/Db2-bind.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"
 sleep 3
-jsub -f "$WORKSPACE_DIR/Db2-insert.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-insert.jcl"
 
 exit $BUILD_RC

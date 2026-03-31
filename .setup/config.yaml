@@ -45,6 +45,6 @@ pipeline_script:
 zconfig:
   # zconfig home folder
   zconfig_home: ~/zconfig
-  zcb_home: ~/zrb/cics-resource-builder-1.0.6
+  zcb_home: /u/ibmuser/zrb/cics-resource-builder-1.0.6 # FIXME ~ not working
   
 # Made with Bob

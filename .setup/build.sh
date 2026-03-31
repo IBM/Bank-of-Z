@@ -31,10 +31,11 @@ source "$LIB_DIR/dbb.sh"
 #########################################################
 
 # Activate zconfig virtual environment
-if [ -f ~/zconfig2/bin/activate ]; then
-    source ~/zconfig2/bin/activate
+ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
+if [ -f $ZCONFIG_HOME/bin/activate ]; then
+    source $ZCONFIG_HOME/bin/activate
 else
-    print_warning "zconfig2 virtual environment not found at ~/zconfig2/bin/activate"
+    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
 fi
 
 print_info "Workspace directory: $WORKSPACE_DIR"

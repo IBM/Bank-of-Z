@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./cics_region_0.1.2.schema.json
+# yaml-language-server: $schema=./cics_region_0.3.0.schema.json
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"

@@ -5,7 +5,7 @@ resourceDefinitions:
                   name: CUSTOMER
                   group: CBSAGRP
                   description: Bank Customer VSAM
-                  dsname: IBMUSER.BOZ.BLD.CUSTOMER
+                  dsname: BANKZ.BOZ.BLD.CUSTOMER
                   rlsaccess: "NO"
                   lsrpoolnum: 1
                   readinteg: UNCOMMITTED
@@ -41,7 +41,7 @@ resourceDefinitions:
                   name: ABNDFILE
                   group: CBSAGRP
                   description: Abend file VSAM
-                  dsname: IBMUSER.BOZ.BLD.ABNDFILE
+                  dsname: BANKZ.BOZ.BLD.ABNDFILE
                   rlsaccess: "NO"
                   lsrpoolnum: 1
                   readinteg: UNCOMMITTED
@@ -1189,4 +1189,4 @@ resourceDefinitions:
         - library:
                   name: CBSA
                   group: CBSAGRP
-                  dsname01: IBMUSER.BOZ.BLD.LOAD
+                  dsname01: BANKZ.BOZ.BLD.LOAD

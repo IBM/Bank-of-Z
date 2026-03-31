@@ -41,6 +41,8 @@ setup_dbb_environment() {
     
     # Add DBB, ZOAU, ZRB to PATH
     export PATH="$DBB_HOME/bin:/usr/lpp/IBM/zoautil/bin:/u/ibmuser/zrb/cics-resource-builder-1.0.6/bin:$PIPELINE_SCRIPTS:$PATH"
+    
+    export DBB_HLQ=$(get_section_value 'pipeline_script' 'dbb_hlq')
 }
 
 # Made with Bob

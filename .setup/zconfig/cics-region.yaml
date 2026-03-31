@@ -2,8 +2,8 @@
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
-  user_id: "IBMUSER"
-  user_id_lower: "ibmuser"
+  cics_hlq: "BANKZ"
+  cics_hlq_lower: "bankz"
   cmci_port: "27100"
 
 cics_region:
@@ -26,7 +26,7 @@ cics_region:
         hlq: CICSTS63.CPSM
     dir: /usr/lpp/cicsts/cicsts63
 
-  region_hlq: "{{ vars.user_id }}.BOZ.{{ vars.applid }}"
+  region_hlq: "{{ vars.cics_hlq }}.BOZ.{{ vars.applid }}"
 
   region_jcl:
     type: JOB
@@ -52,7 +52,7 @@ cics_region:
       authentication: "NO"
       ssl: "NO"
 
-  jvm_profile_dir: "/u/{{ vars.user_id_lower }}/{{ vars.applid }}/JVMProfiles"
+  jvm_profile_dir: "/u/{{ vars.cics_hlq_lower }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - name: EYUSMSSJ
       source_type: inline

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/env sh
 
 # Accept git repository and branch as command-line arguments
 gitRepository=${1:-"https://github.com/IBM/Bank-of-Z.git"}

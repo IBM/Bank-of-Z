@@ -1,29 +1,10 @@
 #!/bin/env bash
 
-#########################################################
-# Configuration Library
-# Provides functions for reading configuration from
-# settings.json and config.yaml files
-#########################################################
-
-# Function to extract value from settings.json
-# Usage: get_setting_value <key> [settings_file]
-get_setting_value() {
-    local key=$1
-    local settings_file=${2:-".vscode/settings.json"}
-    
-    if [ -f "$settings_file" ]; then
-        # Extract value using grep and sed (handles both quoted strings and unquoted values)
-        local value=$(grep "\"$key\"" "$settings_file" | sed -E 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"?([^",}]+)"?.*/\1/' | tr -d ' ')
-        echo "$value"
-    fi
-}
-
 # Function to parse YAML config - reads a key within a specific section
 # Usage: get_section_value <section> <key>
 get_section_value() {
-    local section=$1
-    local key=$2
+    section=$1
+    key=$2
 
     awk -v section="$section" -v key="$key" '
         # Detect section header (no leading spaces)
@@ -51,13 +32,13 @@ get_section_value() {
 
 # Function to expand variables in config values
 expand_vars() {
-    local value=$1
+    value=$1
 
     # Replace $USER with actual username
-    value="${value//\$USER/$USER}"
+    value=$(echo "$value" | sed "s|\$USER|$USER|g")
 
     # Replace $PIPELINE_WORKSPACE
-    value="${value//\$PIPELINE_WORKSPACE/$PIPELINE_WORKSPACE}"
+    value=$(echo "$value" | sed "s|\$PIPELINE_WORKSPACE|$PIPELINE_WORKSPACE|g")
 
     # Replace $CICS_CMCI_USER
     value="${value//\$CICS_CMCI_USER/$CICS_CMCI_USER}"
@@ -66,11 +47,10 @@ expand_vars() {
     value="${value//\$CICS_CMCI_PASSWORD/$CICS_CMCI_PASSWORD}"
 
     # Replace ${global.<key>} with value from [global] section in config
-    while [[ "$value" =~ \$\{global\.([a-zA-Z_]+)\} ]]; do
-        local key="${BASH_REMATCH[1]}"
-        local resolved
+    while echo "$value" | grep -q '\${global\.[a-zA-Z_]*}'; do
+        key=$(echo "$value" | sed 's/.*\${global\.\([a-zA-Z_]*\)}.*/\1/')
         resolved=$(get_section_value "global" "$key")
-        value="${value//\$\{global\.${key}\}/$resolved}"
+        value=$(echo "$value" | sed "s|\${global\.${key}}|$resolved|g")
     done
 
     echo "$value"

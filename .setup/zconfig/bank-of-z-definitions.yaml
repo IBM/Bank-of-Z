@@ -1128,7 +1128,7 @@ resourceDefinitions:
                   connecterror: SQLCODE
                   db2id: DBD1
                   msgqueue1: CSMT
-                  plan: BANKZPLAN
+                  plan: BANKZPLN
 
         # DB2ENTRY Definition
         - db2entry:
@@ -1137,7 +1137,7 @@ resourceDefinitions:
                   accountrec: NONE
                   authtype: USERID
                   drollback: "YES"
-                  plan: BANKZPLAN
+                  plan: BANKZPLN
                   priority: HIGH
                   protectnum: 0
                   threadlimit: 10

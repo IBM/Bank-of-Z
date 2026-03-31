@@ -39,7 +39,7 @@ cics_region:
 
   sit_parameters:
     start: INITIAL
-    grplist: DFHLIST,BANKZLIST
+    grplist: DFHLIST,BANKZLST
     gmtext: SMSS Region provisioned with zconfig
     sec: "NO"
     db2conn: "YES"

@@ -59,6 +59,12 @@ expand_vars() {
     # Replace $PIPELINE_WORKSPACE
     value="${value//\$PIPELINE_WORKSPACE/$PIPELINE_WORKSPACE}"
 
+    # Replace $CICS_CMCI_USER
+    value="${value//\$CICS_CMCI_USER/$CICS_CMCI_USER}"
+
+    # Replace $CICS_CMCI_PASSWORD
+    value="${value//\$CICS_CMCI_PASSWORD/$CICS_CMCI_PASSWORD}"
+
     # Replace ${global.<key>} with value from [global] section in config
     while [[ "$value" =~ \$\{global\.([a-zA-Z_]+)\} ]]; do
         local key="${BASH_REMATCH[1]}"

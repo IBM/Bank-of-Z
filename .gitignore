@@ -3,3 +3,4 @@
 /.bob/*.json
 /.setup/.env
 provisioning/
+/.pydevproject

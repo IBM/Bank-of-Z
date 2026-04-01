@@ -166,8 +166,8 @@
       *
        01 NCS-CUST-NO-STUFF.
           03 NCS-CUST-NO-NAME.
-             05 NCS-CUST-NO-ACT-NAME    PIC X(8)
-                                                      VALUE 'CBSACUST'.
+             05 NCS-CUST-NO-ACT-NAME    PIC X(9)
+                                                      VALUE 'BANKZCUST'.
              05 NCS-CUST-NO-TEST-SORT   PIC X(6)
                                                       VALUE '      '.
              05 NCS-CUST-NO-FILL        PIC XX

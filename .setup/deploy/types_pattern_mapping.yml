@@ -19,8 +19,7 @@
 # 
 
 types:
-  - type: "LOAD" # Not done yet - for Ansible
-    pattern: .*\.LOAD$ # Not done yet - for Pythpn 
+  - pattern: .*\.LOAD$ 
     pds: 
       name: "{{ hlq }}.LOADLIB"
       backup: "{{ hlq }}.BACK.LOADLIB"

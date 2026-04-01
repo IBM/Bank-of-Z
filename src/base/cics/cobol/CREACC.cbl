@@ -187,8 +187,8 @@
       *
        01 NCS-ACC-NO-STUFF.
           03 NCS-ACC-NO-NAME.
-             05 NCS-ACC-NO-ACT-NAME     PIC X(8)
-                                                      VALUE 'CBSAACCT'.
+             05 NCS-ACC-NO-ACT-NAME     PIC X(9)
+                                                      VALUE 'BANKZACCT'.
              05 NCS-ACC-NO-TEST-SORT    PIC X(6)
                                                       VALUE '      '.
              05 NCS-ACC-NO-FILL         PIC XX
@@ -568,7 +568,7 @@
 
               DISPLAY 'CREACC - ACCOUNT NCS '
                       NCS-ACC-NO-NAME
-                      
+
                  ' CANNOT BE ACCESSED AND DB2 SELECT FAILED. SQLCODE='
                       SQLCODE-DISPLAY
 
@@ -659,7 +659,7 @@
 
                  DISPLAY 'CREACC - ACCOUNT NCS '
                          NCS-ACC-NO-NAME
-                         
+
                   ' CANNOT BE ACCESSED AND DB2 UPDATE FAILED. SQLCODE='
                          SQLCODE-DISPLAY
 
@@ -757,7 +757,7 @@
 
               DISPLAY 'CREACC - ACCOUNT NCS '
                       NCS-ACC-NO-NAME
-                      
+
                  ' CANNOT BE ACCESSED AND DB2 SELECT FAILED. SQLCODE='
                       SQLCODE-DISPLAY
 
@@ -843,7 +843,7 @@
 
                  DISPLAY 'CREACC - ACCOUNT NCS '
                          NCS-ACC-NO-NAME
-                         
+
                   ' CANNOT BE ACCESSED AND DB2 UPDATE FAILED. SQLCODE='
                          SQLCODE-DISPLAY
 

@@ -162,9 +162,10 @@ application:
           select:
             - condition: ${IS_CICS}
               value: CICSLOAD
-            - condition:
-                forFiles: "**/src/base/ims/cobol/*.cbl"
-              value: IMSLOAD
+
+        - name: deployType
+          forFiles: "**/src/base/ims/cobol/*.cbl"
+          value: IMSLOAD
 
     # ----------------------------------------------------------
     # PLI task

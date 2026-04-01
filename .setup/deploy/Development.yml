@@ -19,7 +19,7 @@ excludes_artifacts:
 
 # variables that can be overridden via extra vars
 application: "{{ application if application is defined else '' }}"
-hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'WDEPLOY.INT' }}"
+hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'BANKZ.BOZ.TEST' }}"
 uss_root: "{{ extra_vars.uss_root if extra_vars.uss_root is defined else '/tmp/wazi-deploy/int' }}"
 deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home is defined else '/var/wazi-deploy-config-sample' }}"
 
@@ -30,7 +30,7 @@ deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home i
 
 # CICS
 default_cics_user: "IBMUSER"
-default_cics_password: "SYS1SYS1"
+default_cics_password: ""
 default_cics_context: "CICSBOZ"
 default_cmci_host: "127.0.0.1"
 default_cmci_port: 27100

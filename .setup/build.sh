@@ -17,6 +17,7 @@ set -e
 
 # Get the directory where this script is located (the cloned workspace)
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+rm -rf $WORKSPACE_DIR/logs
 
 # Global configureation file
 CONFIG_FILE="$WORKSPACE_DIR/.setup/config.yaml"
@@ -33,14 +34,6 @@ source "$LIB_DIR/dbb.sh"
 #########################################################
 # Configuration
 #########################################################
-
-# Activate zconfig virtual environment
-ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
-if [ -f $ZCONFIG_HOME/bin/activate ]; then
-    source $ZCONFIG_HOME/bin/activate
-else
-    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
-fi
 
 print_info "Workspace directory: $WORKSPACE_DIR"
 
@@ -120,14 +113,62 @@ else
     echo ""
 fi
 
+#########################################################
+# STAGE 3: Run Wazi Deploy - Only deploy modules
+#########################################################
+. /global/opt/pyenv/gdp/bin/activate
+wazideploy-generate -v
+wazideploy-generate\
+  -dm ../dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml\
+  -dp logs/deployment-plan.yml -pif logs/bank-of-z-zos-native-*.tar
+
+if [ $? -eq 0 ]; then
+     TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
+     wazideploy-deploy -dp logs/deployment-plan.yml\
+       -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
+       -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
+       -pt deploy
+    if [ $? -eq 0 ]; then
+         print_success "Wazi Deploy completed successfully!"
+    else
+        print_error "Wazi Deploy failed with return code: $BUILD_RC"
+        echo ""
+        echo "Check logs in: $WORKSPACE_DIR/logs"
+        echo ""
+    fi
+else
+    print_error "Wazi Deploy failed with return code: $BUILD_RC"
+    echo ""
+    echo "Check logs in: $WORKSPACE_DIR/logs"
+    echo ""
+fi
+deactivate
+
+#########################################################
+# STAGE 4: Create CICS instance with zconfig
+#########################################################
+
+# Activate zconfig virtual environment
+ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
+if [ -f $ZCONFIG_HOME/bin/activate ]; then
+    source $ZCONFIG_HOME/bin/activate
+else
+    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
+fi
+
 # Apply CICS region configuration
 cd $WORKSPACE_DIR/.setup/zconfig
 zconfig apply cics-region.yaml
+deactivate
 echo ""
 # Start CICS region
 job_id=$(jsub BANKZ.BOZ.CICSBOZ.DFHSTART)
 echo "CICS Region Job ID: $job_id"
 echo ""
+
+#########################################################
+# STAGE 5: Create DB2 database
+#########################################################
 
 jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"
 sleep 3

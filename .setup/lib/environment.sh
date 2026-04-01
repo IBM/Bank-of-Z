@@ -47,4 +47,15 @@ setup_dbb_environment() {
     export DBB_HLQ=$(get_section_value 'pipeline_script' 'dbb_hlq')
 }
 
+# Get the current USER
+get_user() {
+  if [ -n "$USER" ]; then
+    echo "$USER"
+  elif [ -n "$LOGNAME" ]; then
+    echo "$LOGNAME"
+  else
+    echo "${HOME##*/}"
+  fi
+}
+
 # Made with Bob

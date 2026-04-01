@@ -55,7 +55,7 @@ export DBB_HLQ="${DBB_HLQ:-IBMUSER.BOZ.BLD}"
 print_info "Using HLQ: $DBB_HLQ"
 
 # Cancel CICS region (ignore errors if already cancelled)
-jcan P "CICSBOZ" 2>/dev/null || true
+jcan P "CICSBOZ" & 2>/dev/null || true
 
 print_info "DBB_HOME: $DBB_HOME"
 print_info "DBB_BUILD: $DBB_BUILD"
@@ -172,12 +172,12 @@ echo ""
 # STAGE 5: Create DB2 database
 #########################################################
 
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"&
 sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl&"
 sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"&
 sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-insert.jcl"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-insert.jcl"&
 
 exit $BUILD_RC

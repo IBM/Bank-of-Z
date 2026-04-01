@@ -263,7 +263,7 @@ stage4_build_and_install() {
         print_error "Failed to clone https://github.com/IBM/Bank-of-Z.git on the target!!"
         exit 1
     fi
-    print_success "Clone of https://github.com/IBM/Bank-of-Z.git runs successfully"
+    print_success "Clone of https://github.com/IBM/Bank-of-Z.git branch $(git rev-parse --abbrev-ref HEAD) runs successfully"
     set -o pipefail
     if ! zowe rse-api-for-zowe-cli issue unix-shell "$PIPELINE_WORKSPACE/Bank-of-Z/.setup/build.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee build.log; then
         print_error "Failed install Bank of Z on the target!!"

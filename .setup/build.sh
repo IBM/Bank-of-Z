@@ -186,7 +186,7 @@ echo ""
 
 jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"&
 sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl&"
+jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl"&
 sleep 3
 jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"&
 sleep 3

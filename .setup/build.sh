@@ -123,11 +123,12 @@ wazideploy-generate\
   -dp logs/deployment-plan.yml -pif logs/bank-of-z-zos-native-*.tar
 
 if [ $? -eq 0 ]; then
+     drm BANKZ.CICSBOZ.*&
      TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
      # Overide default mapping (need something more generic)
      cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
      export USER=$(get_user)
-     echo "USER=$USER"
+     echo "* USER=$USER"
      wazideploy-deploy -dp logs/deployment-plan.yml\
        -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\

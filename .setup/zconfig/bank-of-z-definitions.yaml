@@ -1,5 +1,43 @@
 # yaml-language-server: $schema=./resource-schema.json
 resourceDefinitions:
+        # FILE Definitions
+        - file:
+                  name: ABNDFILE
+                  group: CBSAGRP
+                  description: Abend file VSAM
+                  dsname: BANKZ.BOZ.TEST.ABNDFILE
+                  rlsaccess: "NO"
+                  lsrpoolnum: 1
+                  readinteg: UNCOMMITTED
+                  dsnsharing: ALLREQS
+                  strings: 20
+                  recordsize: 681
+                  keylength: 12
+                  status: ENABLED
+                  opentime: STARTUP
+                  disposition: SHARE
+                  databuffers: 21
+                  indexbuffers: 20
+                  table: "NO"
+                  maxnumrecs: NOLIMIT
+                  updatemodel: LOCKING
+                  load: "NO"
+                  recordformat: V
+                  add: "YES"
+                  browse: "YES"
+                  delete: "YES"
+                  read: "YES"
+                  update: "YES"
+                  journal: "NO"
+                  jnlread: NONE
+                  jnlsyncread: "NO"
+                  jnlupdate: "NO"
+                  jnladd: NONE
+                  jnlsyncwrite: "YES"
+                  recovery: NONE
+                  fwdrecovlog: "NO"
+                  backuptype: STATIC
+
         # MAPSET Definitions
         - mapset:
                   name: BNK1ACC

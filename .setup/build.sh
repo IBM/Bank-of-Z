@@ -126,7 +126,7 @@ if [ $? -eq 0 ]; then
      TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
      # Overide default mapping (need something more generic)
      cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
-     USER_NAME=$(get_user)
+     USER=$(get_user)
      wazideploy-deploy -dp logs/deployment-plan.yml\
        -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\

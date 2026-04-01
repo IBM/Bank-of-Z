@@ -116,7 +116,8 @@ fi
 #########################################################
 # STAGE 3: Run Wazi Deploy - Only deploy modules
 #########################################################
-. /global/opt/pyenv/gdp/bin/activate
+WAZIDEPLOY_HOME=$(get_section_value 'wazideploy' 'wazideploy_home')
+. $WAZIDEPLOY_HOME/bin/activate
 wazideploy-generate -v
 wazideploy-generate\
   -dm ../dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml\

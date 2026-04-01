@@ -128,18 +128,19 @@ if [ $? -eq 0 ]; then
        -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
        -pt deploy &
-     PID=$!
-     wait $PID
-    if [ $? -eq 0 ]; then
+    PID=$!
+    wait $PID
+    RC=$?
+    if [ $RC -eq 0 ]; then
          print_success "Wazi Deploy completed successfully!"
     else
-        print_error "Wazi Deploy failed with return code: $BUILD_RC"
+        print_error "Wazi Deploy failed with return code: $RC"
         echo ""
         echo "Check logs in: $WORKSPACE_DIR/logs"
         echo ""
     fi
 else
-    print_error "Wazi Deploy failed with return code: $BUILD_RC"
+    print_error "Wazi Deploy failed with return code: $RC"
     echo ""
     echo "Check logs in: $WORKSPACE_DIR/logs"
     echo ""
@@ -160,7 +161,18 @@ fi
 
 # Apply CICS region configuration
 cd $WORKSPACE_DIR/.setup/zconfig
-zconfig apply cics-region.yaml
+zconfig apply cics-region.yaml&
+PID=$!
+wait $PID
+RC=$?
+if [ $RC -eq 0 ]; then
+    print_success "ZConfig completed successfully!"
+else
+   print_error "ZConfig failed with return code: $RC"
+   echo ""
+   echo "Check logs in: $WORKSPACE_DIR/logs"
+   echo ""
+fi
 deactivate
 echo ""
 # Start CICS region

@@ -212,7 +212,7 @@ You can then test each connection. Example:
 
 - Git installed and available in PATH on USS
 - CICS region for application deployment
-- IBM DBB installed (typically at `/usr/lpp/IBM/dbb`)
+- IBM DBB 3.0.4.1 installed (typically at `/usr/lpp/IBM/dbb`)
 - Appropriate permissions for USS directories and dataset creation
 - ZOAU 1.4.1.0 installed (typically at `/usr/lpp/IBM/zoautil`)
 - Wazi Deploy 3.0.7.2 installed (typically at `/global/opt/pyenv/gdp`)

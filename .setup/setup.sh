@@ -190,9 +190,9 @@ stage3_upload_framework() {
     print_stage "STAGE 3: Upload Build Framework and Scripts"
     
     # Print datasets configuration from datasets.yaml
-    print_info "Datasets configuration from Languages.yaml:"
+    print_info "Datasets configuration from datasets.yaml:"
     echo ""
-    if [ -f "$ZBUILDER_SOURCE/languages/datasets.yaml" ]; then
+    if [ -f "$ZBUILDER_SOURCE/datasets.yaml" ]; then
         grep -A 200 "^variables:" "$ZBUILDER_SOURCE/languages/datasets.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20
     else
         print_warning "datasets.yaml not found at: $ZBUILDER_SOURCE/languages/datasets.yaml"

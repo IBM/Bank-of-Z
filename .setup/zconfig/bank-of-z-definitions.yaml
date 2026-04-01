@@ -1,79 +1,5 @@
 # yaml-language-server: $schema=./resource-schema.json
 resourceDefinitions:
-        # FILE Definitions
-        - file:
-                  name: CUSTOMER
-                  group: BANKZGRP
-                  description: Bank Customer VSAM
-                  dsname: BANKZ.BOZ.BLD.CUSTOMER
-                  rlsaccess: "NO"
-                  lsrpoolnum: 1
-                  readinteg: UNCOMMITTED
-                  dsnsharing: ALLREQS
-                  strings: 20
-                  recordsize: 259
-                  keylength: 16
-                  status: ENABLED
-                  opentime: FIRSTREF
-                  disposition: SHARE
-                  databuffers: 21
-                  indexbuffers: 20
-                  table: "NO"
-                  maxnumrecs: NOLIMIT
-                  updatemodel: LOCKING
-                  load: "NO"
-                  recordformat: V
-                  add: "YES"
-                  browse: "YES"
-                  delete: "YES"
-                  read: "YES"
-                  update: "YES"
-                  journal: "NO"
-                  jnlread: NONE
-                  jnlsyncread: "NO"
-                  jnlupdate: "NO"
-                  jnladd: NONE
-                  jnlsyncwrite: "YES"
-                  recovery: BACKOUTONLY
-                  fwdrecovlog: "NO"
-                  backuptype: STATIC
-        - file:
-                  name: ABNDFILE
-                  group: BANKZGRP
-                  description: Abend file VSAM
-                  dsname: BANKZ.BOZ.BLD.ABNDFILE
-                  rlsaccess: "NO"
-                  lsrpoolnum: 1
-                  readinteg: UNCOMMITTED
-                  dsnsharing: ALLREQS
-                  strings: 20
-                  recordsize: 681
-                  keylength: 12
-                  status: ENABLED
-                  opentime: STARTUP
-                  disposition: SHARE
-                  databuffers: 21
-                  indexbuffers: 20
-                  table: "NO"
-                  maxnumrecs: NOLIMIT
-                  updatemodel: LOCKING
-                  load: "NO"
-                  recordformat: V
-                  add: "YES"
-                  browse: "YES"
-                  delete: "YES"
-                  read: "YES"
-                  update: "YES"
-                  journal: "NO"
-                  jnlread: NONE
-                  jnlsyncread: "NO"
-                  jnlupdate: "NO"
-                  jnladd: NONE
-                  jnlsyncwrite: "YES"
-                  recovery: NONE
-                  fwdrecovlog: "NO"
-                  backuptype: STATIC
-
         # MAPSET Definitions
         - mapset:
                   name: BNK1ACC
@@ -1189,4 +1115,4 @@ resourceDefinitions:
         - library:
                   name: BANKZ
                   group: BANKZGRP
-                  dsname01: BANKZ.BOZ.BLD.LOAD
+                  dsname01: BANKZ.BOZ.TEST.LOADLIB

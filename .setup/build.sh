@@ -124,6 +124,8 @@ wazideploy-generate\
 
 if [ $? -eq 0 ]; then
      TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
+     # Overide default mapping (need something more generic)
+     cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
      wazideploy-deploy -dp logs/deployment-plan.yml\
        -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
@@ -138,6 +140,7 @@ if [ $? -eq 0 ]; then
         echo ""
         echo "Check logs in: $WORKSPACE_DIR/logs"
         echo ""
+        exit 1
     fi
 else
     print_error "Wazi Deploy failed with return code: $RC"
@@ -172,6 +175,7 @@ else
    echo ""
    echo "Check logs in: $WORKSPACE_DIR/logs"
    echo ""
+   exit 1
 fi
 deactivate
 echo ""
@@ -191,5 +195,4 @@ sleep 3
 jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"&
 sleep 3
 jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-insert.jcl"&
-
-exit $BUILD_RC
+sleep 3

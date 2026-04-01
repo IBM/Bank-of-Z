@@ -264,7 +264,9 @@ stage4_build_and_install() {
         exit 1
     fi
     print_success "Clone of https://github.com/IBM/Bank-of-Z.git runs successfully"
-    if ! zowe rse-api-for-zowe-cli issue unix-shell "$PIPELINE_WORKSPACE/Bank-of-Z/.setup/build.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" &> /dev/null; then
+    if ! zowe rse-api-for-zowe-cli issue unix-shell \
+         "$PIPELINE_WORKSPACE/Bank-of-Z/.setup/build.sh > logs/install_bank_of_z.log 2>&1" \
+         --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" &> /dev/null; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi

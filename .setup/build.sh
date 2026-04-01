@@ -180,8 +180,9 @@ fi
 deactivate
 echo ""
 # Start CICS region
-job_id=$(jsub BANKZ.CICSBOZ.DFHSTART)
-echo "CICS Region Job ID: $job_id"
+jsub BANKZ.CICSBOZ.DFHSTART&
+sleep 3
+echo "CICS Region Job Started"
 echo ""
 
 #########################################################

@@ -127,7 +127,9 @@ if [ $? -eq 0 ]; then
      wazideploy-deploy -dp logs/deployment-plan.yml\
        -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
-       -pt deploy
+       -pt deploy &
+     PID=$!
+     wait $PID
     if [ $? -eq 0 ]; then
          print_success "Wazi Deploy completed successfully!"
     else

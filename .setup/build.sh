@@ -55,7 +55,7 @@ export DBB_HLQ="${DBB_HLQ:-IBMUSER.BOZ.BLD}"
 print_info "Using HLQ: $DBB_HLQ"
 
 # Cancel CICS region (ignore errors if already cancelled)
-jcan P "CICSBOZ" 2>/dev/null || true
+jcan P "CICSBOZ"&
 
 print_info "DBB_HOME: $DBB_HOME"
 print_info "DBB_BUILD: $DBB_BUILD"

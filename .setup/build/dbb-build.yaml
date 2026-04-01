@@ -46,6 +46,7 @@ lifecycles:
       - FullAnalysis
       - Languages    # Defined in Languages.yaml
       #- zOSConnect
+      - Package
       - Finish
 
   # build only programs impacted by changes to the application

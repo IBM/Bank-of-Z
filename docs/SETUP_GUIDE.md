@@ -125,7 +125,7 @@ pipeline_script:
   dbb_hlq: false
   
   # Bank of Z target HLQ for Wazi Deploy
-  target_hlq: BANKZ.CICSBSA
+  target_hlq: BANKZ.V0R1M0
 ```
 
 ### Environment Variables

@@ -30,7 +30,7 @@ cics_region:
         hlq: "{{ vars.cics_hlq }}.CPSM"
     dir: "{{ vars.cics_uss_dir }}"
 
-  region_hlq: "{{ vars.region_hlq }}.BOZ.{{ vars.applid }}"
+  region_hlq: "{{ vars.region_hlq }}.{{ vars.applid }}"
 
   region_jcl:
     type: JOB

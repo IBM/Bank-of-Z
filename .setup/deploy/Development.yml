@@ -19,7 +19,7 @@ excludes_artifacts:
 
 # variables that can be overridden via extra vars
 application: "{{ application if application is defined else '' }}"
-hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'BANKZ.BOZ.TEST' }}"
+hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'BANKZ.V0R1M0' }}"
 uss_root: "{{ extra_vars.uss_root if extra_vars.uss_root is defined else '/tmp/wazi-deploy/int' }}"
 deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home is defined else '/var/wazi-deploy-config-sample' }}"
 

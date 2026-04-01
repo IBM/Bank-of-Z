@@ -5,7 +5,7 @@ resourceDefinitions:
                   name: ABNDFILE
                   group: CBSAGRP
                   description: Abend file VSAM
-                  dsname: BANKZ.BOZ.TEST.ABNDFILE
+                  dsname: BANKZ.V0R1M0.ABNDFILE
                   rlsaccess: "NO"
                   lsrpoolnum: 1
                   readinteg: UNCOMMITTED
@@ -1153,4 +1153,4 @@ resourceDefinitions:
         - library:
                   name: BANKZ
                   group: BANKZGRP
-                  dsname01: BANKZ.BOZ.TEST.LOADLIB
+                  dsname01: BANKZ.V0R1M0.LOADLIB

@@ -40,7 +40,7 @@ pipeline_script:
   run_deploy: true
   
   # Bank of Z target HLQ for Wazi Deploy
-  target_hlq: BANKZ.BOZ.TEST
+  target_hlq: BANKZ.V0R1M0
 
 zconfig:
   # zconfig home folder

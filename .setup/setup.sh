@@ -269,7 +269,7 @@ stage4_build_and_install() {
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi
-    if grep -qi "error\|failed\|RC=[^0]\|return code [^0]" build.log; then
+    if grep -qi "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi

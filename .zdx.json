@@ -1,58 +1,18 @@
 {
-
-"buildSettings": {
-
-
-"remoteOefDir": "/usr/lpp/IBM/foz/v1r1/bin",
-
-
-"serverBuildTool": "/usr/local/sandboxes/grubServer/grub-main/bin/grub_server"
-
-},
-
-"listingFileDetails": {
-
-
-"remote": [
-
-
-
-{
-
-
-
-
-"connectionName": "ibmuser@9.47.93.199",
-
-
-
-
-"connectionType": "zosmf",
-
-
-
-
-"uss-directories": [
-
-
-
-
-
-"/usr/local/sandboxes/bank-of-z/Bank-of-Z"
-
-
-
-
-]
-
-
-
-}
-
-
-]
-
-},
-
-"macros": []
+    "buildSettings": {
+        "remoteOefDir": "/usr/lpp/IBM/foz/v1r1/bin",
+        "serverBuildTool": "/usr/local/sandboxes/grubServer/grub-main/bin/grub_server"
+    },
+    "listingFileDetails": {
+        "remote": [
+            {
+                "connectionName": "ibmuser@9.47.93.199",
+                "connectionType": "zosmf",
+                "uss-directories": [
+                    "/usr/local/sandboxes/bank-of-z/Bank-of-Z"
+                ]
+            }
+        ]
+    },
+    "macros": []
 }

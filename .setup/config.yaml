@@ -48,7 +48,7 @@ wazideploy:
 
 zconfig:
   # zconfig home folder
-  zconfig_home: /u/ibmuser/zconfig # FIXME ~ not working
-  zcb_home: /u/ibmuser/zrb/cics-resource-builder-1.0.6 # FIXME ~ not working
-  
+  zconfig_home: ~/zconfig
+  zcb_home: ~/cics-resource-builder-1.0.6
+
 # Made with Bob

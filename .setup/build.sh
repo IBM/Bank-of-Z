@@ -160,6 +160,7 @@ deactivate
 
 # Activate zconfig virtual environment
 ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
+ZCONFIG_HOME=$(echo $ZCONFIG_HOME | sed "s|~|$HOME|g")
 if [ -f $ZCONFIG_HOME/bin/activate ]; then
     source $ZCONFIG_HOME/bin/activate
 else

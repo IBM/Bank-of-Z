@@ -41,6 +41,7 @@ setup_dbb_environment() {
     
     # Add DBB, ZOAU, ZRB to PATH
     ZRB_HOME=$(get_section_value 'zconfig' 'zcb_home')
+    ZRB_HOME=$(echo $ZRB_HOME | sed "s|~|$HOME|g")
     
     export PATH="$ZRB_HOME/bin:$DBB_HOME/bin:/usr/lpp/IBM/zoautil/bin:$PIPELINE_SCRIPTS:$PATH"
     

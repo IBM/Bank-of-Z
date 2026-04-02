@@ -5,3 +5,4 @@
 provisioning/
 /.pydevproject
 build.log
+/bin/

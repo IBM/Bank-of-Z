@@ -49,6 +49,6 @@ wazideploy:
 zconfig:
   # zconfig home folder
   zconfig_home: ~/zconfig
-  zcb_home: ~/cics-resource-builder-1.0.6
+  zcb_home: ~/zrb/cics-resource-builder-1.0.6
 
 # Made with Bob

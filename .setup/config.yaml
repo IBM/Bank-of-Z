@@ -34,17 +34,21 @@ pipeline_script:
   workspace: $PIPELINE_WORKSPACE/workspace
   
   # DBB build HLQ
-  dbb_hlq: BANKZ.BOZ.BLD
+  dbb_hlq: BANKZ.BUILD.V0R1M0
   
   # Enablde Wazi Deploy
-  run_deploy: false
+  run_deploy: true
   
   # Bank of Z target HLQ for Wazi Deploy
-  target_hlq: BANKZ.BOZ.TEST
+  target_hlq: BANKZ.V0R1M0
+
+wazideploy:
+  # Wazi Deploy Python virtual environment
+  wazideploy_home: /global/opt/pyenv/gdp
 
 zconfig:
   # zconfig home folder
-  zconfig_home: /u/ibmuser/zconfig # FIXME ~ not working
-  zcb_home: /u/ibmuser/zrb/cics-resource-builder-1.0.6 # FIXME ~ not working
-  
+  zconfig_home: ~/zconfig
+  zcb_home: ~/zrb/cics-resource-builder-1.0.6
+
 # Made with Bob

@@ -18,7 +18,7 @@ export PIPELINE_WORKSPACE=${PIPELINE_WORKSPACE:-$PIPELINE_WORKSPACE/workspace}
 export DBB_BUILD_PATH=${DBB_BUILD_PATH:-$PIPELINE_WORKSPACE/zBuilder}
 
 # zBuilder framework dbb hlq build
-export DBB_HLQ=${DBB_HLQ:-BANKZ.BOZ.BLD}
+export DBB_HLQ=${DBB_HLQ:-BANKZ.BUILD}
 
 # Adding pipeline scripts to PATH of the user running this script
 export PATH=$PIPELINE_SCRIPTS:$PATH

@@ -41,10 +41,22 @@ setup_dbb_environment() {
     
     # Add DBB, ZOAU, ZRB to PATH
     ZRB_HOME=$(get_section_value 'zconfig' 'zcb_home')
+    ZRB_HOME=$(echo $ZRB_HOME | sed "s|~|$HOME|g")
     
     export PATH="$ZRB_HOME/bin:$DBB_HOME/bin:/usr/lpp/IBM/zoautil/bin:$PIPELINE_SCRIPTS:$PATH"
     
     export DBB_HLQ=$(get_section_value 'pipeline_script' 'dbb_hlq')
+}
+
+# Get the current USER
+get_user() {
+  if [ -n "$USER" ]; then
+    echo "$USER"
+  elif [ -n "$LOGNAME" ]; then
+    echo "$LOGNAME"
+  else
+    echo "${HOME##*/}"
+  fi
 }
 
 # Made with Bob

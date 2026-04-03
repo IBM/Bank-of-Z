@@ -189,13 +189,13 @@ stage2_clone_accelerators() {
 stage3_upload_framework() {
     print_stage "STAGE 3: Upload Build Framework and Scripts"
     
-    # Print datasets configuration from Languages.yaml
-    print_info "Datasets configuration from Languages.yaml:"
+    # Print datasets configuration from datasets.yaml
+    print_info "Datasets configuration from datasets.yaml:"
     echo ""
-    if [ -f "$ZBUILDER_SOURCE/languages/Languages.yaml" ]; then
-        grep -A 200 "^variables:" "$ZBUILDER_SOURCE/languages/Languages.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20
+    if [ -f "$ZBUILDER_SOURCE/datasets.yaml" ]; then
+        grep -A 200 "^variables:" "$ZBUILDER_SOURCE/datasets.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20
     else
-        print_warning "Languages.yaml not found at: $ZBUILDER_SOURCE/languages/Languages.yaml"
+        print_warning "datasets.yaml not found at: $ZBUILDER_SOURCE/languages/datasets.yaml"
     fi
     echo ""
     
@@ -255,6 +255,29 @@ stage3_upload_framework() {
 }
 
 #########################################################
+# STAGE 4: Build and Install Bank of Z
+#########################################################
+stage4_build_and_install() {
+    print_stage "STAGE 4: Build and install Bank of Z"
+    if ! zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $(git rev-parse --abbrev-ref HEAD)" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
+        print_error "Failed to clone https://github.com/IBM/Bank-of-Z.git on the target!!"
+        exit 1
+    fi
+    print_success "Clone of https://github.com/IBM/Bank-of-Z.git branch $(git rev-parse --abbrev-ref HEAD) runs successfully"
+    set -o pipefail
+    if ! zowe rse-api-for-zowe-cli issue unix-shell "$PIPELINE_WORKSPACE/Bank-of-Z/.setup/build.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/build.log; then
+        print_error "Failed install Bank of Z on the target!!"
+        exit 1
+    fi
+    if grep -qi "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log; then
+        print_error "Failed install Bank of Z on the target!!"
+        exit 1
+    fi
+    print_success "The installation of Bank of Z runs successfully"
+}
+
+
+#########################################################
 # Main execution
 #########################################################
 main() {
@@ -274,6 +297,7 @@ main() {
     stage1_initialize_workspace
     stage2_clone_accelerators
     stage3_upload_framework
+    stage4_build_and_install
     
     # Summary
     print_stage "SETUP COMPLETE"
@@ -283,6 +307,10 @@ main() {
     echo ""
     echo "Next steps:"
     echo "  1. Review the uploaded files on USS"
+    echo "  2. Check the Bank of Z x3270:"
+    echo "  2.1 Enter 'logon applid(CICSBOZ)' in the emulattor"
+    echo "  2.2 Enter 'OMEN' as transaction name"
+    echo "  2.3 Enter 1 then 1234 as customer"
     echo "  3. Run the pipeline simulation task from VS Code"
     echo ""
 }

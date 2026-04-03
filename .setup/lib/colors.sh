@@ -6,12 +6,27 @@
 # messaging across all scripts
 #########################################################
 
+# Terminal detection
+if [ -t 1 ]; then
+    USE_COLOR=true
+else
+    USE_COLOR=false
+fi
+
 # Color definitions
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+if [ "$USE_COLOR" = true ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m'
+else
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    NC=''
+fi
 
 # Function to print colored messages
 print_info() {
@@ -29,6 +44,7 @@ print_warning() {
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
+
 
 print_stage() {
     echo ""

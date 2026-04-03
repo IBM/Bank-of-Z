@@ -19,7 +19,7 @@ excludes_artifacts:
 
 # variables that can be overridden via extra vars
 application: "{{ application if application is defined else '' }}"
-hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'WDEPLOY.INT' }}"
+hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'BANKZ.V0R1M0' }}"
 uss_root: "{{ extra_vars.uss_root if extra_vars.uss_root is defined else '/tmp/wazi-deploy/int' }}"
 deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home is defined else '/var/wazi-deploy-config-sample' }}"
 
@@ -30,15 +30,15 @@ deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home i
 
 # CICS
 default_cics_user: "IBMUSER"
-default_cics_password: "SYS1SYS1"
-default_cics_context: "CICSTS63"
+default_cics_password: ""
+default_cics_context: "CICSBOZ"
 default_cmci_host: "127.0.0.1"
-default_cmci_port: 8154
-default_cmci_scheme: "https"
-default_csd_group: "BANK"
+default_cmci_port: 27100
+default_cmci_scheme: "http"
+default_csd_group: "BANKZGRP"
 default_cics_cmci_action: "NEWCOPY"
-default_env_cics_sdfhload: "CICSTS62.CICS.SDFHLOAD"
-default_env_cics_csd: "CICSTS62.DFHCSD"
+default_env_cics_sdfhload: "{{default_cics_context}}.CICS.SDFHLOAD"
+default_env_cics_csd: "{{default_cics_context}}.DFHCSD"
 default_cmci_insecure: True
 default_cmci_cert: ""
 default_cmci_key: ""
@@ -47,12 +47,12 @@ default_cmci_key: ""
 default_db2_sdsnload: "DB2V13.SDSNLOAD"
 default_pkg_jobcard: "BINDPKG JOB 'WD-PKGBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
 default_plan_jobcard: "BINDPLA JOB 'WD-PLANBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
-default_db2_sqlid: "IBMUSER"
-default_db2_package: "PCBSA"
-default_db2_plan: "CBSA"
-default_db2_qualifier: "QUAL"
+default_db2_sqlid: "CICSUSER"
+default_db2_package: "BANKZPACK"
+default_db2_plan: "BANKZPLN"
+default_db2_qualifier: "IBMUSER"
 default_db2_subsys: "DBD1"
-default_db2_plan_pklist: "*.CBSAPK.*"
+default_db2_plan_pklist: "NULLID.*,BANKZPACK.*"
 default_db2_action: "REPLACE"
 
 # load shared configuration

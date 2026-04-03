@@ -4,3 +4,5 @@
 /.setup/.env
 provisioning/
 /.pydevproject
+build.log
+/bin/

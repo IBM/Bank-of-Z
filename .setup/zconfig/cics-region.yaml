@@ -3,8 +3,12 @@ vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
   region_hlq: "BANKZ"
+  java_home: "/usr/lpp/java/java21/current_64"
   jvm_profile_dir: "/usr/local/sandboxes/bank-of-z"
   cmci_port: "27100"
+  cics_hlq: "CICSTS63"
+  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  db2_hlq: "DB2V13"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -20,13 +24,13 @@ cics_region:
   installation:
     data_sets:
       cics:
-        sdfhlic: CICSTS63.SDFHLIC
-        hlq: CICSTS63.CICS
+        sdfhlic: "{{ vars.cics_hlq }}.SDFHLIC"
+        hlq: "{{ vars.cics_hlq }}.CICS"
       cpsm:
-        hlq: CICSTS63.CPSM
-    dir: /usr/lpp/cicsts/cicsts63
+        hlq: "{{ vars.cics_hlq }}.CPSM"
+    dir: "{{ vars.cics_uss_dir }}"
 
-  region_hlq: "{{ vars.region_hlq }}.BOZ.{{ vars.applid }}"
+  region_hlq: "{{ vars.region_hlq }}.{{ vars.applid }}"
 
   region_jcl:
     type: JOB
@@ -34,12 +38,12 @@ cics_region:
       region: 0M
     steplib:
       top_data_sets:
-        - DB2V13.SDSNLOAD
-        - DB2V13.SDSNEXIT
+        - "{{ vars.db2_hlq }}.SDSNLOAD"
+        - "{{ vars.db2_hlq }}.SDSNEXIT"
 
   sit_parameters:
     start: INITIAL
-    grplist: DFHLIST,CBSALIST
+    grplist: DFHLIST,BANKZLST
     gmtext: SMSS Region provisioned with zconfig
     sec: "NO"
     db2conn: "YES"
@@ -57,13 +61,13 @@ cics_region:
     - name: EYUSMSSJ
       source_type: inline
       properties: |
-        JAVA_HOME=/usr/lpp/java/java21/current_64
+        JAVA_HOME={{ vars.java_home }}
         WORK_DIR=.
         -Xms128M
         -Xmx1G
         -Xmso1M
         -Dfile.encoding=ISO-8859-1
-        WLP_INSTALL_DIR=/usr/lpp/cicsts/cicsts63/wlp
+        WLP_INSTALL_DIR={{ vars.cics_uss_dir }}/wlp
         STDOUT=//DD:JVMOUT
         STDERR=//DD:JVMERR
         JVMTRACE=//DD:JVMTRACE

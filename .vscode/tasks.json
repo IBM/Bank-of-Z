@@ -60,7 +60,7 @@
             "id": "gitRepository",
             "type": "promptString",
             "description": "Git repository URL",
-            "default": "https://github.com/user/repo.git"
+            "default": "https://github.com/IBM/Bank-of-Z"
         },
         {
             "id": "gitBranch",

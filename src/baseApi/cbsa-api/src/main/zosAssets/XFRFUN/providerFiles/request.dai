@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="XFRFUN" originalName="XFRFUN" included="Y" path="XFRFUN" fileName="XFRFUN.cpy" structureIndex="0" structSrcFileName="XFRFUN_request_0.cpy" srcLine="01 XFRFUN.">
+                <startPos>1</startPos>
+                <bytes>90</bytes>
+                <maxBytes>90</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="COMM-FACCNO" originalName="COMM-FACCNO" included="Y" path="XFRFUN.COMM-FACCNO" srcLine="03 COMM-FACCNO PIC 9(8) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="COMM-FSCODE" originalName="COMM-FSCODE" included="Y" path="XFRFUN.COMM-FSCODE" srcLine="03 COMM-FSCODE PIC 9(6) USAGE DISPLAY.">
+                    <startPos>9</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                </field>
+                <field name="COMM-TACCNO" originalName="COMM-TACCNO" included="Y" path="XFRFUN.COMM-TACCNO" srcLine="03 COMM-TACCNO PIC 9(8) USAGE DISPLAY.">
+                    <startPos>15</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="COMM-TSCODE" originalName="COMM-TSCODE" included="Y" path="XFRFUN.COMM-TSCODE" srcLine="03 COMM-TSCODE PIC 9(6) USAGE DISPLAY.">
+                    <startPos>23</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                </field>
+                <field name="COMM-AMT" originalName="COMM-AMT" included="Y" path="XFRFUN.COMM-AMT" srcLine="03 COMM-AMT PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>29</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-FAVBAL" originalName="COMM-FAVBAL" included="Y" path="XFRFUN.COMM-FAVBAL" srcLine="03 COMM-FAVBAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>41</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-FACTBAL" originalName="COMM-FACTBAL" included="Y" path="XFRFUN.COMM-FACTBAL" srcLine="03 COMM-FACTBAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>53</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-TAVBAL" originalName="COMM-TAVBAL" included="Y" path="XFRFUN.COMM-TAVBAL" srcLine="03 COMM-TAVBAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>65</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-TACTBAL" originalName="COMM-TACTBAL" included="Y" path="XFRFUN.COMM-TACTBAL" srcLine="03 COMM-TACTBAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>77</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-FAIL-CODE" originalName="COMM-FAIL-CODE" included="Y" path="XFRFUN.COMM-FAIL-CODE" srcLine="03 COMM-FAIL-CODE PIC X USAGE DISPLAY.">
+                    <startPos>89</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-SUCCESS" originalName="COMM-SUCCESS" included="Y" path="XFRFUN.COMM-SUCCESS" srcLine="03 COMM-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>90</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

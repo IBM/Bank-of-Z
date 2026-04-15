@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="INQACCCZ" originalName="INQACCCZ" included="Y" path="INQACCCZ" fileName="INQACCCZ.cpy" structureIndex="0" structSrcFileName="INQACCCZ_response_0.cpy" srcLine="01 INQACCCZ.">
+                <startPos>1</startPos>
+                <bytes>1981</bytes>
+                <maxBytes>0</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="NUMBER-OF-ACCOUNTS" originalName="NUMBER-OF-ACCOUNTS" included="N" path="INQACCCZ.NUMBER-OF-ACCOUNTS" dependedOn="true" srcLine="03 NUMBER-OF-ACCOUNTS PIC S9(8) USAGE COMP.">
+                    <startPos>1</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="INT" precision="8"/>
+                </field>
+                <field name="CUSTOMER-NUMBER" originalName="CUSTOMER-NUMBER" included="Y" path="INQACCCZ.CUSTOMER-NUMBER" srcLine="03 CUSTOMER-NUMBER PIC 9(10) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>10</bytes>
+                    <maxBytes>10</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="10" scale="0"/>
+                </field>
+                <field name="COMM-SUCCESS" originalName="COMM-SUCCESS" included="Y" path="INQACCCZ.COMM-SUCCESS" srcLine="03 COMM-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>15</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-FAIL-CODE" originalName="COMM-FAIL-CODE" included="Y" path="INQACCCZ.COMM-FAIL-CODE" srcLine="03 COMM-FAIL-CODE PIC X USAGE DISPLAY.">
+                    <startPos>16</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="CUSTOMER-FOUND" originalName="CUSTOMER-FOUND" included="Y" path="INQACCCZ.CUSTOMER-FOUND" srcLine="03 CUSTOMER-FOUND PIC X USAGE DISPLAY.">
+                    <startPos>17</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-PCB-POINTER" originalName="COMM-PCB-POINTER" included="Y" path="INQACCCZ.COMM-PCB-POINTER" srcLine="03 COMM-PCB-POINTER PIC X(4) USAGE DISPLAY.">
+                    <startPos>18</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="ACCOUNT-DETAILS" originalName="ACCOUNT-DETAILS" included="Y" path="INQACCCZ.ACCOUNT-DETAILS" dependsOn="NUMBER-OF-ACCOUNTS" dependsOnPath="INQACCCZ.NUMBER-OF-ACCOUNTS" minOccurs="1" maxOccurs="20" srcLine="03 ACCOUNT-DETAILS OCCURS 1 TO 20 TIMES DEPENDING ON NUMBER-OF-ACCOUNTS.">
+                    <startPos>22</startPos>
+                    <bytes>1960</bytes>
+                    <maxBytes>0</maxBytes>
+                    <marshaller alignment="NATURAL"/>
+                    <applicationDatatype datatype="ARRAY"/>
+                    <field name="COMM-EYE" originalName="COMM-EYE" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-EYE" srcLine="05 COMM-EYE PIC X(4) USAGE DISPLAY.">
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-CUSTNO" originalName="COMM-CUSTNO" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-CUSTNO" srcLine="05 COMM-CUSTNO PIC X(10) USAGE DISPLAY.">
+                        <bytes>10</bytes>
+                        <maxBytes>10</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-SCODE" originalName="COMM-SCODE" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-SCODE" srcLine="05 COMM-SCODE PIC X(6) USAGE DISPLAY.">
+                        <bytes>6</bytes>
+                        <maxBytes>6</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-ACCNO" originalName="COMM-ACCNO" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-ACCNO" srcLine="05 COMM-ACCNO PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="COMM-ACC-TYPE" originalName="COMM-ACC-TYPE" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-ACC-TYPE" srcLine="05 COMM-ACC-TYPE PIC X(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-INT-RATE" originalName="COMM-INT-RATE" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-INT-RATE" srcLine="05 COMM-INT-RATE PIC 9(4)V9(2) USAGE DISPLAY.">
+                        <bytes>6</bytes>
+                        <maxBytes>6</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="6" scale="2"/>
+                    </field>
+                    <field name="COMM-OPENED" originalName="COMM-OPENED" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OPENED" srcLine="05 COMM-OPENED PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="COMM-OPENED-GROUP" originalName="COMM-OPENED-GROUP" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OPENED-GROUP" redefines="COMM-OPENED" srcLine="05 COMM-OPENED-GROUP REDEFINES COMM-OPENED.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="STRUCT"/>
+                        <field name="COMM-OPENED-DAY" originalName="COMM-OPENED-DAY" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OPENED-GROUP.COMM-OPENED-DAY" srcLine="07 COMM-OPENED-DAY PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-OPENED-MONTH" originalName="COMM-OPENED-MONTH" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OPENED-GROUP.COMM-OPENED-MONTH" srcLine="07 COMM-OPENED-MONTH PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-OPENED-YEAR" originalName="COMM-OPENED-YEAR" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OPENED-GROUP.COMM-OPENED-YEAR" srcLine="07 COMM-OPENED-YEAR PIC 9(4) USAGE DISPLAY.">
+                            <bytes>4</bytes>
+                            <maxBytes>4</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                        </field>
+                    </field>
+                    <field name="COMM-OVERDRAFT" originalName="COMM-OVERDRAFT" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-OVERDRAFT" srcLine="05 COMM-OVERDRAFT PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="COMM-LAST-STMT-DT" originalName="COMM-LAST-STMT-DT" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-LAST-STMT-DT" srcLine="05 COMM-LAST-STMT-DT PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="COMM-LAST-STMT-GROUP" originalName="COMM-LAST-STMT-GROUP" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-LAST-STMT-GROUP" redefines="COMM-LAST-STMT-DT" srcLine="05 COMM-LAST-STMT-GROUP REDEFINES COMM-LAST-STMT-DT.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="STRUCT"/>
+                        <field name="COMM-LAST-STMT-DAY" originalName="COMM-LAST-STMT-DAY" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-LAST-STMT-GROUP.COMM-LAST-STMT-DAY" srcLine="07 COMM-LAST-STMT-DAY PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-LAST-STMT-MONTH" originalName="COMM-LAST-STMT-MONTH" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-LAST-STMT-GROUP.COMM-LAST-STMT-MONTH" srcLine="07 COMM-LAST-STMT-MONTH PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-LAST-STMT-YEAR" originalName="COMM-LAST-STMT-YEAR" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-LAST-STMT-GROUP.COMM-LAST-STMT-YEAR" srcLine="07 COMM-LAST-STMT-YEAR PIC 9(4) USAGE DISPLAY.">
+                            <bytes>4</bytes>
+                            <maxBytes>4</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                        </field>
+                    </field>
+                    <field name="COMM-NEXT-STMT-DT" originalName="COMM-NEXT-STMT-DT" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-NEXT-STMT-DT" srcLine="05 COMM-NEXT-STMT-DT PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="COMM-NEXT-STMT-GROUP" originalName="COMM-NEXT-STMT-GROUP" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-NEXT-STMT-GROUP" redefines="COMM-NEXT-STMT-DT" srcLine="05 COMM-NEXT-STMT-GROUP REDEFINES COMM-NEXT-STMT-DT.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="STRUCT"/>
+                        <field name="COMM-NEXT-STMT-DAY" originalName="COMM-NEXT-STMT-DAY" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-NEXT-STMT-GROUP.COMM-NEXT-STMT-DAY" srcLine="07 COMM-NEXT-STMT-DAY PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-NEXT-STMT-MONTH" originalName="COMM-NEXT-STMT-MONTH" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-NEXT-STMT-GROUP.COMM-NEXT-STMT-MONTH" srcLine="07 COMM-NEXT-STMT-MONTH PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="COMM-NEXT-STMT-YEAR" originalName="COMM-NEXT-STMT-YEAR" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-NEXT-STMT-GROUP.COMM-NEXT-STMT-YEAR" srcLine="07 COMM-NEXT-STMT-YEAR PIC 9(4) USAGE DISPLAY.">
+                            <bytes>4</bytes>
+                            <maxBytes>4</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                        </field>
+                    </field>
+                    <field name="COMM-AVAIL-BAL" originalName="COMM-AVAIL-BAL" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-AVAIL-BAL" srcLine="05 COMM-AVAIL-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                    </field>
+                    <field name="COMM-ACTUAL-BAL" originalName="COMM-ACTUAL-BAL" included="Y" path="INQACCCZ.ACCOUNT-DETAILS.COMM-ACTUAL-BAL" srcLine="05 COMM-ACTUAL-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

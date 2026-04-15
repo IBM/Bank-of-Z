@@ -1,0 +1,69 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CREACC:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-EYECATCHER:
+            required: false
+            nullable: false
+            template: "{{$body.CommEyecatcher}}"
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            expression: "$body.CommCustno"
+        - COMM-KEY:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-SORTCODE:
+                required: false
+                nullable: false
+                expression: "$body.CommKey.CommSortcode"
+            - COMM-NUMBER:
+                required: false
+                nullable: false
+                expression: "$body.CommKey.CommNumber"
+        - COMM-ACC-TYPE:
+            required: false
+            nullable: false
+            template: "{{$body.CommAccType}}"
+        - COMM-INT-RT:
+            required: false
+            nullable: false
+            expression: "$body.CommIntRt"
+        - COMM-OPENED:
+            required: false
+            nullable: false
+            expression: "$body.CommOpened"
+        - COMM-OVERDR-LIM:
+            required: false
+            nullable: false
+            expression: "$body.CommOverdrLim"
+        - COMM-LAST-STMT-DT:
+            required: false
+            nullable: false
+            expression: "$body.CommLastStmtDt"
+        - COMM-NEXT-STMT-DT:
+            required: false
+            nullable: false
+            expression: "$body.CommNextStmtDt"
+        - COMM-AVAIL-BAL:
+            required: false
+            nullable: false
+            expression: "$body.CommAvailBal"
+        - COMM-ACT-BAL:
+            required: false
+            nullable: false
+            expression: "$body.CommActBal"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.CommSuccess}}"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: "{{$body.CommFailCode}}"

@@ -1,0 +1,57 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - CommEye:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACC.\"COMM-EYE\"}}"
+    - CommCustno:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACC.\"COMM-CUSTNO\"}}"
+    - CommScode:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACC.\"COMM-SCODE\"}}"
+    - CommAccno:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-ACCNO\""
+    - CommAccType:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACC.\"COMM-ACC-TYPE\"}}"
+    - CommIntRate:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-INT-RATE\""
+    - CommOpened:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-OPENED\""
+    - CommOverdraft:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-OVERDRAFT\""
+    - CommLastStmtDt:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-LAST-STMT-DT\""
+    - CommNextStmtDt:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-NEXT-STMT-DT\""
+    - CommAvailBal:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-AVAIL-BAL\""
+    - CommActualBal:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDACC.\"COMM-ACTUAL-BAL\""
+    - CommSuccess:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACC.\"COMM-SUCCESS\"}}"

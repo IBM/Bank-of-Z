@@ -1,0 +1,65 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - CommEyecatcher:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACC.\"COMM-EYECATCHER\"}}"
+    - CommCustno:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-CUSTNO\""
+    - CommKey:
+        required: false
+        nullable: false
+        mappings:
+        - CommSortcode:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.CREACC.\"COMM-KEY\".\"COMM-SORTCODE\""
+        - CommNumber:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.CREACC.\"COMM-KEY\".\"COMM-NUMBER\""
+    - CommAccType:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACC.\"COMM-ACC-TYPE\"}}"
+    - CommIntRt:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-INT-RT\""
+    - CommOpened:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-OPENED\""
+    - CommOverdrLim:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-OVERDR-LIM\""
+    - CommLastStmtDt:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-LAST-STMT-DT\""
+    - CommNextStmtDt:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-NEXT-STMT-DT\""
+    - CommAvailBal:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-AVAIL-BAL\""
+    - CommActBal:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CREACC.\"COMM-ACT-BAL\""
+    - CommSuccess:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACC.\"COMM-SUCCESS\"}}"
+    - CommFailCode:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACC.\"COMM-FAIL-CODE\"}}"

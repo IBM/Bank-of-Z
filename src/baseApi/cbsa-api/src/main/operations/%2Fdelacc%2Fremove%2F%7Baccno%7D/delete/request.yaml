@@ -1,0 +1,17 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - DELACC-COMMAREA:
+        required: false
+        nullable: false
+        mappings:
+        - DELACC-ACCNO:
+            required: false
+            nullable: false
+            expression: "$pathParameters.accno"
+        - DELACC-DEL-PCB3:
+            required: false
+            nullable: false
+            template: "{{$body.DelaccCommarea.DelaccDelPcb3}}"

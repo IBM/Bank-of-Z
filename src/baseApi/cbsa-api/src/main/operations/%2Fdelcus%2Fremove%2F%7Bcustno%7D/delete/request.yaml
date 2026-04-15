@@ -1,0 +1,21 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - DELCUS:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            template: "{{$pathParameters.custno}}"
+        - COMM-DEL-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.Comm.CommDelSuccess}}"
+        - COMM-DEL-FAIL-CD:
+            required: false
+            nullable: false
+            template: "{{$body.Comm.CommDelFailCd}}"

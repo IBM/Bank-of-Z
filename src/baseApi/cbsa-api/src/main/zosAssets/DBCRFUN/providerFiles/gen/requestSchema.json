@@ -1,0 +1,138 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "PAYDBCR" : {
+          "type" : "object",
+          "properties" : {
+            "COMM-ACCNO" : {
+              "maxLength" : 8,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-ACCNO PIC X(8) USAGE DISPLAY.",
+                "name" : "COMM-ACCNO"
+              }
+            },
+            "COMM-AMT" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-AMT PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-AMT"
+              }
+            },
+            "COMM-SORTC" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-SORTC PIC 9(6) USAGE DISPLAY.",
+                "name" : "COMM-SORTC"
+              }
+            },
+            "COMM-AV-BAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-AV-BAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-AV-BAL"
+              }
+            },
+            "COMM-ACT-BAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-ACT-BAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-ACT-BAL"
+              }
+            },
+            "COMM-ORIGIN" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-APPLID" : {
+                  "maxLength" : 8,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-APPLID PIC X(8) USAGE DISPLAY.",
+                    "name" : "COMM-APPLID"
+                  }
+                },
+                "COMM-USERID" : {
+                  "maxLength" : 8,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-USERID PIC X(8) USAGE DISPLAY.",
+                    "name" : "COMM-USERID"
+                  }
+                },
+                "COMM-FACILITY-NAME" : {
+                  "maxLength" : 8,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-FACILITY-NAME PIC X(8) USAGE DISPLAY.",
+                    "name" : "COMM-FACILITY-NAME"
+                  }
+                },
+                "COMM-NETWRK-ID" : {
+                  "maxLength" : 8,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-NETWRK-ID PIC X(8) USAGE DISPLAY.",
+                    "name" : "COMM-NETWRK-ID"
+                  }
+                },
+                "COMM-FACILTYPE" : {
+                  "minimum" : -99999999,
+                  "maximum" : 99999999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-FACILTYPE PIC S9(8) USAGE COMP.",
+                    "name" : "COMM-FACILTYPE"
+                  }
+                },
+                "fill_0" : {
+                  "maxLength" : 4,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 FILLER PIC X(4) USAGE DISPLAY.",
+                    "name" : "fill_0"
+                  }
+                }
+              }
+            },
+            "COMM-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "COMM-SUCCESS"
+              }
+            },
+            "COMM-FAIL-CODE" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FAIL-CODE PIC X USAGE DISPLAY.",
+                "name" : "COMM-FAIL-CODE"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

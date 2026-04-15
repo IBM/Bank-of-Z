@@ -1,0 +1,86 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - InqCustZ:
+        required: false
+        nullable: false
+        mappings:
+        - InqCustEye:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-EYE\"}}"
+        - InqCustScode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-SCODE\"}}"
+        - InqCustCustno:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CUSTNO\""
+        - InqCustName:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\"}}"
+        - InqCustAddr:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\"}}"
+        - InqCustDob:
+            required: false
+            nullable: false
+            mappings:
+            - InqCustDobDd:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"\
+                  INQCUST-DOB-DD\""
+            - InqCustDobMm:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"\
+                  INQCUST-DOB-MM\""
+            - InqCustDobYyyy:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"\
+                  INQCUST-DOB-YYYY\""
+        - InqCustCreditScore:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CREDIT-SCORE\""
+        - InqCustCsReviewDt:
+            required: false
+            nullable: false
+            mappings:
+            - InqCustCsReviewDd:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CS-REVIEW-DT\"\
+                  .\"INQCUST-CS-REVIEW-DD\""
+            - InqCustCsReviewMm:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CS-REVIEW-DT\"\
+                  .\"INQCUST-CS-REVIEW-MM\""
+            - InqCustCsReviewYyyy:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CS-REVIEW-DT\"\
+                  .\"INQCUST-CS-REVIEW-YYYY\""
+        - InqCustInqSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-INQ-SUCCESS\"\
+              }}"
+        - InqCustInqFailCd:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-INQ-FAIL-CD\"\
+              }}"
+        - InqCustPcbPointer:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-PCB-POINTER\"\
+              }}"

@@ -1,0 +1,29 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - UPDCUST:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            template: "{{$body.CommCustno}}"
+        - COMM-NAME:
+            required: false
+            nullable: false
+            template: "{{$body.CommName}}"
+        - COMM-ADDR:
+            required: false
+            nullable: false
+            template: "{{$body.CommAddress}}"
+        - COMM-UPD-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.CommUpdSuccess}}"
+        - COMM-UPD-FAIL-CD:
+            required: false
+            nullable: false
+            template: "{{$body.CommUpdFailCd}}"

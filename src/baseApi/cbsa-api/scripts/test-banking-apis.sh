@@ -6,7 +6,7 @@
 ################################################################################
 
 # Configuration
-BASE_URL="http://lp25-zhss117.pok.stglabs.ibm.com:30701"
+BASE_URL=""
 CONTENT_TYPE="Content-Type: application/json"
 
 # Variables to capture from API responses

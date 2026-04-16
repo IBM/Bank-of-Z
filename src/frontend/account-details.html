@@ -58,15 +58,18 @@
                 <form id="account-form">
                     <div class="cds--row">
                         <div class="cds--col-md-4 cds--col-lg-4">
-                            <cds-text-input id="accountNumber" label="Account Number" readonly></cds-text-input>
-                            <cds-text-input id="customerNumber" label="Customer Number" readonly></cds-text-input>
+                            <cds-text-input id="accountNumber" label="Account ID" readonly></cds-text-input>
+                            <cds-text-input id="customerNumber" label="Customer ID" readonly></cds-text-input>
                             <cds-text-input id="accountType" label="Account Type" readonly></cds-text-input>
+                            <cds-text-input id="currency" label="Currency" readonly></cds-text-input>
+                            <cds-text-input id="status" label="Status" readonly></cds-text-input>
                         </div>
                         <div class="cds--col-md-4 cds--col-lg-4">
-                            <cds-number-input id="actualBalance" label="Balance" step="0.01"></cds-number-input>
-                            <cds-number-input id="interestRate" label="Interest Rate (%)"
-                                step="0.01"></cds-number-input>
-                            <cds-number-input id="overdraft" label="Overdraft Limit" step="100"></cds-number-input>
+                            <cds-text-input id="accountNumberField" label="Account Number" readonly></cds-text-input>
+                            <cds-text-input id="sortCode" label="Sort Code" readonly></cds-text-input>
+                            <cds-text-input id="iban" label="IBAN" readonly></cds-text-input>
+                            <cds-text-input id="nickname" label="Nickname"></cds-text-input>
+                            <cds-text-input id="openingDate" label="Opening Date" readonly></cds-text-input>
                         </div>
                     </div>
                     <br>
@@ -134,7 +137,7 @@
             showLoadingModal('Searching for account...');
 
             try {
-                const account = await api.accounts.getAccountByNumber(accountId);
+                const account = await api.accounts.getAccount(accountId);
                 currentAccount = account;
                 hideLoadingModal();
                 displayAccountDetails(account);
@@ -145,12 +148,16 @@
         }
 
         function displayAccountDetails(account) {
-            document.getElementById('accountNumber').value = account.id || account.accountNumber || '';
-            document.getElementById('customerNumber').value = account.customerNumber || '';
+            document.getElementById('accountNumber').value = account.accountId || '';
+            document.getElementById('customerNumber').value = account.customerId || '';
             document.getElementById('accountType').value = account.accountType || '';
-            document.getElementById('actualBalance').value = account.actualBalance || 0;
-            document.getElementById('interestRate').value = account.interestRate || 0;
-            document.getElementById('overdraft').value = account.overdraft || 0;
+            document.getElementById('currency').value = account.currency || '';
+            document.getElementById('status').value = account.status || '';
+            document.getElementById('sortCode').value = account.sortCode || '';
+            document.getElementById('accountNumberField').value = account.accountNumber || '';
+            document.getElementById('iban').value = account.iban || '';
+            document.getElementById('nickname').value = account.nickname || '';
+            document.getElementById('openingDate').value = account.openingDate || '';
 
             document.getElementById('details-section').style.display = 'block';
         }
@@ -159,21 +166,18 @@
             if (!currentAccount) return;
 
             const updatedData = {
-                ...currentAccount,
-                actualBalance: parseFloat(document.getElementById('actualBalance').value) || 0,
-                interestRate: document.getElementById('interestRate').value || '0',
-                overdraft: document.getElementById('overdraft').value || '0'
+                nickname: document.getElementById('nickname').value
             };
 
             showLoadingModal('Updating account...');
 
             try {
-                await api.accounts.updateAccount(currentAccount.id || currentAccount.accountNumber, updatedData);
+                await api.accounts.updateAccount(currentAccount.accountId, updatedData);
                 hideLoadingModal();
                 showSuccessModal('Success', 'Account updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', 'Failed to update account');
+                showErrorModal('Error', error.message || 'Failed to update account');
             }
         }
     </script>

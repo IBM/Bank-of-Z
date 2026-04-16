@@ -180,7 +180,7 @@
             displayLoading('Searching for customer...');
             
             try {
-                const customer = await api.customers.getCustomerByNumber(customerId);
+                const customer = await api.customers.getCustomer(customerId);
                 currentCustomer = customer;
                 displayCustomerDetails(customer);
                 
@@ -205,13 +205,13 @@
                     // Only one result, display it directly
                     currentCustomer = customers[0];
                     displayCustomerDetails(customers[0]);
-                    loadCustomerAccounts(customers[0].id);
+                    loadCustomerAccounts(customers[0].customerId);
                 } else {
                     // Multiple results, show selection table
                     displayCustomerSearchResults(customers);
                 }
             } catch (error) {
-                displayNotification('error', 'Error', 'Error searching for customers');
+                displayNotification('error', 'Error', error.message || 'Error searching for customers');
                 document.getElementById('details-section').style.display = 'none';
             }
         }
@@ -231,11 +231,15 @@
             
             let tableRows = '';
             customers.forEach(customer => {
+                const fullName = `${customer.title || ''} ${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+                const address = customer.address
+                    ? `${customer.address.addressLine1 || ''}, ${customer.address.city || ''}`.replace(/^,\s*|,\s*$/g, '')
+                    : '';
                 tableRows += `
-                    <tr class="customer-row" data-customer-id="${customer.id}" style="cursor: pointer;">
-                        <td>${customer.id}</td>
-                        <td>${customer.customerName}</td>
-                        <td>${customer.customerAddress || ''}</td>
+                    <tr class="customer-row" data-customer-id="${customer.customerId}" style="cursor: pointer;">
+                        <td>${customer.customerId}</td>
+                        <td>${fullName}</td>
+                        <td>${address}</td>
                     </tr>
                 `;
             });
@@ -262,11 +266,11 @@
             rows.forEach(row => {
                 row.addEventListener('click', () => {
                     const customerId = row.getAttribute('data-customer-id');
-                    const selectedCustomer = customers.find(c => c.id === customerId);
+                    const selectedCustomer = customers.find(c => c.customerId === customerId);
                     if (selectedCustomer) {
                         currentCustomer = selectedCustomer;
                         displayCustomerDetails(selectedCustomer);
-                        loadCustomerAccounts(selectedCustomer.id);
+                        loadCustomerAccounts(selectedCustomer.customerId);
                     }
                 });
             });
@@ -282,13 +286,20 @@
 
                 <div class="form-constrained">
                     <cds-form id="customer-form">
-                        <cds-text-input id="customerId" label="Customer ID" readonly value="${customer.id || ''}"></cds-text-input>
-                        <cds-text-input id="customerName" label="Customer Name" value="${customer.customerName || ''}"></cds-text-input>
-                        <cds-text-input id="customerAddress" label="Address" value="${customer.customerAddress || ''}"></cds-text-input>
-                        <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formatDate(customer.dateOfBirth) || ''}"></cds-text-input>
-                        <cds-text-input id="sortCode" label="Sort Code" readonly value="${customer.sortCode || ''}"></cds-text-input>
-                        <cds-text-input id="customerCreditScore" label="Credit Score" readonly value="${customer.customerCreditScore || ''}"></cds-text-input>
-                        <cds-text-input id="customerCreditScoreReviewDate" label="Credit Score Review Date" readonly value="${formatDate(customer.customerCreditScoreReviewDate) || ''}"></cds-text-input>
+                        <cds-text-input id="customerId" label="Customer ID" readonly value="${customer.customerId || ''}"></cds-text-input>
+                        <cds-text-input id="title" label="Title" value="${customer.title || ''}"></cds-text-input>
+                        <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
+                        <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
+                        <cds-text-input id="email" label="Email" value="${customer.email || ''}"></cds-text-input>
+                        <cds-text-input id="phoneNumber" label="Phone Number" value="${customer.phoneNumber || ''}"></cds-text-input>
+                        <cds-text-input id="dateOfBirth" label="Date of Birth" value="${customer.dateOfBirth || ''}"></cds-text-input>
+                        <cds-text-input id="addressLine1" label="Address Line 1" value="${customer.address?.addressLine1 || ''}"></cds-text-input>
+                        <cds-text-input id="addressLine2" label="Address Line 2" value="${customer.address?.addressLine2 || ''}"></cds-text-input>
+                        <cds-text-input id="city" label="City" value="${customer.address?.city || ''}"></cds-text-input>
+                        <cds-text-input id="postalCode" label="Postal Code" value="${customer.address?.postalCode || ''}"></cds-text-input>
+                        <cds-text-input id="country" label="Country" value="${customer.address?.country || ''}"></cds-text-input>
+                        <cds-text-input id="customerStatus" label="Status" readonly value="${customer.customerStatus || ''}"></cds-text-input>
+                        <cds-text-input id="createdDate" label="Created Date" readonly value="${customer.createdDate || ''}"></cds-text-input>
                         <br>
                         <cds-button id="update-btn">Update Customer</cds-button>
                     </cds-form>
@@ -305,8 +316,8 @@
         
         async function loadCustomerAccounts(customerId) {
             try {
-                const response = await api.accounts.getAccountsByCustomerNumber(customerId);
-                const accounts = response.accounts || response;
+                const response = await api.customers.getCustomerAccounts(customerId);
+                const accounts = response.accounts || [];
                 displayAccountsTable(accounts);
             } catch (error) {
                 console.error('Error loading accounts:', error);
@@ -324,11 +335,12 @@
                 <table class="cds--data-table">
                     <thead>
                         <tr>
+                            <th>Account ID</th>
                             <th>Account Number</th>
+                            <th>Sort Code</th>
                             <th>Account Type</th>
-                            <th>Balance</th>
-                            <th>Interest Rate</th>
-                            <th>Overdraft</th>
+                            <th>Currency</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -338,13 +350,14 @@
             accounts.forEach(account => {
                 tableHTML += `
                     <tr>
-                        <td>${account.id || account.accountNumber || 'N/A'}</td>
+                        <td>${account.accountId || 'N/A'}</td>
+                        <td>${account.accountNumber || 'N/A'}</td>
+                        <td>${account.sortCode || 'N/A'}</td>
                         <td>${account.accountType || 'N/A'}</td>
-                        <td>${formatCurrency(account.actualBalance || 0)}</td>
-                        <td>${account.interestRate || 0}%</td>
-                        <td>${formatCurrency(account.overdraft || 0)}</td>
+                        <td>${account.currency || 'N/A'}</td>
+                        <td>${account.status || 'N/A'}</td>
                         <td>
-                            <a href="account-details.html?id=${account.id || account.accountNumber}">View</a>
+                            <a href="account-details.html?id=${account.accountId}">View</a>
                         </td>
                     </tr>
                 `;
@@ -361,31 +374,31 @@
         async function updateCustomer() {
             if (!currentCustomer) return;
             
-            const dateValue = document.getElementById('dateOfBirth').value.trim();
-            const formattedDate = parseDate(dateValue);
-            
-            if (!formattedDate) {
-                showErrorModal('Validation Error', 'Invalid date format. Please use DD/MM/YYYY');
-                return;
-            }
-            
             const updatedData = {
-                customerName: document.getElementById('customerName').value,
-                customerAddress: document.getElementById('customerAddress').value,
-                dateOfBirth: formattedDate,
-                sortCode: currentCustomer.sortCode,
-                creditScore: currentCustomer.customerCreditScore
+                title: document.getElementById('title').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                address: {
+                    addressLine1: document.getElementById('addressLine1').value,
+                    addressLine2: document.getElementById('addressLine2').value,
+                    city: document.getElementById('city').value,
+                    postalCode: document.getElementById('postalCode').value,
+                    country: document.getElementById('country').value
+                }
             };
             
             showLoadingModal('Updating customer...');
             
             try {
-                await api.customers.updateCustomer(currentCustomer.id, updatedData);
+                await api.customers.updateCustomer(currentCustomer.customerId, updatedData);
                 hideLoadingModal();
                 showSuccessModal('Success', 'Customer updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', 'Failed to update customer');
+                showErrorModal('Not Supported', error.message || 'Customer updates are not available in the OpenBanking API');
             }
         }
     </script>

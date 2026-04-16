@@ -5,11 +5,11 @@
  */
 
 /**
- * CICS Banking Sample Application API Client
- * Generated from OpenAPI specification
+ * Bank of Z - OpenBanking API Client
+
  * 
  * This is a zero-dependency API client using native fetch()
- * Based on: src/bank-test-backend/openapi-spec.yaml
+ * Based on: src/api/src/main/api/openapi.yaml
  */
 
 import { config } from '../config.js';
@@ -19,8 +19,7 @@ import { config } from '../config.js';
  */
 class ApiConfiguration {
     constructor() {
-        this.customerBaseUrl = config.api.customerUrl;
-        this.accountBaseUrl = config.api.accountUrl;
+        this.baseUrl = config.api.baseUrl;
         this.defaultHeaders = {
             'Content-Type': 'application/json'
         };
@@ -65,7 +64,7 @@ class BaseApi {
                 const error = new Error(data.message || `HTTP error! status: ${response.status}`);
                 error.status = response.status;
                 error.code = data.code;
-                error.timestamp = data.timestamp;
+                error.details = data.details;
                 throw error;
             }
 
@@ -83,65 +82,62 @@ class BaseApi {
  */
 class CustomersApi extends BaseApi {
     /**
-     * Create a new customer
-     * POST /customer
-     * @param {CustomerCreateRequest} customerCreateRequest - Customer data
-     * @returns {Promise<Customer>} Created customer
-     */
-    async createCustomer(customerCreateRequest) {
-        return this.request(`${this.configuration.customerBaseUrl}`, {
-            method: 'POST',
-            body: JSON.stringify(customerCreateRequest)
-        });
-    }
-
-    /**
-     * Get customer by number
-     * GET /customer/{customerNumber}
-     * @param {string} customerNumber - Unique customer identifier
+     * Get customer information
+     * GET /customers/{customerId}
+     * @param {string} customerId - Unique identifier for the customer
      * @returns {Promise<Customer>} Customer details
      */
-    async getCustomerByNumber(customerNumber) {
-        return this.request(`${this.configuration.customerBaseUrl}/${customerNumber}`);
+    async getCustomer(customerId) {
+        return this.request(`${this.configuration.baseUrl}/customers/${customerId}`);
     }
 
     /**
-     * Update customer
-     * PUT /customer/{customerNumber}
-     * @param {string} customerNumber - Unique customer identifier
-     * @param {CustomerUpdateRequest} customerUpdateRequest - Updated customer data
-     * @returns {Promise<Customer>} Updated customer
+     * Get customer accounts
+     * GET /customers/{customerId}/accounts
+     * @param {string} customerId - Unique identifier for the customer
+     * @returns {Promise<AccountList>} List of customer accounts
      */
-    async updateCustomer(customerNumber, customerUpdateRequest) {
-        return this.request(`${this.configuration.customerBaseUrl}/${customerNumber}`, {
-            method: 'PUT',
-            body: JSON.stringify(customerUpdateRequest)
-        });
+    async getCustomerAccounts(customerId) {
+        return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
+    }
+
+    // Stub methods for legacy endpoints not in OpenAPI spec
+    /**
+     * Create a new customer (stub - not in OpenAPI spec)
+     * @param {Object} customerData - Customer data
+     * @returns {Promise<Object>} Rejected promise
+     */
+    async createCustomer(customerData) {
+        throw new Error('Customer creation is not supported in the OpenBanking API specification');
     }
 
     /**
-     * Delete customer
-     * DELETE /customer/{customerNumber}
-     * Note: Customer must have no associated accounts before deletion
+     * Update customer (stub - not in OpenAPI spec)
      * @param {string} customerNumber - Unique customer identifier
-     * @returns {Promise<{message: string}>} Deletion confirmation
+     * @param {Object} customerData - Updated customer data
+     * @returns {Promise<Object>} Rejected promise
+     */
+    async updateCustomer(customerNumber, customerData) {
+        throw new Error('Customer updates are not supported in the OpenBanking API specification');
+    }
+
+    /**
+     * Delete customer (stub - not in OpenAPI spec)
+     * @param {string} customerNumber - Unique customer identifier
+     * @returns {Promise<Object>} Rejected promise
      */
     async deleteCustomer(customerNumber) {
-        return this.request(`${this.configuration.customerBaseUrl}/${customerNumber}`, {
-            method: 'DELETE'
-        });
+        throw new Error('Customer deletion is not supported in the OpenBanking API specification');
     }
 
     /**
-     * Search customers by name
-     * GET /customer/name
-     * @param {string} name - Customer name to search for (case sensitive)
-     * @param {number} [limit=10] - Maximum number of results (max 10)
-     * @returns {Promise<CustomerSearchResponse>} Search results
+     * Search customers by name (stub - not in OpenAPI spec)
+     * @param {string} name - Customer name to search for
+     * @param {number} [limit=10] - Maximum number of results
+     * @returns {Promise<Object>} Rejected promise
      */
     async searchCustomersByName(name, limit = 10) {
-        const params = new URLSearchParams({ name, limit: limit.toString() });
-        return this.request(`${this.configuration.customerBaseUrl}/name?${params}`);
+        throw new Error('Customer search by name is not supported in the OpenBanking API specification');
     }
 }
 
@@ -151,62 +147,120 @@ class CustomersApi extends BaseApi {
  */
 class AccountsApi extends BaseApi {
     /**
-     * Create a new account
-     * POST /account
-     * @param {AccountCreateRequest} accountCreateRequest - Account data
-     * @returns {Promise<Account>} Created account
+     * Get all accounts
+     * GET /accounts
+     * @param {Object} filters - Optional filters
+     * @param {string} filters.accountType - Filter by account type (CURRENT, SAVINGS, CREDIT_CARD, LOAN)
+     * @param {string} filters.status - Filter by status (ACTIVE, INACTIVE, CLOSED)
+     * @returns {Promise<AccountList>} List of accounts
      */
-    async createAccount(accountCreateRequest) {
-        return this.request(`${this.configuration.accountBaseUrl}`, {
-            method: 'POST',
-            body: JSON.stringify(accountCreateRequest)
-        });
+    async getAccounts(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.accountType) params.append('accountType', filters.accountType);
+        if (filters.status) params.append('status', filters.status);
+        
+        const queryString = params.toString();
+        const url = queryString 
+            ? `${this.configuration.baseUrl}/accounts?${queryString}`
+            : `${this.configuration.baseUrl}/accounts`;
+        
+        return this.request(url);
     }
 
     /**
-     * Get account by number
-     * GET /account/{accountNumber}
-     * @param {string} accountNumber - Unique account identifier
+     * Get account details
+     * GET /accounts/{accountId}
+     * @param {string} accountId - Unique identifier for the account
      * @returns {Promise<Account>} Account details
      */
-    async getAccountByNumber(accountNumber) {
-        return this.request(`${this.configuration.accountBaseUrl}/${accountNumber}`);
+    async getAccount(accountId) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
     }
 
     /**
-     * Update account
-     * PUT /account/{accountNumber}
-     * @param {string} accountNumber - Unique account identifier
-     * @param {AccountUpdateRequest} accountUpdateRequest - Updated account data
-     * @returns {Promise<Account>} Updated account
+     * Get account balances
+     * GET /accounts/{accountId}/balances
+     * @param {string} accountId - Unique identifier for the account
+     * @returns {Promise<BalanceList>} Balance information
      */
-    async updateAccount(accountNumber, accountUpdateRequest) {
-        return this.request(`${this.configuration.accountBaseUrl}/${accountNumber}`, {
-            method: 'PUT',
-            body: JSON.stringify(accountUpdateRequest)
-        });
+    async getAccountBalances(accountId) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
     }
 
     /**
-     * Delete account
-     * DELETE /account/{accountNumber}
+     * Get account transactions
+     * GET /accounts/{accountId}/transactions
+     * @param {string} accountId - Unique identifier for the account
+     * @param {Object} options - Query parameters
+     * @param {string} options.fromDate - Start date (ISO 8601 format)
+     * @param {string} options.toDate - End date (ISO 8601 format)
+     * @param {number} options.limit - Maximum number of transactions (1-100, default 50)
+     * @param {number} options.offset - Number of transactions to skip (default 0)
+     * @returns {Promise<TransactionList>} Transaction history
+     */
+    async getAccountTransactions(accountId, options = {}) {
+        const params = new URLSearchParams();
+        if (options.fromDate) params.append('fromDate', options.fromDate);
+        if (options.toDate) params.append('toDate', options.toDate);
+        if (options.limit) params.append('limit', options.limit.toString());
+        if (options.offset) params.append('offset', options.offset.toString());
+        
+        const queryString = params.toString();
+        const url = queryString
+            ? `${this.configuration.baseUrl}/accounts/${accountId}/transactions?${queryString}`
+            : `${this.configuration.baseUrl}/accounts/${accountId}/transactions`;
+        
+        return this.request(url);
+    }
+
+    /**
+     * Get transaction details
+     * GET /accounts/{accountId}/transactions/{transactionId}
+     * @param {string} accountId - Unique identifier for the account
+     * @param {string} transactionId - Unique identifier for the transaction
+     * @returns {Promise<Transaction>} Transaction details
+     */
+    async getTransaction(accountId, transactionId) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/transactions/${transactionId}`);
+    }
+
+    // Stub methods for legacy endpoints not in OpenAPI spec
+    /**
+     * Create a new account (stub - not in OpenAPI spec)
+     * @param {Object} accountData - Account data
+     * @returns {Promise<Object>} Rejected promise
+     */
+    async createAccount(accountData) {
+        throw new Error('Account creation is not supported in the OpenBanking API specification');
+    }
+
+    /**
+     * Update account (stub - not in OpenAPI spec)
      * @param {string} accountNumber - Unique account identifier
-     * @returns {Promise<{message: string}>} Deletion confirmation
+     * @param {Object} accountData - Updated account data
+     * @returns {Promise<Object>} Rejected promise
+     */
+    async updateAccount(accountNumber, accountData) {
+        throw new Error('Account updates are not supported in the OpenBanking API specification');
+    }
+
+    /**
+     * Delete account (stub - not in OpenAPI spec)
+     * @param {string} accountNumber - Unique account identifier
+     * @returns {Promise<Object>} Rejected promise
      */
     async deleteAccount(accountNumber) {
-        return this.request(`${this.configuration.accountBaseUrl}/${accountNumber}`, {
-            method: 'DELETE'
-        });
+        throw new Error('Account deletion is not supported in the OpenBanking API specification');
     }
 
     /**
-     * Get accounts by customer number
-     * GET /account/retrieveByCustomerNumber/{customerNumber}
-     * @param {string} customerNumber - Customer number to retrieve accounts for
-     * @returns {Promise<AccountListResponse>} List of accounts
+     * Get accounts by customer number (stub - not in OpenAPI spec)
+     * Use getCustomerAccounts from CustomersApi instead
+     * @param {string} customerNumber - Customer number
+     * @returns {Promise<Object>} Rejected promise
      */
     async getAccountsByCustomerNumber(customerNumber) {
-        return this.request(`${this.configuration.accountBaseUrl}/retrieveByCustomerNumber/${customerNumber}`);
+        throw new Error('This endpoint is deprecated. Use api.customers.getCustomerAccounts() instead');
     }
 }
 
@@ -222,13 +276,11 @@ class ApiClient {
     }
 
     /**
-     * Update base URLs for customer and account services
-     * @param {string} customerUrl - Customer service base URL
-     * @param {string} accountUrl - Account service base URL
+     * Update base URL
+     * @param {string} baseUrl - API base URL
      */
-    setBaseUrls(customerUrl, accountUrl) {
-        this.configuration.customerBaseUrl = customerUrl;
-        this.configuration.accountBaseUrl = accountUrl;
+    setBaseUrl(baseUrl) {
+        this.configuration.baseUrl = baseUrl;
     }
 
     /**
@@ -254,74 +306,81 @@ export { ApiClient, CustomersApi, AccountsApi, ApiConfiguration };
 
 /**
  * TypeScript-style type definitions (for documentation)
+ * Based on OpenAPI specification
  * 
  * @typedef {Object} Customer
- * @property {string} id - Unique customer identifier
- * @property {string} customerName - Full name with title
- * @property {string} customerAddress - Customer's address
- * @property {string} dateOfBirth - Date of birth (YYYY-MM-DD)
- * @property {string} sortCode - Bank sort code
- * @property {number} [customerCreditScore] - Credit score
- * @property {string} [customerCreditScoreReviewDate] - Next review date
+ * @property {string} customerId - Unique identifier for the customer
+ * @property {string} [title] - Customer title
+ * @property {string} firstName - Customer first name
+ * @property {string} lastName - Customer last name
+ * @property {string} [dateOfBirth] - Customer date of birth (YYYY-MM-DD)
+ * @property {string} email - Customer email address
+ * @property {string} [phoneNumber] - Customer phone number
+ * @property {Address} [address] - Customer address
+ * @property {string} [customerStatus] - Current status (ACTIVE, INACTIVE, SUSPENDED)
+ * @property {string} [createdDate] - Date when customer account was created
  * 
- * @typedef {Object} CustomerCreateRequest
- * @property {string} customerName - Full name with title
- * @property {string} customerAddress - Customer's address
- * @property {string} dateOfBirth - Date of birth (YYYY-MM-DD)
- * @property {string} sortCode - Bank sort code
+ * @typedef {Object} Address
+ * @property {string} [addressLine1] - Address line 1
+ * @property {string} [addressLine2] - Address line 2
+ * @property {string} [city] - City
+ * @property {string} [postalCode] - Postal code
+ * @property {string} [country] - Country
  * 
- * @typedef {Object} CustomerUpdateRequest
- * @property {string} customerName - Full name with title
- * @property {string} customerAddress - Customer's address
- * @property {string} dateOfBirth - Date of birth (YYYY-MM-DD)
- * @property {string} sortCode - Bank sort code
- * @property {number} creditScore - Credit score
- * 
- * @typedef {Object} CustomerSearchResponse
- * @property {Customer[]} customers - Array of matching customers
+ * @typedef {Object} AccountList
+ * @property {Account[]} accounts - Array of accounts
+ * @property {number} [totalCount] - Total number of accounts
  * 
  * @typedef {Object} Account
- * @property {string} id - Unique account identifier
- * @property {string} customerNumber - Customer number
- * @property {string} accountType - MORTGAGE|ISA|LOAN|SAVING|CURRENT
- * @property {string} interestRate - Interest rate
- * @property {string} overdraft - Overdraft limit
- * @property {number} availableBalance - Available balance
- * @property {number} actualBalance - Actual balance
- * @property {string} dateOpened - Date opened (YYYY-MM-DD)
- * @property {string} lastStatementDate - Last statement date
- * @property {string} nextStatementDate - Next statement date
- * @property {string} sortCode - Bank sort code
+ * @property {string} accountId - Unique identifier for the account
+ * @property {string} accountType - Type of account (CURRENT, SAVINGS, CREDIT_CARD, LOAN)
+ * @property {string} [accountSubType] - Sub-type of account
+ * @property {string} currency - Currency code (ISO 4217)
+ * @property {string} [nickname] - Customer-defined nickname
+ * @property {string} [accountNumber] - Account number
+ * @property {string} [sortCode] - Bank sort code
+ * @property {string} [iban] - International Bank Account Number
+ * @property {string} status - Current status (ACTIVE, INACTIVE, CLOSED)
+ * @property {string} [openingDate] - Date when account was opened
+ * @property {string} [customerId] - Customer ID associated with this account
  * 
- * @typedef {Object} AccountCreateRequest
- * @property {string} customerNumber - Customer number
- * @property {string} accountType - MORTGAGE|ISA|LOAN|SAVING|CURRENT
- * @property {string} interestRate - Interest rate
- * @property {string} overdraft - Overdraft limit
- * @property {string} dateOpened - Date opened (YYYY-MM-DD)
- * @property {string} sortCode - Bank sort code
+ * @typedef {Object} BalanceList
+ * @property {Balance[]} balances - Array of balances
  * 
- * @typedef {Object} AccountUpdateRequest
- * @property {string} id - Account identifier
- * @property {string} customerNumber - Customer number
- * @property {string} accountType - MORTGAGE|ISA|LOAN|SAVING|CURRENT
- * @property {string} interestRate - Interest rate
- * @property {string} overdraft - Overdraft limit
- * @property {number} availableBalance - Available balance
- * @property {number} actualBalance - Actual balance
- * @property {string} dateOpened - Date opened (YYYY-MM-DD)
- * @property {string} lastStatementDate - Last statement date
- * @property {string} nextStatementDate - Next statement date
- * @property {string} sortCode - Bank sort code
+ * @typedef {Object} Balance
+ * @property {string} balanceType - Type of balance (AVAILABLE, CURRENT, OPENING_AVAILABLE, OPENING_BOOKED)
+ * @property {number} amount - Balance amount
+ * @property {string} currency - Currency code (ISO 4217)
+ * @property {string} [creditDebitIndicator] - Indicates if balance is credit or debit (CREDIT, DEBIT)
+ * @property {string} dateTime - Date and time of the balance
  * 
- * @typedef {Object} AccountListResponse
- * @property {Account[]} accounts - Array of accounts
- * @property {number} numberOfAccounts - Total number of accounts
+ * @typedef {Object} TransactionList
+ * @property {Transaction[]} transactions - Array of transactions
+ * @property {number} [totalCount] - Total number of transactions
+ * @property {number} [limit] - Maximum number of transactions returned
+ * @property {number} [offset] - Number of transactions skipped
+ * 
+ * @typedef {Object} Transaction
+ * @property {string} transactionId - Unique identifier for the transaction
+ * @property {string} accountId - Account identifier
+ * @property {number} amount - Transaction amount
+ * @property {string} currency - Currency code (ISO 4217)
+ * @property {string} creditDebitIndicator - Indicates if transaction is credit or debit (CREDIT, DEBIT)
+ * @property {string} status - Transaction status (PENDING, BOOKED, CANCELLED)
+ * @property {string} bookingDateTime - Date and time when transaction was booked
+ * @property {string} [valueDateTime] - Date and time when transaction value is applied
+ * @property {string} [transactionInformation] - Additional information about the transaction
+ * @property {MerchantDetails} [merchantDetails] - Merchant details
+ * @property {Balance} [balance] - Balance after transaction
+ * 
+ * @typedef {Object} MerchantDetails
+ * @property {string} [merchantName] - Name of the merchant
+ * @property {string} [merchantCategoryCode] - Merchant category code
  * 
  * @typedef {Object} Error
- * @property {string} message - Error message
  * @property {string} code - Error code
- * @property {string} timestamp - Error timestamp
+ * @property {string} message - Human-readable error message
+ * @property {Array} [details] - Additional error details
  */
 
 // Made with Bob

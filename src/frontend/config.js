@@ -9,8 +9,7 @@
  */
 export const config = {
     api: {
-        customerUrl: 'http://localhost:8080/customer',
-        accountUrl: 'http://localhost:8080/account'
+        baseUrl: 'http://localhost:8080'
     },
     defaults: {
         sortCode: '987654'

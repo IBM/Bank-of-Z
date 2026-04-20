@@ -102,7 +102,7 @@
             showLoadingModal('Searching for account...');
             
             try {
-                const account = await api.accounts.getAccountByNumber(accountId);
+                const account = await api.accounts.getAccount(accountId);
                 currentAccount = account;
                 hideLoadingModal();
                 displayAccountInfo(account);
@@ -117,28 +117,36 @@
                 <table class="cds--data-table">
                     <tbody>
                         <tr>
-                            <th>Account Number</th>
-                            <td>${account.id || account.accountNumber}</td>
+                            <th>Account ID</th>
+                            <td>${account.accountId}</td>
                         </tr>
                         <tr>
-                            <th>Customer Number</th>
-                            <td>${account.customerNumber}</td>
+                            <th>Account Number</th>
+                            <td>${account.accountNumber || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Sort Code</th>
+                            <td>${account.sortCode || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Customer ID</th>
+                            <td>${account.customerId || 'N/A'}</td>
                         </tr>
                         <tr>
                             <th>Account Type</th>
                             <td>${account.accountType}</td>
                         </tr>
                         <tr>
-                            <th>Balance</th>
-                            <td>${formatCurrency(account.actualBalance || 0)}</td>
+                            <th>Currency</th>
+                            <td>${account.currency}</td>
                         </tr>
                         <tr>
-                            <th>Interest Rate</th>
-                            <td>${account.interestRate || 0}%</td>
+                            <th>Status</th>
+                            <td>${account.status}</td>
                         </tr>
                         <tr>
-                            <th>Overdraft Limit</th>
-                            <td>${formatCurrency(account.overdraft || 0)}</td>
+                            <th>IBAN</th>
+                            <td>${account.iban || 'N/A'}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -159,7 +167,7 @@
                     <cds-modal-heading>Confirm Deletion</cds-modal-heading>
                 </cds-modal-header>
                 <cds-modal-body>
-                    <p>Are you sure you want to delete account "${currentAccount.id || currentAccount.accountNumber}"?</p>
+                    <p>Are you sure you want to delete account "${currentAccount.accountId}"?</p>
                     <p>This action cannot be undone.</p>
                 </cds-modal-body>
                 <cds-modal-footer>
@@ -186,10 +194,10 @@
             showLoadingModal('Deleting account...');
             
             try {
-                await api.accounts.deleteAccount(currentAccount.id || currentAccount.accountNumber);
+                await api.accounts.deleteAccount(currentAccount.accountId);
                 hideLoadingModal();
                 showSuccessModal(
-                    'Success', 
+                    'Success',
                     'Account deleted successfully',
                     () => {
                         window.location.reload();
@@ -197,7 +205,7 @@
                 );
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', 'Failed to delete account.');
+                showErrorModal('Error', error.message || 'Failed to delete account');
             }
         }
     </script>

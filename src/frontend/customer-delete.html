@@ -103,7 +103,7 @@
             showLoadingModal('Searching for customer...');
             
             try {
-                const customer = await api.customers.getCustomerByNumber(customerId);
+                const customer = await api.customers.getCustomer(customerId);
                 currentCustomer = customer;
                 hideLoadingModal();
                 displayCustomerInfo(customer);
@@ -114,28 +114,41 @@
         }
         
         function displayCustomerInfo(customer) {
+            const fullName = `${customer.title || ''} ${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+            const address = customer.address
+                ? `${customer.address.addressLine1 || ''}, ${customer.address.city || ''}, ${customer.address.postalCode || ''}`.replace(/^,\s*|,\s*$/g, '')
+                : '';
+            
             const infoHTML = `
                 <table class="cds--data-table">
                     <tbody>
                         <tr>
                             <th>Customer ID</th>
-                            <td>${customer.id}</td>
+                            <td>${customer.customerId}</td>
                         </tr>
                         <tr>
                             <th>Name</th>
-                            <td>${customer.customerName}</td>
+                            <td>${fullName}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>${customer.email || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>${customer.phoneNumber || 'N/A'}</td>
                         </tr>
                         <tr>
                             <th>Address</th>
-                            <td>${customer.customerAddress}</td>
+                            <td>${address}</td>
                         </tr>
                         <tr>
                             <th>Date of Birth</th>
-                            <td>${formatDate(customer.dateOfBirth)}</td>
+                            <td>${customer.dateOfBirth || 'N/A'}</td>
                         </tr>
                         <tr>
-                            <th>Sort Code</th>
-                            <td>${customer.sortCode}</td>
+                            <th>Status</th>
+                            <td>${customer.customerStatus || 'N/A'}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -156,7 +169,7 @@
                     <cds-modal-heading>Confirm Deletion</cds-modal-heading>
                 </cds-modal-header>
                 <cds-modal-body>
-                    <p>Are you sure you want to delete customer "${currentCustomer.customerName}"?</p>
+                    <p>Are you sure you want to delete customer "${currentCustomer.firstName} ${currentCustomer.lastName}"?</p>
                     <p>This action cannot be undone.</p>
                 </cds-modal-body>
                 <cds-modal-footer>
@@ -183,10 +196,10 @@
             showLoadingModal('Deleting customer...');
             
             try {
-                await api.customers.deleteCustomer(currentCustomer.id);
+                await api.customers.deleteCustomer(currentCustomer.customerId);
                 hideLoadingModal();
                 showSuccessModal(
-                    'Success', 
+                    'Success',
                     'Customer deleted successfully',
                     () => {
                         window.location.reload();
@@ -194,7 +207,7 @@
                 );
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', 'Failed to delete customer. The customer may have associated accounts.');
+                showErrorModal('Error', error.message || 'Failed to delete customer');
             }
         }
     </script>

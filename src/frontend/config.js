@@ -9,7 +9,7 @@
  */
 export const config = {
     api: {
-        baseUrl: 'http://localhost:8080'
+        baseUrl: 'http://localhost:3001'
     },
     defaults: {
         sortCode: '987654'

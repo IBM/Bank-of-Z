@@ -1,0 +1,40 @@
+version: "3.2"
+services:
+  zosConnect:
+    image: icr.io/zosconnect/ibm-zcon-designer:3.0.101
+    environment:
+      - CICS_USER=
+      - CICS_PASSWORD=
+      - CICS_HOST=
+      - CICS_PORT=
+      - HTTP_PORT=9080
+      - zosconnect_remote_download_allowlist=BLOCK_ALL
+    ports:
+      - "9443:9443"
+      - "9080:9080"
+    volumes:
+      - ./src/api:/workspace/project
+      - ./logs/:/logs/
+      # - ./certs:/config/resources/security/:ro
+    networks:
+      - bank-network
+
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    command: node server.js
+    environment:
+      - PORT=3001
+      - API_BASE_URL=http://zosConnect:9080
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./src/frontend:/app
+    depends_on:
+      - zosConnect
+    networks:
+      - bank-network
+
+networks:
+  bank-network:
+    driver: bridge

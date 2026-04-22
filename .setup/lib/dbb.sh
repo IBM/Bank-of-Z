@@ -49,7 +49,7 @@ run_dbb_build() {
     print_info "Starting DBB build with HLQ: $hlq"
     print_info "Build command: dbb build $build_type --hlq $hlq"
     
-    if dbb build "$build_type" --hlq "$hlq"; then
+    if dbb build "$build_type" --verbose --hlq "$hlq"; then
         print_success "DBB build completed successfully"
         return 0
     else

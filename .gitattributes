@@ -34,3 +34,4 @@
 *.yaml zos-working-tree-encoding=utf-8
 
 *.rec binary
+.setup/envsubst binary

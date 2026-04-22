@@ -36,7 +36,7 @@ pipeline_script:
   # DBB build HLQ
   dbb_hlq: BANKZ.BUILD.V0R1M0
   
-  # Enablde Wazi Deploy
+  # Enable Wazi Deploy
   run_deploy: true
   
   # Bank of Z target HLQ for Wazi Deploy

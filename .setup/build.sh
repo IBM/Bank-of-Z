@@ -19,7 +19,7 @@ set -e
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 rm -rf $WORKSPACE_DIR/logs
 
-# Global configureation file
+# Global configuration file
 CONFIG_FILE="$WORKSPACE_DIR/.setup/config.yaml"
 chtag -t -c ISO8859-1 $CONFIG_FILE
 
@@ -45,6 +45,9 @@ print_info "Application: $APPLICATION"
 # Timestamp for unique build identifier
 TIMESTAMP=$(date +%F_%H-%M-%S)
 print_info "Build timestamp: $TIMESTAMP"
+
+# Set PIPELINE_WORKSPACE for config.yaml variable expansion
+export PIPELINE_WORKSPACE="$WORKSPACE_DIR"
 
 # Setup DBB environment variables
 setup_dbb_environment "$WORKSPACE_DIR"

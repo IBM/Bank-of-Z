@@ -252,7 +252,7 @@ The easiest way to get started is using the built-in VS Code tasks:
 
 3. **Run Pipeline Simulation**
 
-   - You must adpat this file before [pipeline_simulation.sh](.setup/pipeline_simulation.sh)  (TODO needs variables)
+   - You must adapt this file before [pipeline_simulation.sh](.setup/pipeline_simulation.sh)  (TODO needs variables)
    - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
    - Type "Tasks: Run Task"
    - Select **"Run Pipeline Simulation"**

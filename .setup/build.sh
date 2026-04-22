@@ -49,8 +49,10 @@ print_info "Build timestamp: $TIMESTAMP"
 # Set PIPELINE_WORKSPACE for config.yaml variable expansion
 export PIPELINE_WORKSPACE="$WORKSPACE_DIR"
 
-# Expand environment variables in config.yaml using our bundled envsubst
-$WORKSPACE_DIR/.setup/envsubst < $WORKSPACE_DIR/.setup/config.yaml > $WORKSPACE_DIR/.setup/config.yaml.expanded
+# Expand environment variables in config.yaml using shell parameter expansion
+# Since envsubst is Python and may not be available, use a simpler approach
+envsubst < $WORKSPACE_DIR/.setup/config.yaml > $WORKSPACE_DIR/.setup/config.yaml.expanded 2>/dev/null || \
+  sed "s|\$PIPELINE_WORKSPACE|$PIPELINE_WORKSPACE|g" $WORKSPACE_DIR/.setup/config.yaml > $WORKSPACE_DIR/.setup/config.yaml.expanded
 export CONFIG_FILE="$WORKSPACE_DIR/.setup/config.yaml.expanded"
 
 # Setup DBB environment variables

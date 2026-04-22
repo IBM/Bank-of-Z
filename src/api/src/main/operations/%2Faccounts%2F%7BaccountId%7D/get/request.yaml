@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQACC-COMMAREA:
+        required: false
+        nullable: false
+        mappings:
+        - INQACC-ACCNO:
+            required: false
+            nullable: false
+            expression: "$pathParameters.accountId"

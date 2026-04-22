@@ -427,7 +427,6 @@
                  PERFORM GET-CUST-DATA
               ELSE
                  INITIALIZE INQCUST-COMMAREA
-                 SET INQCUST-PCB-POINTER TO NULL
               END-IF
            END-IF.
 
@@ -831,7 +830,6 @@
       *    Set up the fields required by INQCUST then link to it
       *
            INITIALIZE INQCUST-COMMAREA.
-           SET INQCUST-PCB-POINTER TO NULL.
 
            MOVE CUSTNOI TO INQCUST-CUSTNO.
 

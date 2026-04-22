@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="UPDCUST" originalName="UPDCUST" included="Y" path="UPDCUST" fileName="UPDCUST.cpy" structureIndex="0" structSrcFileName="UPDCUST_response_0.cpy" srcLine="01 UPDCUST.">
+                <startPos>1</startPos>
+                <bytes>261</bytes>
+                <maxBytes>261</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="COMM-EYE" originalName="COMM-EYE" included="Y" path="UPDCUST.COMM-EYE" srcLine="03 COMM-EYE PIC X(4) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-SCODE" originalName="COMM-SCODE" included="Y" path="UPDCUST.COMM-SCODE" srcLine="03 COMM-SCODE PIC X(6) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-CUSTNO" originalName="COMM-CUSTNO" included="Y" path="UPDCUST.COMM-CUSTNO" srcLine="03 COMM-CUSTNO PIC X(10) USAGE DISPLAY.">
+                    <startPos>11</startPos>
+                    <bytes>10</bytes>
+                    <maxBytes>10</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-NAME" originalName="COMM-NAME" included="Y" path="UPDCUST.COMM-NAME" srcLine="03 COMM-NAME PIC X(60) USAGE DISPLAY.">
+                    <startPos>21</startPos>
+                    <bytes>60</bytes>
+                    <maxBytes>60</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-ADDR" originalName="COMM-ADDR" included="Y" path="UPDCUST.COMM-ADDR" srcLine="03 COMM-ADDR PIC X(160) USAGE DISPLAY.">
+                    <startPos>81</startPos>
+                    <bytes>160</bytes>
+                    <maxBytes>160</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-DOB" originalName="COMM-DOB" included="Y" path="UPDCUST.COMM-DOB" srcLine="03 COMM-DOB PIC 9(8) USAGE DISPLAY.">
+                    <startPos>241</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="COMM-DOB-GROUP" originalName="COMM-DOB-GROUP" included="Y" path="UPDCUST.COMM-DOB-GROUP" redefines="COMM-DOB" srcLine="03 COMM-DOB-GROUP REDEFINES COMM-DOB.">
+                    <startPos>241</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-BIRTH-DAY" originalName="COMM-BIRTH-DAY" included="Y" path="UPDCUST.COMM-DOB-GROUP.COMM-BIRTH-DAY" srcLine="05 COMM-BIRTH-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>241</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-BIRTH-MONTH" originalName="COMM-BIRTH-MONTH" included="Y" path="UPDCUST.COMM-DOB-GROUP.COMM-BIRTH-MONTH" srcLine="05 COMM-BIRTH-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>243</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-BIRTH-YEAR" originalName="COMM-BIRTH-YEAR" included="Y" path="UPDCUST.COMM-DOB-GROUP.COMM-BIRTH-YEAR" srcLine="05 COMM-BIRTH-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>245</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="COMM-CREDIT-SCORE" originalName="COMM-CREDIT-SCORE" included="Y" path="UPDCUST.COMM-CREDIT-SCORE" srcLine="03 COMM-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.">
+                    <startPos>249</startPos>
+                    <bytes>3</bytes>
+                    <maxBytes>3</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="3" scale="0"/>
+                </field>
+                <field name="COMM-CS-REVIEW-DATE" originalName="COMM-CS-REVIEW-DATE" included="Y" path="UPDCUST.COMM-CS-REVIEW-DATE" srcLine="03 COMM-CS-REVIEW-DATE PIC 9(8) USAGE DISPLAY.">
+                    <startPos>252</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="COMM-CS-GROUP" originalName="COMM-CS-GROUP" included="Y" path="UPDCUST.COMM-CS-GROUP" redefines="COMM-CS-REVIEW-DATE" srcLine="03 COMM-CS-GROUP REDEFINES COMM-CS-REVIEW-DATE.">
+                    <startPos>252</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-CS-DAY" originalName="COMM-CS-DAY" included="Y" path="UPDCUST.COMM-CS-GROUP.COMM-CS-DAY" srcLine="05 COMM-CS-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>252</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CS-MONTH" originalName="COMM-CS-MONTH" included="Y" path="UPDCUST.COMM-CS-GROUP.COMM-CS-MONTH" srcLine="05 COMM-CS-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>254</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CS-YEAR" originalName="COMM-CS-YEAR" included="Y" path="UPDCUST.COMM-CS-GROUP.COMM-CS-YEAR" srcLine="05 COMM-CS-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>256</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="COMM-UPD-SUCCESS" originalName="COMM-UPD-SUCCESS" included="Y" path="UPDCUST.COMM-UPD-SUCCESS" srcLine="03 COMM-UPD-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>260</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-UPD-FAIL-CD" originalName="COMM-UPD-FAIL-CD" included="Y" path="UPDCUST.COMM-UPD-FAIL-CD" srcLine="03 COMM-UPD-FAIL-CD PIC X USAGE DISPLAY.">
+                    <startPos>261</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

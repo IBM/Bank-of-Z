@@ -1,0 +1,29 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - XFRFUN:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-FACCNO:
+            required: false
+            nullable: false
+            expression: "$body.XFRFUN.CommFaccno"
+        - COMM-FSCODE:
+            required: false
+            nullable: false
+            expression: "$body.XFRFUN.CommFscode"
+        - COMM-TACCNO:
+            required: false
+            nullable: false
+            expression: "$body.XFRFUN.CommTaccno"
+        - COMM-TSCODE:
+            required: false
+            nullable: false
+            expression: "$body.XFRFUN.CommTscode"
+        - COMM-AMT:
+            required: false
+            nullable: false
+            expression: "$body.XFRFUN.CommAmt"

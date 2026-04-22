@@ -1,0 +1,69 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - InqAcc:
+        required: false
+        nullable: false
+        mappings:
+        - InqAccEye:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-EYE\"\
+              }}"
+        - InqAccCustno:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-CUSTNO\""
+        - InqAccScode:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-SCODE\""
+        - InqAccAccno:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACCNO\""
+        - InqAccAccType:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACC-TYPE\"\
+              }}"
+        - InqAccIntRate:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-INT-RATE\""
+        - InqAccOpened:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-OPENED\""
+        - InqAccOverdraft:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-OVERDRAFT\""
+        - InqAccLastStmtDt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-LAST-STMT-DT\""
+        - InqAccNextStmtDt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-NEXT-STMT-DT\""
+        - InqAccAvailBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-AVAIL-BAL\""
+        - InqAccActualBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACTUAL-BAL\""
+        - InqAccSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-SUCCESS\"\
+              }}"
+        - InqAccPcb1Pointer:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-PCB1-POINTER\"\
+              }}"

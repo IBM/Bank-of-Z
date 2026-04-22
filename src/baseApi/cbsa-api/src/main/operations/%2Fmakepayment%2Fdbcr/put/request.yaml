@@ -1,0 +1,65 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - PAYDBCR:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-ACCNO:
+            required: false
+            nullable: false
+            template: "{{$body.PAYDBCR.CommAccno}}"
+        - COMM-AMT:
+            required: false
+            nullable: false
+            expression: "$body.PAYDBCR.CommAmt"
+        - COMM-SORTC:
+            required: false
+            nullable: false
+            expression: "$body.PAYDBCR.mSortC"
+        - COMM-AV-BAL:
+            required: false
+            nullable: false
+            expression: "$body.PAYDBCR.CommAvBal"
+        - COMM-ACT-BAL:
+            required: false
+            nullable: false
+            expression: "$body.PAYDBCR.CommActBal"
+        - COMM-ORIGIN:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-APPLID:
+                required: false
+                nullable: false
+                template: "{{$body.PAYDBCR.CommOrigin.CommApplid}}"
+            - COMM-USERID:
+                required: false
+                nullable: false
+                template: "{{$body.PAYDBCR.CommOrigin.CommUserid}}"
+            - COMM-FACILITY-NAME:
+                required: false
+                nullable: false
+                template: "{{$body.PAYDBCR.CommOrigin.CommFacilityName}}"
+            - COMM-NETWRK-ID:
+                required: false
+                nullable: false
+                template: "{{$body.PAYDBCR.CommOrigin.CommNetwrkId}}"
+            - COMM-FACILTYPE:
+                required: false
+                nullable: false
+                expression: "$body.PAYDBCR.CommOrigin.CommFaciltype"
+            - fill_0:
+                required: false
+                nullable: false
+                template: "{{$body.PAYDBCR.CommOrigin.Fill0}}"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.PAYDBCR.CommSuccess}}"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: "{{$body.PAYDBCR.CommFailCode}}"

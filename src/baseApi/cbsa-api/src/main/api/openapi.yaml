@@ -1,0 +1,1532 @@
+openapi: 3.0.0
+info:
+  title: CBSA Banking APIs
+  description: Combined banking services APIs for account and customer management
+  version: 1.0.0
+servers:
+  - url: https://localhost:8080/banking
+  - url: http://localhost:8080/banking
+x-ibm-configuration:
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - invoke:
+          title: invoke-cics
+          version: 2.0.0
+          verb: keep
+          target-url: 'cics://cbsaCicsConnection'
+paths:
+  /creacc/insert:
+    post:
+      tags:
+        - accounts
+      summary: Create Account
+      description: Creates an account on the CREACC Service
+      operationId: postCREACC
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postCREACC_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postCREACC_response_200'
+  /crecust/insert:
+    post:
+      tags:
+        - customers
+      summary: Create Customer
+      description: Creates a customer on the CRECUST Service
+      operationId: postCRECUST
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postCRECUST_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postCRECUST_response_200'
+  /delacc/remove/{accno}:
+    delete:
+      tags:
+        - accounts
+      summary: Delete Account
+      description: Deletes an account on the DELACC Service
+      operationId: deleteDELACC
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: accno
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deleteDELACC_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteDELACC_response_200'
+  /delcus/remove/{custno}:
+    delete:
+      tags:
+        - customers
+      summary: Delete Customer
+      description: Deletes a customer and their accounts on the DELCUS Service
+      operationId: deleteDELCUS
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: custno
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deleteDELCUS_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteDELCUS_response_200'
+  /inqaccz/enquiry/{accno}:
+    get:
+      tags:
+        - accounts
+      summary: Enquire Account
+      description: Enquire about an account on the INQACC service
+      operationId: getINQACC
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: accno
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getINQACC_response_200'
+  /inqacccz/list/{custno}:
+    get:
+      tags:
+        - accounts
+      summary: List Customer Accounts
+      description: Enquire about the accounts belonging to a customer on the INQACCCU service
+      operationId: getINQACCCU
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: custno
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getINQACCCU_response_200'
+  /inqcustz/enquiry/{custno}:
+    get:
+      tags:
+        - customers
+      summary: Enquire Customer
+      description: Enquiry about a customer on the INQCUST service
+      operationId: getINQCUST
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: custno
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getINQCUST_response_200'
+  /makepayment/dbcr:
+    put:
+      tags:
+        - payments
+      summary: Make Payment
+      description: Make a payment on the DBCRFUN Service
+      operationId: putDBCRFUN
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/putDBCRFUN_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/putDBCRFUN_response_200'
+  /transfer/funds:
+    put:
+      tags:
+        - payments
+      summary: Transfer Funds
+      description: Transfer funds between accounts on the XFRFUN Service
+      operationId: putXFRFUN
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/putXFRFUN_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/putXFRFUN_response_200'
+  /updacc/update:
+    put:
+      tags:
+        - accounts
+      summary: Update Account
+      description: Updates account information on the UPDACC Service
+      operationId: putUPDACC
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/putUPDACC_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/putUPDACC_response_200'
+  /updcust/update:
+    put:
+      tags:
+        - customers
+      summary: Update Customer
+      description: Update a customer's details on the UPDCUST Service
+      operationId: putUPDCUST
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/putUPDCUST_request'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/putUPDCUST_response_200'
+components:
+  schemas:
+    # Create Account Schemas
+    postCREACC_request:
+      type: object
+      properties:
+        CommEyecatcher:
+          type: string
+          maxLength: 4
+        CommCustno:
+          type: integer
+          minimum: 0
+          maximum: 9999999999
+        CommKey:
+          type: object
+          properties:
+            CommSortcode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommNumber:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+        CommAccType:
+          type: string
+          maxLength: 8
+        CommIntRt:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 9999.99
+        CommOpened:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommOverdrLim:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommLastStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommNextStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAvailBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommActBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommSuccess:
+          type: string
+          maxLength: 1
+        CommFailCode:
+          type: string
+          maxLength: 1
+    postCREACC_response_200:
+      type: object
+      properties:
+        CommEyecatcher:
+          type: string
+          maxLength: 4
+        CommCustno:
+          type: integer
+          minimum: 0
+          maximum: 9999999999
+        CommKey:
+          type: object
+          properties:
+            CommSortcode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommNumber:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+        CommAccType:
+          type: string
+          maxLength: 8
+        CommIntRt:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 9999.99
+        CommOpened:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommOverdrLim:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommLastStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommNextStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAvailBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommActBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommSuccess:
+          type: string
+          maxLength: 1
+        CommFailCode:
+          type: string
+          maxLength: 1
+    # Create Customer Schemas
+    postCRECUST_request:
+      type: object
+      properties:
+        CommEyecatcher:
+          type: string
+          maxLength: 4
+        CommKey:
+          type: object
+          properties:
+            CommSortcode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommNumber:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+        CommName:
+          type: string
+          maxLength: 60
+        CommAddress:
+          type: string
+          maxLength: 160
+        CommDateOfBirth:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+        CommCsReviewDate:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommSuccess:
+          type: string
+          maxLength: 1
+        CommFailCode:
+          type: string
+          maxLength: 1
+    postCRECUST_response_200:
+      type: object
+      properties:
+        CommEyecatcher:
+          type: string
+          maxLength: 4
+        CommKey:
+          type: object
+          properties:
+            CommSortcode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommNumber:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+        CommName:
+          type: string
+          maxLength: 60
+        CommAddress:
+          type: string
+          maxLength: 160
+        CommDateOfBirth:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+        CommCsReviewDate:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommSuccess:
+          type: string
+          maxLength: 1
+        CommFailCode:
+          type: string
+          maxLength: 1
+    # Delete Account Schemas
+    deleteDELACC_request:
+      type: object
+      properties:
+        DelaccCommarea:
+          type: object
+          properties:
+            DelaccEye:
+              type: string
+              maxLength: 4
+            DelaccCustno:
+              type: string
+              maxLength: 10
+            DelaccScode:
+              type: string
+              maxLength: 6
+            DelaccAccType:
+              type: string
+              maxLength: 8
+            DelaccIntRate:
+              type: number
+              format: decimal
+              minimum: 0
+              maximum: 9999.99
+            DelaccOpened:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccOverdraft:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccLastStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccNextStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccAvailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            DelaccActualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            DelaccSuccess:
+              type: string
+              maxLength: 1
+            DelaccFailCd:
+              type: string
+              maxLength: 1
+            DelaccDelSuccess:
+              type: string
+              maxLength: 1
+            DelaccDelFailCd:
+              type: string
+              maxLength: 1
+            DelaccDelApplid:
+              type: string
+              maxLength: 8
+            DelaccDelPcb1:
+              type: string
+              maxLength: 4
+            DelaccDelPcb2:
+              type: string
+              maxLength: 4
+            DelaccDelPcb3:
+              type: string
+              maxLength: 4
+    deleteDELACC_response_200:
+      type: object
+      properties:
+        DelaccCommarea:
+          type: object
+          properties:
+            DelaccEye:
+              type: string
+              maxLength: 4
+            DelaccCustno:
+              type: string
+              maxLength: 10
+            DelaccScode:
+              type: string
+              maxLength: 6
+            DelaccAccno:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccAccType:
+              type: string
+              maxLength: 8
+            DelaccIntRate:
+              type: number
+              format: decimal
+              minimum: 0
+              maximum: 9999.99
+            DelaccOpened:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccOverdraft:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccLastStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccNextStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            DelaccAvailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            DelaccActualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            DelaccSuccess:
+              type: string
+              maxLength: 1
+            DelaccFailCd:
+              type: string
+              maxLength: 1
+            DelaccDelSuccess:
+              type: string
+              maxLength: 1
+            DelaccDelFailCd:
+              type: string
+              maxLength: 1
+            DelaccDelApplid:
+              type: string
+              maxLength: 8
+            DelaccDelPcb1:
+              type: string
+              maxLength: 4
+            DelaccDelPcb2:
+              type: string
+              maxLength: 4
+            DelaccDelPcb3:
+              type: string
+              maxLength: 4
+    # Delete Customer Schemas
+    deleteDELCUS_request:
+      type: object
+      properties:
+        Comm:
+          type: object
+          properties:
+            CommEye:
+              type: string
+              maxLength: 4
+            CommScode:
+              type: string
+              maxLength: 6
+            CommName:
+              type: string
+              maxLength: 60
+            CommAddr:
+              type: string
+              maxLength: 160
+            CommDob:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            CommCreditScore:
+              type: integer
+              minimum: 0
+              maximum: 999
+            CommCsReviewDate:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            CommDelSuccess:
+              type: string
+              maxLength: 1
+            CommDelFailCd:
+              type: string
+              maxLength: 1
+    deleteDELCUS_response_200:
+      type: object
+      properties:
+        Comm:
+          type: object
+          properties:
+            CommEye:
+              type: string
+              maxLength: 4
+            CommScode:
+              type: string
+              maxLength: 6
+            CommCustno:
+              type: string
+              maxLength: 10
+            CommName:
+              type: string
+              maxLength: 60
+            CommAddr:
+              type: string
+              maxLength: 160
+            CommDob:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            CommCreditScore:
+              type: integer
+              minimum: 0
+              maximum: 999
+            CommCsReviewDate:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            CommDelSuccess:
+              type: string
+              maxLength: 1
+            CommDelFailCd:
+              type: string
+              maxLength: 1
+    # Enquire Account Schemas
+    getINQACC_request:
+      type: object
+      properties:
+        InqAcc:
+          type: object
+          properties:
+            InqAccEye:
+              type: string
+              maxLength: 4
+            InqAccCustno:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+            InqAccScode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            InqAccAccType:
+              type: string
+              maxLength: 8
+            InqAccIntRate:
+              type: number
+              format: decimal
+              minimum: 0
+              maximum: 9999.99
+            InqAccOpened:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccOverdraft:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccLastStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccNextStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccAvailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            InqAccActualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            InqAccSuccess:
+              type: string
+              maxLength: 1
+            InqAccPcb1Pointer:
+              type: string
+              maxLength: 4
+    getINQACC_response_200:
+      type: object
+      properties:
+        InqAcc:
+          type: object
+          properties:
+            InqAccEye:
+              type: string
+              maxLength: 4
+            InqAccCustno:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+            InqAccScode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            InqAccAccno:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccAccType:
+              type: string
+              maxLength: 8
+            InqAccIntRate:
+              type: number
+              format: decimal
+              minimum: 0
+              maximum: 9999.99
+            InqAccOpened:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccOverdraft:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccLastStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccNextStmtDt:
+              type: integer
+              minimum: 0
+              maximum: 99999999
+            InqAccAvailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            InqAccActualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            InqAccSuccess:
+              type: string
+              maxLength: 1
+            InqAccPcb1Pointer:
+              type: string
+              maxLength: 4
+    # List Customer Accounts Schemas
+    getINQACCCU_request:
+      type: object
+      properties:
+        InqAccZ:
+          type: object
+          properties:
+            CommSuccess:
+              type: string
+              maxLength: 1
+            CommFailCode:
+              type: string
+              maxLength: 1
+            CustomerFound:
+              type: string
+              maxLength: 1
+            CommPcbPointer:
+              type: string
+              maxLength: 4
+            AccountDetails:
+              type: array
+              items:
+                type: object
+                properties:
+                  CommEye:
+                    type: string
+                    maxLength: 4
+                  CommCustno:
+                    type: string
+                    maxLength: 10
+                  CommAccno:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommAccType:
+                    type: string
+                    maxLength: 8
+                  CommIntRate:
+                    type: number
+                    format: decimal
+                    minimum: 0
+                    maximum: 9999.99
+                  CommOpened:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommOverdraft:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommLastStmtDt:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommNextStmtDt:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommAvailBal:
+                    type: number
+                    format: decimal
+                    minimum: -9999999999.99
+                    maximum: 9999999999.99
+                  CommActualBal:
+                    type: number
+                    format: decimal
+                    minimum: -9999999999.99
+                    maximum: 9999999999.99
+              maxItems: 20
+              minItems: 1
+    getINQACCCU_response_200:
+      type: object
+      properties:
+        InqAccZ:
+          type: object
+          properties:
+            CustomerNumber:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+            CommSuccess:
+              type: string
+              maxLength: 1
+            CommFailCode:
+              type: string
+              maxLength: 1
+            CustomerFound:
+              type: string
+              maxLength: 1
+            CommPcbPointer:
+              type: string
+              maxLength: 4
+            AccountDetails:
+              type: array
+              items:
+                type: object
+                properties:
+                  CommEye:
+                    type: string
+                    maxLength: 4
+                  CommCustno:
+                    type: string
+                    maxLength: 10
+                  CommAccno:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommAccType:
+                    type: string
+                    maxLength: 8
+                  CommIntRate:
+                    type: number
+                    format: decimal
+                    minimum: 0
+                    maximum: 9999.99
+                  CommOpened:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommOverdraft:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommLastStmtDt:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommNextStmtDt:
+                    type: integer
+                    minimum: 0
+                    maximum: 99999999
+                  CommAvailBal:
+                    type: number
+                    format: decimal
+                    minimum: -9999999999.99
+                    maximum: 9999999999.99
+                  CommActualBal:
+                    type: number
+                    format: decimal
+                    minimum: -9999999999.99
+                    maximum: 9999999999.99
+              maxItems: 20
+              minItems: 1
+    # Enquire Customer Schemas
+    getINQCUST_request:
+      type: object
+      properties:
+        InqCustZ:
+          type: object
+          properties:
+            InqCustEye:
+              type: string
+              maxLength: 4
+            InqCustScode:
+              type: string
+              maxLength: 6
+            InqCustCustno:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+            InqCustName:
+              type: string
+              maxLength: 60
+            InqCustAddr:
+              type: string
+              maxLength: 160
+            InqCustDob:
+              type: object
+              properties:
+                InqCustDobDd:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustDobMm:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustDobYyyy:
+                  type: integer
+                  minimum: 0
+                  maximum: 9999
+            InqCustCreditScore:
+              type: integer
+              minimum: 0
+              maximum: 999
+            InqCustCsReviewDt:
+              type: object
+              properties:
+                InqCustCsReviewDd:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustCsReviewMm:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustCsReviewYyyy:
+                  type: integer
+                  minimum: 0
+                  maximum: 9999
+            InqCustInqSuccess:
+              type: string
+              maxLength: 1
+            InqCustInqFailCd:
+              type: string
+              maxLength: 1
+            InqCustPcbPointer:
+              type: string
+              maxLength: 4
+    getINQCUST_response_200:
+      type: object
+      properties:
+        InqCustZ:
+          type: object
+          properties:
+            InqCustEye:
+              type: string
+              maxLength: 4
+            InqCustScode:
+              type: string
+              maxLength: 6
+            InqCustCustno:
+              type: integer
+              minimum: 0
+              maximum: 9999999999
+            InqCustName:
+              type: string
+              maxLength: 60
+            InqCustAddr:
+              type: string
+              maxLength: 160
+            InqCustDob:
+              type: object
+              properties:
+                InqCustDobDd:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustDobMm:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustDobYyyy:
+                  type: integer
+                  minimum: 0
+                  maximum: 9999
+            InqCustCreditScore:
+              type: integer
+              minimum: 0
+              maximum: 999
+            InqCustCsReviewDt:
+              type: object
+              properties:
+                InqCustCsReviewDd:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustCsReviewMm:
+                  type: integer
+                  minimum: 0
+                  maximum: 99
+                InqCustCsReviewYyyy:
+                  type: integer
+                  minimum: 0
+                  maximum: 9999
+            InqCustInqSuccess:
+              type: string
+              maxLength: 1
+            InqCustInqFailCd:
+              type: string
+              maxLength: 1
+            InqCustPcbPointer:
+              type: string
+              maxLength: 4
+    # Make Payment Schemas
+    putDBCRFUN_request:
+      type: object
+      properties:
+        PAYDBCR:
+          type: object
+          properties:
+            CommAccno:
+              type: string
+              maxLength: 8
+            CommAmt:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            mSortC:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommAvBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            CommActBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            CommOrigin:
+              type: object
+              properties:
+                CommApplid:
+                  type: string
+                  maxLength: 8
+                CommUserid:
+                  type: string
+                  maxLength: 8
+                CommFacilityName:
+                  type: string
+                  maxLength: 8
+                CommNetwrkId:
+                  type: string
+                  maxLength: 8
+                CommFaciltype:
+                  type: integer
+                  minimum: -99999999
+                  maximum: 99999999
+                Fill0:
+                  type: string
+                  maxLength: 4
+            CommSuccess:
+              type: string
+              maxLength: 1
+            CommFailCode:
+              type: string
+              maxLength: 1
+    putDBCRFUN_response_200:
+      type: object
+      properties:
+        PAYDBCR:
+          type: object
+          properties:
+            CommAccno:
+              type: string
+              maxLength: 8
+            CommAmt:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            mSortC:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommAvBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            CommActBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+            CommOrigin:
+              type: object
+              properties:
+                CommApplid:
+                  type: string
+                  maxLength: 8
+                CommUserid:
+                  type: string
+                  maxLength: 8
+                CommFacilityName:
+                  type: string
+                  maxLength: 8
+                CommNetwrkId:
+                  type: string
+                  maxLength: 8
+                CommFaciltype:
+                  type: integer
+                  minimum: -99999999
+                  maximum: 99999999
+                Fill0:
+                  type: string
+                  maxLength: 4
+            CommSuccess:
+              type: string
+              maxLength: 1
+            CommFailCode:
+              type: string
+              maxLength: 1
+    # Update Account Schemas
+    putUPDACC_request:
+      type: object
+      properties:
+        CommEye:
+          type: string
+          maxLength: 4
+        CommCustno:
+          type: string
+          maxLength: 10
+        CommScode:
+          type: string
+          maxLength: 6
+        CommAccno:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAccType:
+          type: string
+          maxLength: 8
+        CommIntRate:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 9999.99
+        CommOpened:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommOverdraft:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommLastStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommNextStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAvailBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommActualBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommSuccess:
+          type: string
+          maxLength: 1
+    putUPDACC_response_200:
+      type: object
+      properties:
+        CommEye:
+          type: string
+          maxLength: 4
+        CommCustno:
+          type: string
+          maxLength: 10
+        CommScode:
+          type: string
+          maxLength: 6
+        CommAccno:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAccType:
+          type: string
+          maxLength: 8
+        CommIntRate:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 9999.99
+        CommOpened:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommOverdraft:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommLastStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommNextStmtDt:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommAvailBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommActualBal:
+          type: number
+          format: decimal
+          minimum: -9999999999.99
+          maximum: 9999999999.99
+        CommSuccess:
+          type: string
+          maxLength: 1
+    # Update Customer Schemas
+    putUPDCUST_request:
+      type: object
+      properties:
+        CommEye:
+          type: string
+          maxLength: 4
+        CommScode:
+          type: string
+          maxLength: 6
+        CommCustno:
+          type: string
+          maxLength: 10
+        CommName:
+          type: string
+          maxLength: 60
+        CommAddress:
+          type: string
+          maxLength: 160
+        CommDob:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+        CommCsReviewDate:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommUpdSuccess:
+          type: string
+          maxLength: 1
+        CommUpdFailCd:
+          type: string
+          maxLength: 1
+    putUPDCUST_response_200:
+      type: object
+      properties:
+        CommEye:
+          type: string
+          maxLength: 4
+        CommScode:
+          type: string
+          maxLength: 6
+        CommCustno:
+          type: string
+          maxLength: 10
+        CommName:
+          type: string
+          maxLength: 60
+        CommAddress:
+          type: string
+          maxLength: 160
+        CommDob:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+        CommCsReviewDate:
+          type: integer
+          minimum: 0
+          maximum: 99999999
+        CommUpdSuccess:
+          type: string
+          maxLength: 1
+        CommUpdFailCd:
+          type: string
+          maxLength: 1
+
+    # Transfer Funds Schemas
+    putXFRFUN_request:
+      type: object
+      properties:
+        XFRFUN:
+          type: object
+          properties:
+            CommFscode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+              description: From account sortcode
+            CommFaccno:
+              type: string
+              maxLength: 8
+              description: From account number
+            CommTscode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+              description: To account sortcode
+            CommTaccno:
+              type: string
+              maxLength: 8
+              description: To account number
+            CommAmt:
+              type: number
+              format: decimal
+              minimum: 0.01
+              maximum: 9999999999.99
+              description: Transfer amount (must be positive)
+    putXFRFUN_response_200:
+      type: object
+      properties:
+        XFRFUN:
+          type: object
+          properties:
+            CommFscode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommFaccno:
+              type: string
+              maxLength: 8
+            CommTscode:
+              type: integer
+              minimum: 0
+              maximum: 999999
+            CommTaccno:
+              type: string
+              maxLength: 8
+            CommAmt:
+              type: number
+              format: decimal
+              minimum: 0.01
+              maximum: 9999999999.99
+            CommFavailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+              description: From account available balance after transfer
+            CommFactualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+              description: From account actual balance after transfer
+            CommTavailBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+              description: To account available balance after transfer
+            CommTactualBal:
+              type: number
+              format: decimal
+              minimum: -9999999999.99
+              maximum: 9999999999.99
+              description: To account actual balance after transfer
+            CommSuccess:
+              type: string
+              maxLength: 1
+              description: Success flag (Y/N)
+            CommFailCode:
+              type: string
+              maxLength: 1
+              description: Failure code if unsuccessful
+
+# Made with Bob

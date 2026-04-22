@@ -1,0 +1,125 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "XFRFUN" : {
+          "type" : "object",
+          "properties" : {
+            "COMM-FACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "COMM-FACCNO"
+              }
+            },
+            "COMM-FSCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FSCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "COMM-FSCODE"
+              }
+            },
+            "COMM-TACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-TACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "COMM-TACCNO"
+              }
+            },
+            "COMM-TSCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-TSCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "COMM-TSCODE"
+              }
+            },
+            "COMM-AMT" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-AMT PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-AMT"
+              }
+            },
+            "COMM-FAVBAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FAVBAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-FAVBAL"
+              }
+            },
+            "COMM-FACTBAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FACTBAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-FACTBAL"
+              }
+            },
+            "COMM-TAVBAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-TAVBAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-TAVBAL"
+              }
+            },
+            "COMM-TACTBAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-TACTBAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "COMM-TACTBAL"
+              }
+            },
+            "COMM-FAIL-CODE" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-FAIL-CODE PIC X USAGE DISPLAY.",
+                "name" : "COMM-FAIL-CODE"
+              }
+            },
+            "COMM-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "COMM-SUCCESS"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

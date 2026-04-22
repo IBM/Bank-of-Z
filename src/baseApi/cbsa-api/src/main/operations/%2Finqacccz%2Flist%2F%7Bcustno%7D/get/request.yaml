@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQACCCZ:
+        required: false
+        nullable: false
+        mappings:
+        - CUSTOMER-NUMBER:
+            required: false
+            nullable: false
+            expression: "$pathParameters.custno"

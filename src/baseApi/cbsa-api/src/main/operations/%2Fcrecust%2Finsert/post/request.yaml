@@ -1,0 +1,33 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CRECUST:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-NAME:
+            required: false
+            nullable: false
+            template: "{{$body.CommName}}"
+        - COMM-ADDRESS:
+            required: false
+            nullable: false
+            template: "{{$body.CommAddress}}"
+        - COMM-DATE-OF-BIRTH:
+            required: false
+            nullable: false
+            expression: "$body.CommDateOfBirth"
+        - COMM-CS-REVIEW-DATE:
+            required: false
+            nullable: false
+            expression: "$body.CommCsReviewDate"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.CommSuccess}}"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: "{{$body.CommFailCode}}"

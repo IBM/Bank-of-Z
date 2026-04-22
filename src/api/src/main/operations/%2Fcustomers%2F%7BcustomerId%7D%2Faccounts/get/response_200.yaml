@@ -1,0 +1,32 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accounts:
+        required: true
+        nullable: false
+        foreach:
+          input: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\""
+          mappings:
+          - accountId:
+              required: true
+              nullable: false
+              template: "{{$item.\"COMM-ACCNO\"}}"
+          - accountType:
+              required: true
+              nullable: false
+              template: "{{$item.\"COMM-ACC-TYPE\"}}"
+          - currency:
+              required: true
+              nullable: false
+              template: "GBP"
+          - status:
+              required: true
+              nullable: false
+              template: "ACTIVE"
+    - totalCount:
+        required: false
+        nullable: false
+        expression: "$count($zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+          )"

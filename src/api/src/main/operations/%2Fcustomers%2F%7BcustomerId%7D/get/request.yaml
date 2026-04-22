@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQCUSTZ:
+        required: false
+        nullable: false
+        mappings:
+        - INQCUST-CUSTNO:
+            required: false
+            nullable: false
+            expression: "$pathParameters.customerId"

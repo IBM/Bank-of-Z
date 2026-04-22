@@ -1,0 +1,37 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - customerId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CUSTNO\"}}"
+    - firstName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\"}}"
+    - lastName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\"}}"
+    - dateOfBirth:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\"}}"
+    - email:
+        required: true
+        nullable: false
+        template: "customer@bankofz.com"
+    - address:
+        required: false
+        nullable: false
+        mappings:
+        - addressLine1:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\"}}"
+    - customerStatus:
+        required: false
+        nullable: false
+        template: "ACTIVE"

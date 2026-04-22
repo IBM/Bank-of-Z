@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3001;
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9080';
 
 // MIME types for different file extensions
 const mimeTypes = {
@@ -31,6 +32,13 @@ const mimeTypes = {
 
 const server = http.createServer((req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+
+    // Check if this is an API request
+    if (req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
+        // Proxy API requests to backend
+        proxyApiRequest(req, res);
+        return;
+    }
 
     // Parse URL and strip query parameters
     const urlPath = req.url.split('?')[0];
@@ -62,6 +70,37 @@ const server = http.createServer((req, res) => {
         }
     });
 });
+
+// Proxy API requests to backend
+function proxyApiRequest(req, res) {
+    const apiUrl = `${API_BASE_URL}${req.url}`;
+    console.log(`Proxying API request to: ${apiUrl}`);
+
+    const options = {
+        method: req.method,
+        headers: {
+            'Content-Type': 'application/json',
+            ...req.headers
+        }
+    };
+
+    const proxyReq = http.request(apiUrl, options, (proxyRes) => {
+        // Forward status code and headers
+        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+
+        // Pipe response back to client
+        proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', (error) => {
+        console.error('Proxy request failed:', error);
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Bad Gateway', message: error.message }));
+    });
+
+    // Pipe request body to backend
+    req.pipe(proxyReq);
+}
 
 server.listen(PORT, () => {
     console.log('='.repeat(60));

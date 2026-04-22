@@ -1,0 +1,244 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "abendCode" : {
+      "type" : "string"
+    },
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "INQACC-COMMAREA" : {
+          "type" : "object",
+          "properties" : {
+            "INQACC-EYE" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-EYE PIC X(4) USAGE DISPLAY.",
+                "name" : "INQACC-EYE"
+              }
+            },
+            "INQACC-CUSTNO" : {
+              "minimum" : 0,
+              "maximum" : 9999999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-CUSTNO PIC 9(10) USAGE DISPLAY.",
+                "name" : "INQACC-CUSTNO"
+              }
+            },
+            "INQACC-SCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-SCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQACC-SCODE"
+              }
+            },
+            "INQACC-ACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-ACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQACC-ACCNO"
+              }
+            },
+            "INQACC-ACC-TYPE" : {
+              "maxLength" : 8,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-ACC-TYPE PIC X(8) USAGE DISPLAY.",
+                "name" : "INQACC-ACC-TYPE"
+              }
+            },
+            "INQACC-INT-RATE" : {
+              "multipleOf" : 0.01,
+              "minimum" : 0,
+              "maximum" : 9999.99,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-INT-RATE PIC 9(4)V9(2) USAGE DISPLAY.",
+                "name" : "INQACC-INT-RATE"
+              }
+            },
+            "INQACC-OPENED" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-OPENED PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQACC-OPENED"
+              }
+            },
+            "INQACC-OPENED-GROUP" : {
+              "type" : "object",
+              "properties" : {
+                "INQACC-OPENED-DAY" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-OPENED-DAY PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-OPENED-DAY"
+                  }
+                },
+                "INQACC-OPENED-MONTH" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-OPENED-MONTH PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-OPENED-MONTH"
+                  }
+                },
+                "INQACC-OPENED-YEAR" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-OPENED-YEAR PIC 9(4) USAGE DISPLAY.",
+                    "name" : "INQACC-OPENED-YEAR"
+                  }
+                }
+              }
+            },
+            "INQACC-OVERDRAFT" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-OVERDRAFT PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQACC-OVERDRAFT"
+              }
+            },
+            "INQACC-LAST-STMT-DT" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-LAST-STMT-DT PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQACC-LAST-STMT-DT"
+              }
+            },
+            "INQACC-LAST-STMT-GROUP" : {
+              "type" : "object",
+              "properties" : {
+                "INQACC-LAST-STMT-DAY" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-LAST-STMT-DAY PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-LAST-STMT-DAY"
+                  }
+                },
+                "INQACC-LAST-STMT-MONTH" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-LAST-STMT-MONTH PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-LAST-STMT-MONTH"
+                  }
+                },
+                "INQACC-LAST-STMT-YEAR" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-LAST-STMT-YEAR PIC 9(4) USAGE DISPLAY.",
+                    "name" : "INQACC-LAST-STMT-YEAR"
+                  }
+                }
+              }
+            },
+            "INQACC-NEXT-STMT-DT" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-NEXT-STMT-DT PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQACC-NEXT-STMT-DT"
+              }
+            },
+            "INQACC-NEXT-STMT-GROUP" : {
+              "type" : "object",
+              "properties" : {
+                "INQACC-NEXT-STMT-DAY" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-NEXT-STMT-DAY PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-NEXT-STMT-DAY"
+                  }
+                },
+                "INQACC-NEXT-STMT-MONTH" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-NEXT-STMT-MONTH PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQACC-NEXT-STMT-MONTH"
+                  }
+                },
+                "INQACC-NEXT-STMT-YEAR" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQACC-NEXT-STMT-YEAR PIC 9(4) USAGE DISPLAY.",
+                    "name" : "INQACC-NEXT-STMT-YEAR"
+                  }
+                }
+              }
+            },
+            "INQACC-AVAIL-BAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-AVAIL-BAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "INQACC-AVAIL-BAL"
+              }
+            },
+            "INQACC-ACTUAL-BAL" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-ACTUAL-BAL PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "INQACC-ACTUAL-BAL"
+              }
+            },
+            "INQACC-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "INQACC-SUCCESS"
+              }
+            },
+            "INQACC-PCB1-POINTER" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQACC-PCB1-POINTER PIC X(4) USAGE DISPLAY.",
+                "name" : "INQACC-PCB1-POINTER"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset responses"
+}

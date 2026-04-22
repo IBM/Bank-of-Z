@@ -1,0 +1,19 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accountType:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACC-TYPE\"\
+          \ = 'ISA' ? 'SAVINGS' : $zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"\
+          INQACC-ACC-TYPE\" = 'MORTGAGE' ? 'LOAN' : 'CURRENT'}}"
+    - currency:
+        required: true
+        nullable: false
+        template: "GBP"
+    - status:
+        required: true
+        nullable: false
+        template: "ACTIVE"

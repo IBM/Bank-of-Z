@@ -12,12 +12,6 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 
-servers:
-  - url: https://api.bankofz.com/v1
-    description: Production server
-  - url: https://sandbox.bankofz.com/v1
-    description: Sandbox server for testing
-
 tags:
   - name: Customers
     description: Customer information endpoints

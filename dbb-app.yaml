@@ -212,7 +212,7 @@ application:
     # Assembler task
     # Handles IMS control block sources: PSBs (Program Specification
     # Blocks) and DBDs (Database Descriptors). These are not compiled
-    # like application programs — they are assembled by the IMS ACBGEN
+    # like application programs. They are assembled by the IMS ACBGEN
     # utility and stored in dedicated load libraries.
     # ----------------------------------------------------------
     - task: Assembler
@@ -235,7 +235,7 @@ application:
         #   DBDLOAD - IMS DBD library; a DBD describes the physical
         #             structure of an IMS database: segment types,
         #             field layouts, and access methods (HDAM, HIDAM…).
-        #             DBDs are the counterpart to PSBs — PSBs reference
+        #             DBDs are the counterpart to PSBs - PSBs reference
         #             DBDs to express what a program can see.
         - name: deployType
           forFiles: "**/src/base/ims/PSB/*.asm"

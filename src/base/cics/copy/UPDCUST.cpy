@@ -20,5 +20,6 @@
              05 COMM-CS-DAY                  PIC 99.
              05 COMM-CS-MONTH                PIC 99.
              05 COMM-CS-YEAR                 PIC 9999.
+          03 COMM-EMAIL                PIC X(60).
           03 COMM-UPD-SUCCESS          PIC X.
           03 COMM-UPD-FAIL-CD          PIC X.

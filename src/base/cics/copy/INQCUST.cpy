@@ -18,6 +18,7 @@
             05 INQCUST-CS-REVIEW-DD       PIC 99.
             05 INQCUST-CS-REVIEW-MM       PIC 99.
             05 INQCUST-CS-REVIEW-YYYY     PIC 9999.
+          03 INQCUST-EMAIL                PIC X(60).
           03 INQCUST-INQ-SUCCESS          PIC X.
           03 INQCUST-INQ-FAIL-CD          PIC X.
           03 INQCUST-PCB-POINTER          POINTER.

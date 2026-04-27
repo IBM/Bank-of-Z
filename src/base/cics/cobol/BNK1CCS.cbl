@@ -94,6 +94,16 @@
 
        01 WS-ABCODE PIC XXXX.
 
+       01 WS-EMAIL-VALIDATION.
+          03 WS-EMAIL-WORK             PIC X(60).
+          03 WS-AT-COUNT               PIC 99 VALUE 0.
+          03 WS-DOT-COUNT              PIC 99 VALUE 0.
+       01 WS-EMAIL-MESSAGES.
+          03 WS-EMAIL-REQUIRED-MSG     PIC X(35)
+             VALUE 'Please supply a valid email address'.
+          03 WS-EMAIL-INVALID-MSG      PIC X(21)
+             VALUE 'Invalid email format.'.
+
        01 WS-ADDR-SPLIT.
           03 WS-ADDR-SPLIT1            PIC X(60).
           03 WS-ADDR-SPLIT2            PIC X(60).
@@ -113,6 +123,7 @@
              05 SUBPGM-BIRTH-YEAR              PIC 9999.
           03 SUBPGM-CREDIT-SCORE               PIC 999.
           03 SUBPGM-CS-REVIEW-DATE             PIC 9(8).
+          03 SUBPGM-EMAIL                      PIC X(60).
           03 SUBPGM-SUCCESS                    PIC X.
           03 SUBPGM-FAIL-CODE                  PIC X.
 
@@ -486,6 +497,7 @@
            MOVE SPACES TO CUSTAD1I.
            MOVE SPACES TO CUSTAD2I.
            MOVE SPACES TO CUSTAD3I.
+           MOVE SPACES TO CUSTEMLI.
            MOVE 0 TO DOBDDI.
            MOVE 0 TO DOBMMI.
            MOVE 0 TO DOBYYI.
@@ -930,6 +942,41 @@
               GO TO ED999
            END-IF.
 
+      *
+      *    Validate the Email Address
+      *
+           MOVE SPACES TO WS-EMAIL-WORK.
+           MOVE ZERO   TO WS-AT-COUNT
+                          WS-DOT-COUNT.
+
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO WS-EMAIL-WORK
+              INSPECT WS-EMAIL-WORK REPLACING ALL LOW-VALUE BY ' '
+              INSPECT WS-EMAIL-WORK REPLACING ALL '_' BY ' '
+           END-IF
+
+           IF WS-EMAIL-WORK = SPACES
+              MOVE SPACES TO MESSAGEO
+              MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
+              MOVE 'N' TO VALID-DATA-SW
+              MOVE -1 TO CUSTEMLL
+              GO TO ED999
+           END-IF
+
+           INSPECT WS-EMAIL-WORK TALLYING WS-AT-COUNT
+              FOR ALL '@'
+           INSPECT WS-EMAIL-WORK TALLYING WS-DOT-COUNT
+              FOR ALL '.'
+
+           IF WS-AT-COUNT NOT = 1
+           OR WS-DOT-COUNT = 0
+              MOVE SPACES TO MESSAGEO
+              MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
+              MOVE 'N' TO VALID-DATA-SW
+              MOVE -1 TO CUSTEMLL
+              GO TO ED999
+           END-IF.
+
        ED999.
            EXIT.
 
@@ -972,6 +1019,13 @@
            MOVE DOBDDI TO SUBPGM-BIRTH-DAY.
            MOVE DOBMMI TO SUBPGM-BIRTH-MONTH.
            MOVE DOBYYI TO SUBPGM-BIRTH-YEAR.
+
+           MOVE SPACES TO SUBPGM-EMAIL.
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO SUBPGM-EMAIL
+              INSPECT SUBPGM-EMAIL REPLACING ALL LOW-VALUE BY ' '
+              INSPECT SUBPGM-EMAIL REPLACING ALL '_' BY ' '
+           END-IF
 
            EXEC CICS LINK
               PROGRAM('CRECUST')

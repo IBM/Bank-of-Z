@@ -13,6 +13,6 @@
                 CUSTOMER_ADDRESS               CHAR(160),
                 CUSTOMER_DATE_OF_BIRTH         INTEGER,
                 CUSTOMER_CREDIT_SCORE          SMALLINT,
-                CUSTOMER_CS_REVIEW_DATE        INTEGER )
+                CUSTOMER_CS_REVIEW_DATE        INTEGER,
+                CUSTOMER_EMAIL                 CHAR(60) )
            END-EXEC.
-

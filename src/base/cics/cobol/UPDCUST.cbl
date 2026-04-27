@@ -59,6 +59,7 @@
           03 HV-CUSTOMER-NUMBER         PIC X(10).
           03 HV-CUSTOMER-NAME           PIC X(60).
           03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
@@ -264,6 +265,7 @@
                      CUSTOMER_NUMBER,
                      CUSTOMER_NAME,
                      CUSTOMER_ADDRESS,
+                     CUSTOMER_EMAIL,
                      CUSTOMER_DATE_OF_BIRTH,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
@@ -272,6 +274,7 @@
                      :HV-CUSTOMER-NUMBER,
                      :HV-CUSTOMER-NAME,
                      :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-DOB,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
@@ -317,13 +320,16 @@
               MOVE COMM-NAME TO HV-CUSTOMER-NAME
            END-IF.
 
+           MOVE COMM-EMAIL TO HV-CUSTOMER-EMAIL.
+
       *
       *    Update the customer record in DB2
       *
            EXEC SQL
               UPDATE CUSTOMER
                  SET CUSTOMER_NAME = :HV-CUSTOMER-NAME,
-                     CUSTOMER_ADDRESS = :HV-CUSTOMER-ADDRESS
+                     CUSTOMER_ADDRESS = :HV-CUSTOMER-ADDRESS,
+                     CUSTOMER_EMAIL = :HV-CUSTOMER-EMAIL
                WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
                  AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
@@ -348,6 +354,7 @@
            MOVE HV-CUSTOMER-NUMBER TO COMM-CUSTNO.
            MOVE HV-CUSTOMER-NAME TO COMM-NAME.
            MOVE HV-CUSTOMER-ADDRESS TO COMM-ADDR.
+           MOVE HV-CUSTOMER-EMAIL TO COMM-EMAIL.
            MOVE HV-CUSTOMER-DOB TO COMM-DOB.
            MOVE HV-CUSTOMER-CREDIT-SCORE TO COMM-CREDIT-SCORE.
            MOVE HV-CUSTOMER-CS-REVIEW-DATE TO COMM-CS-REVIEW-DATE.

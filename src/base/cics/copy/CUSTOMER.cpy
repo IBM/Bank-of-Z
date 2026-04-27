@@ -32,3 +32,4 @@
                  07 CUSTOMER-CS-REVIEW-DAY           PIC 99.
                  07 CUSTOMER-CS-REVIEW-MONTH         PIC 99.
                  07 CUSTOMER-CS-REVIEW-YEAR          PIC 9999.
+              05 CUSTOMER-EMAIL                      PIC X(60).

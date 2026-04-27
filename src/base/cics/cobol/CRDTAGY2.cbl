@@ -55,6 +55,7 @@
              05 WS-CONT-IN-BIRTH-YEAR   PIC 9999.
           03 WS-CONT-IN-CREDIT-SCORE    PIC 999.
           03 WS-CONT-IN-CS-REVIEW-DATE  PIC 9(8).
+          03 WS-CONT-IN-EMAIL           PIC X(60).
           03 WS-CONT-IN-SUCCESS         PIC X.
           03 WS-CONT-IN-FAIL-CODE       PIC X.
 

@@ -96,8 +96,9 @@
 
        01 WS-EMAIL-VALIDATION.
           03 WS-EMAIL-WORK             PIC X(60).
-          03 WS-AT-COUNT               PIC 99 VALUE 0.
-          03 WS-DOT-COUNT              PIC 99 VALUE 0.
+       01 WS-EMAIL-COMMAREA.
+           COPY EMLVALID.
+       01 WS-EMAIL-COMMAREA-LEN        PIC S9(4) COMP VALUE 0.
        01 WS-EMAIL-MESSAGES.
           03 WS-EMAIL-REQUIRED-MSG     PIC X(35)
              VALUE 'Please supply a valid email address'.
@@ -945,33 +946,15 @@
       *
       *    Validate the Email Address
       *
-           MOVE SPACES TO WS-EMAIL-WORK.
-           MOVE ZERO   TO WS-AT-COUNT
-                          WS-DOT-COUNT.
+           PERFORM CALL-EMAIL-VALIDATOR.
 
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO WS-EMAIL-WORK
-              INSPECT WS-EMAIL-WORK REPLACING ALL LOW-VALUE BY ' '
-              INSPECT WS-EMAIL-WORK REPLACING ALL '_' BY ' '
-           END-IF
-
-           IF WS-EMAIL-WORK = SPACES
+           IF EMLVALID-EMAIL-INVALID
               MOVE SPACES TO MESSAGEO
-              MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
-              MOVE 'N' TO VALID-DATA-SW
-              MOVE -1 TO CUSTEMLL
-              GO TO ED999
-           END-IF
-
-           INSPECT WS-EMAIL-WORK TALLYING WS-AT-COUNT
-              FOR ALL '@'
-           INSPECT WS-EMAIL-WORK TALLYING WS-DOT-COUNT
-              FOR ALL '.'
-
-           IF WS-AT-COUNT NOT = 1
-           OR WS-DOT-COUNT = 0
-              MOVE SPACES TO MESSAGEO
-              MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
+              IF EMLVALID-MISSING-EMAIL
+                 MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
+              ELSE
+                 MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
+              END-IF
               MOVE 'N' TO VALID-DATA-SW
               MOVE -1 TO CUSTEMLL
               GO TO ED999
@@ -1021,11 +1004,7 @@
            MOVE DOBYYI TO SUBPGM-BIRTH-YEAR.
 
            MOVE SPACES TO SUBPGM-EMAIL.
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO SUBPGM-EMAIL
-              INSPECT SUBPGM-EMAIL REPLACING ALL LOW-VALUE BY ' '
-              INSPECT SUBPGM-EMAIL REPLACING ALL '_' BY ' '
-           END-IF
+           MOVE WS-EMAIL-WORK TO SUBPGM-EMAIL.
 
            EXEC CICS LINK
               PROGRAM('CRECUST')
@@ -1147,6 +1126,39 @@
                                       TO SCRDTYYO.
 
        CCD999.
+           EXIT.
+
+
+       CALL-EMAIL-VALIDATOR SECTION.
+       CEV010.
+
+           MOVE SPACES TO WS-EMAIL-WORK.
+           INITIALIZE WS-EMAIL-COMMAREA.
+           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
+
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO EMLVALID-EMAIL
+           END-IF.
+
+           MOVE LENGTH OF WS-EMAIL-COMMAREA
+              TO WS-EMAIL-COMMAREA-LEN.
+
+           EXEC CICS LINK
+              PROGRAM('EMLVALID')
+              COMMAREA(WS-EMAIL-COMMAREA)
+              LENGTH(WS-EMAIL-COMMAREA-LEN)
+              RESP(WS-CICS-RESP)
+              RESP2(WS-CICS-RESP2)
+           END-EXEC.
+
+           IF WS-CICS-RESP = DFHRESP(NORMAL)
+              MOVE EMLVALID-EMAIL TO WS-EMAIL-WORK
+           ELSE
+              SET EMLVALID-EMAIL-INVALID TO TRUE
+              SET EMLVALID-BAD-FORMAT TO TRUE
+           END-IF.
+
+       CEV999.
            EXIT.
 
 

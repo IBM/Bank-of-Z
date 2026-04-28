@@ -175,8 +175,9 @@
 
        01 WS-EMAIL-VALIDATION.
           03 WS-EMAIL-WORK            PIC X(60).
-          03 WS-AT-COUNT              PIC 99 VALUE 0.
-          03 WS-DOT-COUNT             PIC 99 VALUE 0.
+       01 WS-EMAIL-COMMAREA.
+           COPY EMLVALID.
+       01 WS-EMAIL-COMMAREA-LEN       PIC S9(4) COMP VALUE 0.
        01 WS-EMAIL-MESSAGES.
           03 WS-EMAIL-REQUIRED-MSG    PIC X(35)
              VALUE 'Please supply a valid email address'.
@@ -811,33 +812,15 @@
       *
       *    Validate the Email Address
       *
-           MOVE SPACES TO WS-EMAIL-WORK.
-           MOVE ZERO   TO WS-AT-COUNT
-                          WS-DOT-COUNT.
+           PERFORM CALL-EMAIL-VALIDATOR.
 
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO WS-EMAIL-WORK
-              INSPECT WS-EMAIL-WORK REPLACING ALL LOW-VALUE BY ' '
-              INSPECT WS-EMAIL-WORK REPLACING ALL '_' BY ' '
-           END-IF
-
-           IF WS-EMAIL-WORK = SPACES
+           IF EMLVALID-EMAIL-INVALID
               MOVE SPACES TO MESSAGEO
-              MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
-              MOVE 'N' TO VALID-DATA-SW
-              MOVE -1 TO CUSTEMLL
-              GO TO ED2999
-           END-IF
-
-           INSPECT WS-EMAIL-WORK TALLYING WS-AT-COUNT
-              FOR ALL '@'
-           INSPECT WS-EMAIL-WORK TALLYING WS-DOT-COUNT
-              FOR ALL '.'
-
-           IF WS-AT-COUNT NOT = 1
-           OR WS-DOT-COUNT = 0
-              MOVE SPACES TO MESSAGEO
-              MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
+              IF EMLVALID-MISSING-EMAIL
+                 MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
+              ELSE
+                 MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
+              END-IF
               MOVE 'N' TO VALID-DATA-SW
               MOVE -1 TO CUSTEMLL
            END-IF.
@@ -872,6 +855,39 @@
            END-IF.
 
        VD999.
+           EXIT.
+
+
+       CALL-EMAIL-VALIDATOR SECTION.
+       CEV010.
+
+           MOVE SPACES TO WS-EMAIL-WORK.
+           INITIALIZE WS-EMAIL-COMMAREA.
+           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
+
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO EMLVALID-EMAIL
+           END-IF.
+
+           MOVE LENGTH OF WS-EMAIL-COMMAREA
+              TO WS-EMAIL-COMMAREA-LEN.
+
+           EXEC CICS LINK
+              PROGRAM('EMLVALID')
+              COMMAREA(WS-EMAIL-COMMAREA)
+              LENGTH(WS-EMAIL-COMMAREA-LEN)
+              RESP(WS-CICS-RESP)
+              RESP2(WS-CICS-RESP2)
+           END-EXEC.
+
+           IF WS-CICS-RESP = DFHRESP(NORMAL)
+              MOVE EMLVALID-EMAIL TO WS-EMAIL-WORK
+           ELSE
+              SET EMLVALID-EMAIL-INVALID TO TRUE
+              SET EMLVALID-BAD-FORMAT TO TRUE
+           END-IF.
+
+       CEV999.
            EXIT.
 
 
@@ -1211,13 +1227,7 @@
            MOVE COMM-CS-REVIEW-UPD-9
               TO COMM-CS-REVIEW-DATE OF UPDCUST-COMMAREA.
            MOVE SPACES TO COMM-EMAIL OF UPDCUST-COMMAREA.
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO COMM-EMAIL OF UPDCUST-COMMAREA
-              INSPECT COMM-EMAIL OF UPDCUST-COMMAREA
-                 REPLACING ALL LOW-VALUE BY ' '
-              INSPECT COMM-EMAIL OF UPDCUST-COMMAREA
-                 REPLACING ALL '_' BY ' '
-           END-IF
+           MOVE WS-EMAIL-WORK TO COMM-EMAIL OF UPDCUST-COMMAREA.
 
            MOVE SPACE TO COMM-UPD-SUCCESS.
            MOVE SPACE TO COMM-UPD-FAIL-CD.

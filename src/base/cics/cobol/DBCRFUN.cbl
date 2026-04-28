@@ -656,6 +656,9 @@
 
 
        GET-ME-OUT-OF-HERE SECTION.
+           EXEC CICS SIGNAL EVENT('PAY') 
+           FROM(DFHCOMMAREA)
+           END-EXEC.
        GMOOH010.
            EXEC CICS RETURN
            END-EXEC.

@@ -247,6 +247,7 @@
           03 FILLER                     PIC X(9)      VALUE 'Sir'.
           03 FILLER                     PIC X(9)      VALUE 'Lady'.
           03 FILLER                     PIC X(9)      VALUE 'Lady'.
+       77 WS-POSTCODE-NUM                 PIC 9(4).
 
 
        01 TITLE-NUMBER                  PIC S9(9) BINARY.
@@ -532,27 +533,23 @@
                    COMPUTE TOWN-PTR =((TOWN-COUNT - 1)
                       * FUNCTION RANDOM) + 1
 
-                   MOVE SPACES TO CUSTOMER-TITLE
-                   MOVE SPACES TO CUSTOMER-FIRST-NAME
-                   MOVE SPACES TO CUSTOMER-LAST-NAME
+                   MOVE SPACES TO CUSTOMER-NAME
                    MOVE SPACES TO CUSTOMER-EMAIL
                    MOVE SPACES TO CUSTOMER-PHONE
-                   MOVE SPACES TO CUSTOMER-ADDR-LINE1
-                   MOVE SPACES TO CUSTOMER-ADDR-LINE2
-                   MOVE SPACES TO CUSTOMER-CITY
-                   MOVE SPACES TO CUSTOMER-POSTCODE
-                   MOVE SPACES TO CUSTOMER-COUNTRY
+                   MOVE SPACES TO CUSTOMER-ADDRESS
                    MOVE SPACES TO CUSTOMER-STATUS
 
                    MOVE TITLE-WORD(TITLE-NUMBER) TO CUSTOMER-TITLE
+                      OF CUSTOMER-NAME
                    
                    STRING FORENAME(FORENAMES-PTR) DELIMITED BY SPACE
                           ' ' DELIMITED BY SIZE
                           INITIAL-CHARACTER(INITIALS-PTR) DELIMITED BY
                       SPACE
-                      INTO CUSTOMER-FIRST-NAME
+                      INTO CUSTOMER-FIRST-NAME OF CUSTOMER-NAME
                    
                    MOVE SURNAME(SURNAMES-PTR) TO CUSTOMER-LAST-NAME
+                      OF CUSTOMER-NAME
                    
                    STRING
                       HOUSE-NUMBER DELIMITED BY SIZE
@@ -562,17 +559,29 @@
                       ' ' DELIMITED BY SIZE
                       STREET-NAME-ROAD(STREET-NAME-R-PTR)
                       DELIMITED BY SPACE
-                      INTO CUSTOMER-ADDR-LINE1
+                      INTO CUSTOMER-ADDR-LINE1 OF CUSTOMER-ADDRESS
                    
                    MOVE TOWN(TOWN-PTR) TO CUSTOMER-CITY
-                   MOVE 'ACTIVE' TO CUSTOMER-STATUS
+                      OF CUSTOMER-ADDRESS
+                   
+      *            Generate random UK-style postcode (e.g., SW1A 1AA)
+                   COMPUTE WS-POSTCODE-NUM =
+                      ((9999 - 1000) * FUNCTION RANDOM) + 1000
+                   STRING 'SW' DELIMITED BY SIZE
+                          WS-POSTCODE-NUM DELIMITED BY SIZE
+                          ' 1AA' DELIMITED BY SIZE
+                      INTO CUSTOMER-POSTCODE OF CUSTOMER-ADDRESS
+                   END-STRING
+                   
                    MOVE 'United Kingdom' TO CUSTOMER-COUNTRY
+                      OF CUSTOMER-ADDRESS
+                   MOVE 'ACTIVE' TO CUSTOMER-STATUS
 
-                   COMPUTE CUSTOMER-BIRTH-DAY =((28 - 1)
+                   COMPUTE CUSTOMER-DOB-DAY =((28 - 1)
                       * FUNCTION RANDOM) + 1
-                   COMPUTE CUSTOMER-BIRTH-MONTH =((12 - 1)
+                   COMPUTE CUSTOMER-DOB-MONTH =((12 - 1)
                       * FUNCTION RANDOM) + 1
-                   COMPUTE CUSTOMER-BIRTH-YEAR =((2000 - 1900)
+                   COMPUTE CUSTOMER-DOB-YEAR =((2000 - 1900)
                       * FUNCTION RANDOM) + 1900
 
                    MOVE SORTCODE TO
@@ -608,6 +617,16 @@
                       CUSTOMER-CS-REVIEW-DAY
 
       *
+      *        Set the customer created date to today's date
+      *
+                   MOVE WS-CURRENT-DATE-9(1:4) TO
+                      CUSTOMER-CREATED-YEAR OF CUSTOMER-CREATED-DATE
+                   MOVE WS-CURRENT-DATE-9(5:2) TO
+                      CUSTOMER-CREATED-MONTH OF CUSTOMER-CREATED-DATE
+                   MOVE WS-CURRENT-DATE-9(7:2) TO
+                      CUSTOMER-CREATED-DAY OF CUSTOMER-CREATED-DATE
+
+      *
       * Populate host variables for DB2 INSERT
       *
                    MOVE 'CUST' TO HV-CUSTOMER-EYECATCHER
@@ -624,15 +643,24 @@
                    MOVE CUSTOMER-POSTCODE TO HV-CUSTOMER-POSTCODE
                    MOVE CUSTOMER-COUNTRY TO HV-CUSTOMER-COUNTRY
                    MOVE CUSTOMER-STATUS TO HV-CUSTOMER-STATUS
-                   MOVE CUSTOMER-CREATED-DATE TO HV-CUSTOMER-CREATE-DATE
 
       *
       * Convert date of birth to INTEGER format (YYYYMMDD)
       *
                    COMPUTE HV-CUSTOMER-DOB =
-                      (CUSTOMER-BIRTH-YEAR * 10000) +
-                      (CUSTOMER-BIRTH-MONTH * 100) +
-                      CUSTOMER-BIRTH-DAY
+                      (CUSTOMER-DOB-YEAR OF CUSTOMER-DOB * 10000) +
+                      (CUSTOMER-DOB-MONTH OF CUSTOMER-DOB * 100) +
+                      CUSTOMER-DOB-DAY OF CUSTOMER-DOB
+
+      *
+      * Convert created date to INTEGER format (YYYYMMDD)
+      *
+                   COMPUTE HV-CUSTOMER-CREATE-DATE =
+                      (CUSTOMER-CREATED-YEAR OF CUSTOMER-CREATED-DATE
+                         * 10000) +
+                      (CUSTOMER-CREATED-MONTH OF CUSTOMER-CREATED-DATE
+                         * 100) +
+                      CUSTOMER-CREATED-DAY OF CUSTOMER-CREATED-DATE
 
                    MOVE CUSTOMER-CREDIT-SCORE TO
                       HV-CUSTOMER-CREDIT-SCORE
@@ -1074,16 +1102,16 @@
            MOVE WS-ACCOUNT-OPENED-MONTH TO HV-ACCOUNT-OPENED-MONTH.
            COMPUTE WS-ACCOUNT-OPENED-YEAR
               =((2014 -
-              CUSTOMER-BIRTH-YEAR)
+              CUSTOMER-DOB-YEAR OF CUSTOMER-DOB)
               * FUNCTION RANDOM) +
-              CUSTOMER-BIRTH-YEAR.
+              CUSTOMER-DOB-YEAR OF CUSTOMER-DOB.
            MOVE WS-ACCOUNT-OPENED-YEAR TO HV-ACCOUNT-OPENED-YEAR.
       D    DISPLAY 'DATE OF BIRTH IS '
-      D             CUSTOMER-BIRTH-DAY
+      D             CUSTOMER-DOB-DAY OF CUSTOMER-DOB
       D             '/'
-      D             CUSTOMER-BIRTH-MONTH
+      D             CUSTOMER-DOB-MONTH OF CUSTOMER-DOB
       D             '/'
-      D             CUSTOMER-BIRTH-YEAR
+      D             CUSTOMER-DOB-YEAR OF CUSTOMER-DOB
 
       D    DISPLAY 'ACCOUNT OPENED  '
       D             HV-ACCOUNT-OPENED-DAY
@@ -1094,15 +1122,18 @@
 
            ADD 1 TO OPENED-DATE-ATTEMPTS GIVING OPENED-DATE-ATTEMPTS.
            IF HV-ACCOUNT-OPENED-YEAR
-              > CUSTOMER-BIRTH-YEAR
+              > CUSTOMER-DOB-YEAR OF CUSTOMER-DOB
               MOVE 'Y' TO OPENED-DATE-VALID
               GO TO GOD999
            END-IF.
            IF OPENED-DATE-ATTEMPTS > 100
               MOVE 'Y' TO OPENED-DATE-VALID
-              MOVE CUSTOMER-BIRTH-DAY TO HV-ACCOUNT-OPENED-DAY
-              MOVE CUSTOMER-BIRTH-MONTH TO HV-ACCOUNT-OPENED-MONTH
-              MOVE CUSTOMER-BIRTH-YEAR TO HV-ACCOUNT-OPENED-YEAR
+              MOVE CUSTOMER-DOB-DAY OF CUSTOMER-DOB
+                   TO HV-ACCOUNT-OPENED-DAY
+              MOVE CUSTOMER-DOB-MONTH OF CUSTOMER-DOB
+                   TO HV-ACCOUNT-OPENED-MONTH
+              MOVE CUSTOMER-DOB-YEAR OF CUSTOMER-DOB
+                   TO HV-ACCOUNT-OPENED-YEAR
            END-IF.
        GOD999.
            EXIT.

@@ -3,10 +3,10 @@ services:
   zosConnect:
     image: icr.io/zosconnect/ibm-zcon-designer:3.0.101
     environment:
-      - CICS_USER=
-      - CICS_PASSWORD=
-      - CICS_HOST=
-      - CICS_PORT=
+      - CICS_USER=IBMUSER
+      - CICS_PASSWORD=welcome0
+      - CICS_HOST=9.47.80.80
+      - CICS_PORT=27114
       - HTTP_PORT=9080
       - zosconnect_remote_download_allowlist=BLOCK_ALL
     ports:

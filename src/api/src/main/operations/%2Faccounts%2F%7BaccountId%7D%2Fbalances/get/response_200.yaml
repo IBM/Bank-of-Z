@@ -7,18 +7,16 @@ mappings:
         required: true
         nullable: false
         foreach:
-          input: "[$zosAssetResponse.commarea.\"INQACC-COMMAREA\" ]"
+          input: "[{\"balanceType\": \"AVAILABLE\", \"amount\": $zosAssetResponse.commarea.\"\
+            INQACC-COMMAREA\".\"INQACC-AVAIL-BAL\" }, {\"balanceType\":\"CURRENT\"\
+            , \"amount\": $zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACTUAL-BAL\"\
+            \ }]"
           mappings:
           - balanceType:
               required: true
               nullable: false
-              template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-SUCCESS\"\
-                }}"
+              template: "$item.balanceType"
           - amount:
               required: true
               nullable: false
-              expression: "$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACTUAL-BAL\""
-          - currency:
-              required: true
-              nullable: false
-              template: "GBP"
+              expression: "$item.amount"

@@ -21,5 +21,6 @@
              05 COMM-CS-REVIEW-DD            PIC 99.
              05 COMM-CS-REVIEW-MM            PIC 99.
              05 COMM-CS-REVIEW-YYYY          PIC 9999.
+          03 COMM-EMAIL                      PIC X(60).
           03 COMM-SUCCESS                    PIC X.
           03 COMM-FAIL-CODE                  PIC X.

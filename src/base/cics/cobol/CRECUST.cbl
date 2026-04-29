@@ -70,6 +70,7 @@
           03 HV-CUSTOMER-NUMBER         PIC X(10).
           03 HV-CUSTOMER-NAME           PIC X(60).
           03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
@@ -266,6 +267,7 @@
           03 WS-CHILD-DATA-CREDIT-SCORE PIC 999.
           03 WS-CHILD-DATA-CS-REVIEW-DATE
                                         PIC 9(8).
+          03 WS-CHILD-DATA-EMAIL        PIC X(60).
           03 WS-CHILD-DATA-SUCCESS      PIC X.
           03 WS-CHILD-DATA-FAIL-CODE    PIC X.
 
@@ -1003,7 +1005,8 @@
                                    TO WS-CONTAINER-NAME
                            END-EVALUATE
 
-                           MOVE 261 TO WS-CHILD-CONTAINER-LEN
+                           MOVE LENGTH OF WS-CHILD-DATA
+                              TO WS-CHILD-CONTAINER-LEN
 
                            EXEC CICS GET CONTAINER(WS-CONTAINER-NAME)
                                 CHANNEL(WS-ANY-CHILD-FETCH-CHAN)
@@ -1149,6 +1152,7 @@
            MOVE COMM-DATE-OF-BIRTH TO CUSTOMER-DATE-OF-BIRTH.
            MOVE COMM-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE.
            MOVE COMM-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE.
+           MOVE COMM-EMAIL TO CUSTOMER-EMAIL.
 
       *
       *    Populate host variables for DB2 INSERT
@@ -1158,6 +1162,7 @@
            MOVE WS-CUSTOMER-NO-NUM TO HV-CUSTOMER-NUMBER.
            MOVE COMM-NAME TO HV-CUSTOMER-NAME.
            MOVE COMM-ADDRESS TO HV-CUSTOMER-ADDRESS.
+           MOVE COMM-EMAIL TO HV-CUSTOMER-EMAIL.
            MOVE COMM-DATE-OF-BIRTH TO HV-CUSTOMER-DOB.
            MOVE COMM-CREDIT-SCORE TO HV-CUSTOMER-CREDIT-SCORE.
            MOVE COMM-CS-REVIEW-DATE TO HV-CUSTOMER-CS-REVIEW-DATE.
@@ -1187,6 +1192,7 @@
                   CUSTOMER_NUMBER,
                   CUSTOMER_NAME,
                   CUSTOMER_ADDRESS,
+                  CUSTOMER_EMAIL,
                   CUSTOMER_DATE_OF_BIRTH,
                   CUSTOMER_CREDIT_SCORE,
                   CUSTOMER_CS_REVIEW_DATE)
@@ -1196,6 +1202,7 @@
                   :HV-CUSTOMER-NUMBER,
                   :HV-CUSTOMER-NAME,
                   :HV-CUSTOMER-ADDRESS,
+                  :HV-CUSTOMER-EMAIL,
                   :HV-CUSTOMER-DOB,
                   :HV-CUSTOMER-CREDIT-SCORE,
                   :HV-CUSTOMER-CS-REVIEW-DATE)

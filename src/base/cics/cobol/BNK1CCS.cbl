@@ -94,6 +94,9 @@
 
        01 WS-ABCODE PIC XXXX.
 
+       01 WS-EMAIL-COMMAREA.
+           COPY EMLVALID.
+
        01 WS-ADDR-SPLIT.
           03 WS-ADDR-SPLIT1            PIC X(60).
           03 WS-ADDR-SPLIT2            PIC X(60).
@@ -113,6 +116,7 @@
              05 SUBPGM-BIRTH-YEAR              PIC 9999.
           03 SUBPGM-CREDIT-SCORE               PIC 999.
           03 SUBPGM-CS-REVIEW-DATE             PIC 9(8).
+          03 SUBPGM-EMAIL                      PIC X(60).
           03 SUBPGM-SUCCESS                    PIC X.
           03 SUBPGM-FAIL-CODE                  PIC X.
 
@@ -486,6 +490,7 @@
            MOVE SPACES TO CUSTAD1I.
            MOVE SPACES TO CUSTAD2I.
            MOVE SPACES TO CUSTAD3I.
+           MOVE SPACES TO CUSTEMLI.
            MOVE 0 TO DOBDDI.
            MOVE 0 TO DOBMMI.
            MOVE 0 TO DOBYYI.
@@ -930,6 +935,25 @@
               GO TO ED999
            END-IF.
 
+      *
+      *    Validate the Email Address
+      *
+           INITIALIZE WS-EMAIL-COMMAREA.
+           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
+
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO EMLVALID-EMAIL
+           END-IF.
+
+           CALL 'EMLVALID' USING WS-EMAIL-COMMAREA.
+
+           IF EMLVALID-EMAIL-INVALID
+              MOVE EMLVALID-MESSAGE TO MESSAGEO
+              MOVE 'N' TO VALID-DATA-SW
+              MOVE -1 TO CUSTEMLL
+              GO TO ED999
+           END-IF.
+
        ED999.
            EXIT.
 
@@ -972,6 +996,9 @@
            MOVE DOBDDI TO SUBPGM-BIRTH-DAY.
            MOVE DOBMMI TO SUBPGM-BIRTH-MONTH.
            MOVE DOBYYI TO SUBPGM-BIRTH-YEAR.
+
+           MOVE SPACES TO SUBPGM-EMAIL.
+           MOVE EMLVALID-EMAIL TO SUBPGM-EMAIL.
 
            EXEC CICS LINK
               PROGRAM('CRECUST')

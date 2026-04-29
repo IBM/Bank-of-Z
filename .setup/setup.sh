@@ -282,9 +282,9 @@ stage4_build_and_install() {
 #########################################################
 main() {
     echo ""
-    echo -e "${GREEN}╔════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║  Pipeline Simulation Environment Setup Script      ║${NC}"
-    echo -e "${GREEN}╚════════════════════════════════════════════════════╝${NC}"
+    echo -e "${GREEN}======================================================${NC}"
+    echo -e "${GREEN}=  Pipeline Simulation Environment Setup Script      =${NC}"
+    echo -e "${GREEN}======================================================${NC}"
     echo ""
     
     # Check prerequisites

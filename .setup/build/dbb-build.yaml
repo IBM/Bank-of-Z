@@ -42,11 +42,9 @@ lifecycles:
     tasks:
       - Start
       - ScannerInit
-      - MetadataInit
       - FullAnalysis
       - Languages    # Defined in Languages.yaml
       #- zOSConnect
-      - Package
       - Finish
 
   # build only programs impacted by changes to the application
@@ -89,7 +87,6 @@ lifecycles:
       - ImpactAnalysis
       - Languages    # Defined in Languages.yaml
       #- zOSConnect
-      - Package
       - Finish
 
   # build only changed programs on a topic branch which will be merged back into the main build branch
@@ -184,6 +181,7 @@ tasks:
 
     # create build package
   - task: Package
+    script: /u/ibmuser/dev/dbb/Pipeline/PackageBuildOutputs/PackageBuildOutputs.groovy
     condition: ${STATUS} == 2 || ${STATUS} == 0 # Skip task on build error or PREVIEW
     variables:
       - name: copyModeMappings

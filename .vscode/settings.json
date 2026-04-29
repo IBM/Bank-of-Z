@@ -1,0 +1,4 @@
+{
+  "grub.sshHost": "zconfig",
+  "grub.buildCommand": "./.setup/build.sh"
+}

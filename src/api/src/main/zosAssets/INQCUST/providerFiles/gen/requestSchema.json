@@ -1,149 +1,253 @@
 {
-  "$schema" : "http://json-schema.org/draft-04/schema#",
-  "type" : "object",
-  "properties" : {
-    "commarea" : {
-      "type" : "object",
-      "properties" : {
-        "INQCUSTZ" : {
-          "type" : "object",
-          "properties" : {
-            "INQCUST-EYE" : {
-              "maxLength" : 4,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-EYE PIC X(4) USAGE DISPLAY.",
-                "name" : "INQCUST-EYE"
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "commarea": {
+      "type": "object",
+      "properties": {
+        "INQCUSTZ": {
+          "type": "object",
+          "properties": {
+            "INQCUST-EYE": {
+              "maxLength": 4,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-EYE PIC X(4) USAGE DISPLAY.",
+                "name": "INQCUST-EYE"
               }
             },
-            "INQCUST-SCODE" : {
-              "maxLength" : 6,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-SCODE PIC X(6) USAGE DISPLAY.",
-                "name" : "INQCUST-SCODE"
+            "INQCUST-SCODE": {
+              "maxLength": 6,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-SCODE PIC X(6) USAGE DISPLAY.",
+                "name": "INQCUST-SCODE"
               }
             },
-            "INQCUST-CUSTNO" : {
-              "minimum" : 0,
-              "maximum" : 9999999999,
-              "type" : "integer",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-CUSTNO PIC 9(10) USAGE DISPLAY.",
-                "name" : "INQCUST-CUSTNO"
+            "INQCUST-CUSTNO": {
+              "minimum": 0,
+              "maximum": 9999999999,
+              "type": "integer",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-CUSTNO PIC 9(10) USAGE DISPLAY.",
+                "name": "INQCUST-CUSTNO"
               }
             },
-            "INQCUST-NAME" : {
-              "maxLength" : 60,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-NAME PIC X(60) USAGE DISPLAY.",
-                "name" : "INQCUST-NAME"
+            "INQCUST-TITLE": {
+              "maxLength": 10,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-TITLE PIC X(10) USAGE DISPLAY.",
+                "name": "INQCUST-TITLE"
               }
             },
-            "INQCUST-ADDR" : {
-              "maxLength" : 160,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-ADDR PIC X(160) USAGE DISPLAY.",
-                "name" : "INQCUST-ADDR"
+            "INQCUST-FIRST-NAME": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-FIRST-NAME PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-FIRST-NAME"
               }
             },
-            "INQCUST-DOB" : {
-              "type" : "object",
-              "properties" : {
-                "INQCUST-DOB-DD" : {
-                  "minimum" : 0,
-                  "maximum" : 99,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-DOB-DD PIC 9(2) USAGE DISPLAY.",
-                    "name" : "INQCUST-DOB-DD"
+            "INQCUST-LAST-NAME": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-LAST-NAME PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-LAST-NAME"
+              }
+            },
+            "INQCUST-DOB": {
+              "type": "object",
+              "properties": {
+                "INQCUST-DOB-DD": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-DOB-DD PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-DOB-DD"
                   }
                 },
-                "INQCUST-DOB-MM" : {
-                  "minimum" : 0,
-                  "maximum" : 99,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-DOB-MM PIC 9(2) USAGE DISPLAY.",
-                    "name" : "INQCUST-DOB-MM"
+                "INQCUST-DOB-MM": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-DOB-MM PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-DOB-MM"
                   }
                 },
-                "INQCUST-DOB-YYYY" : {
-                  "minimum" : 0,
-                  "maximum" : 9999,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-DOB-YYYY PIC 9(4) USAGE DISPLAY.",
-                    "name" : "INQCUST-DOB-YYYY"
+                "INQCUST-DOB-YYYY": {
+                  "minimum": 0,
+                  "maximum": 9999,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-DOB-YYYY PIC 9(4) USAGE DISPLAY.",
+                    "name": "INQCUST-DOB-YYYY"
                   }
                 }
               }
             },
-            "INQCUST-CREDIT-SCORE" : {
-              "minimum" : 0,
-              "maximum" : 999,
-              "type" : "integer",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.",
-                "name" : "INQCUST-CREDIT-SCORE"
+            "INQCUST-EMAIL": {
+              "maxLength": 100,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-EMAIL PIC X(100) USAGE DISPLAY.",
+                "name": "INQCUST-EMAIL"
               }
             },
-            "INQCUST-CS-REVIEW-DT" : {
-              "type" : "object",
-              "properties" : {
-                "INQCUST-CS-REVIEW-DD" : {
-                  "minimum" : 0,
-                  "maximum" : 99,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-CS-REVIEW-DD PIC 9(2) USAGE DISPLAY.",
-                    "name" : "INQCUST-CS-REVIEW-DD"
+            "INQCUST-PHONE": {
+              "maxLength": 20,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-PHONE PIC X(20) USAGE DISPLAY.",
+                "name": "INQCUST-PHONE"
+              }
+            },
+            "INQCUST-ADDR-LINE1": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-ADDR-LINE1 PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-ADDR-LINE1"
+              }
+            },
+            "INQCUST-ADDR-LINE2": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-ADDR-LINE2 PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-ADDR-LINE2"
+              }
+            },
+            "INQCUST-CITY": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-CITY PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-CITY"
+              }
+            },
+            "INQCUST-POSTCODE": {
+              "maxLength": 10,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-POSTCODE PIC X(10) USAGE DISPLAY.",
+                "name": "INQCUST-POSTCODE"
+              }
+            },
+            "INQCUST-COUNTRY": {
+              "maxLength": 50,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-COUNTRY PIC X(50) USAGE DISPLAY.",
+                "name": "INQCUST-COUNTRY"
+              }
+            },
+            "INQCUST-STATUS": {
+              "maxLength": 10,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-STATUS PIC X(10) USAGE DISPLAY.",
+                "name": "INQCUST-STATUS"
+              }
+            },
+            "INQCUST-CREATED-DATE": {
+              "type": "object",
+              "properties": {
+                "INQCUST-CREATED-DD": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CREATED-DD PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-CREATED-DD"
                   }
                 },
-                "INQCUST-CS-REVIEW-MM" : {
-                  "minimum" : 0,
-                  "maximum" : 99,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-CS-REVIEW-MM PIC 9(2) USAGE DISPLAY.",
-                    "name" : "INQCUST-CS-REVIEW-MM"
+                "INQCUST-CREATED-MM": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CREATED-MM PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-CREATED-MM"
                   }
                 },
-                "INQCUST-CS-REVIEW-YYYY" : {
-                  "minimum" : 0,
-                  "maximum" : 9999,
-                  "type" : "integer",
-                  "x-ibm-zcon-metadata" : {
-                    "type" : "05 INQCUST-CS-REVIEW-YYYY PIC 9(4) USAGE DISPLAY.",
-                    "name" : "INQCUST-CS-REVIEW-YYYY"
+                "INQCUST-CREATED-YYYY": {
+                  "minimum": 0,
+                  "maximum": 9999,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CREATED-YYYY PIC 9(4) USAGE DISPLAY.",
+                    "name": "INQCUST-CREATED-YYYY"
                   }
                 }
               }
             },
-            "INQCUST-INQ-SUCCESS" : {
-              "maxLength" : 1,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-INQ-SUCCESS PIC X USAGE DISPLAY.",
-                "name" : "INQCUST-INQ-SUCCESS"
+            "INQCUST-CREDIT-SCORE": {
+              "minimum": 0,
+              "maximum": 999,
+              "type": "integer",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.",
+                "name": "INQCUST-CREDIT-SCORE"
               }
             },
-            "INQCUST-INQ-FAIL-CD" : {
-              "maxLength" : 1,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-INQ-FAIL-CD PIC X USAGE DISPLAY.",
-                "name" : "INQCUST-INQ-FAIL-CD"
+            "INQCUST-CS-REVIEW-DT": {
+              "type": "object",
+              "properties": {
+                "INQCUST-CS-REVIEW-DD": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CS-REVIEW-DD PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-CS-REVIEW-DD"
+                  }
+                },
+                "INQCUST-CS-REVIEW-MM": {
+                  "minimum": 0,
+                  "maximum": 99,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CS-REVIEW-MM PIC 9(2) USAGE DISPLAY.",
+                    "name": "INQCUST-CS-REVIEW-MM"
+                  }
+                },
+                "INQCUST-CS-REVIEW-YYYY": {
+                  "minimum": 0,
+                  "maximum": 9999,
+                  "type": "integer",
+                  "x-ibm-zcon-metadata": {
+                    "type": "05 INQCUST-CS-REVIEW-YYYY PIC 9(4) USAGE DISPLAY.",
+                    "name": "INQCUST-CS-REVIEW-YYYY"
+                  }
+                }
               }
             },
-            "INQCUST-PCB-POINTER" : {
-              "maxLength" : 4,
-              "type" : "string",
-              "x-ibm-zcon-metadata" : {
-                "type" : "03 INQCUST-PCB-POINTER PIC X(4) USAGE DISPLAY.",
-                "name" : "INQCUST-PCB-POINTER"
+            "INQCUST-INQ-SUCCESS": {
+              "maxLength": 1,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-INQ-SUCCESS PIC X USAGE DISPLAY.",
+                "name": "INQCUST-INQ-SUCCESS"
+              }
+            },
+            "INQCUST-INQ-FAIL-CD": {
+              "maxLength": 1,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-INQ-FAIL-CD PIC X USAGE DISPLAY.",
+                "name": "INQCUST-INQ-FAIL-CD"
+              }
+            },
+            "INQCUST-PCB-POINTER": {
+              "maxLength": 4,
+              "type": "string",
+              "x-ibm-zcon-metadata": {
+                "type": "03 INQCUST-PCB-POINTER PIC X(4) USAGE DISPLAY.",
+                "name": "INQCUST-PCB-POINTER"
               }
             }
           }
@@ -151,6 +255,8 @@
       }
     }
   },
-  "required" : [ "commarea" ],
-  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+  "required": [
+    "commarea"
+  ],
+  "description": "General wrapper for CICS COMMAREA z/OS Asset requests"
 }

@@ -117,7 +117,7 @@
           03 COMM-ADDR-UPD3           PIC X(40).
 
        01 INQCUST-COMMAREA.
-           COPY INQCUST.
+           COPY INQCUSTZ.
 
        01 DELCUS-COMMAREA.
            COPY DELCUS.
@@ -130,9 +130,19 @@
           03 WS-COMM-EYE              PIC X(4).
           03 WS-COMM-SCODE            PIC X(6).
           03 WS-COMM-CUSTNO           PIC X(10).
-          03 WS-COMM-NAME             PIC X(60).
-          03 WS-COMM-ADDR             PIC X(160).
+          03 WS-COMM-TITLE            PIC X(10).
+          03 WS-COMM-FIRST-NAME       PIC X(50).
+          03 WS-COMM-LAST-NAME        PIC X(50).
           03 WS-COMM-DOB              PIC 9(8).
+          03 WS-COMM-EMAIL            PIC X(100).
+          03 WS-COMM-PHONE            PIC X(20).
+          03 WS-COMM-ADDR-LINE1       PIC X(50).
+          03 WS-COMM-ADDR-LINE2       PIC X(50).
+          03 WS-COMM-CITY             PIC X(50).
+          03 WS-COMM-POSTCODE         PIC X(10).
+          03 WS-COMM-COUNTRY          PIC X(50).
+          03 WS-COMM-STATUS           PIC X(10).
+          03 WS-COMM-CREATED-DATE     PIC 9(8).
           03 WS-COMM-CREDIT-SCORE     PIC 9(3).
           03 WS-COMM-CS-REVIEW-DATE   PIC 9(8).
           03 WS-COMM-DEL-SUCCESS      PIC X.
@@ -141,6 +151,10 @@
 
        01 WS-VALIDATE-NAME            PIC X(60)  VALUE ' '.
        01 WS-UNSTR-TITLE              PIC X(9)   VALUE ' '.
+       01 WS-LAST-SPACE-POS           PIC 99     VALUE 0.
+       01 WS-NAME-INDEX               PIC 99     VALUE 0.
+       01 WS-TEMP-NAME                PIC X(60)  VALUE SPACES.
+       01 WS-FIRST-NAME-LEN           PIC 99     VALUE 0.
        01 WS-TITLE-VALID              PIC X      VALUE ' '.
 
        COPY DFHBMSCA.
@@ -180,9 +194,19 @@
           03 COMM-EYE                 PIC X(4).
           03 COMM-SCODE               PIC X(6).
           03 COMM-CUSTNO              PIC X(10).
-          03 COMM-NAME                PIC X(60).
-          03 COMM-ADDR                PIC X(160).
+          03 COMM-TITLE               PIC X(10).
+          03 COMM-FIRST-NAME          PIC X(50).
+          03 COMM-LAST-NAME           PIC X(50).
           03 COMM-DOB                 PIC 9(8).
+          03 COMM-EMAIL               PIC X(100).
+          03 COMM-PHONE               PIC X(20).
+          03 COMM-ADDR-LINE1          PIC X(50).
+          03 COMM-ADDR-LINE2          PIC X(50).
+          03 COMM-CITY                PIC X(50).
+          03 COMM-POSTCODE            PIC X(10).
+          03 COMM-COUNTRY             PIC X(50).
+          03 COMM-STATUS              PIC X(10).
+          03 COMM-CREATED-DATE        PIC 9(8).
           03 COMM-CREDIT-SCORE        PIC 9(3).
           03 COMM-CS-REVIEW-DATE      PIC 9(8).
           03 COMM-DEL-SUCCESS         PIC X.
@@ -315,11 +339,23 @@
       *
            IF EIBCALEN NOT = ZERO
               MOVE COMM-TERM OF DFHCOMMAREA TO WS-COMM-TERM
+              MOVE COMM-TERM OF DFHCOMMAREA TO STORED-UCTRANS
               MOVE COMM-EYE OF DFHCOMMAREA TO WS-COMM-EYE
               MOVE COMM-SCODE OF DFHCOMMAREA TO WS-COMM-SCODE
               MOVE COMM-CUSTNO OF DFHCOMMAREA TO WS-COMM-CUSTNO
-              MOVE COMM-NAME OF DFHCOMMAREA TO WS-COMM-NAME
-              MOVE COMM-ADDR OF DFHCOMMAREA TO WS-COMM-ADDR
+              MOVE COMM-TITLE OF DFHCOMMAREA TO WS-COMM-TITLE
+              MOVE COMM-FIRST-NAME OF DFHCOMMAREA TO WS-COMM-FIRST-NAME
+              MOVE COMM-LAST-NAME OF DFHCOMMAREA TO WS-COMM-LAST-NAME
+              MOVE COMM-EMAIL OF DFHCOMMAREA TO WS-COMM-EMAIL
+              MOVE COMM-PHONE OF DFHCOMMAREA TO WS-COMM-PHONE
+              MOVE COMM-ADDR-LINE1 OF DFHCOMMAREA TO WS-COMM-ADDR-LINE1
+              MOVE COMM-ADDR-LINE2 OF DFHCOMMAREA TO WS-COMM-ADDR-LINE2
+              MOVE COMM-CITY OF DFHCOMMAREA TO WS-COMM-CITY
+              MOVE COMM-POSTCODE OF DFHCOMMAREA TO WS-COMM-POSTCODE
+              MOVE COMM-COUNTRY OF DFHCOMMAREA TO WS-COMM-COUNTRY
+              MOVE COMM-STATUS OF DFHCOMMAREA TO WS-COMM-STATUS
+              MOVE COMM-CREATED-DATE OF DFHCOMMAREA
+                 TO WS-COMM-CREATED-DATE
               MOVE COMM-DOB OF DFHCOMMAREA TO WS-COMM-DOB
               MOVE COMM-CREDIT-SCORE OF DFHCOMMAREA
                  TO WS-COMM-CREDIT-SCORE
@@ -331,7 +367,7 @@
            EXEC CICS
                 RETURN TRANSID('ODCS')
                 COMMAREA(WS-COMM-AREA)
-                LENGTH(266)
+                LENGTH(504)
                 RESP(WS-CICS-RESP)
                 RESP2(WS-CICS-RESP2)
                 END-EXEC.
@@ -715,12 +751,9 @@
 
       *
       *    Validate the amended data from the update starting with
-      *    Customer Name, this must have a valid title at the begining.
+      *    Customer Title, this must be a valid title.
       *
-           MOVE CUSTNAMI TO WS-VALIDATE-NAME.
-
-           UNSTRING WS-VALIDATE-NAME DELIMITED BY SPACE
-              INTO WS-UNSTR-TITLE.
+           MOVE CUSTTITLI TO WS-UNSTR-TITLE.
 
            MOVE ' ' TO WS-TITLE-VALID.
 
@@ -771,7 +804,7 @@
                      'Drs,Lord,Sir,Lady' DELIMITED BY SIZE
                  INTO MESSAGEO
               MOVE 'N' TO VALID-DATA-SW
-              MOVE -1 TO CUSTNAML
+              MOVE -1 TO CUSTTITLL
            END-IF.
 
       *
@@ -906,13 +939,16 @@
       *    Check to see if there was any data returned,
       *    if not output an error message
       *
-           IF INQCUST-NAME = SPACES AND INQCUST-ADDR = SPACES
+           IF INQCUST-FIRST-NAME = SPACES AND
+              INQCUST-LAST-NAME = SPACES AND
+              INQCUST-ADDR-LINE1 = SPACES
               MOVE SPACES TO MESSAGEO
               MOVE 'Sorry, but that customer number was not found.' TO
                  MESSAGEO
               MOVE 'N' TO VALID-DATA-SW
               MOVE SPACES TO SORTCO
-              MOVE SPACES TO CUSTNO2O CUSTNAMO
+              MOVE SPACES TO CUSTNO2O
+              MOVE SPACES TO CUSTTITLO CUSTFNAMO CUSTLNAMO
               MOVE SPACES TO CUSTAD1O CUSTAD2O CUSTAD3O
               MOVE SPACES TO DOBDDO DOBMMO DOBYYO
               MOVE SPACES TO CREDSCO SCRDTDDO SCRDTMMO SCRDTYYO
@@ -924,9 +960,18 @@
       *
            MOVE INQCUST-SCODE TO SORTCO.
            MOVE INQCUST-CUSTNO TO CUSTNO2O.
-           MOVE INQCUST-NAME TO CUSTNAMO.
+           MOVE INQCUST-TITLE TO CUSTTITLO.
+           MOVE INQCUST-FIRST-NAME TO CUSTFNAMO.
+           MOVE INQCUST-LAST-NAME TO CUSTLNAMO.
 
-           MOVE INQCUST-ADDR TO COMM-ADDR-SPLIT.
+           MOVE INQCUST-ADDR-LINE1 TO COMM-ADDR-SPLIT1.
+           MOVE INQCUST-ADDR-LINE2 TO COMM-ADDR-SPLIT2.
+           MOVE SPACES TO COMM-ADDR-SPLIT3
+           STRING INQCUST-CITY DELIMITED BY '  '
+                  ' ' DELIMITED BY SIZE
+                  INQCUST-POSTCODE DELIMITED BY '  '
+              INTO COMM-ADDR-SPLIT3
+           END-STRING.
            MOVE COMM-ADDR-SPLIT1 TO CUSTAD1O.
            MOVE COMM-ADDR-SPLIT2 TO CUSTAD2O.
            MOVE COMM-ADDR-SPLIT3 TO CUSTAD3O.
@@ -1097,7 +1142,9 @@
       *
            MOVE SPACES TO SORTCO.
            MOVE SPACES TO CUSTNO2O.
-           MOVE SPACES TO CUSTNAMO.
+           MOVE SPACES TO CUSTTITLO.
+           MOVE SPACES TO CUSTFNAMO.
+           MOVE SPACES TO CUSTLNAMO.
            MOVE SPACES TO CUSTAD1O.
            MOVE SPACES TO CUSTAD2O.
            MOVE SPACES TO CUSTAD3O.
@@ -1126,20 +1173,37 @@
        UPDATE-CUST-DATA SECTION.
        UPDCD010.
       *
-      *    Set up the fields required by UPDUCUST then link to it
+      *    Set up the fields required by UPDCUST then link to it
       *
            INITIALIZE UPDCUST-COMMAREA.
 
+           MOVE 'CUST' TO COMM-EYE OF UPDCUST-COMMAREA.
            MOVE SORTCI TO COMM-SCODE OF UPDCUST-COMMAREA.
            MOVE CUSTNO2I TO COMM-CUSTNO OF UPDCUST-COMMAREA.
-           MOVE CUSTNAMI TO COMM-NAME OF UPDCUST-COMMAREA.
-           STRING CUSTAD1I
-              DELIMITED BY SIZE,
-                  CUSTAD2I
-              DELIMITED BY SIZE,
-                  CUSTAD3I
-              DELIMITED BY SIZE,
-              INTO COMM-ADDR OF UPDCUST-COMMAREA.
+
+      *
+      *    Get the name fields from the screen input
+      *    Now that we have separate fields, no parsing needed
+      *
+           MOVE CUSTTITLI TO COMM-TITLE OF UPDCUST-COMMAREA.
+           MOVE CUSTFNAMI TO COMM-FIRST-NAME OF UPDCUST-COMMAREA.
+           MOVE CUSTLNAMI TO COMM-LAST-NAME OF UPDCUST-COMMAREA.
+
+      *
+      *    For address, use the screen input values
+      *
+           MOVE CUSTAD1I TO COMM-ADDR-LINE1 OF UPDCUST-COMMAREA.
+           MOVE CUSTAD2I TO COMM-ADDR-LINE2 OF UPDCUST-COMMAREA.
+
+      *
+      *    Parse address line 3 to extract city and postcode
+      *
+           MOVE SPACES TO COMM-CITY OF UPDCUST-COMMAREA.
+           MOVE SPACES TO COMM-POSTCODE OF UPDCUST-COMMAREA.
+           UNSTRING CUSTAD3I DELIMITED BY '  '
+              INTO COMM-CITY OF UPDCUST-COMMAREA
+                   COMM-POSTCODE OF UPDCUST-COMMAREA
+           END-UNSTRING.
 
            MOVE DOBDDI TO COMM-DOBX-DD.
            MOVE DOBMMI TO COMM-DOBX-MM.
@@ -1268,6 +1332,17 @@
                    MOVE -1 TO CUSTNO2L
                    GO TO UPDCD999
 
+              WHEN 'T'
+                   MOVE SPACES TO MESSAGEO
+                   STRING 'Sorry but the title is invalid.'
+                      DELIMITED BY SIZE,
+                          ' Customer NOT updated.' DELIMITED BY SIZE
+                      INTO MESSAGEO
+                   MOVE 'N' TO VALID-DATA-SW
+                   MOVE COMM-SCODE OF UPDCUST-COMMAREA TO SORTCO
+                   MOVE -1 TO CUSTNO2L
+                   GO TO UPDCD999
+
               WHEN OTHER
                    MOVE SPACES TO MESSAGEO
                    STRING 'Sorry but an unknown error occurred.'
@@ -1288,12 +1363,18 @@
       *
            MOVE COMM-SCODE OF UPDCUST-COMMAREA TO SORTCO.
            MOVE COMM-CUSTNO OF UPDCUST-COMMAREA TO CUSTNO2O.
-           MOVE COMM-NAME OF UPDCUST-COMMAREA TO CUSTNAMO.
+           MOVE COMM-TITLE OF UPDCUST-COMMAREA TO CUSTTITLO.
+           MOVE COMM-FIRST-NAME OF UPDCUST-COMMAREA TO CUSTFNAMO.
+           MOVE COMM-LAST-NAME OF UPDCUST-COMMAREA TO CUSTLNAMO.
 
-           MOVE COMM-ADDR OF UPDCUST-COMMAREA TO COMM-ADDR-SPLIT.
-           MOVE COMM-ADDR-SPLIT1 TO CUSTAD1O.
-           MOVE COMM-ADDR-SPLIT2 TO CUSTAD2O.
-           MOVE COMM-ADDR-SPLIT3 TO CUSTAD3O.
+           MOVE COMM-ADDR-LINE1 OF UPDCUST-COMMAREA TO CUSTAD1O.
+           MOVE COMM-ADDR-LINE2 OF UPDCUST-COMMAREA TO CUSTAD2O.
+           MOVE SPACES TO CUSTAD3O
+           STRING COMM-CITY OF UPDCUST-COMMAREA DELIMITED BY '  '
+                  ' ' DELIMITED BY SIZE
+                  COMM-POSTCODE OF UPDCUST-COMMAREA DELIMITED BY '  '
+              INTO CUSTAD3O
+           END-STRING.
 
            MOVE COMM-DOB OF UPDCUST-COMMAREA TO COMM-DOB-SPLIT.
            MOVE COMM-DOB-SPLIT-DD TO DOBDDO.
@@ -1334,12 +1415,14 @@
            MOVE 'CUST' TO COMM-EYE OF DFHCOMMAREA.
            MOVE SORTCO TO COMM-SCODE OF DFHCOMMAREA.
            MOVE CUSTNO2O TO COMM-CUSTNO OF DFHCOMMAREA.
-           MOVE CUSTNAMO TO COMM-NAME OF DFHCOMMAREA.
+           MOVE CUSTTITLO TO COMM-TITLE OF DFHCOMMAREA.
+           MOVE CUSTFNAMO TO COMM-FIRST-NAME OF DFHCOMMAREA.
+           MOVE CUSTLNAMO TO COMM-LAST-NAME OF DFHCOMMAREA.
 
-           MOVE CUSTAD1O TO COMM-ADDR-UPD1.
-           MOVE CUSTAD2O TO COMM-ADDR-UPD2.
-           MOVE CUSTAD3O TO COMM-ADDR-UPD3.
-           MOVE COMM-ADDR-UPD-SPLIT TO COMM-ADDR OF DFHCOMMAREA.
+           MOVE CUSTAD1O TO COMM-ADDR-LINE1 OF DFHCOMMAREA.
+           MOVE CUSTAD2O TO COMM-ADDR-LINE2 OF DFHCOMMAREA.
+           MOVE INQCUST-CITY TO COMM-CITY OF DFHCOMMAREA.
+           MOVE INQCUST-POSTCODE TO COMM-POSTCODE OF DFHCOMMAREA.
 
            MOVE DOBDDO TO COMM-DOBX-DD.
            MOVE DOBMMO TO COMM-DOBX-MM.
@@ -1368,14 +1451,22 @@
       *    (Customer Sortcode, and DOB) are already protected.
       *
 
-           MOVE DFHGREEN TO CUSTNAMC.
-           MOVE 'A' TO CUSTNAMA.
-           MOVE DFHUNDLN TO CUSTNAMH.
+           MOVE DFHGREEN TO CUSTTITLC.
+           MOVE 'A' TO CUSTTITLA.
+           MOVE DFHUNDLN TO CUSTTITLH.
+
+           MOVE DFHGREEN TO CUSTFNAMC.
+           MOVE 'A' TO CUSTFNAMA.
+           MOVE DFHUNDLN TO CUSTFNAMH.
+
+           MOVE DFHGREEN TO CUSTLNAMC.
+           MOVE 'A' TO CUSTLNAMA.
+           MOVE DFHUNDLN TO CUSTLNAMH.
 
       *
-      *    Postion the cursor at the customer name
+      *    Position the cursor at the title field
       *
-           MOVE -1 TO CUSTNAML.
+           MOVE -1 TO CUSTTITLL.
 
            MOVE DFHGREEN TO CUSTAD1C.
            MOVE 'A' TO CUSTAD1A.
@@ -1754,10 +1845,13 @@
       *    We must now restore the UCTRAN setting back to what it
       *    was at the start
       *
+      *    If STORED-UCTRANS is zero, it was never set, so skip restore
+      *
+           IF STORED-UCTRANS = 0
+              GO TO RTD999
+           END-IF.
 
-           MOVE DFHCOMMAREA TO WS-COMM-AREA.
-
-           MOVE WS-COMM-TERM TO WS-UCTRANS.
+           MOVE STORED-UCTRANS TO WS-UCTRANS.
 
            EXEC CICS SET TERMINAL(EIBTRMID)
                 UCTRANST(WS-UCTRANS)
@@ -1952,12 +2046,18 @@
       *
            MOVE COMM-SCODE OF UPDCUST-COMMAREA TO SORTCO.
            MOVE COMM-CUSTNO OF UPDCUST-COMMAREA TO CUSTNO2O.
-           MOVE COMM-NAME OF UPDCUST-COMMAREA TO CUSTNAMO.
+           MOVE COMM-TITLE OF UPDCUST-COMMAREA TO CUSTTITLO.
+           MOVE COMM-FIRST-NAME OF UPDCUST-COMMAREA TO CUSTFNAMO.
+           MOVE COMM-LAST-NAME OF UPDCUST-COMMAREA TO CUSTLNAMO.
 
-           MOVE COMM-ADDR OF UPDCUST-COMMAREA TO COMM-ADDR-SPLIT.
-           MOVE COMM-ADDR-SPLIT1 TO CUSTAD1O.
-           MOVE COMM-ADDR-SPLIT2 TO CUSTAD2O.
-           MOVE COMM-ADDR-SPLIT3 TO CUSTAD3O.
+           MOVE COMM-ADDR-LINE1 OF UPDCUST-COMMAREA TO CUSTAD1O.
+           MOVE COMM-ADDR-LINE2 OF UPDCUST-COMMAREA TO CUSTAD2O.
+           MOVE SPACES TO CUSTAD3O
+           STRING COMM-CITY OF UPDCUST-COMMAREA DELIMITED BY '  '
+                  ' ' DELIMITED BY SIZE
+                  COMM-POSTCODE OF UPDCUST-COMMAREA DELIMITED BY '  '
+              INTO CUSTAD3O
+           END-STRING.
 
            MOVE COMM-DOB OF UPDCUST-COMMAREA TO COMM-DOB-SPLIT.
            MOVE COMM-DOB-SPLIT-DD TO DOBDDO.
@@ -1967,12 +2067,17 @@
            MOVE 'CUST' TO COMM-EYE OF DFHCOMMAREA.
            MOVE SORTCO TO COMM-SCODE OF DFHCOMMAREA.
            MOVE CUSTNO2O TO COMM-CUSTNO OF DFHCOMMAREA.
-           MOVE CUSTNAMO TO COMM-NAME OF DFHCOMMAREA.
+           MOVE COMM-FIRST-NAME OF UPDCUST-COMMAREA
+              TO COMM-FIRST-NAME OF DFHCOMMAREA
+           MOVE COMM-LAST-NAME OF UPDCUST-COMMAREA
+              TO COMM-LAST-NAME OF DFHCOMMAREA
 
-           MOVE CUSTAD1O TO COMM-ADDR-UPD1.
-           MOVE CUSTAD2O TO COMM-ADDR-UPD2.
-           MOVE CUSTAD3O TO COMM-ADDR-UPD3.
-           MOVE COMM-ADDR-UPD-SPLIT TO COMM-ADDR OF DFHCOMMAREA.
+           MOVE CUSTAD1O TO COMM-ADDR-LINE1 OF DFHCOMMAREA.
+           MOVE CUSTAD2O TO COMM-ADDR-LINE2 OF DFHCOMMAREA.
+           UNSTRING CUSTAD3O DELIMITED BY '  '
+              INTO COMM-CITY OF DFHCOMMAREA
+                   COMM-POSTCODE OF DFHCOMMAREA
+           END-UNSTRING.
 
 
            MOVE DOBDDO TO COMM-DOBX-DD.
@@ -2004,9 +2109,17 @@
            MOVE DFHNEUTR TO CUSTNO2C.
            MOVE DFHBMPRF TO CUSTNO2A.
 
-           MOVE DFHNEUTR TO CUSTNAMC.
-           MOVE DFHBMPRF TO CUSTNAMA.
-           MOVE HIGH-VALUES TO CUSTNAMH.
+           MOVE DFHNEUTR TO CUSTTITLC.
+           MOVE DFHBMPRF TO CUSTTITLA.
+           MOVE HIGH-VALUES TO CUSTTITLH.
+
+           MOVE DFHNEUTR TO CUSTFNAMC.
+           MOVE DFHBMPRF TO CUSTFNAMA.
+           MOVE HIGH-VALUES TO CUSTFNAMH.
+
+           MOVE DFHNEUTR TO CUSTLNAMC.
+           MOVE DFHBMPRF TO CUSTLNAMA.
+           MOVE HIGH-VALUES TO CUSTLNAMH.
 
       *
       *    Postion the cursor at the customer number

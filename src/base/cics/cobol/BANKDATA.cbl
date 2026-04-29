@@ -58,9 +58,19 @@
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-EMAIL          PIC X(100).
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
@@ -522,19 +532,28 @@
                    COMPUTE TOWN-PTR =((TOWN-COUNT - 1)
                       * FUNCTION RANDOM) + 1
 
-                   MOVE SPACES TO CUSTOMER-NAME
+                   MOVE SPACES TO CUSTOMER-TITLE
+                   MOVE SPACES TO CUSTOMER-FIRST-NAME
+                   MOVE SPACES TO CUSTOMER-LAST-NAME
+                   MOVE SPACES TO CUSTOMER-EMAIL
+                   MOVE SPACES TO CUSTOMER-PHONE
+                   MOVE SPACES TO CUSTOMER-ADDR-LINE1
+                   MOVE SPACES TO CUSTOMER-ADDR-LINE2
+                   MOVE SPACES TO CUSTOMER-CITY
+                   MOVE SPACES TO CUSTOMER-POSTCODE
+                   MOVE SPACES TO CUSTOMER-COUNTRY
+                   MOVE SPACES TO CUSTOMER-STATUS
 
-                   STRING TITLE-WORD(TITLE-NUMBER) DELIMITED BY SPACE
-                          ' ' DELIMITED BY SIZE
-                          FORENAME(FORENAMES-PTR) DELIMITED BY SPACE
+                   MOVE TITLE-WORD(TITLE-NUMBER) TO CUSTOMER-TITLE
+                   
+                   STRING FORENAME(FORENAMES-PTR) DELIMITED BY SPACE
                           ' ' DELIMITED BY SIZE
                           INITIAL-CHARACTER(INITIALS-PTR) DELIMITED BY
                       SPACE
-                          ' ' DELIMITED BY SIZE
-                          SURNAME(SURNAMES-PTR) DELIMITED BY SIZE
-                      INTO CUSTOMER-NAME
-
-                   MOVE SPACES TO CUSTOMER-ADDRESS
+                      INTO CUSTOMER-FIRST-NAME
+                   
+                   MOVE SURNAME(SURNAMES-PTR) TO CUSTOMER-LAST-NAME
+                   
                    STRING
                       HOUSE-NUMBER DELIMITED BY SIZE
                       ' ' DELIMITED BY SIZE
@@ -543,10 +562,11 @@
                       ' ' DELIMITED BY SIZE
                       STREET-NAME-ROAD(STREET-NAME-R-PTR)
                       DELIMITED BY SPACE
-                      ', ' DELIMITED BY SIZE
-                      TOWN(TOWN-PTR)
-                      DELIMITED BY SPACE
-                      INTO CUSTOMER-ADDRESS
+                      INTO CUSTOMER-ADDR-LINE1
+                   
+                   MOVE TOWN(TOWN-PTR) TO CUSTOMER-CITY
+                   MOVE 'ACTIVE' TO CUSTOMER-STATUS
+                   MOVE 'United Kingdom' TO CUSTOMER-COUNTRY
 
                    COMPUTE CUSTOMER-BIRTH-DAY =((28 - 1)
                       * FUNCTION RANDOM) + 1
@@ -593,8 +613,18 @@
                    MOVE 'CUST' TO HV-CUSTOMER-EYECATCHER
                    MOVE CUSTOMER-SORTCODE TO HV-CUSTOMER-SORTCODE
                    MOVE CUSTOMER-NUMBER TO HV-CUSTOMER-NUMBER
-                   MOVE CUSTOMER-NAME TO HV-CUSTOMER-NAME
-                   MOVE CUSTOMER-ADDRESS TO HV-CUSTOMER-ADDRESS
+                   MOVE CUSTOMER-TITLE TO HV-CUSTOMER-TITLE
+                   MOVE CUSTOMER-FIRST-NAME TO HV-CUSTOMER-FIRST-NAME
+                   MOVE CUSTOMER-LAST-NAME TO HV-CUSTOMER-LAST-NAME
+                   MOVE CUSTOMER-EMAIL TO HV-CUSTOMER-EMAIL
+                   MOVE CUSTOMER-PHONE TO HV-CUSTOMER-PHONE
+                   MOVE CUSTOMER-ADDR-LINE1 TO HV-CUSTOMER-ADDR-LINE1
+                   MOVE CUSTOMER-ADDR-LINE2 TO HV-CUSTOMER-ADDR-LINE2
+                   MOVE CUSTOMER-CITY TO HV-CUSTOMER-CITY
+                   MOVE CUSTOMER-POSTCODE TO HV-CUSTOMER-POSTCODE
+                   MOVE CUSTOMER-COUNTRY TO HV-CUSTOMER-COUNTRY
+                   MOVE CUSTOMER-STATUS TO HV-CUSTOMER-STATUS
+                   MOVE CUSTOMER-CREATED-DATE TO HV-CUSTOMER-CREATE-DATE
 
       *
       * Convert date of birth to INTEGER format (YYYYMMDD)
@@ -623,17 +653,37 @@
                          (CUSTOMER_EYECATCHER,
                           CUSTOMER_SORTCODE,
                           CUSTOMER_NUMBER,
-                          CUSTOMER_NAME,
-                          CUSTOMER_ADDRESS,
+                          CUSTOMER_TITLE,
+                          CUSTOMER_FIRST_NAME,
+                          CUSTOMER_LAST_NAME,
                           CUSTOMER_DATE_OF_BIRTH,
+                          CUSTOMER_EMAIL,
+                          CUSTOMER_PHONE,
+                          CUSTOMER_ADDR_LINE1,
+                          CUSTOMER_ADDR_LINE2,
+                          CUSTOMER_CITY,
+                          CUSTOMER_POSTCODE,
+                          CUSTOMER_COUNTRY,
+                          CUSTOMER_STATUS,
+                          CUSTOMER_CREATED_DATE,
                           CUSTOMER_CREDIT_SCORE,
                           CUSTOMER_CS_REVIEW_DATE)
                   VALUES(:HV-CUSTOMER-EYECATCHER,
                           :HV-CUSTOMER-SORTCODE,
                           :HV-CUSTOMER-NUMBER,
-                          :HV-CUSTOMER-NAME,
-                          :HV-CUSTOMER-ADDRESS,
+                          :HV-CUSTOMER-TITLE,
+                          :HV-CUSTOMER-FIRST-NAME,
+                          :HV-CUSTOMER-LAST-NAME,
                           :HV-CUSTOMER-DOB,
+                          :HV-CUSTOMER-EMAIL,
+                          :HV-CUSTOMER-PHONE,
+                          :HV-CUSTOMER-ADDR-LINE1,
+                          :HV-CUSTOMER-ADDR-LINE2,
+                          :HV-CUSTOMER-CITY,
+                          :HV-CUSTOMER-POSTCODE,
+                          :HV-CUSTOMER-COUNTRY,
+                          :HV-CUSTOMER-STATUS,
+                          :HV-CUSTOMER-CREATE-DATE,
                           :HV-CUSTOMER-CREDIT-SCORE,
                           :HV-CUSTOMER-CS-REVIEW-DATE)
                END-EXEC

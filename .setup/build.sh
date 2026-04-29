@@ -55,7 +55,7 @@ export DBB_HLQ="${DBB_HLQ:-IBMUSER.BOZ.BLD}"
 print_info "Using HLQ: $DBB_HLQ"
 
 # Cancel CICS region (ignore errors if already cancelled)
-jcan P "CICSBOZ"&
+# jcan P "CICSBOZ"&
 
 print_info "DBB_HOME: $DBB_HOME"
 print_info "DBB_BUILD: $DBB_BUILD"
@@ -111,84 +111,116 @@ else
     echo ""
     echo "Check logs in: $WORKSPACE_DIR/logs"
     echo ""
+    exit 1
 fi
 
 #########################################################
-# STAGE 3: Run Wazi Deploy - Only deploy modules
+# STAGE 2.5: Package Build Outputs
 #########################################################
-WAZIDEPLOY_HOME=$(get_section_value 'wazideploy' 'wazideploy_home')
-. $WAZIDEPLOY_HOME/bin/activate
-wazideploy-generate -v
-wazideploy-generate\
-  -dm ../dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml\
-  -dp logs/deployment-plan.yml -pif logs/bank-of-z-zos-native-*.tar
+print_stage "STAGE 2.5: Package Build Outputs"
 
-if [ $? -eq 0 ]; then
-     drm BANKZ.CICSBOZ.*&
-     TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
-     # Overide default mapping (need something more generic)
-     cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
-     export USER=$(get_user)
-     echo "* USER=$USER"
-     wazideploy-deploy -dp logs/deployment-plan.yml\
-       -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
-       -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
-       -pt deploy &
-    PID=$!
-    wait $PID
-    RC=$?
-    if [ $RC -eq 0 ]; then
-         print_success "Wazi Deploy completed successfully!"
-    else
-        print_error "Wazi Deploy failed with return code: $RC"
-        echo ""
-        echo "Check logs in: $WORKSPACE_DIR/logs"
-        echo ""
-        exit 1
-    fi
+# Run packageBuildOutputs.sh to create tar file
+print_info "Creating build package..."
+cd "$WORKSPACE_DIR"
+
+# Call the packageBuildOutputs script
+# Note: packageBuildOutputs.sh expects workspace to be the parent directory of the application
+# and expects logs to be at $PARENT_DIR/logs, so we create a symlink
+PARENT_DIR=$(dirname "$WORKSPACE_DIR")
+if [ ! -e "$PARENT_DIR/logs" ]; then
+    ln -s "$WORKSPACE_DIR/logs" "$PARENT_DIR/logs"
+fi
+packageBuildOutputs.sh -w "$PARENT_DIR" -a "$APPLICATION" -b "main" -p build -i "$TIMESTAMP" -r "$TIMESTAMP"
+PACKAGE_RC=$?
+# Clean up the symlink
+rm -f "$PARENT_DIR/logs"
+
+if [ $PACKAGE_RC -eq 0 ]; then
+    print_success "Build package created successfully"
 else
-    print_error "Wazi Deploy failed with return code: $RC"
-    echo ""
-    echo "Check logs in: $WORKSPACE_DIR/logs"
-    echo ""
+    print_error "Failed to create build package"
+    exit 1
 fi
-deactivate
+
+# #########################################################
+# # STAGE 3: Run Wazi Deploy - Only deploy modules
+# #########################################################
+# WAZIDEPLOY_HOME=$(get_section_value 'wazideploy' 'wazideploy_home')
+# . $WAZIDEPLOY_HOME/bin/activate
+# wazideploy-generate -v
+# wazideploy-generate\
+#   -dm ../dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml\
+#   -dp logs/deployment-plan.yml -pif logs/Default.tar
+
+# if [ $? -eq 0 ]; then
+#      drm BANKZ.CICSBOZ.*&
+#      TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
+#      # Overide default mapping (need something more generic)
+#      cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
+#      export USER=$(get_user)
+#      echo "* USER=$USER"
+#      wazideploy-deploy -dp logs/deployment-plan.yml\
+#        -pif logs/Default.tar -ef .setup/deploy/Development.yml \
+#        -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
+#        -pt deploy &
+#     PID=$!
+#     wait $PID
+#     RC=$?
+#     if [ $RC -eq 0 ]; then
+#          print_success "Wazi Deploy completed successfully!"
+#     else
+#         print_error "Wazi Deploy failed with return code: $RC"
+#         echo ""
+#         echo "Check logs in: $WORKSPACE_DIR/logs"
+#         echo ""
+#         exit 1
+#     fi
+# else
+#     print_error "Wazi Deploy failed with return code: $RC"
+#     echo ""
+#     echo "Check logs in: $WORKSPACE_DIR/logs"
+#     echo ""
+# fi
+# deactivate
 
 #########################################################
 # STAGE 4: Create CICS instance with zconfig
 #########################################################
 
-# Activate zconfig virtual environment
-ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
-ZCONFIG_HOME=$(echo $ZCONFIG_HOME | sed "s|~|$HOME|g")
-if [ -f $ZCONFIG_HOME/bin/activate ]; then
-    source $ZCONFIG_HOME/bin/activate
-else
-    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
-fi
+# # Activate zconfig virtual environment
+# ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
+# ZCONFIG_HOME=$(echo $ZCONFIG_HOME | sed "s|~|$HOME|g")
+# if [ -f $ZCONFIG_HOME/bin/activate ]; then
+#     source $ZCONFIG_HOME/bin/activate
+# else
+#     print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
+# fi
 
-# Apply CICS region configuration
-cd $WORKSPACE_DIR/.setup/zconfig
-zconfig apply cics-region.yaml&
-PID=$!
-wait $PID
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "ZConfig completed successfully!"
-else
-   print_error "ZConfig failed with return code: $RC"
-   echo ""
-   echo "Check logs in: $WORKSPACE_DIR/logs"
-   echo ""
-   exit 1
-fi
-deactivate
-echo ""
-# Start CICS region
-jsub BANKZ.CICSBOZ.DFHSTART&
-sleep 3
-echo "CICS Region Job Started"
-echo ""
+# # Apply CICS region configuration
+# cd $WORKSPACE_DIR/.setup/zconfig
+# zconfig apply cics-region.yaml&
+# PID=$!
+# wait $PID
+# RC=$?
+# if [ $RC -eq 0 ]; then
+#     print_success "ZConfig completed successfully!"
+# else
+#    print_error "ZConfig failed with return code: $RC"
+#    echo ""
+#    echo "Check logs in: $WORKSPACE_DIR/logs"
+#    echo ""
+#    exit 1
+# fi
+# deactivate
+# echo ""
+# # Start CICS region
+# jsub BANKZ.CICSBOZ.DFHSTART&
+# sleep 3
+# echo "CICS Region Job Started"
+# echo ""
+
+
+# opercmd "F CICSBOZ,CEMT SET PROGRAM(BANKDATA) NEWCOPY"
 
 #########################################################
 # STAGE 5: Create DB2 database

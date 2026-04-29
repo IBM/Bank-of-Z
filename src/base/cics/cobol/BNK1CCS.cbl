@@ -94,16 +94,8 @@
 
        01 WS-ABCODE PIC XXXX.
 
-       01 WS-EMAIL-VALIDATION.
-          03 WS-EMAIL-WORK             PIC X(60).
        01 WS-EMAIL-COMMAREA.
            COPY EMLVALID.
-       01 WS-EMAIL-COMMAREA-LEN        PIC S9(4) COMP VALUE 0.
-       01 WS-EMAIL-MESSAGES.
-          03 WS-EMAIL-REQUIRED-MSG     PIC X(35)
-             VALUE 'Please supply a valid email address'.
-          03 WS-EMAIL-INVALID-MSG      PIC X(21)
-             VALUE 'Invalid email format.'.
 
        01 WS-ADDR-SPLIT.
           03 WS-ADDR-SPLIT1            PIC X(60).
@@ -946,15 +938,17 @@
       *
       *    Validate the Email Address
       *
-           PERFORM CALL-EMAIL-VALIDATOR.
+           INITIALIZE WS-EMAIL-COMMAREA.
+           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
+
+           IF CUSTEMLL > 0
+              MOVE CUSTEMLI TO EMLVALID-EMAIL
+           END-IF.
+
+           CALL 'EMLVALID' USING WS-EMAIL-COMMAREA.
 
            IF EMLVALID-EMAIL-INVALID
-              MOVE SPACES TO MESSAGEO
-              IF EMLVALID-MISSING-EMAIL
-                 MOVE WS-EMAIL-REQUIRED-MSG TO MESSAGEO
-              ELSE
-                 MOVE WS-EMAIL-INVALID-MSG TO MESSAGEO
-              END-IF
+              MOVE EMLVALID-MESSAGE TO MESSAGEO
               MOVE 'N' TO VALID-DATA-SW
               MOVE -1 TO CUSTEMLL
               GO TO ED999
@@ -1126,39 +1120,6 @@
                                       TO SCRDTYYO.
 
        CCD999.
-           EXIT.
-
-
-       CALL-EMAIL-VALIDATOR SECTION.
-       CEV010.
-
-           MOVE SPACES TO WS-EMAIL-WORK.
-           INITIALIZE WS-EMAIL-COMMAREA.
-           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
-
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO EMLVALID-EMAIL
-           END-IF.
-
-           MOVE LENGTH OF WS-EMAIL-COMMAREA
-              TO WS-EMAIL-COMMAREA-LEN.
-
-           EXEC CICS LINK
-              PROGRAM('EMLVALID')
-              COMMAREA(WS-EMAIL-COMMAREA)
-              LENGTH(WS-EMAIL-COMMAREA-LEN)
-              RESP(WS-CICS-RESP)
-              RESP2(WS-CICS-RESP2)
-           END-EXEC.
-
-           IF WS-CICS-RESP = DFHRESP(NORMAL)
-              MOVE EMLVALID-EMAIL TO WS-EMAIL-WORK
-           ELSE
-              SET EMLVALID-EMAIL-INVALID TO TRUE
-              SET EMLVALID-BAD-FORMAT TO TRUE
-           END-IF.
-
-       CEV999.
            EXIT.
 
 

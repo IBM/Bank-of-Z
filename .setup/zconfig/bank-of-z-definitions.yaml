@@ -464,24 +464,6 @@ resourceDefinitions:
                   executionset: FULLAPI
                   jvm: "NO"
         - program:
-                  name: EMLVALID
-                  group: BANKZGRP
-                  description: BANK Email Address Validator
-                  language: COBOL
-                  reload: "NO"
-                  resident: "NO"
-                  usage: NORMAL
-                  uselpacopy: "NO"
-                  status: ENABLED
-                  cedf: "YES"
-                  datalocation: ANY
-                  execkey: USER
-                  concurrency: THREADSAFE
-                  api: CICSAPI
-                  dynamic: "NO"
-                  executionset: FULLAPI
-                  jvm: "NO"
-        - program:
                   name: DBCRFUN
                   group: BANKZGRP
                   description: BANK Online Credit/Debit Account

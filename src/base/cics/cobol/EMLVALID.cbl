@@ -26,11 +26,17 @@
           88 EMAIL-OK                  VALUE 'Y'.
           88 EMAIL-NOT-OK              VALUE 'N'.
 
+       01 WS-ERROR-MESSAGES.
+          03 WS-EMAIL-REQUIRED-MSG     PIC X(50)
+             VALUE 'Please supply a valid email address'.
+          03 WS-EMAIL-INVALID-MSG      PIC X(50)
+             VALUE 'Invalid email format.'.
+
        LINKAGE SECTION.
-       01 DFHCOMMAREA.
+       01 LS-EMLVALID-AREA.
            COPY EMLVALID.
 
-       PROCEDURE DIVISION USING DFHCOMMAREA.
+       PROCEDURE DIVISION USING LS-EMLVALID-AREA.
        MAINLINE SECTION.
        ML010.
 
@@ -50,8 +56,7 @@
               END-IF
            END-IF.
 
-           EXEC CICS RETURN
-           END-EXEC.
+           GOBACK.
 
        ML999.
            EXIT.
@@ -62,7 +67,7 @@
 
            INSPECT EMLVALID-EMAIL REPLACING ALL LOW-VALUE BY SPACE.
            SET EMLVALID-EMAIL-VALID TO TRUE.
-           MOVE SPACE TO EMLVALID-REASON.
+           MOVE SPACES TO EMLVALID-MESSAGE.
            MOVE ZERO TO WS-EMAIL-LENGTH
                         WS-POSITION
                         WS-AT-POSITION
@@ -282,7 +287,7 @@
        MME010.
 
            SET EMLVALID-EMAIL-INVALID TO TRUE.
-           SET EMLVALID-MISSING-EMAIL TO TRUE.
+           MOVE WS-EMAIL-REQUIRED-MSG TO EMLVALID-MESSAGE.
 
        MME999.
            EXIT.
@@ -292,7 +297,7 @@
        MBF010.
 
            SET EMLVALID-EMAIL-INVALID TO TRUE.
-           SET EMLVALID-BAD-FORMAT TO TRUE.
+           MOVE WS-EMAIL-INVALID-MSG TO EMLVALID-MESSAGE.
 
        MBF999.
            EXIT.

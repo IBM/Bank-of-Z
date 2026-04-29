@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="PAYDBCR" originalName="PAYDBCR" included="Y" path="PAYDBCR" fileName="PAYDBCR.cpy" structureIndex="0" structSrcFileName="PAYDBCR_request_0.cpy" srcLine="01 PAYDBCR.">
+                <startPos>1</startPos>
+                <bytes>92</bytes>
+                <maxBytes>92</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="COMM-ACCNO" originalName="COMM-ACCNO" included="Y" path="PAYDBCR.COMM-ACCNO" srcLine="03 COMM-ACCNO PIC X(8) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-AMT" originalName="COMM-AMT" included="Y" path="PAYDBCR.COMM-AMT" srcLine="03 COMM-AMT PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>9</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-SORTC" originalName="COMM-SORTC" included="Y" path="PAYDBCR.COMM-SORTC" srcLine="03 COMM-SORTC PIC 9(6) USAGE DISPLAY.">
+                    <startPos>21</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                </field>
+                <field name="COMM-AV-BAL" originalName="COMM-AV-BAL" included="Y" path="PAYDBCR.COMM-AV-BAL" srcLine="03 COMM-AV-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>27</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-ACT-BAL" originalName="COMM-ACT-BAL" included="Y" path="PAYDBCR.COMM-ACT-BAL" srcLine="03 COMM-ACT-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>39</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="COMM-ORIGIN" originalName="COMM-ORIGIN" included="Y" path="PAYDBCR.COMM-ORIGIN" srcLine="03 COMM-ORIGIN.">
+                    <startPos>51</startPos>
+                    <bytes>40</bytes>
+                    <maxBytes>40</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-APPLID" originalName="COMM-APPLID" included="Y" path="PAYDBCR.COMM-ORIGIN.COMM-APPLID" srcLine="05 COMM-APPLID PIC X(8) USAGE DISPLAY.">
+                        <startPos>51</startPos>
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-USERID" originalName="COMM-USERID" included="Y" path="PAYDBCR.COMM-ORIGIN.COMM-USERID" srcLine="05 COMM-USERID PIC X(8) USAGE DISPLAY.">
+                        <startPos>59</startPos>
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-FACILITY-NAME" originalName="COMM-FACILITY-NAME" included="Y" path="PAYDBCR.COMM-ORIGIN.COMM-FACILITY-NAME" srcLine="05 COMM-FACILITY-NAME PIC X(8) USAGE DISPLAY.">
+                        <startPos>67</startPos>
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-NETWRK-ID" originalName="COMM-NETWRK-ID" included="Y" path="PAYDBCR.COMM-ORIGIN.COMM-NETWRK-ID" srcLine="05 COMM-NETWRK-ID PIC X(8) USAGE DISPLAY.">
+                        <startPos>75</startPos>
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-FACILTYPE" originalName="COMM-FACILTYPE" included="Y" path="PAYDBCR.COMM-ORIGIN.COMM-FACILTYPE" srcLine="05 COMM-FACILTYPE PIC S9(8) USAGE COMP.">
+                        <startPos>83</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                        <applicationDatatype datatype="INT" precision="8"/>
+                    </field>
+                    <field name="fill_0" originalName="fill_0" included="Y" path="PAYDBCR.COMM-ORIGIN.fill_0" srcLine="05 FILLER PIC X(4) USAGE DISPLAY.">
+                        <startPos>87</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+                <field name="COMM-SUCCESS" originalName="COMM-SUCCESS" included="Y" path="PAYDBCR.COMM-SUCCESS" srcLine="03 COMM-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>91</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-FAIL-CODE" originalName="COMM-FAIL-CODE" included="Y" path="PAYDBCR.COMM-FAIL-CODE" srcLine="03 COMM-FAIL-CODE PIC X USAGE DISPLAY.">
+                    <startPos>92</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

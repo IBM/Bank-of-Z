@@ -1,0 +1,91 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - InqAccZ:
+        required: false
+        nullable: false
+        mappings:
+        - CustomerNumber:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.INQACCCZ.\"CUSTOMER-NUMBER\""
+        - CommSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQACCCZ.\"COMM-SUCCESS\"}}"
+        - CommFailCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQACCCZ.\"COMM-FAIL-CODE\"}}"
+        - CustomerFound:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQACCCZ.\"CUSTOMER-FOUND\"}}"
+        - CommPcbPointer:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQACCCZ.\"COMM-PCB-POINTER\"\
+              }}"
+        - AccountDetails:
+            required: false
+            nullable: false
+            foreach:
+              input: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\""
+              mappings:
+              - CommEye:
+                  required: false
+                  nullable: false
+                  template: "{{$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-EYE\"}}"
+              - CommCustno:
+                  required: false
+                  nullable: false
+                  template: "{{$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-CUSTNO\"}}"
+              - CommAccno:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-ACCNO\""
+              - CommAccType:
+                  required: false
+                  nullable: false
+                  template: "{{$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-ACC-TYPE\"}}"
+              - CommIntRate:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-INT-RATE\""
+              - CommOpened:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-OPENED\""
+              - CommOverdraft:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-OVERDRAFT\""
+              - CommLastStmtDt:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-LAST-STMT-DT\""
+              - CommNextStmtDt:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-NEXT-STMT-DT\""
+              - CommAvailBal:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-AVAIL-BAL\""
+              - CommActualBal:
+                  required: false
+                  nullable: false
+                  expression: "$zosAssetResponse.commarea.INQACCCZ.\"ACCOUNT-DETAILS\"\
+                    .\"COMM-ACTUAL-BAL\""

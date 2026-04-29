@@ -1,0 +1,167 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "abendCode" : {
+      "type" : "string"
+    },
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "DELCUS" : {
+          "type" : "object",
+          "properties" : {
+            "COMM-EYE" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-EYE PIC X(4) USAGE DISPLAY.",
+                "name" : "COMM-EYE"
+              }
+            },
+            "COMM-SCODE" : {
+              "maxLength" : 6,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-SCODE PIC X(6) USAGE DISPLAY.",
+                "name" : "COMM-SCODE"
+              }
+            },
+            "COMM-CUSTNO" : {
+              "maxLength" : 10,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-CUSTNO PIC X(10) USAGE DISPLAY.",
+                "name" : "COMM-CUSTNO"
+              }
+            },
+            "COMM-NAME" : {
+              "maxLength" : 60,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-NAME PIC X(60) USAGE DISPLAY.",
+                "name" : "COMM-NAME"
+              }
+            },
+            "COMM-ADDR" : {
+              "maxLength" : 160,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-ADDR PIC X(160) USAGE DISPLAY.",
+                "name" : "COMM-ADDR"
+              }
+            },
+            "COMM-DOB" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-DOB PIC 9(8) USAGE DISPLAY.",
+                "name" : "COMM-DOB"
+              }
+            },
+            "COMM-DOB-GROUP" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-BIRTH-DAY" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-BIRTH-DAY PIC 9(2) USAGE DISPLAY.",
+                    "name" : "COMM-BIRTH-DAY"
+                  }
+                },
+                "COMM-BIRTH-MONTH" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-BIRTH-MONTH PIC 9(2) USAGE DISPLAY.",
+                    "name" : "COMM-BIRTH-MONTH"
+                  }
+                },
+                "COMM-BIRTH-YEAR" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-BIRTH-YEAR PIC 9(4) USAGE DISPLAY.",
+                    "name" : "COMM-BIRTH-YEAR"
+                  }
+                }
+              }
+            },
+            "COMM-CREDIT-SCORE" : {
+              "minimum" : 0,
+              "maximum" : 999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.",
+                "name" : "COMM-CREDIT-SCORE"
+              }
+            },
+            "COMM-CS-REVIEW-DATE" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-CS-REVIEW-DATE PIC 9(8) USAGE DISPLAY.",
+                "name" : "COMM-CS-REVIEW-DATE"
+              }
+            },
+            "COMM-CS-REVIEW-GROUP" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-CS-REVIEW-DD" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-CS-REVIEW-DD PIC 9(2) USAGE DISPLAY.",
+                    "name" : "COMM-CS-REVIEW-DD"
+                  }
+                },
+                "COMM-CS-REVIEW-MM" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-CS-REVIEW-MM PIC 9(2) USAGE DISPLAY.",
+                    "name" : "COMM-CS-REVIEW-MM"
+                  }
+                },
+                "COMM-CS-REVIEW-YYYY" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 COMM-CS-REVIEW-YYYY PIC 9(4) USAGE DISPLAY.",
+                    "name" : "COMM-CS-REVIEW-YYYY"
+                  }
+                }
+              }
+            },
+            "COMM-DEL-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-DEL-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "COMM-DEL-SUCCESS"
+              }
+            },
+            "COMM-DEL-FAIL-CD" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-DEL-FAIL-CD PIC X USAGE DISPLAY.",
+                "name" : "COMM-DEL-FAIL-CD"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset responses"
+}

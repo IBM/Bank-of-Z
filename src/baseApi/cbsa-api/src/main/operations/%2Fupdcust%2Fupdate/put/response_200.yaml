@@ -1,0 +1,45 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - CommEye:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-EYE\"}}"
+    - CommScode:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-SCODE\"}}"
+    - CommCustno:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-CUSTNO\"}}"
+    - CommName:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-NAME\"}}"
+    - CommAddress:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\"}}"
+    - CommDob:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDCUST.\"COMM-DOB\""
+    - CommCreditScore:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDCUST.\"COMM-CREDIT-SCORE\""
+    - CommCsReviewDate:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.UPDCUST.\"COMM-CS-REVIEW-DATE\""
+    - CommUpdSuccess:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-UPD-SUCCESS\"}}"
+    - CommUpdFailCd:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-UPD-FAIL-CD\"}}"

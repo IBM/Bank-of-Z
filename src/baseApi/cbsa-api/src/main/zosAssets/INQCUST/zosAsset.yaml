@@ -1,0 +1,11 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: ""
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "OMEN"
+  language: "COBOL"
+  program: "INQCUST"
+  connectionRef: "cbsaCicsConnection"
+  ccsid: "037"

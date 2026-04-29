@@ -1,0 +1,53 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - XFRFUN:
+        required: false
+        nullable: false
+        mappings:
+        - CommFscode:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-FSCODE\""
+        - CommFaccno:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.XFRFUN.\"COMM-FACCNO\"}}"
+        - CommTscode:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-TSCODE\""
+        - CommTaccno:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.XFRFUN.\"COMM-TACCNO\"}}"
+        - CommAmt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-AMT\""
+        - CommFavailBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-FAVBAL\""
+        - CommFactualBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-FACTBAL\""
+        - CommTavailBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-TAVBAL\""
+        - CommTactualBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.XFRFUN.\"COMM-TACTBAL\""
+        - CommSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.XFRFUN.\"COMM-SUCCESS\"}}"
+        - CommFailCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.XFRFUN.\"COMM-FAIL-CODE\"}}"

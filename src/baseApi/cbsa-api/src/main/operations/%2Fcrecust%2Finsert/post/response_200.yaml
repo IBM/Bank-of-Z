@@ -1,0 +1,49 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - CommEyecatcher:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUST.\"COMM-EYECATCHER\"}}"
+    - CommKey:
+        required: false
+        nullable: false
+        mappings:
+        - CommSortcode:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.CRECUST.\"COMM-KEY\".\"COMM-SORTCODE\""
+        - CommNumber:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.CRECUST.\"COMM-KEY\".\"COMM-NUMBER\""
+    - CommName:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUST.\"COMM-NAME\"}}"
+    - CommAddress:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUST.\"COMM-ADDRESS\"}}"
+    - CommDateOfBirth:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CRECUST.\"COMM-DATE-OF-BIRTH\""
+    - CommCreditScore:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CRECUST.\"COMM-CREDIT-SCORE\""
+    - CommCsReviewDate:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.CRECUST.\"COMM-CS-REVIEW-DATE\""
+    - CommSuccess:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUST.\"COMM-SUCCESS\"}}"
+    - CommFailCode:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUST.\"COMM-FAIL-CODE\"}}"

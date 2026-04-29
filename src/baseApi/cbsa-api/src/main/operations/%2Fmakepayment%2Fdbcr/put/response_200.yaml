@@ -1,0 +1,70 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - PAYDBCR:
+        required: false
+        nullable: false
+        mappings:
+        - CommAccno:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ACCNO\"}}"
+        - CommAmt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.PAYDBCR.\"COMM-AMT\""
+        - mSortC:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.PAYDBCR.\"COMM-SORTC\""
+        - CommAvBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.PAYDBCR.\"COMM-AV-BAL\""
+        - CommActBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.PAYDBCR.\"COMM-ACT-BAL\""
+        - CommOrigin:
+            required: false
+            nullable: false
+            mappings:
+            - CommApplid:
+                required: false
+                nullable: false
+                template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".\"\
+                  COMM-APPLID\"}}"
+            - CommUserid:
+                required: false
+                nullable: false
+                template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".\"\
+                  COMM-USERID\"}}"
+            - CommFacilityName:
+                required: false
+                nullable: false
+                template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".\"\
+                  COMM-FACILITY-NAME\"}}"
+            - CommNetwrkId:
+                required: false
+                nullable: false
+                template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".\"\
+                  COMM-NETWRK-ID\"}}"
+            - CommFaciltype:
+                required: false
+                nullable: false
+                expression: "$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".\"\
+                  COMM-FACILTYPE\""
+            - Fill0:
+                required: false
+                nullable: false
+                template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-ORIGIN\".fill_0}}"
+        - CommSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-SUCCESS\"}}"
+        - CommFailCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.PAYDBCR.\"COMM-FAIL-CODE\"}}"

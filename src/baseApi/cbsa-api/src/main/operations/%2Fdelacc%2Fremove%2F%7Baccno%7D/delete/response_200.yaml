@@ -1,0 +1,101 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - DelaccCommarea:
+        required: false
+        nullable: false
+        mappings:
+        - DelaccEye:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-EYE\"\
+              }}"
+        - DelaccCustno:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-CUSTNO\"\
+              }}"
+        - DelaccScode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-SCODE\"\
+              }}"
+        - DelaccAccno:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-ACCNO\""
+        - DelaccAccType:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-ACC-TYPE\"\
+              }}"
+        - DelaccIntRate:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-INT-RATE\""
+        - DelaccOpened:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-OPENED\""
+        - DelaccOverdraft:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-OVERDRAFT\""
+        - DelaccLastStmtDt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-LAST-STMT-DT\""
+        - DelaccNextStmtDt:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-NEXT-STMT-DT\""
+        - DelaccAvailBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-AVAIL-BAL\""
+        - DelaccActualBal:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-ACTUAL-BAL\""
+        - DelaccSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-SUCCESS\"\
+              }}"
+        - DelaccFailCd:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-FAIL-CD\"\
+              }}"
+        - DelaccDelSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-SUCCESS\"\
+              }}"
+        - DelaccDelFailCd:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-FAIL-CD\"\
+              }}"
+        - DelaccDelApplid:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-APPLID\"\
+              }}"
+        - DelaccDelPcb1:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-PCB1\"\
+              }}"
+        - DelaccDelPcb2:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-PCB2\"\
+              }}"
+        - DelaccDelPcb3:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.\"DELACC-COMMAREA\".\"DELACC-DEL-PCB3\"\
+              }}"

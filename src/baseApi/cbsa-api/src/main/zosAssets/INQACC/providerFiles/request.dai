@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="INQACC-COMMAREA" originalName="INQACC-COMMAREA" included="Y" path="INQACC-COMMAREA" fileName="INQACCZ.cpy" structureIndex="0" structSrcFileName="INQACC-COMMAREA_request_0.cpy" srcLine="01 INQACC-COMMAREA.">
+                <startPos>1</startPos>
+                <bytes>103</bytes>
+                <maxBytes>103</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="INQACC-EYE" originalName="INQACC-EYE" included="Y" path="INQACC-COMMAREA.INQACC-EYE" srcLine="03 INQACC-EYE PIC X(4) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="INQACC-CUSTNO" originalName="INQACC-CUSTNO" included="Y" path="INQACC-COMMAREA.INQACC-CUSTNO" srcLine="03 INQACC-CUSTNO PIC 9(10) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>10</bytes>
+                    <maxBytes>10</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="10" scale="0"/>
+                </field>
+                <field name="INQACC-SCODE" originalName="INQACC-SCODE" included="Y" path="INQACC-COMMAREA.INQACC-SCODE" srcLine="03 INQACC-SCODE PIC 9(6) USAGE DISPLAY.">
+                    <startPos>15</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                </field>
+                <field name="INQACC-ACCNO" originalName="INQACC-ACCNO" included="Y" path="INQACC-COMMAREA.INQACC-ACCNO" srcLine="03 INQACC-ACCNO PIC 9(8) USAGE DISPLAY.">
+                    <startPos>21</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQACC-ACC-TYPE" originalName="INQACC-ACC-TYPE" included="Y" path="INQACC-COMMAREA.INQACC-ACC-TYPE" srcLine="03 INQACC-ACC-TYPE PIC X(8) USAGE DISPLAY.">
+                    <startPos>29</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="INQACC-INT-RATE" originalName="INQACC-INT-RATE" included="Y" path="INQACC-COMMAREA.INQACC-INT-RATE" srcLine="03 INQACC-INT-RATE PIC 9(4)V9(2) USAGE DISPLAY.">
+                    <startPos>37</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="2"/>
+                </field>
+                <field name="INQACC-OPENED" originalName="INQACC-OPENED" included="Y" path="INQACC-COMMAREA.INQACC-OPENED" srcLine="03 INQACC-OPENED PIC 9(8) USAGE DISPLAY.">
+                    <startPos>43</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQACC-OPENED-GROUP" originalName="INQACC-OPENED-GROUP" included="Y" path="INQACC-COMMAREA.INQACC-OPENED-GROUP" redefines="INQACC-OPENED" srcLine="03 INQACC-OPENED-GROUP REDEFINES INQACC-OPENED.">
+                    <startPos>43</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="INQACC-OPENED-DAY" originalName="INQACC-OPENED-DAY" included="Y" path="INQACC-COMMAREA.INQACC-OPENED-GROUP.INQACC-OPENED-DAY" srcLine="05 INQACC-OPENED-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>43</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-OPENED-MONTH" originalName="INQACC-OPENED-MONTH" included="Y" path="INQACC-COMMAREA.INQACC-OPENED-GROUP.INQACC-OPENED-MONTH" srcLine="05 INQACC-OPENED-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>45</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-OPENED-YEAR" originalName="INQACC-OPENED-YEAR" included="Y" path="INQACC-COMMAREA.INQACC-OPENED-GROUP.INQACC-OPENED-YEAR" srcLine="05 INQACC-OPENED-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>47</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="INQACC-OVERDRAFT" originalName="INQACC-OVERDRAFT" included="Y" path="INQACC-COMMAREA.INQACC-OVERDRAFT" srcLine="03 INQACC-OVERDRAFT PIC 9(8) USAGE DISPLAY.">
+                    <startPos>51</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQACC-LAST-STMT-DT" originalName="INQACC-LAST-STMT-DT" included="Y" path="INQACC-COMMAREA.INQACC-LAST-STMT-DT" srcLine="03 INQACC-LAST-STMT-DT PIC 9(8) USAGE DISPLAY.">
+                    <startPos>59</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQACC-LAST-STMT-GROUP" originalName="INQACC-LAST-STMT-GROUP" included="Y" path="INQACC-COMMAREA.INQACC-LAST-STMT-GROUP" redefines="INQACC-LAST-STMT-DT" srcLine="03 INQACC-LAST-STMT-GROUP REDEFINES INQACC-LAST-STMT-DT.">
+                    <startPos>59</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="INQACC-LAST-STMT-DAY" originalName="INQACC-LAST-STMT-DAY" included="Y" path="INQACC-COMMAREA.INQACC-LAST-STMT-GROUP.INQACC-LAST-STMT-DAY" srcLine="05 INQACC-LAST-STMT-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>59</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-LAST-STMT-MONTH" originalName="INQACC-LAST-STMT-MONTH" included="Y" path="INQACC-COMMAREA.INQACC-LAST-STMT-GROUP.INQACC-LAST-STMT-MONTH" srcLine="05 INQACC-LAST-STMT-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>61</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-LAST-STMT-YEAR" originalName="INQACC-LAST-STMT-YEAR" included="Y" path="INQACC-COMMAREA.INQACC-LAST-STMT-GROUP.INQACC-LAST-STMT-YEAR" srcLine="05 INQACC-LAST-STMT-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>63</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="INQACC-NEXT-STMT-DT" originalName="INQACC-NEXT-STMT-DT" included="Y" path="INQACC-COMMAREA.INQACC-NEXT-STMT-DT" srcLine="03 INQACC-NEXT-STMT-DT PIC 9(8) USAGE DISPLAY.">
+                    <startPos>67</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQACC-NEXT-STMT-GROUP" originalName="INQACC-NEXT-STMT-GROUP" included="Y" path="INQACC-COMMAREA.INQACC-NEXT-STMT-GROUP" redefines="INQACC-NEXT-STMT-DT" srcLine="03 INQACC-NEXT-STMT-GROUP REDEFINES INQACC-NEXT-STMT-DT.">
+                    <startPos>67</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="INQACC-NEXT-STMT-DAY" originalName="INQACC-NEXT-STMT-DAY" included="Y" path="INQACC-COMMAREA.INQACC-NEXT-STMT-GROUP.INQACC-NEXT-STMT-DAY" srcLine="05 INQACC-NEXT-STMT-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>67</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-NEXT-STMT-MONTH" originalName="INQACC-NEXT-STMT-MONTH" included="Y" path="INQACC-COMMAREA.INQACC-NEXT-STMT-GROUP.INQACC-NEXT-STMT-MONTH" srcLine="05 INQACC-NEXT-STMT-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>69</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="INQACC-NEXT-STMT-YEAR" originalName="INQACC-NEXT-STMT-YEAR" included="Y" path="INQACC-COMMAREA.INQACC-NEXT-STMT-GROUP.INQACC-NEXT-STMT-YEAR" srcLine="05 INQACC-NEXT-STMT-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>71</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="INQACC-AVAIL-BAL" originalName="INQACC-AVAIL-BAL" included="Y" path="INQACC-COMMAREA.INQACC-AVAIL-BAL" srcLine="03 INQACC-AVAIL-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>75</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="INQACC-ACTUAL-BAL" originalName="INQACC-ACTUAL-BAL" included="Y" path="INQACC-COMMAREA.INQACC-ACTUAL-BAL" srcLine="03 INQACC-ACTUAL-BAL PIC S9(10)V9(2) USAGE DISPLAY.">
+                    <startPos>87</startPos>
+                    <bytes>12</bytes>
+                    <maxBytes>12</maxBytes>
+                    <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                </field>
+                <field name="INQACC-SUCCESS" originalName="INQACC-SUCCESS" included="Y" path="INQACC-COMMAREA.INQACC-SUCCESS" srcLine="03 INQACC-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>99</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="INQACC-PCB1-POINTER" originalName="INQACC-PCB1-POINTER" included="Y" path="INQACC-COMMAREA.INQACC-PCB1-POINTER" srcLine="03 INQACC-PCB1-POINTER PIC X(4) USAGE DISPLAY.">
+                    <startPos>100</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

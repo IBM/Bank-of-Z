@@ -1,0 +1,27 @@
+.gradle
+**/build/
+bin/
+!src/**/build/
+src/gen/
+src/main/webapp/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
+
+# Ignore VSCode generated files
+.settings
+.project
+.classpath
+.factorypath
+
+# Ignore OpenAPI generator files
+.openapi-generator/*

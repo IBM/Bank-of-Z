@@ -1,0 +1,41 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - UPDACC:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            template: "{{$body.CommCustno}}"
+        - COMM-ACCNO:
+            required: false
+            nullable: false
+            expression: "$body.CommAccno"
+        - COMM-ACC-TYPE:
+            required: false
+            nullable: false
+            template: "{{$body.CommAccType}}"
+        - COMM-INT-RATE:
+            required: false
+            nullable: false
+            expression: "$body.CommIntRate"
+        - COMM-OVERDRAFT:
+            required: false
+            nullable: false
+            expression: "$body.CommOverdraft"
+        - COMM-AVAIL-BAL:
+            required: false
+            nullable: false
+            expression: "$body.CommAvailBal"
+        - COMM-ACTUAL-BAL:
+            required: false
+            nullable: false
+            expression: "$body.CommActualBal"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "{{$body.CommSuccess}}"

@@ -1,0 +1,49 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - Comm:
+        required: false
+        nullable: false
+        mappings:
+        - CommEye:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-EYE\"}}"
+        - CommScode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-SCODE\"}}"
+        - CommCustno:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-CUSTNO\"}}"
+        - CommName:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-NAME\"}}"
+        - CommAddr:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-ADDR\"}}"
+        - CommDob:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.DELCUS.\"COMM-DOB\""
+        - CommCreditScore:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.DELCUS.\"COMM-CREDIT-SCORE\""
+        - CommCsReviewDate:
+            required: false
+            nullable: false
+            expression: "$zosAssetResponse.commarea.DELCUS.\"COMM-CS-REVIEW-DATE\""
+        - CommDelSuccess:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-DEL-SUCCESS\"}}"
+        - CommDelFailCd:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.DELCUS.\"COMM-DEL-FAIL-CD\"}}"

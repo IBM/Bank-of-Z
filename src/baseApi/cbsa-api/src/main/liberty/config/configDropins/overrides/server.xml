@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Bank of Z API Server - Custom Configuration">
+    
+    <!-- HTTP Endpoint Configuration -->
+    <httpEndpoint id="defaultHttpEndpoint" 
+                  host="*" 
+                  httpPort="30701"/>
+
+    <!-- CORS Configuration for all API endpoints -->
+    <cors domain="/"
+          allowedOrigins="*"
+          allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
+          allowedHeaders="Content-Type, Authorization, Accept, Origin, X-Requested-With"
+          allowCredentials="false"
+          maxAge="3600" />
+                            
+    <!-- CICS Connection Configuration -->
+    <zosconnect_cicsIpicConnection id="cbsaCicsConnection" 
+                                   host="localhost" 
+                                   port="30711" 
+                                   authDataRef="cicsCredentials"/>
+    
+    <zosconnect_authData id="cicsCredentials" 
+                         user="IBMUSER" 
+                         password="SYS1SYS1"/>
+
+    <!-- Application Configuration -->
+    <application id="banking-api" 
+                 location="${server.config.dir}/apps/api.war" 
+                 name="banking-api" 
+                 type="war"/>
+</server>
+
+<!-- Made with Bob -->

@@ -7,22 +7,36 @@ mappings:
         required: true
         nullable: false
         template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CUSTNO\"}}"
+    - title:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\".\"INQCUST-TITLE\"\
+          }}"
     - firstName:
         required: true
         nullable: false
-        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\"}}"
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\".\"INQCUST-FIRST-NAME\"\
+          }}"
     - lastName:
         required: true
         nullable: false
-        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\"}}"
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-NAME\".\"INQCUST-LAST-NAME\"\
+          }}"
     - dateOfBirth:
         required: false
         nullable: false
-        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\"}}"
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"INQCUST-DOB-YYYY\"\
+          }}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"INQCUST-DOB-MM\"\
+          }}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"INQCUST-DOB-DD\"\
+          }}"
     - email:
         required: true
         nullable: false
-        template: "customer@bankofz.com"
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-EMAIL\"}}"
+    - phoneNumber:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-PHONE\"}}"
     - address:
         required: false
         nullable: false
@@ -30,8 +44,36 @@ mappings:
         - addressLine1:
             required: false
             nullable: false
-            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\"}}"
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\".\"INQCUST-ADDR-LINE1\"\
+              }}"
+        - addressLine2:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\".\"INQCUST-ADDR-LINE2\"\
+              }}"
+        - city:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\".\"INQCUST-CITY\"\
+              }}"
+        - postalCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\".\"INQCUST-POSTCODE\"\
+              }}"
+        - country:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-ADDR\".\"INQCUST-COUNTRY\"\
+              }}"
     - customerStatus:
         required: false
         nullable: false
-        template: "ACTIVE"
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-STATUS\"}}"
+    - createdDate:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CREATED-DATE\"\
+          .\"INQCUST-CREATED-YYYY\"}}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CREATED-DATE\"\
+          .\"INQCUST-CREATED-MM\"}}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-CREATED-DATE\"\
+          .\"INQCUST-CREATED-DD\"}}T00:00:00Z"

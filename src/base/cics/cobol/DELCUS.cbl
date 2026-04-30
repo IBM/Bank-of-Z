@@ -61,6 +61,7 @@
           03 HV-CUSTOMER-NUMBER         PIC X(10).
           03 HV-CUSTOMER-NAME           PIC X(60).
           03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
@@ -435,6 +436,7 @@
                      CUSTOMER_NUMBER,
                      CUSTOMER_NAME,
                      CUSTOMER_ADDRESS,
+                     CUSTOMER_EMAIL,
                      CUSTOMER_DATE_OF_BIRTH,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
@@ -443,6 +445,7 @@
                      :HV-CUSTOMER-NUMBER,
                      :HV-CUSTOMER-NAME,
                      :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-DOB,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
@@ -570,6 +573,7 @@
            MOVE CUSTOMER-CS-REVIEW-DATE(5:4)
               TO WS-STOREDC-CS-REVIEW-DATE(7:4)
                  COMM-CS-REVIEW-YYYY IN DFHCOMMAREA.
+           MOVE HV-CUSTOMER-EMAIL TO COMM-EMAIL IN DFHCOMMAREA.
 
       *
       *    Now delete the customer from DB2

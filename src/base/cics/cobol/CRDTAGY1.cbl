@@ -42,22 +42,39 @@
 
 
        01 WS-CONT-IN.
-          03 WS-CONT-IN-EYECATCHER      PIC X(4).
-          03 WS-CONT-IN-KEY.
-             05 WS-CONT-IN-SORTCODE     PIC 9(6)  DISPLAY.
-             05 WS-CONT-IN-NUMBER       PIC 9(10) DISPLAY.
-          03 WS-CONT-IN-NAME            PIC X(60).
-          03 WS-CONT-IN-ADDRESS         PIC X(160).
-          03 WS-CONT-IN-DATE-OF-BIRTH   PIC 9(8).
-          03 WS-CONT-IN-DOB-GROUP REDEFINES WS-CONT-IN-DATE-OF-BIRTH.
-             05 WS-CONT-IN-BIRTH-DAY    PIC 99.
-             05 WS-CONT-IN-BIRTH-MONTH  PIC 99.
-             05 WS-CONT-IN-BIRTH-YEAR   PIC 9999.
-          03 WS-CONT-IN-CREDIT-SCORE    PIC 999.
-          03 WS-CONT-IN-CS-REVIEW-DATE  PIC 9(8).
-          03 WS-CONT-IN-EMAIL           PIC X(60).
-          03 WS-CONT-IN-SUCCESS         PIC X.
-          03 WS-CONT-IN-FAIL-CODE       PIC X.
+          03 WS-CONT-CUSTOMER-RECORD.
+             05 WS-CONT-EYECATCHER         PIC X(4).
+             05 WS-CONT-KEY.
+                07 WS-CONT-SORTCODE        PIC 9(6) DISPLAY.
+                07 WS-CONT-NUMBER          PIC 9(10) DISPLAY.
+             05 WS-CONT-NAME.
+                07 WS-CONT-TITLE           PIC X(10).
+                07 WS-CONT-FIRST-NAME      PIC X(50).
+                07 WS-CONT-LAST-NAME       PIC X(50).
+             05 WS-CONT-DOB.
+                07 WS-CONT-DOB-DAY         PIC 99 DISPLAY.
+                07 WS-CONT-DOB-MONTH       PIC 99 DISPLAY.
+                07 WS-CONT-DOB-YEAR        PIC 9999 DISPLAY.
+             05 WS-CONT-EMAIL              PIC X(60).
+             05 WS-CONT-PHONE              PIC X(20).
+             05 WS-CONT-ADDRESS.
+                07 WS-CONT-ADDR-LINE1      PIC X(50).
+                07 WS-CONT-ADDR-LINE2      PIC X(50).
+                07 WS-CONT-CITY            PIC X(50).
+                07 WS-CONT-POSTCODE        PIC X(10).
+                07 WS-CONT-COUNTRY         PIC X(50).
+             05 WS-CONT-STATUS             PIC X(10).
+             05 WS-CONT-CREATED-DATE.
+                07 WS-CONT-CREATED-DAY     PIC 99 DISPLAY.
+                07 WS-CONT-CREATED-MONTH   PIC 99 DISPLAY.
+                07 WS-CONT-CREATED-YEAR    PIC 9999 DISPLAY.
+             05 WS-CONT-CREDIT-SCORE       PIC 999.
+             05 WS-CONT-CS-REVIEW-DATE.
+                07 WS-CONT-CS-REVIEW-DAY   PIC 99 DISPLAY.
+                07 WS-CONT-CS-REVIEW-MONTH PIC 99 DISPLAY.
+                07 WS-CONT-CS-REVIEW-YEAR  PIC 9999 DISPLAY.
+             05 WS-CONT-SUCCESS            PIC X.
+             05 WS-CONT-FAIL-CODE          PIC X.
 
        01 WS-CICS-WORK-AREA.
           05 WS-CICS-RESP               PIC S9(8) COMP.
@@ -216,7 +233,7 @@
            COMPUTE WS-NEW-CREDSCORE = ((999 - 1)
                             * FUNCTION RANDOM) + 1.
 
-           MOVE WS-NEW-CREDSCORE TO WS-CONT-IN-CREDIT-SCORE.
+           MOVE WS-NEW-CREDSCORE TO WS-CONT-CREDIT-SCORE.
 
       *
       *    Now PUT the data back into a container

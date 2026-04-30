@@ -46,62 +46,87 @@ SORTC    DFHMDF POS=(7,18),LENGTH=6,ATTRB=(NORM,PROT,FSET,ASKIP),      *
 CUSTNO2  DFHMDF POS=(8,18),LENGTH=10,ATTRB=(NORM,PROT,ASKIP,FSET),     *
                COLOR=NEUTRAL
          DFHMDF POS=(9,1),LENGTH=16,ATTRB=(NORM,PROT),                 *
-               COLOR=NEUTRAL,INITIAL='Customer Name   '
-CUSTNAM  DFHMDF POS=(9,18),LENGTH=60,                                  *
+               COLOR=NEUTRAL,INITIAL='Title           '
+CUSTTITL DFHMDF POS=(9,18),LENGTH=10,                                  *
                ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
-         DFHMDF POS=(9,79),LENGTH=0,                                   *
+         DFHMDF POS=(9,29),LENGTH=0,                                   *
                ATTRB=(PROT,ASKIP),COLOR=GREEN
          DFHMDF POS=(10,1),LENGTH=16,ATTRB=(NORM,PROT),                *
-               COLOR=NEUTRAL,INITIAL='Customer Address'
-CUSTAD1  DFHMDF POS=(10,18),LENGTH=60,                                 *
+               COLOR=NEUTRAL,INITIAL='First Name      '
+CUSTFNAM DFHMDF POS=(10,18),LENGTH=50,                                 *
                ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
-         DFHMDF POS=(10,79),LENGTH=0,                                  *
+         DFHMDF POS=(10,69),LENGTH=0,                                  *
                ATTRB=(PROT,ASKIP),COLOR=GREEN
-         DFHMDF POS=(11,1),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),           *
-               COLOR=NEUTRAL,INITIAL=' '
-CUSTAD2  DFHMDF POS=(11,18),LENGTH=60,ATTRB=(NORM,PROT,ASKIP,FSET),    *
-               COLOR=NEUTRAL
-         DFHMDF POS=(11,79),LENGTH=0,                                  *
+         DFHMDF POS=(11,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Last Name       '
+CUSTLNAM DFHMDF POS=(11,18),LENGTH=50,                                 *
+               ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
+         DFHMDF POS=(11,69),LENGTH=0,                                  *
                ATTRB=(PROT,ASKIP),COLOR=GREEN
-         DFHMDF POS=(12,1),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),           *
-               COLOR=NEUTRAL,INITIAL=' '
-CUSTAD3  DFHMDF POS=(12,18),LENGTH=40,ATTRB=(NORM,PROT,FSET,ASKIP),    *
+         DFHMDF POS=(12,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Address Line 1  '
+CUSTAD1  DFHMDF POS=(12,18),LENGTH=50,                                 *
+               ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
+         DFHMDF POS=(12,69),LENGTH=0,                                  *
+               ATTRB=(PROT,ASKIP),COLOR=GREEN
+         DFHMDF POS=(13,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Address Line 2  '
+CUSTAD2  DFHMDF POS=(13,18),LENGTH=50,ATTRB=(NORM,PROT,ASKIP,FSET),    *
                COLOR=NEUTRAL
-         DFHMDF POS=(12,59),LENGTH=0,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(13,69),LENGTH=0,                                  *
+               ATTRB=(PROT,ASKIP),COLOR=GREEN
+         DFHMDF POS=(14,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='City            '
+CUSTCITY DFHMDF POS=(14,18),LENGTH=50,ATTRB=(NORM,PROT,FSET,ASKIP),    *
                COLOR=NEUTRAL
-         DFHMDF POS=(13,1),LENGTH=16,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(14,69),LENGTH=0,ATTRB=(NORM,PROT,ASKIP),          *
+               COLOR=NEUTRAL
+         DFHMDF POS=(15,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Postcode        '
+CUSTPOST DFHMDF POS=(15,18),LENGTH=10,ATTRB=(NORM,PROT,FSET,ASKIP),    *
+               COLOR=NEUTRAL
+         DFHMDF POS=(15,29),LENGTH=0,ATTRB=(NORM,PROT,ASKIP),          *
+               COLOR=NEUTRAL
+         DFHMDF POS=(16,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Country         '
+CUSTCTRY DFHMDF POS=(16,18),LENGTH=50,ATTRB=(NORM,PROT,FSET,ASKIP),    *
+               COLOR=NEUTRAL
+         DFHMDF POS=(16,69),LENGTH=0,ATTRB=(NORM,PROT,ASKIP),          *
+               COLOR=NEUTRAL
+         DFHMDF POS=(17,1),LENGTH=16,ATTRB=(NORM,PROT,ASKIP),          *
                COLOR=NEUTRAL,INITIAL='Customer D.O.B.'
-DOBDD    DFHMDF POS=(13,18),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+DOBDD    DFHMDF POS=(17,18),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
-         DFHMDF POS=(13,21),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(17,21),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
                COLOR=NEUTRAL,INITIAL='/'
-DOBMM    DFHMDF POS=(13,23),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+DOBMM    DFHMDF POS=(17,23),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
-         DFHMDF POS=(13,26),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(17,26),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
                COLOR=NEUTRAL,INITIAL='/'
-DOBYY    DFHMDF POS=(13,28),LENGTH=4,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+DOBYY    DFHMDF POS=(17,28),LENGTH=4,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
-         DFHMDF POS=(14,1),LENGTH=17,ATTRB=(NORM,PROT),                *
-               COLOR=NEUTRAL,INITIAL='Email Address   '
-CUSTEML  DFHMDF POS=(14,18),LENGTH=60,                                 *
-               ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
-         DFHMDF POS=(14,79),LENGTH=0,                                  *
-               ATTRB=(PROT,ASKIP),COLOR=GREEN
-         DFHMDF POS=(17,1),LENGTH=17,ATTRB=(NORM,PROT),                *
-               COLOR=NEUTRAL,INITIAL='Credit Score    '
-CREDSC   DFHMDF POS=(17,18),LENGTH=3,ATTRB=(NORM,PROT,FSET,ASKIP),     *
-               COLOR=NEUTRAL
+         DFHMDF POS=(17,33),ATTRB=(PROT,ASKIP),LENGTH=1
          DFHMDF POS=(18,1),LENGTH=17,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Email Address   '
+CUSTEML  DFHMDF POS=(18,18),LENGTH=60,                                 *
+               ATTRB=(PROT,FSET,NORM,ASKIP),COLOR=NEUTRAL
+         DFHMDF POS=(18,79),LENGTH=0,                                  *
+               ATTRB=(PROT,ASKIP),COLOR=GREEN
+         DFHMDF POS=(19,1),LENGTH=17,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL='Credit Score    '
+CREDSC   DFHMDF POS=(19,18),LENGTH=3,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+               COLOR=NEUTRAL
+         DFHMDF POS=(20,1),LENGTH=17,ATTRB=(NORM,PROT),                *
                COLOR=NEUTRAL,INITIAL='CS Review Date  '
-SCRDTDD  DFHMDF POS=(18,18),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+SCRDTDD  DFHMDF POS=(20,18),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
-         DFHMDF POS=(18,21),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(20,21),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
                COLOR=NEUTRAL,INITIAL='/'
-SCRDTMM  DFHMDF POS=(18,23),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+SCRDTMM  DFHMDF POS=(20,23),LENGTH=2,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
-         DFHMDF POS=(18,26),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
+         DFHMDF POS=(20,26),LENGTH=1,ATTRB=(NORM,PROT,ASKIP),          *
                COLOR=NEUTRAL,INITIAL='/'
-SCRDTYY  DFHMDF POS=(18,28),LENGTH=4,ATTRB=(NORM,PROT,FSET,ASKIP),     *
+SCRDTYY  DFHMDF POS=(20,28),LENGTH=4,ATTRB=(NORM,PROT,FSET,ASKIP),     *
                COLOR=NEUTRAL
 ***********************************************************************
 MESSAGE  DFHMDF POS=(23,1),LENGTH=79,COLOR=YELLOW,                     *

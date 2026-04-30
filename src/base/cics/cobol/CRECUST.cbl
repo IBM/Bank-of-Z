@@ -68,10 +68,19 @@
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
@@ -249,27 +258,39 @@
        01 WS-CHILD-FETCH-COMPST         PIC S9(8) COMP.
 
        01 WS-CHILD-DATA.
-          03 WS-CHILD-DATA-EYECATCHER   PIC X(4).
-          03 WS-CHLD-DATA-KEY.
-             05 WS-CHILD-DATA-SORTCODE  PIC 9(6) DISPLAY.
-             05 WS-CHILD-DATA-NUMBER    PIC 9(10) DISPLAY.
-          03 WS-CHILD-DATA-NAME         PIC X(60).
-          03 WS-CHILD-DATA-ADDRESS      PIC X(160).
-          03 WS-CHILD-DATA-DATE-OF-BIRTH
-                                        PIC 9(8).
-          03 WS-CHILD-DATA-DOB-GROUP
-                REDEFINES WS-CHILD-DATA-DATE-OF-BIRTH.
-             05 WS-CHILD-DATA-BIRTH-DAY PIC 99.
-             05 WS-CHILD-DATA-BIRTH-MONTH
-                                        PIC 99.
-             05 WS-CHILD-DATA-BIRTH-YEAR
-                                        PIC 9999.
-          03 WS-CHILD-DATA-CREDIT-SCORE PIC 999.
-          03 WS-CHILD-DATA-CS-REVIEW-DATE
-                                        PIC 9(8).
-          03 WS-CHILD-DATA-EMAIL        PIC X(60).
-          03 WS-CHILD-DATA-SUCCESS      PIC X.
-          03 WS-CHILD-DATA-FAIL-CODE    PIC X.
+          03 WS-CHILD-CUSTOMER-RECORD.
+             05 WS-CHILD-EYECATCHER        PIC X(4).
+             05 WS-CHILD-KEY.
+                07 WS-CHILD-SORTCODE       PIC 9(6) DISPLAY.
+                07 WS-CHILD-NUMBER         PIC 9(10) DISPLAY.
+             05 WS-CHILD-NAME.
+                07 WS-CHILD-TITLE          PIC X(10).
+                07 WS-CHILD-FIRST-NAME     PIC X(50).
+                07 WS-CHILD-LAST-NAME      PIC X(50).
+             05 WS-CHILD-DOB.
+                07 WS-CHILD-DOB-DAY        PIC 99 DISPLAY.
+                07 WS-CHILD-DOB-MONTH      PIC 99 DISPLAY.
+                07 WS-CHILD-DOB-YEAR       PIC 9999 DISPLAY.
+             05 WS-CHILD-EMAIL             PIC X(60).
+             05 WS-CHILD-PHONE             PIC X(20).
+             05 WS-CHILD-ADDRESS.
+                07 WS-CHILD-ADDR-LINE1     PIC X(50).
+                07 WS-CHILD-ADDR-LINE2     PIC X(50).
+                07 WS-CHILD-CITY           PIC X(50).
+                07 WS-CHILD-POSTCODE       PIC X(10).
+                07 WS-CHILD-COUNTRY        PIC X(50).
+             05 WS-CHILD-STATUS            PIC X(10).
+             05 WS-CHILD-CREATED-DATE.
+                07 WS-CHILD-CREATED-DAY    PIC 99 DISPLAY.
+                07 WS-CHILD-CREATED-MONTH  PIC 99 DISPLAY.
+                07 WS-CHILD-CREATED-YEAR   PIC 9999 DISPLAY.
+             05 WS-CHILD-CREDIT-SCORE      PIC 999.
+             05 WS-CHILD-CS-REVIEW-DATE.
+                07 WS-CHILD-CS-REVIEW-DAY  PIC 99 DISPLAY.
+                07 WS-CHILD-CS-REVIEW-MONTH PIC 99 DISPLAY.
+                07 WS-CHILD-CS-REVIEW-YEAR PIC 9999 DISPLAY.
+             05 WS-CHILD-SUCCESS           PIC X.
+             05 WS-CHILD-FAIL-CODE         PIC X.
 
        01 WS-CONTAINER-NAME             PIC X(16)     VALUE SPACES.
        01 WS-CHILD-CONTAINER-LEN        PIC S9(8) COMP
@@ -374,6 +395,7 @@
            COPY CUSTCTRL.
 
        01 WS-UNSTR-TITLE                PIC X(9)      VALUE ' '.
+       01 WS-FULL-NAME                  PIC X(110)    VALUE SPACES.
        01 WS-TITLE-VALID                PIC X.
 
 
@@ -391,13 +413,9 @@
       *    You can change the customer's name, but the title must
       *    be a valid one. Check that here
       *
-           MOVE SPACES TO WS-UNSTR-TITLE.
-           UNSTRING COMM-NAME DELIMITED BY SPACE
-              INTO WS-UNSTR-TITLE.
-
            MOVE ' ' TO WS-TITLE-VALID.
 
-           EVALUATE WS-UNSTR-TITLE
+           EVALUATE COMM-TITLE
            WHEN 'Professor'
                 MOVE 'Y' TO WS-TITLE-VALID
 
@@ -1005,8 +1023,8 @@
                                    TO WS-CONTAINER-NAME
                            END-EVALUATE
 
-                           MOVE LENGTH OF WS-CHILD-DATA
-                              TO WS-CHILD-CONTAINER-LEN
+                           COMPUTE WS-CHILD-CONTAINER-LEN =
+                              LENGTH OF WS-CHILD-DATA
 
                            EXEC CICS GET CONTAINER(WS-CONTAINER-NAME)
                                 CHANNEL(WS-ANY-CHILD-FETCH-CHAN)
@@ -1051,7 +1069,7 @@
                               WS-RETRIEVED-CNT + 1
                            COMPUTE WS-TOTAL-CS-SCR =
                               WS-TOTAL-CS-SCR +
-                              WS-CHILD-DATA-CREDIT-SCORE
+                              WS-CHILD-CREDIT-SCORE
 
                       WHEN DFHVALUE(ABEND)
       *
@@ -1148,8 +1166,12 @@
            MOVE SORTCODE TO CUSTOMER-SORTCODE.
            MOVE NCS-CUST-NO-VALUE TO CUSTOMER-NUMBER.
            MOVE COMM-NAME TO CUSTOMER-NAME.
-           MOVE COMM-ADDRESS TO CUSTOMER-ADDRESS.
-           MOVE COMM-DATE-OF-BIRTH TO CUSTOMER-DATE-OF-BIRTH.
+           MOVE COMM-DOB TO CUSTOMER-DOB.
+           MOVE COMM-EMAIL TO CUSTOMER-EMAIL.
+           MOVE COMM-PHONE TO CUSTOMER-PHONE.
+           MOVE COMM-ADDR TO CUSTOMER-ADDRESS.
+           MOVE COMM-STATUS TO CUSTOMER-STATUS.
+           MOVE COMM-CREATED-DATE TO CUSTOMER-CREATED-DATE.
            MOVE COMM-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE.
            MOVE COMM-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE.
            MOVE COMM-EMAIL TO CUSTOMER-EMAIL.
@@ -1160,25 +1182,58 @@
            MOVE 'CUST' TO HV-CUSTOMER-EYECATCHER.
            MOVE SORTCODE TO HV-CUSTOMER-SORTCODE.
            MOVE WS-CUSTOMER-NO-NUM TO HV-CUSTOMER-NUMBER.
-           MOVE COMM-NAME TO HV-CUSTOMER-NAME.
-           MOVE COMM-ADDRESS TO HV-CUSTOMER-ADDRESS.
+           MOVE COMM-TITLE OF COMM-NAME TO HV-CUSTOMER-TITLE.
+           MOVE COMM-FIRST-NAME OF COMM-NAME TO HV-CUSTOMER-FIRST-NAME.
+           MOVE COMM-LAST-NAME OF COMM-NAME TO HV-CUSTOMER-LAST-NAME.
+           COMPUTE HV-CUSTOMER-DOB =
+              (COMM-DOB-YEAR * 10000) +
+              (COMM-DOB-MONTH * 100) +
+              COMM-DOB-DAY.
            MOVE COMM-EMAIL TO HV-CUSTOMER-EMAIL.
-           MOVE COMM-DATE-OF-BIRTH TO HV-CUSTOMER-DOB.
+           MOVE COMM-PHONE TO HV-CUSTOMER-PHONE.
+           MOVE COMM-ADDR-LINE1 OF COMM-ADDR
+              TO HV-CUSTOMER-ADDR-LINE1.
+           MOVE COMM-ADDR-LINE2 OF COMM-ADDR
+              TO HV-CUSTOMER-ADDR-LINE2.
+           MOVE COMM-CITY OF COMM-ADDR TO HV-CUSTOMER-CITY.
+           MOVE COMM-POSTCODE OF COMM-ADDR TO HV-CUSTOMER-POSTCODE.
+           MOVE COMM-COUNTRY OF COMM-ADDR TO HV-CUSTOMER-COUNTRY.
+           MOVE COMM-STATUS TO HV-CUSTOMER-STATUS.
+           
+      *
+      * Convert created date to INTEGER format (YYYYMMDD)
+      *
+           COMPUTE HV-CUSTOMER-CREATE-DATE =
+              (COMM-CREATED-YEAR OF COMM-CREATED-DATE * 10000) +
+              (COMM-CREATED-MONTH OF COMM-CREATED-DATE * 100) +
+              COMM-CREATED-DAY OF COMM-CREATED-DATE.
+              
            MOVE COMM-CREDIT-SCORE TO HV-CUSTOMER-CREDIT-SCORE.
-           MOVE COMM-CS-REVIEW-DATE TO HV-CUSTOMER-CS-REVIEW-DATE.
+           
+      *
+      * Convert CS review date to INTEGER format (YYYYMMDD)
+      *
+           COMPUTE HV-CUSTOMER-CS-REVIEW-DATE =
+              (COMM-CS-REVIEW-YEAR OF COMM-CS-REVIEW-DATE * 10000) +
+              (COMM-CS-REVIEW-MONTH OF COMM-CS-REVIEW-DATE * 100) +
+              COMM-CS-REVIEW-DAY OF COMM-CS-REVIEW-DATE.
 
            DISPLAY 'CUSTOMER-EYECATCHER: ' CUSTOMER-EYECATCHER
            DISPLAY 'CUSTOMER-SORTCODE: ' CUSTOMER-SORTCODE
            DISPLAY 'CUSTOMER-NUMBER: ' CUSTOMER-NUMBER
-           DISPLAY 'CUSTOMER-NAME: ' CUSTOMER-NAME
-           DISPLAY 'CUSTOMER-ADDRESS: ' CUSTOMER-ADDRESS
-           DISPLAY 'CUSTOMER-DOB: ' CUSTOMER-DATE-OF-BIRTH
+           DISPLAY 'CUSTOMER-FIRST-NAME: ' CUSTOMER-FIRST-NAME
+           DISPLAY 'CUSTOMER-LAST-NAME: ' CUSTOMER-LAST-NAME
+           DISPLAY 'CUSTOMER-EMAIL: ' CUSTOMER-EMAIL
+           DISPLAY 'CUSTOMER-DOB: ' CUSTOMER-DOB-DAY OF CUSTOMER-DOB
+              '/' CUSTOMER-DOB-MONTH OF CUSTOMER-DOB
+              '/' CUSTOMER-DOB-YEAR OF CUSTOMER-DOB
 
            DISPLAY 'HV-CUSTOMER-EYECATCHER: ' HV-CUSTOMER-EYECATCHER
            DISPLAY 'HV-CUSTOMER-SORTCODE: ' HV-CUSTOMER-SORTCODE
            DISPLAY 'HV-CUSTOMER-NUMBER: ' HV-CUSTOMER-NUMBER
-           DISPLAY 'HV-CUSTOMER-NAME: ' HV-CUSTOMER-NAME
-           DISPLAY 'HV-CUSTOMER-ADDRESS: ' HV-CUSTOMER-ADDRESS
+           DISPLAY 'HV-CUSTOMER-FIRST-NAME: ' HV-CUSTOMER-FIRST-NAME
+           DISPLAY 'HV-CUSTOMER-LAST-NAME: ' HV-CUSTOMER-LAST-NAME
+           DISPLAY 'HV-CUSTOMER-EMAIL: ' HV-CUSTOMER-EMAIL
            DISPLAY 'HV-CUSTOMER-DOB: ' HV-CUSTOMER-DOB
            DISPLAY 'HV-CUSTOMER-CREDIT-SCOR: ' HV-CUSTOMER-CREDIT-SCORE
            DISPLAY 'HV-CUSTOMER-CS-DATE: ' HV-CUSTOMER-CS-REVIEW-DATE
@@ -1190,20 +1245,38 @@
                  (CUSTOMER_EYECATCHER,
                   CUSTOMER_SORTCODE,
                   CUSTOMER_NUMBER,
-                  CUSTOMER_NAME,
-                  CUSTOMER_ADDRESS,
+                  CUSTOMER_TITLE,
+                  CUSTOMER_FIRST_NAME,
+                  CUSTOMER_LAST_NAME,
                   CUSTOMER_EMAIL,
                   CUSTOMER_DATE_OF_BIRTH,
+                  CUSTOMER_PHONE,
+                  CUSTOMER_ADDR_LINE1,
+                  CUSTOMER_ADDR_LINE2,
+                  CUSTOMER_CITY,
+                  CUSTOMER_POSTCODE,
+                  CUSTOMER_COUNTRY,
+                  CUSTOMER_STATUS,
+                  CUSTOMER_CREATED_DATE,
                   CUSTOMER_CREDIT_SCORE,
                   CUSTOMER_CS_REVIEW_DATE)
               VALUES
                  (:HV-CUSTOMER-EYECATCHER,
                   :HV-CUSTOMER-SORTCODE,
                   :HV-CUSTOMER-NUMBER,
-                  :HV-CUSTOMER-NAME,
-                  :HV-CUSTOMER-ADDRESS,
+                  :HV-CUSTOMER-TITLE,
+                  :HV-CUSTOMER-FIRST-NAME,
+                  :HV-CUSTOMER-LAST-NAME,
                   :HV-CUSTOMER-EMAIL,
                   :HV-CUSTOMER-DOB,
+                  :HV-CUSTOMER-PHONE,
+                  :HV-CUSTOMER-ADDR-LINE1,
+                  :HV-CUSTOMER-ADDR-LINE2,
+                  :HV-CUSTOMER-CITY,
+                  :HV-CUSTOMER-POSTCODE,
+                  :HV-CUSTOMER-COUNTRY,
+                  :HV-CUSTOMER-STATUS,
+                  :HV-CUSTOMER-CREATE-DATE,
                   :HV-CUSTOMER-CREDIT-SCORE,
                   :HV-CUSTOMER-CS-REVIEW-DATE)
            END-EXEC.
@@ -1230,12 +1303,18 @@
       *
            MOVE CUSTOMER-SORTCODE OF OUTPUT-DATA TO STORED-SORTCODE.
            MOVE CUSTOMER-NUMBER OF OUTPUT-DATA TO STORED-CUSTNO.
-           MOVE CUSTOMER-NAME TO STORED-NAME.
-           MOVE CUSTOMER-DATE-OF-BIRTH(1:2) TO STORED-DOB(1:2).
+           STRING CUSTOMER-FIRST-NAME OF CUSTOMER-NAME
+                  DELIMITED BY '  '
+                  ' ' DELIMITED BY SIZE
+                  CUSTOMER-LAST-NAME OF CUSTOMER-NAME
+                  DELIMITED BY '  '
+              INTO STORED-NAME
+           END-STRING.
+           MOVE CUSTOMER-DOB-DAY OF CUSTOMER-DOB TO STORED-DOB(1:2).
            MOVE '/' TO STORED-DOB(3:1).
-           MOVE CUSTOMER-DATE-OF-BIRTH(3:2) TO STORED-DOB(4:2).
+           MOVE CUSTOMER-DOB-MONTH OF CUSTOMER-DOB TO STORED-DOB(4:2).
            MOVE '/' TO STORED-DOB(6:1).
-           MOVE CUSTOMER-DATE-OF-BIRTH(5:4) TO STORED-DOB(7:4).
+           MOVE CUSTOMER-DOB-YEAR OF CUSTOMER-DOB TO STORED-DOB(7:4).
 
            PERFORM WRITE-PROCTRAN.
 
@@ -1504,22 +1583,33 @@
       *
       *    Ensure that the Date Of Birth is valid
       *
-           IF COMM-BIRTH-YEAR < 1601
+           DISPLAY '7A - Starting DATE-OF-BIRTH-CHECK'
+           DISPLAY '7A - COMM-DOB-YEAR=' COMM-DOB-YEAR OF COMM-DOB
+           DISPLAY '7A - COMM-DOB-MONTH=' COMM-DOB-MONTH OF COMM-DOB
+           DISPLAY '7A - COMM-DOB-DAY=' COMM-DOB-DAY OF COMM-DOB
+           
+           IF COMM-DOB-YEAR OF COMM-DOB < 1601
+              DISPLAY '7B - DOB YEAR < 1601, setting error'
               MOVE 'Y' TO WS-DATE-OF-BIRTH-ERROR
               MOVE 'O' TO COMM-FAIL-CODE
               GO TO DOBC999
            END-IF.
 
-           MOVE COMM-BIRTH-YEAR TO CEEDAYS-YEAR.
-           MOVE COMM-BIRTH-MONTH TO CEEDAYS-MONTH.
-           MOVE COMM-BIRTH-DAY TO CEEDAYS-DAY.
+           DISPLAY '7C - DOB year check passed'
+           MOVE COMM-DOB-YEAR OF COMM-DOB TO CEEDAYS-YEAR.
+           MOVE COMM-DOB-MONTH OF COMM-DOB TO CEEDAYS-MONTH.
+           MOVE COMM-DOB-DAY OF COMM-DOB TO CEEDAYS-DAY.
 
+           DISPLAY '7D - Calling CEEDAYS with date='
+                   DATE-OF-BIRTH-FOR-CEEDAYS
            CALL "CEEDAYS" USING DATE-OF-BIRTH-FOR-CEEDAYS
                                 DATE-OF-BIRTH-FORMAT,
                                 WS-DATE-OF-BIRTH-LILLIAN,
                                 FC.
 
+           DISPLAY '7E - CEEDAYS returned, FC=' FC
            IF NOT CEE000 OF FC THEN
+              DISPLAY '7F - CEEDAYS failed'
               MOVE 'Y' TO WS-DATE-OF-BIRTH-ERROR
               MOVE 'Z' TO COMM-FAIL-CODE
               DISPLAY 'CEEDAYS failed, FORMAT LENGTH 10 with msg '
@@ -1528,6 +1618,8 @@
                       DATE-OF-BIRTH-FOR-CEEDAYS
               GO TO DOBC999
            END-IF.
+           
+           DISPLAY '7G - CEEDAYS succeeded'
 
            CALL "CEELOCT" USING WS-TODAY-LILLIAN,
                                 WS-TODAY-SECONDS,
@@ -1541,7 +1633,7 @@
               GO TO DOBC999
            END-IF.
 
-           SUBTRACT COMM-BIRTH-YEAR FROM WS-TODAY-G-YEAR
+           SUBTRACT COMM-DOB-YEAR OF COMM-DOB FROM WS-TODAY-G-YEAR
               GIVING WS-CUSTOMER-AGE
 
            IF WS-CUSTOMER-AGE > 150

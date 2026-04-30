@@ -107,16 +107,32 @@
           03 SUBPGM-KEY.
              05 SUBPGM-SORTCODE                PIC 9(6) DISPLAY.
              05 SUBPGM-NUMBER                  PIC 9(10) DISPLAY.
-          03 SUBPGM-NAME                       PIC X(60).
-          03 SUBPGM-ADDRESS                    PIC X(160).
-          03 SUBPGM-DATE-OF-BIRTH              PIC 9(8).
-          03 SUBPGM-DOB-GROUP REDEFINES SUBPGM-DATE-OF-BIRTH.
-             05 SUBPGM-BIRTH-DAY               PIC 99.
-             05 SUBPGM-BIRTH-MONTH             PIC 99.
-             05 SUBPGM-BIRTH-YEAR              PIC 9999.
-          03 SUBPGM-CREDIT-SCORE               PIC 999.
-          03 SUBPGM-CS-REVIEW-DATE             PIC 9(8).
+          03 SUBPGM-NAME.
+             05 SUBPGM-TITLE                   PIC X(10).
+             05 SUBPGM-FIRST-NAME              PIC X(50).
+             05 SUBPGM-LAST-NAME               PIC X(50).
+          03 SUBPGM-DOB.
+             05 SUBPGM-BIRTH-DAY               PIC 99 DISPLAY.
+             05 SUBPGM-BIRTH-MONTH             PIC 99 DISPLAY.
+             05 SUBPGM-BIRTH-YEAR              PIC 9999 DISPLAY.
           03 SUBPGM-EMAIL                      PIC X(60).
+          03 SUBPGM-PHONE                      PIC X(20).
+          03 SUBPGM-ADDR.
+             05 SUBPGM-ADDR-LINE1              PIC X(50).
+             05 SUBPGM-ADDR-LINE2              PIC X(50).
+             05 SUBPGM-CITY                    PIC X(50).
+             05 SUBPGM-POSTCODE                PIC X(10).
+             05 SUBPGM-COUNTRY                 PIC X(50).
+          03 SUBPGM-STATUS                     PIC X(10).
+          03 SUBPGM-CREATED-DATE.
+             05 SUBPGM-CREATED-DAY             PIC 99 DISPLAY.
+             05 SUBPGM-CREATED-MONTH           PIC 99 DISPLAY.
+             05 SUBPGM-CREATED-YEAR            PIC 9999 DISPLAY.
+          03 SUBPGM-CREDIT-SCORE               PIC 999.
+          03 SUBPGM-CS-REVIEW-DATE.
+             05 SUBPGM-CS-REVIEW-DAY           PIC 99 DISPLAY.
+             05 SUBPGM-CS-REVIEW-MONTH         PIC 99 DISPLAY.
+             05 SUBPGM-CS-REVIEW-YEAR          PIC 9999 DISPLAY.
           03 SUBPGM-SUCCESS                    PIC X.
           03 SUBPGM-FAIL-CODE                  PIC X.
 
@@ -179,7 +195,6 @@
                  MOVE SPACES TO CUSTSNO
                  MOVE SPACES TO CUSTAD1O
                  MOVE SPACES TO CUSTAD2O
-                 MOVE SPACES TO CUSTAD3O
 
                  MOVE -1 TO CUSTTITL
                  SET SEND-ERASE TO TRUE
@@ -489,7 +504,9 @@
            MOVE SPACES TO CUSTSNI.
            MOVE SPACES TO CUSTAD1I.
            MOVE SPACES TO CUSTAD2I.
-           MOVE SPACES TO CUSTAD3I.
+           MOVE SPACES TO CITYI.
+           MOVE SPACES TO POSTCODEI.
+           MOVE SPACES TO COUNTRYI.
            MOVE SPACES TO CUSTEMLI.
            MOVE 0 TO DOBDDI.
            MOVE 0 TO DOBMMI.
@@ -975,23 +992,28 @@
            INSPECT CUSTINSI REPLACING ALL '_' BY ' '.
            INSPECT CUSTSNI  REPLACING ALL '_' BY ' '.
 
-           STRING CUSTTITI DELIMITED BY SPACE,
+           MOVE CUSTTITI TO SUBPGM-TITLE.
+           MOVE CHRISTNI TO SUBPGM-FIRST-NAME.
+           
+           STRING CUSTINSI DELIMITED BY SPACE,
                   ' ' DELIMITED BY SIZE,
-                  CHRISTNI DELIMITED BY SPACE,
-                  ' ' DELIMITED BY SIZE,
-                  CUSTINSI  DELIMITED BY SPACE,
-                  ' ' DELIMITED BY SIZE,
-                  CUSTSNI   DELIMITED BY SIZE
-           INTO SUBPGM-NAME.
+                  CUSTSNI DELIMITED BY SIZE
+           INTO SUBPGM-LAST-NAME.
 
            INSPECT CUSTAD1I REPLACING ALL '_' BY ' '.
            INSPECT CUSTAD2I REPLACING ALL '_' BY ' '.
-           INSPECT CUSTAD3I REPLACING ALL '_' BY ' '.
+           INSPECT CITYI REPLACING ALL '_' BY ' '.
+           INSPECT POSTCODEI REPLACING ALL '_' BY ' '.
+           INSPECT COUNTRYI REPLACING ALL '_' BY ' '.
 
-           STRING CUSTAD1I   DELIMITED BY SIZE,
-                  CUSTAD2I   DELIMITED BY SIZE,
-                  CUSTAD3I   DELIMITED BY SIZE
-                  INTO SUBPGM-ADDRESS.
+           MOVE CUSTAD1I TO SUBPGM-ADDR-LINE1.
+           MOVE CUSTAD2I TO SUBPGM-ADDR-LINE2.
+           MOVE CITYI TO SUBPGM-CITY.
+           MOVE POSTCODEI TO SUBPGM-POSTCODE.
+           MOVE COUNTRYI TO SUBPGM-COUNTRY.
+           MOVE SPACES TO SUBPGM-EMAIL.
+           MOVE SPACES TO SUBPGM-PHONE.
+           MOVE SPACES TO SUBPGM-STATUS.
 
            MOVE DOBDDI TO SUBPGM-BIRTH-DAY.
            MOVE DOBMMI TO SUBPGM-BIRTH-MONTH.
@@ -1107,10 +1129,11 @@
            MOVE SUBPGM-BIRTH-YEAR     TO DOBYYO.
            MOVE SUBPGM-BIRTH-MONTH    TO DOBMMO.
            MOVE SUBPGM-BIRTH-DAY      TO DOBDDO.
-           MOVE SUBPGM-ADDRESS        TO WS-ADDR-SPLIT.
-           MOVE WS-ADDR-SPLIT1        TO CUSTAD1O.
-           MOVE WS-ADDR-SPLIT2        TO CUSTAD2O.
-           MOVE WS-ADDR-SPLIT3        TO CUSTAD3O.
+           MOVE SUBPGM-ADDR-LINE1  TO CUSTAD1O.
+           MOVE SUBPGM-ADDR-LINE2  TO CUSTAD2O.
+           MOVE SUBPGM-CITY        TO CITYO.
+           MOVE SUBPGM-POSTCODE    TO POSTCODEO.
+           MOVE SUBPGM-COUNTRY     TO COUNTRYO.
            MOVE SUBPGM-CREDIT-SCORE   TO CREDSCO.
            MOVE SUBPGM-CS-REVIEW-DATE(1:2)
                                       TO SCRDTDDO.

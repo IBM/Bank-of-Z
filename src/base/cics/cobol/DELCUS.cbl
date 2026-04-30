@@ -59,10 +59,19 @@
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
@@ -434,19 +443,37 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_EMAIL,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER
@@ -534,26 +561,57 @@
                                         COMM-SCODE IN DFHCOMMAREA.
            MOVE HV-CUSTOMER-NUMBER TO WS-STOREDC-NUMBER
                                       COMM-CUSTNO IN DFHCOMMAREA.
-           MOVE HV-CUSTOMER-NAME TO WS-STOREDC-NAME
-                                    COMM-NAME IN DFHCOMMAREA.
-           MOVE HV-CUSTOMER-ADDRESS TO WS-STOREDC-ADDRESS
-                                       COMM-ADDR IN DFHCOMMAREA.
+           MOVE HV-CUSTOMER-TITLE TO COMM-TITLE OF COMM-NAME.
+           MOVE HV-CUSTOMER-FIRST-NAME TO COMM-FIRST-NAME OF COMM-NAME.
+           MOVE HV-CUSTOMER-LAST-NAME TO COMM-LAST-NAME OF COMM-NAME.
+           MOVE HV-CUSTOMER-EMAIL TO COMM-EMAIL.
+           MOVE HV-CUSTOMER-PHONE TO COMM-PHONE.
+           MOVE HV-CUSTOMER-ADDR-LINE1 TO COMM-ADDR-LINE1 OF COMM-ADDR.
+           MOVE HV-CUSTOMER-ADDR-LINE2 TO COMM-ADDR-LINE2 OF COMM-ADDR.
+           MOVE HV-CUSTOMER-CITY TO COMM-CITY OF COMM-ADDR.
+           MOVE HV-CUSTOMER-POSTCODE TO COMM-POSTCODE OF COMM-ADDR.
+           MOVE HV-CUSTOMER-COUNTRY TO COMM-COUNTRY OF COMM-ADDR.
+           MOVE HV-CUSTOMER-STATUS TO COMM-STATUS.
+           COMPUTE COMM-CREATED-YEAR =
+              HV-CUSTOMER-CREATE-DATE / 10000.
+           COMPUTE COMM-CREATED-MONTH =
+              FUNCTION MOD(HV-CUSTOMER-CREATE-DATE / 100, 100).
+           COMPUTE COMM-CREATED-DAY =
+              FUNCTION MOD(HV-CUSTOMER-CREATE-DATE, 100).
+           
+           STRING HV-CUSTOMER-FIRST-NAME DELIMITED BY '  '
+                  ' ' DELIMITED BY SIZE
+                  HV-CUSTOMER-LAST-NAME DELIMITED BY '  '
+              INTO WS-STOREDC-NAME
+           END-STRING.
+           
+           STRING HV-CUSTOMER-ADDR-LINE1 DELIMITED BY '  '
+                  ', ' DELIMITED BY SIZE
+                  HV-CUSTOMER-CITY DELIMITED BY '  '
+                  ', ' DELIMITED BY SIZE
+                  HV-CUSTOMER-POSTCODE DELIMITED BY '  '
+              INTO WS-STOREDC-ADDRESS
+           END-STRING.
 
       *
       *    Format date of birth (convert from INTEGER to formatted string)
       *
-           MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH.
-           MOVE CUSTOMER-DATE-OF-BIRTH(1:2)
-              TO WS-STOREDC-DATE-OF-BIRTH(1:2)
-                 COMM-BIRTH-DAY IN DFHCOMMAREA.
+           COMPUTE COMM-DOB-YEAR = HV-CUSTOMER-DOB / 10000.
+           COMPUTE COMM-DOB-MONTH =
+              FUNCTION MOD(HV-CUSTOMER-DOB / 100, 100).
+           COMPUTE COMM-DOB-DAY =
+              FUNCTION MOD(HV-CUSTOMER-DOB, 100).
+           MOVE COMM-DOB-DAY TO WS-STOREDC-DATE-OF-BIRTH(1:2).
+           MOVE COMM-DOB-DAY TO COMM-DOB-DAY OF COMM-DOB
+              IN DFHCOMMAREA.
            MOVE '/' TO WS-STOREDC-DATE-OF-BIRTH(3:1).
-           MOVE CUSTOMER-DATE-OF-BIRTH(3:2)
-              TO WS-STOREDC-DATE-OF-BIRTH(4:2)
-                 COMM-BIRTH-MONTH IN DFHCOMMAREA.
+           MOVE COMM-DOB-MONTH TO WS-STOREDC-DATE-OF-BIRTH(4:2).
+           MOVE COMM-DOB-MONTH TO COMM-DOB-MONTH OF COMM-DOB
+              IN DFHCOMMAREA.
            MOVE '/' TO WS-STOREDC-DATE-OF-BIRTH(6:1).
-           MOVE CUSTOMER-DATE-OF-BIRTH(5:4)
-              TO WS-STOREDC-DATE-OF-BIRTH(7:4)
-                 COMM-BIRTH-YEAR IN DFHCOMMAREA.
+           MOVE COMM-DOB-YEAR TO WS-STOREDC-DATE-OF-BIRTH(7:4).
+           MOVE COMM-DOB-YEAR TO COMM-DOB-YEAR OF COMM-DOB
+              IN DFHCOMMAREA.
 
            MOVE HV-CUSTOMER-CREDIT-SCORE TO WS-STOREDC-CREDIT-SCORE
                                             COMM-CREDIT-SCORE.
@@ -561,19 +619,22 @@
       *
       *    Format credit score review date
       *
-           MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE.
-           MOVE CUSTOMER-CS-REVIEW-DATE(1:2)
-              TO WS-STOREDC-CS-REVIEW-DATE(1:2)
-                 COMM-CS-REVIEW-DD IN DFHCOMMAREA.
+           COMPUTE COMM-CS-REVIEW-YEAR OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA = HV-CUSTOMER-CS-REVIEW-DATE / 10000.
+           COMPUTE COMM-CS-REVIEW-MONTH OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA =
+              FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE / 100, 100).
+           COMPUTE COMM-CS-REVIEW-DAY OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA =
+              FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE, 100).
+           MOVE COMM-CS-REVIEW-DAY OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA TO WS-STOREDC-CS-REVIEW-DATE(1:2).
            MOVE '/' TO WS-STOREDC-CS-REVIEW-DATE(3:1).
-           MOVE CUSTOMER-CS-REVIEW-DATE(3:2)
-              TO WS-STOREDC-CS-REVIEW-DATE(4:2)
-                 COMM-CS-REVIEW-MM IN DFHCOMMAREA.
+           MOVE COMM-CS-REVIEW-MONTH OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA TO WS-STOREDC-CS-REVIEW-DATE(4:2).
            MOVE '/' TO WS-STOREDC-CS-REVIEW-DATE(6:1).
-           MOVE CUSTOMER-CS-REVIEW-DATE(5:4)
-              TO WS-STOREDC-CS-REVIEW-DATE(7:4)
-                 COMM-CS-REVIEW-YYYY IN DFHCOMMAREA.
-           MOVE HV-CUSTOMER-EMAIL TO COMM-EMAIL IN DFHCOMMAREA.
+           MOVE COMM-CS-REVIEW-YEAR OF COMM-CS-REVIEW-DATE
+              OF DFHCOMMAREA TO WS-STOREDC-CS-REVIEW-DATE(7:4).
 
       *
       *    Now delete the customer from DB2

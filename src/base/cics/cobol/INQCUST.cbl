@@ -36,37 +36,46 @@
 
        WORKING-STORAGE SECTION.
 
-       77 SYSIDERR-RETRY               PIC 999.
-       77 INQCUST-RETRY                PIC 9999.
+       77 SYSIDERR-RETRY                 PIC 999.
+       77 INQCUST-RETRY                 PIC 9999.
 
       * CUSTOMER DB2 copybook
-          EXEC SQL
+           EXEC SQL
              INCLUDE CUSTDB2
-          END-EXEC.
+           END-EXEC.
 
       * CUSTOMER host variables for DB2
        01 HOST-CUSTOMER-ROW.
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
-          03 HV-CUSTOMER-EMAIL          PIC X(60).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-EMAIL          PIC X(60).
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
       * Pull in the SQL COMMAREA
-       EXEC SQL
+           EXEC SQL
           INCLUDE SQLCA
-       END-EXEC.
+           END-EXEC.
 
        01 SQLCODE-DISPLAY               PIC S9(8) DISPLAY
              SIGN LEADING SEPARATE.
 
        01 WS-CICS-WORK-AREA.
-          03 WS-CICS-RESP              PIC S9(8) COMP.
-          03 WS-CICS-RESP2             PIC S9(8) COMP.
+          03 WS-CICS-RESP               PIC S9(8) COMP.
+          03 WS-CICS-RESP2              PIC S9(8) COMP.
 
        LOCAL-STORAGE SECTION.
        COPY SORTCODE.
@@ -77,25 +86,25 @@
            COPY CUSTOMER.
 
        01 CUSTOMER-KY.
-          03 REQUIRED-SORT-CODE        PIC 9(6) VALUE 0.
-          03 REQUIRED-CUST-NUMBER      PIC 9(10) VALUE 0.
+          03 REQUIRED-SORT-CODE         PIC 9(6)   VALUE 0.
+          03 REQUIRED-CUST-NUMBER       PIC 9(10)  VALUE 0.
 
        01 CUSTOMER-KY2.
-          03 REQUIRED-SORT-CODE2       PIC 9(6) VALUE 0.
-          03 REQUIRED-CUST-NUMBER2     PIC 9(10) VALUE 0.
+          03 REQUIRED-SORT-CODE2        PIC 9(6)   VALUE 0.
+          03 REQUIRED-CUST-NUMBER2      PIC 9(10)  VALUE 0.
 
-       01 RANDOM-CUSTOMER              PIC 9(10) VALUE 0.
-       01 HIGHEST-CUST-NUMBER          PIC 9(10) VALUE 0.
+       01 RANDOM-CUSTOMER               PIC 9(10)  VALUE 0.
+       01 HIGHEST-CUST-NUMBER           PIC 9(10)  VALUE 0.
 
-       01 EXIT-VSAM-READ               PIC X VALUE 'N'.
-       01 EXIT-DB2-READ                PIC X VALUE 'N'.
-       01 EXIT-IMS-READ                PIC X VALUE 'N'.
+       01 EXIT-VSAM-READ                PIC X      VALUE 'N'.
+       01 EXIT-DB2-READ                 PIC X      VALUE 'N'.
+       01 EXIT-IMS-READ                 PIC X      VALUE 'N'.
 
 
-       01 WS-V-RETRIED                 PIC X VALUE 'N'.
-       01 WS-D-RETRIED                 PIC X VALUE 'N'.
+       01 WS-V-RETRIED                  PIC X      VALUE 'N'.
+       01 WS-D-RETRIED                  PIC X      VALUE 'N'.
 
-       01 WS-PROGRAM                   PIC X(8) VALUE SPACES.
+       01 WS-PROGRAM                    PIC X(8)   VALUE SPACES.
 
 
       *
@@ -103,78 +112,84 @@
       *
        01 NCS-CUST-NO-STUFF.
           03 NCS-CUST-NO-NAME.
-             05 NCS-CUST-NO-ACT-NAME   PIC X(8) VALUE 'HBNKCUST'.
-             05 NCS-CUST-NO-TEST-SORT  PIC X(6) VALUE '      '.
-             05 NCS-CUST-NO-FILL       PIC XX VALUE '  '.
+             05 NCS-CUST-NO-ACT-NAME    PIC X(8)   VALUE 'HBNKCUST'.
+             05 NCS-CUST-NO-TEST-SORT   PIC X(6)   VALUE '      '.
+             05 NCS-CUST-NO-FILL        PIC XX     VALUE '  '.
 
-          03 NCS-CUST-NO-INC           PIC 9(16) COMP VALUE 0.
-          03 NCS-CUST-NO-VALUE         PIC 9(16) COMP VALUE 0.
+          03 NCS-CUST-NO-INC            PIC 9(16) COMP
+                                                   VALUE 0.
+          03 NCS-CUST-NO-VALUE          PIC 9(16) COMP
+                                                   VALUE 0.
 
-          03 NCS-CUST-NO-RESP          PIC XX VALUE '00'.
+          03 NCS-CUST-NO-RESP           PIC XX     VALUE '00'.
 
 
        01 WS-PASSED-DATA.
-          02 WS-TEST-KEY               PIC X(4).
-          02 WS-SORT-CODE              PIC 9(6).
+          02 WS-TEST-KEY                PIC X(4).
+          02 WS-SORT-CODE               PIC 9(6).
           02 WS-CUSTOMER-RANGE.
-             07 WS-CUSTOMER-RANGE-TOP             PIC X.
-             07 WS-CUSTOMER-RANGE-MIDDLE          PIC X.
-             07 WS-CUSTOMER-RANGE-BOTTOM          PIC X.
+             07 WS-CUSTOMER-RANGE-TOP   PIC X.
+             07 WS-CUSTOMER-RANGE-MIDDLE
+                                        PIC X.
+             07 WS-CUSTOMER-RANGE-BOTTOM
+                                        PIC X.
 
        01 WS-SORT-DIV.
-          03 WS-SORT-DIV1              PIC XX.
-          03 WS-SORT-DIV2              PIC XX.
-          03 WS-SORT-DIV3              PIC XX.
+          03 WS-SORT-DIV1               PIC XX.
+          03 WS-SORT-DIV2               PIC XX.
+          03 WS-SORT-DIV3               PIC XX.
 
-       01 WS-DISP-CUST-NO-VAL          PIC S9(18) DISPLAY.
+       01 WS-DISP-CUST-NO-VAL           PIC S9(18) DISPLAY.
 
        01 VAR-REMIX.
-          03 REMIX-SCODE               PIC X(6).
+          03 REMIX-SCODE                PIC X(6).
           03 REMIX-NUM REDEFINES REMIX-SCODE.
-             05 REMIX-SCODE-NUM        PIC 9(6).
+             05 REMIX-SCODE-NUM         PIC 9(6).
 
        01 VAR-REMIX2.
-          03 REMIX2-CREDIT-SCR         PIC X(3).
+          03 REMIX2-CREDIT-SCR          PIC X(3).
           03 REMIX2-NUM REDEFINES REMIX2-CREDIT-SCR.
-             05 REMIX2-CREDIT-SCR-NUM  PIC 9(3).
+             05 REMIX2-CREDIT-SCR-NUM   PIC 9(3).
 
-       01 MY-ABEND-CODE                PIC XXXX.
+       01 MY-ABEND-CODE                 PIC XXXX.
 
-       01 WS-STORM-DRAIN               PIC X VALUE 'N'.
-       01 STORM-DRAIN-CONDITION        PIC X(20).
+       01 WS-STORM-DRAIN                PIC X      VALUE 'N'.
+       01 STORM-DRAIN-CONDITION         PIC X(20).
 
-        01 WS-INVOKING-PROGRAM         PIC X(8).
+       01 WS-INVOKING-PROGRAM           PIC X(8).
 
        01 WS-POINTER USAGE POINTER.
-       01 WS-POINTER-BYTES   REDEFINES WS-POINTER PIC X(8).
-       01 WS-POINTER-NUMBER  REDEFINES WS-POINTER PIC 9(8) BINARY.
+       01 WS-POINTER-BYTES REDEFINES WS-POINTER
+                                        PIC X(8).
+       01 WS-POINTER-NUMBER REDEFINES WS-POINTER
+                                        PIC 9(8) BINARY.
 
-       01 WS-POINTER-NUMBER-DISPLAY    PIC 9(8) DISPLAY.
+       01 WS-POINTER-NUMBER-DISPLAY     PIC 9(8) DISPLAY.
 
-       01 WS-U-TIME                    PIC S9(15) COMP-3.
-       01 WS-ORIG-DATE                 PIC X(10).
+       01 WS-U-TIME                     PIC S9(15) COMP-3.
+       01 WS-ORIG-DATE                  PIC X(10).
        01 WS-ORIG-DATE-GRP REDEFINES WS-ORIG-DATE.
-          03 WS-ORIG-DATE-DD           PIC 99.
-          03 FILLER                    PIC X.
-          03 WS-ORIG-DATE-MM           PIC 99.
-          03 FILLER                    PIC X.
-          03 WS-ORIG-DATE-YYYY         PIC 9999.
+          03 WS-ORIG-DATE-DD            PIC 99.
+          03 FILLER                     PIC X.
+          03 WS-ORIG-DATE-MM            PIC 99.
+          03 FILLER                     PIC X.
+          03 WS-ORIG-DATE-YYYY          PIC 9999.
 
        01 WS-ORIG-DATE-GRP-X.
-          03 WS-ORIG-DATE-DD-X         PIC XX.
-          03 FILLER                    PIC X VALUE '.'.
-          03 WS-ORIG-DATE-MM-X         PIC XX.
-          03 FILLER                    PIC X VALUE '.'.
-          03 WS-ORIG-DATE-YYYY-X       PIC X(4).
+          03 WS-ORIG-DATE-DD-X          PIC XX.
+          03 FILLER                     PIC X      VALUE '.'.
+          03 WS-ORIG-DATE-MM-X          PIC XX.
+          03 FILLER                     PIC X      VALUE '.'.
+          03 WS-ORIG-DATE-YYYY-X        PIC X(4).
 
        01 WS-TIME-DATA.
-           03 WS-TIME-NOW              PIC 9(6).
-           03 WS-TIME-NOW-GRP REDEFINES WS-TIME-NOW.
-              05 WS-TIME-NOW-GRP-HH    PIC 99.
-              05 WS-TIME-NOW-GRP-MM    PIC 99.
-              05 WS-TIME-NOW-GRP-SS    PIC 99.
+          03 WS-TIME-NOW                PIC 9(6).
+          03 WS-TIME-NOW-GRP REDEFINES WS-TIME-NOW.
+             05 WS-TIME-NOW-GRP-HH      PIC 99.
+             05 WS-TIME-NOW-GRP-MM      PIC 99.
+             05 WS-TIME-NOW-GRP-SS      PIC 99.
 
-       01 WS-ABEND-PGM                 PIC X(8) VALUE 'ABNDPROC'.
+       01 WS-ABEND-PGM                  PIC X(8)   VALUE 'ABNDPROC'.
 
        01 ABNDINFO-REC.
            COPY ABNDINFO.
@@ -192,13 +207,17 @@
       *    Set up abend handling
       *
            EXEC CICS HANDLE ABEND
-              LABEL(ABEND-HANDLING)
-           END-EXEC.
+                LABEL(ABEND-HANDLING)
+                END-EXEC.
 
            MOVE 'N' TO INQCUST-INQ-SUCCESS
            MOVE '0' TO INQCUST-INQ-FAIL-CD
 
-           MOVE SORTCODE TO REQUIRED-SORT-CODE.
+           IF INQCUST-SCODE = SPACES OR LOW-VALUES
+              MOVE SORTCODE TO REQUIRED-SORT-CODE
+           ELSE
+              MOVE INQCUST-SCODE TO REQUIRED-SORT-CODE
+           END-IF.
            MOVE INQCUST-CUSTNO TO REQUIRED-CUST-NUMBER.
       *
       *    Is the incoming CUSTOMER number set to 0's, 9's or
@@ -214,9 +233,9 @@
               PERFORM READ-CUSTOMER-NCS
       D       DISPLAY 'CUST NO RETURNED FROM NCS=' NCS-CUST-NO-VALUE
               IF INQCUST-INQ-SUCCESS = 'Y'
-                MOVE NCS-CUST-NO-VALUE TO REQUIRED-CUST-NUMBER
+                 MOVE NCS-CUST-NO-VALUE TO REQUIRED-CUST-NUMBER
               ELSE
-                PERFORM GET-ME-OUT-OF-HERE
+                 PERFORM GET-ME-OUT-OF-HERE
               END-IF
            END-IF.
       *
@@ -236,30 +255,36 @@
       *          Get the customer information
       *
            PERFORM READ-CUSTOMER-DB2
-             UNTIL EXIT-VSAM-READ = 'Y'.
+              UNTIL EXIT-VSAM-READ = 'Y'.
       *
       * Return the CUSTOMER data in the commarea.
       *
            IF INQCUST-INQ-SUCCESS = 'Y'
-             MOVE '0' TO INQCUST-INQ-FAIL-CD
-             MOVE CUSTOMER-EYECATCHER OF OUTPUT-DATA
-                TO INQCUST-EYE
-             MOVE CUSTOMER-SORTCODE OF OUTPUT-DATA
-                TO INQCUST-SCODE
-             MOVE CUSTOMER-NUMBER OF OUTPUT-DATA
-                TO INQCUST-CUSTNO
-             MOVE CUSTOMER-NAME OF OUTPUT-DATA
-                TO INQCUST-NAME
-             MOVE CUSTOMER-ADDRESS OF OUTPUT-DATA
-                TO INQCUST-ADDR
-             MOVE CUSTOMER-EMAIL OF OUTPUT-DATA
-                TO INQCUST-EMAIL
-             MOVE CUSTOMER-DATE-OF-BIRTH OF OUTPUT-DATA
-                TO INQCUST-DOB
-             MOVE CUSTOMER-CREDIT-SCORE OF OUTPUT-DATA
-                TO INQCUST-CREDIT-SCORE
-             MOVE CUSTOMER-CS-REVIEW-DATE OF OUTPUT-DATA
-                TO INQCUST-CS-REVIEW-DT
+              MOVE '0' TO INQCUST-INQ-FAIL-CD
+              MOVE CUSTOMER-EYECATCHER OF OUTPUT-DATA
+                 TO INQCUST-EYE
+              MOVE CUSTOMER-SORTCODE OF OUTPUT-DATA
+                 TO INQCUST-SCODE
+              MOVE CUSTOMER-NUMBER OF OUTPUT-DATA
+                 TO INQCUST-CUSTNO
+              MOVE CUSTOMER-NAME OF OUTPUT-DATA
+                 TO INQCUST-NAME
+              MOVE CUSTOMER-DOB OF OUTPUT-DATA
+                 TO INQCUST-DOB
+              MOVE CUSTOMER-EMAIL OF OUTPUT-DATA
+                 TO INQCUST-EMAIL
+              MOVE CUSTOMER-PHONE OF OUTPUT-DATA
+                 TO INQCUST-PHONE
+              MOVE CUSTOMER-ADDRESS OF OUTPUT-DATA
+                 TO INQCUST-ADDR
+              MOVE CUSTOMER-STATUS OF OUTPUT-DATA
+                 TO INQCUST-STATUS
+              MOVE CUSTOMER-CREATED-DATE OF OUTPUT-DATA
+                 TO INQCUST-CREATED-DATE
+              MOVE CUSTOMER-CREDIT-SCORE OF OUTPUT-DATA
+                 TO INQCUST-CREDIT-SCORE
+              MOVE CUSTOMER-CS-REVIEW-DATE OF OUTPUT-DATA
+                 TO INQCUST-CS-REVIEW-DT
            END-IF.
 
            PERFORM GET-ME-OUT-OF-HERE.
@@ -275,7 +300,7 @@
       *
            PERFORM GET-LAST-CUSTOMER-DB2
            IF INQCUST-INQ-SUCCESS = 'Y'
-             MOVE REQUIRED-CUST-NUMBER2 TO NCS-CUST-NO-VALUE
+              MOVE REQUIRED-CUST-NUMBER2 TO NCS-CUST-NO-VALUE
            END-IF.
        RCN999.
            EXIT.
@@ -295,19 +320,37 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
-                     CUSTOMER_EMAIL,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_EMAIL,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
-                     :HV-CUSTOMER-EMAIL,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-EMAIL,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER
@@ -324,12 +367,43 @@
               MOVE HV-CUSTOMER-EYECATCHER TO CUSTOMER-EYECATCHER
               MOVE HV-CUSTOMER-SORTCODE TO CUSTOMER-SORTCODE
               MOVE HV-CUSTOMER-NUMBER TO CUSTOMER-NUMBER
-              MOVE HV-CUSTOMER-NAME TO CUSTOMER-NAME
-              MOVE HV-CUSTOMER-ADDRESS TO CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-TITLE TO CUSTOMER-TITLE
+                 OF CUSTOMER-NAME
+              MOVE HV-CUSTOMER-FIRST-NAME TO CUSTOMER-FIRST-NAME
+                 OF CUSTOMER-NAME
+              MOVE HV-CUSTOMER-LAST-NAME TO CUSTOMER-LAST-NAME
+                 OF CUSTOMER-NAME
+              COMPUTE CUSTOMER-DOB-YEAR = HV-CUSTOMER-DOB / 10000
+              COMPUTE CUSTOMER-DOB-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-DOB / 100, 100)
+              COMPUTE CUSTOMER-DOB-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-DOB, 100)
               MOVE HV-CUSTOMER-EMAIL TO CUSTOMER-EMAIL
-              MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH
+              MOVE HV-CUSTOMER-PHONE TO CUSTOMER-PHONE
+              MOVE HV-CUSTOMER-ADDR-LINE1 TO CUSTOMER-ADDR-LINE1
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-ADDR-LINE2 TO CUSTOMER-ADDR-LINE2
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-CITY TO CUSTOMER-CITY
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-POSTCODE TO CUSTOMER-POSTCODE
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-COUNTRY TO CUSTOMER-COUNTRY
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-STATUS TO CUSTOMER-STATUS
+              COMPUTE CUSTOMER-CREATED-YEAR =
+                 HV-CUSTOMER-CREATE-DATE / 10000
+              COMPUTE CUSTOMER-CREATED-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-CREATE-DATE / 100, 100)
+              COMPUTE CUSTOMER-CREATED-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-CREATE-DATE, 100)
               MOVE HV-CUSTOMER-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE
-              MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE
+              COMPUTE CUSTOMER-CS-REVIEW-YEAR =
+                 HV-CUSTOMER-CS-REVIEW-DATE / 10000
+              COMPUTE CUSTOMER-CS-REVIEW-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE / 100, 100)
+              COMPUTE CUSTOMER-CS-REVIEW-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE, 100)
               GO TO RCD999
            END-IF.
 
@@ -340,21 +414,21 @@
       *
            IF SQLCODE = 100 AND
               INQCUST-CUSTNO = 0000000000
-            IF INQCUST-RETRY < 1000
-                PERFORM GENERATE-RANDOM-CUSTOMER-AGAIN
-                MOVE RANDOM-CUSTOMER TO REQUIRED-CUST-NUMBER
-                GO TO RCD999
+              IF INQCUST-RETRY < 1000
+                 PERFORM GENERATE-RANDOM-CUSTOMER-AGAIN
+                 MOVE RANDOM-CUSTOMER TO REQUIRED-CUST-NUMBER
+                 GO TO RCD999
               ELSE
-                MOVE 'Y' TO EXIT-VSAM-READ
-                MOVE 'N' TO INQCUST-INQ-SUCCESS
-                MOVE '1' TO INQCUST-INQ-FAIL-CD
-                GO TO RCD999
+                 MOVE 'Y' TO EXIT-VSAM-READ
+                 MOVE 'N' TO INQCUST-INQ-SUCCESS
+                 MOVE '1' TO INQCUST-INQ-FAIL-CD
+                 GO TO RCD999
               END-IF
            END-IF.
 
            IF SQLCODE = 100 AND
-           INQCUST-CUSTNO = 9999999999 AND
-           WS-V-RETRIED = 'N'
+              INQCUST-CUSTNO = 9999999999 AND
+              WS-V-RETRIED = 'N'
               PERFORM GET-LAST-CUSTOMER-DB2
       D       DISPLAY 'CUSTOMER NUMBER RETURNED FROM DB2 IS='
       D           NCS-CUST-NO-VALUE
@@ -370,16 +444,25 @@
       *    customer number was a dud.
       *
            IF (SQLCODE = 100
-                AND INQCUST-CUSTNO NOT = 9999999999)
-                AND (SQLCODE = 100
-                AND INQCUST-CUSTNO NOT = 0000000000)
+              AND INQCUST-CUSTNO NOT = 9999999999)
+              AND (SQLCODE = 100
+              AND INQCUST-CUSTNO NOT = 0000000000)
               MOVE REQUIRED-CUST-NUMBER TO CUSTOMER-NUMBER
-                                           OF OUTPUT-DATA
+                 OF OUTPUT-DATA
               MOVE 'Y' TO EXIT-VSAM-READ
               MOVE 'N' TO INQCUST-INQ-SUCCESS
               MOVE '1' TO INQCUST-INQ-FAIL-CD
-              MOVE SPACES TO INQCUST-ADDR
-              MOVE SPACES TO INQCUST-NAME
+              MOVE SPACES TO INQCUST-TITLE
+              MOVE SPACES TO INQCUST-FIRST-NAME
+              MOVE SPACES TO INQCUST-LAST-NAME
+              MOVE SPACES TO INQCUST-EMAIL
+              MOVE SPACES TO INQCUST-PHONE
+              MOVE SPACES TO INQCUST-ADDR-LINE1
+              MOVE SPACES TO INQCUST-ADDR-LINE2
+              MOVE SPACES TO INQCUST-CITY
+              MOVE SPACES TO INQCUST-POSTCODE
+              MOVE SPACES TO INQCUST-COUNTRY
+              MOVE SPACES TO INQCUST-STATUS
               GO TO RCD999
            END-IF.
 
@@ -400,54 +483,55 @@
       *       Get supplemental information
       *
               EXEC CICS ASSIGN APPLID(ABND-APPLID)
-              END-EXEC
+                   END-EXEC
 
-              MOVE EIBTASKN   TO ABND-TASKNO-KEY
-              MOVE EIBTRNID   TO ABND-TRANID
+              MOVE EIBTASKN TO ABND-TASKNO-KEY
+              MOVE EIBTRNID TO ABND-TRANID
 
               PERFORM POPULATE-TIME-DATE
 
               MOVE WS-ORIG-DATE TO ABND-DATE
               STRING WS-TIME-NOW-GRP-HH DELIMITED BY SIZE,
-                    ':' DELIMITED BY SIZE,
+                     ':' DELIMITED BY SIZE,
                      WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
                      ':' DELIMITED BY SIZE,
                      WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
-                     INTO ABND-TIME
+                 INTO ABND-TIME
               END-STRING
 
-              MOVE WS-U-TIME   TO ABND-UTIME-KEY
-              MOVE 'CVR1'      TO ABND-CODE
+              MOVE WS-U-TIME TO ABND-UTIME-KEY
+              MOVE 'CVR1' TO ABND-CODE
 
               EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
-              END-EXEC
+                   END-EXEC
 
               MOVE SQLCODE TO SQLCODE-DISPLAY
               STRING 'RCD010 - CUSTOMER DB2 SELECT KEY='
-                    DELIMITED BY SIZE,
-                    CUSTOMER-KY DELIMITED SIZE,
-                    ' GAVE SQLCODE=' DELIMITED BY SIZE,
-                    SQLCODE-DISPLAY DELIMITED BY SIZE,
-                    ' FOR CUSTOMER=' DELIMITED BY SIZE,
-                    ABND-RESP2CODE DELIMITED BY SIZE
-                    INTO ABND-FREEFORM
+                 DELIMITED BY SIZE,
+                     CUSTOMER-KY DELIMITED SIZE,
+                     ' GAVE SQLCODE=' DELIMITED BY SIZE,
+                     SQLCODE-DISPLAY DELIMITED BY SIZE,
+                     ' FOR CUSTOMER=' DELIMITED BY SIZE,
+                     ABND-RESP2CODE DELIMITED BY SIZE
+                 INTO ABND-FREEFORM
               END-STRING
 
               EXEC CICS LINK PROGRAM(WS-ABEND-PGM)
-                        COMMAREA(ABNDINFO-REC)
-              END-EXEC
+                   COMMAREA(ABNDINFO-REC)
+                   END-EXEC
 
               DISPLAY 'CUSTOMER DB2 SELECT KEY='
-                  CUSTOMER-KY ' GAVE SQLCODE='
-                  SQLCODE-DISPLAY
+                      CUSTOMER-KY
+                      ' GAVE SQLCODE='
+                      SQLCODE-DISPLAY
 
               IF WS-V-RETRIED = 'Y'
                  DISPLAY 'ON A RETRY'
               END-IF
 
               EXEC CICS ABEND ABCODE('CVR1')
-                 CANCEL
-              END-EXEC
+                   CANCEL
+                   END-EXEC
 
            END-IF.
 
@@ -461,7 +545,7 @@
       *    Finish
       *
            EXEC CICS RETURN
-           END-EXEC.
+                END-EXEC.
 
        GMOFH999.
            EXIT.
@@ -473,8 +557,8 @@
       * How ABENDs are dealt with
       *
            EXEC CICS ASSIGN
-              ABCODE(MY-ABEND-CODE)
-           END-EXEC.
+                ABCODE(MY-ABEND-CODE)
+                END-EXEC.
 
       *    Evaluate the Abend code that is returned
       *    for DB2 AD2Z ... provide some diagnostics,
@@ -491,20 +575,22 @@
       *      if handled (as here) and Workload Abend Thresholds are
       *      set.
       *
-             WHEN 'AFCR'
-             WHEN 'AFCS'
-             WHEN 'AFCT'
-               MOVE 'Y' TO WS-STORM-DRAIN
-               DISPLAY 'INQCUST: Check-For-Storm-Drain-VSAM: Storm '
-                       'Drain condition (Abend ' MY-ABEND-CODE ') '
-                       'has been met.'
+           WHEN 'AFCR'
+           WHEN 'AFCS'
+           WHEN 'AFCT'
+                MOVE 'Y' TO WS-STORM-DRAIN
+                DISPLAY 'INQCUST: Check-For-Storm-Drain-VSAM: Storm '
+                        'Drain condition (Abend '
+                        MY-ABEND-CODE
+                        ') '
+                        'has been met.'
 
-               EXEC CICS SYNCPOINT ROLLBACK
-                   RESP(WS-CICS-RESP)
-                   RESP2(WS-CICS-RESP2)
-               END-EXEC
+                EXEC CICS SYNCPOINT ROLLBACK
+                     RESP(WS-CICS-RESP)
+                     RESP2(WS-CICS-RESP2)
+                     END-EXEC
 
-               IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
+                IF WS-CICS-RESP NOT = DFHRESP(NORMAL)
 
       *
       *          Preserve the RESP and RESP2, then set up the
@@ -512,78 +598,88 @@
       *          date/time etc. and linking to the Abend Handler
       *          program.
       *
-                 INITIALIZE ABNDINFO-REC
-                 MOVE EIBRESP    TO ABND-RESPCODE
-                 MOVE EIBRESP2   TO ABND-RESP2CODE
+                   INITIALIZE ABNDINFO-REC
+                   MOVE EIBRESP TO ABND-RESPCODE
+                   MOVE EIBRESP2 TO ABND-RESP2CODE
       *
       *          Get supplemental information
       *
-                 EXEC CICS ASSIGN APPLID(ABND-APPLID)
-                 END-EXEC
+                   EXEC CICS ASSIGN APPLID(ABND-APPLID)
+                        END-EXEC
 
-                 MOVE EIBTASKN   TO ABND-TASKNO-KEY
-                 MOVE EIBTRNID   TO ABND-TRANID
+                   MOVE EIBTASKN TO ABND-TASKNO-KEY
+                   MOVE EIBTRNID TO ABND-TRANID
 
-                 PERFORM POPULATE-TIME-DATE
+                   PERFORM POPULATE-TIME-DATE
 
-                 MOVE WS-ORIG-DATE TO ABND-DATE
-                 STRING WS-TIME-NOW-GRP-HH DELIMITED BY SIZE,
-                       ':' DELIMITED BY SIZE,
-                        WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
-                        ':' DELIMITED BY SIZE,
-                        WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
-                        INTO ABND-TIME
-                 END-STRING
+                   MOVE WS-ORIG-DATE TO ABND-DATE
+                   STRING WS-TIME-NOW-GRP-HH DELIMITED BY SIZE,
+                          ':' DELIMITED BY SIZE,
+                          WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
+                          ':' DELIMITED BY SIZE,
+                          WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
+                      INTO ABND-TIME
+                   END-STRING
 
-                 MOVE WS-U-TIME   TO ABND-UTIME-KEY
-                 MOVE 'HROL'      TO ABND-CODE
+                   MOVE WS-U-TIME TO ABND-UTIME-KEY
+                   MOVE 'HROL' TO ABND-CODE
 
-                 EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
-                 END-EXEC
+                   EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
+                        END-EXEC
 
-                 MOVE 0 TO ABND-SQLCODE
+                   MOVE 0 TO ABND-SQLCODE
 
-                 STRING 'AH010 -Unable to perform SYNCPOINT ROLLBACK.'
-                       DELIMITED BY SIZE,
-                       ' Possible integrity issue following VSAM RLS '
-                       DELIMITED BY SIZE,
-                       ' abend.' DELIMITED BY SIZE,
-                       ' EIBRESP=' DELIMITED BY SIZE,
-                       ABND-RESPCODE DELIMITED BY SIZE,
-                       ' RESP2=' DELIMITED BY SIZE,
-                       ABND-RESP2CODE DELIMITED BY SIZE
-                       INTO ABND-FREEFORM
-                 END-STRING
-
-                 EXEC CICS LINK PROGRAM(WS-ABEND-PGM)
-                           COMMAREA(ABNDINFO-REC)
-                 END-EXEC
+                   STRING 'AH010 -Unable to perform SYNCPOINT ROLLBACK.'
+                      DELIMITED BY SIZE,
 
 
-                 DISPLAY 'INQCUST: Unable to perform Synpoint Rollback.'
-                 ' Possible Integrity issue following VSAM RLS abend'
-                 ' RESP CODE=' WS-CICS-RESP ' RESP2 CODE=' WS-CICS-RESP2
+                          
+                      ' Possible integrity issue following VSAM RLS '
+                      DELIMITED BY SIZE,
+                          ' abend.' DELIMITED BY SIZE,
+                          ' EIBRESP=' DELIMITED BY SIZE,
+                          ABND-RESPCODE DELIMITED BY SIZE,
+                          ' RESP2=' DELIMITED BY SIZE,
+                          ABND-RESP2CODE DELIMITED BY SIZE
+                      INTO ABND-FREEFORM
+                   END-STRING
 
-                  EXEC CICS ABEND
-                     ABCODE ('HROL')
-                     CANCEL
-                  END-EXEC
+                   EXEC CICS LINK PROGRAM(WS-ABEND-PGM)
+                        COMMAREA(ABNDINFO-REC)
+                        END-EXEC
 
-               END-IF
 
-               MOVE 'N' TO INQCUST-INQ-SUCCESS
-               MOVE '2' TO INQCUST-INQ-FAIL-CD
+                   DISPLAY
+                      'INQCUST: Unable to perform Synpoint Rollback.'
 
-               EXEC CICS RETURN
-               END-EXEC
+
+                      
+                   ' Possible Integrity issue following VSAM RLS abend'
+                      ' RESP CODE='
+                      WS-CICS-RESP
+                      ' RESP2 CODE='
+                      WS-CICS-RESP2
+
+                   EXEC CICS ABEND
+                        ABCODE('HROL')
+                        CANCEL
+                        END-EXEC
+
+                END-IF
+
+                MOVE 'N' TO INQCUST-INQ-SUCCESS
+                MOVE '2' TO INQCUST-INQ-FAIL-CD
+
+                EXEC CICS RETURN
+                     END-EXEC
 
            END-EVALUATE.
 
            IF WS-STORM-DRAIN = 'N'
 
-              EXEC CICS ABEND ABCODE( MY-ABEND-CODE)
-              NODUMP
-              END-EXEC
+              EXEC CICS ABEND ABCODE(MY-ABEND-CODE)
+                   NODUMP
+                   END-EXEC
 
            END-IF.
 
@@ -606,19 +702,37 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
-                     CUSTOMER_EMAIL,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_EMAIL,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
-                     :HV-CUSTOMER-EMAIL,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-EMAIL,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER
@@ -664,15 +778,15 @@
        PTD010.
 
            EXEC CICS ASKTIME
-              ABSTIME(WS-U-TIME)
-           END-EXEC.
+                ABSTIME(WS-U-TIME)
+                END-EXEC.
 
            EXEC CICS FORMATTIME
-                     ABSTIME(WS-U-TIME)
-                     DDMMYYYY(WS-ORIG-DATE)
-                     TIME(WS-TIME-NOW)
-                     DATESEP
-           END-EXEC.
+                ABSTIME(WS-U-TIME)
+                DDMMYYYY(WS-ORIG-DATE)
+                TIME(WS-TIME-NOW)
+                DATESEP
+                END-EXEC.
 
        PTD999.
            EXIT.
@@ -683,8 +797,8 @@
        GENERATE-RANDOM-CUSTOMER SECTION.
        GRC010.
            MOVE ZERO TO INQCUST-RETRY.
-           COMPUTE RANDOM-CUSTOMER = ((NCS-CUST-NO-VALUE - 1)
-                                     * FUNCTION RANDOM(EIBTASKN)) + 1.
+           COMPUTE RANDOM-CUSTOMER =((NCS-CUST-NO-VALUE - 1)
+              * FUNCTION RANDOM(EIBTASKN)) + 1.
        GRC999.
            EXIT.
       *
@@ -693,7 +807,7 @@
        GENERATE-RANDOM-CUSTOMER-AGAIN SECTION.
        GRCA10.
            ADD 1 TO INQCUST-RETRY GIVING INQCUST-RETRY.
-           COMPUTE RANDOM-CUSTOMER = ((NCS-CUST-NO-VALUE - 1)
-                                                * FUNCTION RANDOM) + 1.
-        GRCA99.
-            EXIT.
+           COMPUTE RANDOM-CUSTOMER =((NCS-CUST-NO-VALUE - 1)
+              * FUNCTION RANDOM) + 1.
+       GRCA99.
+           EXIT.

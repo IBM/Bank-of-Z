@@ -21,6 +21,14 @@ mappings:
               required: true
               nullable: false
               template: "GBP"
+          - accountNumber:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-ACCNO\"}}"
+          - sortCode:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-SCODE\"}}"
           - status:
               required: true
               nullable: false

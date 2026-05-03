@@ -21,7 +21,8 @@
 *.plx zos-working-tree-encoding=ibm-1047 
 *.copy zos-working-tree-encoding=ibm-1047 
 *.lmod zos-working-tree-encoding=ibm-1047 
-*.dtl zos-working-tree-encoding=ibm-1047 
+*.dtl zos-working-tree-encoding=ibm-1047
+*.csd zos-working-tree-encoding=ibm-1047 
 *.config zos-working-tree-encoding=ibm-1047 
 *.azucfg zos-working-tree-encoding=utf-8 
 *.json zos-working-tree-encoding=utf-8 

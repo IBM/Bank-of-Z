@@ -2,7 +2,9 @@
 
 # Function to parse YAML config - reads a key within a specific section
 # Usage: get_section_value <section> <key>
-get_section_value() {
+
+
+_get_section_value_() {
     section=$1
     key=$2
 
@@ -30,6 +32,12 @@ get_section_value() {
     ' "$CONFIG_FILE"
 }
 
+get_section_value() {
+    section=$1
+    key=$2
+    expand_vars $(_get_section_value_ $1 $2)
+}
+
 # Function to expand variables in config values
 expand_vars() {
     value=$1
@@ -37,23 +45,51 @@ expand_vars() {
     # Replace $USER with actual username
     value=$(echo "$value" | sed "s|\$USER|$USER|g")
 
-    # Replace $PIPELINE_WORKSPACE
-    value=$(echo "$value" | sed "s|\$PIPELINE_WORKSPACE|$PIPELINE_WORKSPACE|g")
-
     # Replace $CICS_CMCI_USER
     value="${value//\$CICS_CMCI_USER/$CICS_CMCI_USER}"
 
     # Replace $CICS_CMCI_PASSWORD
     value="${value//\$CICS_CMCI_PASSWORD/$CICS_CMCI_PASSWORD}"
 
-    # Replace ${global.<key>} with value from [global] section in config
-    while echo "$value" | grep -q '\${global\.[a-zA-Z_]*}'; do
-        key=$(echo "$value" | sed 's/.*\${global\.\([a-zA-Z_]*\)}.*/\1/')
-        resolved=$(get_section_value "global" "$key")
-        value=$(echo "$value" | sed "s|\${global\.${key}}|$resolved|g")
-    done
+    # Replace ${section.key} with value from matching YAML section
+    while [[ "$value" =~ \$\{([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)\} ]]; do
+        section="${BASH_REMATCH[1]}"
+        key="${BASH_REMATCH[2]}"
+        ref="${BASH_REMATCH[0]}"
 
+        resolved="$(get_section_value "$section" "$key")"
+        [[ -z "$resolved" ]] && break
+
+        resolved="$(expand_vars "$resolved")"
+        value="${value//$ref/$resolved}"
+    done
     echo "$value"
 }
 
-# Made with Bob
+resolve_path() {
+  local path="$1"
+  local dir file
+
+  dir=$(dirname "$path")
+  file=$(basename "$path")
+
+  cd "$dir" 2>/dev/null || return 1
+  printf "%s/%s\n" "$(pwd -P)" "$file"
+}
+
+submit_jcl() {
+  local jcl_file="$1"
+  local tmp_jcl="/tmp/$(basename "$jcl_file").$$"
+
+  # Prepare JCL by replacing placeholder
+  cat  "$jcl_file" | sed "s/#APP_BASE_NAME/${APP_BASE_NAME}/g" | sed "s/#APP_VERSION/${APP_VERSION}/g" > "$tmp_jcl"
+
+  # Submit JCL in background
+  jsub -f "$tmp_jcl" &
+
+  # Allow submission to start
+  sleep 3
+
+  # Remove temporary file
+  # rm -f "$tmp_jcl"
+}

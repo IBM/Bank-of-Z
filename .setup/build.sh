@@ -87,7 +87,7 @@ print_stage "STAGE 2: Run DBB Build"
 cd "$WORKSPACE_DIR"
 
 # Run DBB build
-if run_dbb_build "$DBB_HLQ" "full"; then
+if bash ./dbb-build.sh "full"; then
     BUILD_RC=0
 else
     BUILD_RC=$?
@@ -116,89 +116,33 @@ fi
 #########################################################
 # STAGE 3: Run Wazi Deploy - Only deploy modules
 #########################################################
-WAZIDEPLOY_HOME=$(get_section_value 'wazideploy' 'wazideploy_home')
-. $WAZIDEPLOY_HOME/bin/activate
-wazideploy-generate -v
-wazideploy-generate\
-  -dm ../dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml\
-  -dp logs/deployment-plan.yml -pif logs/bank-of-z-zos-native-*.tar
+print_stage "STAGE 3: Run Wazi Deploy"
 
-if [ $? -eq 0 ]; then
-     drm BANKZ.CICSBOZ.*&
-     TARGET_HLQ=$(get_section_value 'pipeline_script' 'target_hlq')
-     # Overide default mapping (need something more generic)
-     cp .setup/deploy/types_pattern_mapping.yml ../dbb/WaziDeploy/zDeploy/deployment-configuration/global
-     export USER=$(get_user)
-     echo "* USER=$USER"
-     wazideploy-deploy -dp logs/deployment-plan.yml\
-       -pif logs/bank-of-z-zos-native-*.tar -ef .setup/deploy/Development.yml \
-       -wf logs/ -e deploy_cfg_home=../dbb/WaziDeploy/zDeploy -e hlq=$TARGET_HLQ\
-       -pt deploy &
-    PID=$!
-    wait $PID
-    RC=$?
-    if [ $RC -eq 0 ]; then
-         print_success "Wazi Deploy completed successfully!"
-    else
-        print_error "Wazi Deploy failed with return code: $RC"
-        echo ""
-        echo "Check logs in: $WORKSPACE_DIR/logs"
-        echo ""
-        exit 1
-    fi
+# Change to workspace directory
+cd "$WORKSPACE_DIR"
+
+# Run DBB build
+export INSTALL_APP="true"
+if bash ./wazi-deploy.sh; then
+    print_success "Wazi Deploy completed successfully!"
 else
-    print_error "Wazi Deploy failed with return code: $RC"
-    echo ""
-    echo "Check logs in: $WORKSPACE_DIR/logs"
-    echo ""
-fi
-deactivate
-
-#########################################################
-# STAGE 4: Create CICS instance with zconfig
-#########################################################
-
-# Activate zconfig virtual environment
-ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
-ZCONFIG_HOME=$(echo $ZCONFIG_HOME | sed "s|~|$HOME|g")
-if [ -f $ZCONFIG_HOME/bin/activate ]; then
-    source $ZCONFIG_HOME/bin/activate
-else
-    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
+    print_error "Wazi Deploy failed with return code: $?"
+    exit 1
 fi
 
-# Apply CICS region configuration
-cd $WORKSPACE_DIR/.setup/zconfig
-zconfig apply cics-region.yaml&
-PID=$!
-wait $PID
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "ZConfig completed successfully!"
+#########################################################
+# STAGE 4: Create CICS instance with zconfig, DB2, TAZ
+#########################################################
+print_stage "STAGE 4: Create CICS instance with zconfig, DB2, TAZ"
+
+# Change to workspace directory
+cd "$WORKSPACE_DIR"
+
+# Run DBB build
+export INSTALL_APP="true"
+if bash ./zconfig-install.sh; then
+    print_success "Create CICS instance with zconfig, DB2, TAZ completed successfully!"
 else
-   print_error "ZConfig failed with return code: $RC"
-   echo ""
-   echo "Check logs in: $WORKSPACE_DIR/logs"
-   echo ""
-   exit 1
+    print_error "Create CICS instance with zconfig, DB2, TAZ failed with return code: $?"
+    exit 1
 fi
-deactivate
-echo ""
-# Start CICS region
-jsub BANKZ.CICSBOZ.DFHSTART&
-sleep 3
-echo "CICS Region Job Started"
-echo ""
-
-#########################################################
-# STAGE 5: Create DB2 database
-#########################################################
-
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-drop.jcl"&
-sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-create.jcl"&
-sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-bind.jcl"&
-sleep 3
-jsub -f "$WORKSPACE_DIR/.setup/jcl/Db2-insert.jcl"&
-sleep 3

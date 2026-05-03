@@ -2,25 +2,99 @@
 #########################################################
 # Setup Configuration for Pipeline Simulation
 #########################################################
+
 version: 1.0.0
- 
-# Git repositories to clone
-repositories:
-  - name: dbb
-    url: https://github.com/IBM/dbb.git
-    target_dir: dbb
 
-# zBuilder framework configuration
-zbuilder:
-  # Local source directory (relative to .setup)
-  source_dir: build
-  
-  # Target USS directory for upload
-  target_dir: $PIPELINE_WORKSPACE/zBuilder
+# Application metadata
+app:
+  # Application short name
+  base_name: CBOZ
+  # z/OS version used for dataset naming
+  zos_version: V0R1M0
 
-  # Java home (min version 17)
+# Sandbox root directory (USS)
+sandbox:
+  # Root path of the project on the remote server
+  path: /usr/local/sandboxes/manzanita/cbsa
+
+# Z configuration tools
+zconfig:
+  # Z Config installation directory
+  zconfig_home: /usr/local/sandboxes/tools/zconfig
+  # CICS Resource Builder installation
+  zcb_home: /usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6
+  # Java runtime for Z tools
   java_home: /usr/lpp/java/java21/current_64
+  # CICS cmci port
+  cmci_port: 27101
 
+# DBB (Dependency Based Build)
+dbb:
+  # DBB installation directory
+  dbb_home: /usr/lpp/IBM/dbb
+  # Java runtime for DBB
+  java_home: /usr/local/sandboxes/tools/J17.0_64
+  # DBB build output directory
+  dbb_build: ${sandbox.path}/zDevOps/applications/CBSA/build
+  # DBB application configuration file
+  dbb_app_conf: ${sandbox.path}/zDevOps/applications/CBSA/application/dbb-app.yaml
+  # DBB working directory (source root)
+  dbb_cwd: ${sandbox.path}/zDevOps/applications/CBSA/application/src
+  # API build output directory
+  api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
+
+# Z Code Scan (static analysis)
+zcodescan:
+  # Z Code Scan installation (Python environment)
+  zcodescan_home: /global/opt/pyenv/akf
+  # Java runtime for scanning tools
+  java_home: /usr/lpp/java/java21/current_64
+  # Working directory
+  cwd_folder: ${sandbox.path}/zDevOps/applications/CBSA/application
+  # Source directory to scan
+  src_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/src/base
+  # Output directory for scan reports
+  output_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/zcodescan
+  # Source encoding (z/OS default encoding)
+  src_encoding: IBM-1047
+
+# Wazi Deploy (deployment automation)
+wazideploy:
+  # Wazi Deploy installation
+  wazideploy_home: /global/opt/pyenv/gdp
+  # Deployment method configuration file
+  deployment_method: ${sandbox.path}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml
+  # Environment-specific deployment configuration
+  deployment_envfile: ${sandbox.path}/zDevOps/applications/CBSA/deploy/Development.yml
+  # zDeploy root folder
+  zdeploy_folder: ${sandbox.path}/dbb/WaziDeploy/zDeploy
+
+# TAZ Unit Test configuration
+taz:
+  # TAZ CLI installation directory
+  taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
+  # Root folder containing test suites
+  test_folder: ${sandbox.path}/zDevOps
+  # JES procedure library
+  proclib: SYS1.PROCLIB
+  # Load library used during execution
+  library: ${app.base_name}.${app.zos_version}.LOAD
+  # STEPLIB for runtime/debug
+  steplib: EQAW.VHR0M0.PTF.SEQAMOD
+
+# z/OS Connect (API exposure)
+zosconnect:
+  # z/OS Connect installation
+  zosconnect_home: /usr/lpp/IBM/zosconnect/bin/
+
+# Frontend (Node.js runtime)
+fronted:
+  # Node.js runtime for z/OS
+  node_home: /usr/lpp/IBM/cnj/IBM/node-latest-os390-s390x
+
+# ZOAU installtion folder
+zoau:
+  zoau_home: /usr/lpp/IBM/zoautil
 
 # Pipeline simulation script
 pipeline_script:
@@ -42,13 +116,11 @@ pipeline_script:
   # Bank of Z target HLQ for Wazi Deploy
   target_hlq: BANKZ.V0R1M0
 
-wazideploy:
-  # Wazi Deploy Python virtual environment
-  wazideploy_home: /global/opt/pyenv/gdp
+# zBuilder framework configuration
+zbuilder:
+  # Local source directory (relative to .setup)
+  source_dir: build
+  
+  # Target USS directory for upload
+  target_dir: $PIPELINE_WORKSPACE/zBuilder
 
-zconfig:
-  # zconfig home folder
-  zconfig_home: ~/zconfig
-  zcb_home: ~/zrb/cics-resource-builder-1.0.6
-
-# Made with Bob

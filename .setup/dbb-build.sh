@@ -1,5 +1,5 @@
 #!/bin/env bash
-
+set -eu
 ###############################################################################
 # Script: DBB Build + WAR Packaging + TAR Rebuild
 #
@@ -60,8 +60,8 @@ TMP_LOG="/tmp/dbb_build_$$.log"
 finalize_results() {
     RC=$?
 
+    cd "$DBB_CWD" || exit 1
     mkdir -p logs
-
     if [ -f "$TMP_LOG" ]; then
         cp "$TMP_LOG" "logs/dbb-build-console.log" 2>/dev/null || true
     fi
@@ -78,6 +78,10 @@ finalize_results() {
     print_result "${GREEN}[DBB-BUILD][LOG-PATH]${NC} $LOG_TAR"
 
     rm -f "$TMP_LOG" 2>/dev/null || true
+    
+    if [ $RC -eq 0 ]; then
+        print_success "${GREEN}[DBB-BUILD]${NC} Process completed"
+    fi
 
     exit "$RC"
 }
@@ -123,8 +127,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-print_success "${GREEN}[DBB-BUILD] DBB build completed with status CLEAN"
-
 # =========================
 # Publish DBB report results
 # =========================
@@ -134,12 +136,14 @@ print_result "${GREEN}[DBB-BUILD][BUILD-LIST]${NC} $PWD/logs/buildList.txt"
 # =========================
 # Skip packaging if nothing processed
 # =========================
+set +e
 grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_result "${GREEN}[DBB-BUILD][TAR-PATH]${NC} NONE"
-    print_success "Process completed"
     exit 0
 fi
+set -e
+
 
 # =========================
 # Variables
@@ -152,7 +156,6 @@ SRC_TAR=$(ls -t logs/*-*.tar 2>/dev/null | head -1 || true)
 if [ -z "$SRC_TAR" ]; then
     if echo "$BUILD_OPTIONS" | grep -q "preview"; then
         print_result "${GREEN}[DBB-BUILD][TAR-PATH]${NC} NONE"
-        print_success "Process completed"
         exit 0
     else
         print_error "No tar file found in logs/"
@@ -209,5 +212,3 @@ else
     print_error "Tar not found: $PWD/$TARGET_TAR"
     exit 1
 fi
-
-print_success "${GREEN}[DBB-BUILD]${NC} Process completed"

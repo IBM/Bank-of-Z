@@ -1,6 +1,5 @@
 #!/bin/env bash
-set -e
-
+set -eu
 #*********************************************************************
 #* Script  : configure-cics-taz-and-generate-proc.sh
 #* Purpose : Configure the TAZ CICS CSD dataset, submit the CICS TAZ

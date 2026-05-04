@@ -1,6 +1,5 @@
 #!/bin/env bash
-set -u
-
+set -eu
 ###############################################################################
 # Script: Wazi Deploy Generate + Deploy
 #
@@ -49,19 +48,13 @@ export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
-if [ "$INSTALL_APP" = "true" ]; then
-  TAGS="deploy"
-else
-  TAGS=""
-fi
-
 # =========================
 # Output directories
 # =========================
 timestamp=$(date +%F_%H-%M-%S)
 outputDir="${SCRIPTS_DIR}/logs"
 evidenceDir="${outputDir}/evidences"
-LOG_TAR="${outputDir}/wazi-deploy-log.tar"
+LOG_TAR="${SCRIPTS_DIR}/wazi-deploy-log.tar"
 EVIDENCE_FILE="${evidenceDir}/evidence.yaml"
 
 mkdir -p "$outputDir" "$evidenceDir"
@@ -70,18 +63,13 @@ finalize_results() {
     RC=$?
 
     mkdir -p "$outputDir" "$evidenceDir"
+    cd $SCRIPTS_DIR
 
-    if ls "$outputDir"/*.log >/dev/null 2>&1; then
-        tar cf "$LOG_TAR" -C "$outputDir" . 2>/dev/null || true
+    if ls logs/*.log >/dev/null 2>&1; then
+        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$outputDir/wazi-deploy-console.log"
-        tar cf "$LOG_TAR" -C "$outputDir" . 2>/dev/null || true
-    fi
-
-    if [ -f "$EVIDENCE_FILE" ]; then
-        print_result "${GREEN}[WAZIDEPLOY][EVIDENCE-FILE]${NC} $EVIDENCE_FILE"
-    else
-        print_result "${GREEN}[WAZIDEPLOY][EVIDENCE-FILE]${NC} NONE"
+        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
     fi
 
     print_result "${GREEN}[WAZIDEPLOY][LOG-PATH]${NC} $LOG_TAR"
@@ -118,7 +106,7 @@ CMD="wazideploy-generate \
  --deploymentMethod $DEPLOYMENT_METHOD \
  --deploymentPlan $outputDir/deploymentPlan.yaml \
  --deploymentPlanReport $outputDir/deploymentPlanReport.html \
- --packageInputFile $PACKAGE_URL -pt $TAGS"
+ --packageInputFile $PACKAGE_URL"
 
 print_info "${CYAN}[WAZIDEPLOY] ${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY] ${NC} \t$CMD"
@@ -128,7 +116,7 @@ tmp_rc="/tmp/cmd_rc_gen_$$"
 (
   ${CMD}
   echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/01-wazideploy-generate.log" | while IFS= read -r line
+) 2>&1 | tee "${outputDir}/wazideploy-generate.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY] ${NC} [GENERATE] $line"
 done
@@ -163,8 +151,9 @@ if [ -n "${CICS_CMCI_PASSWORD:-}" ]; then
   CICS_CREDS="$CICS_CREDS -e default_cics_password=$CICS_CMCI_PASSWORD"
 fi
 
+rm -rf "./work"
 CMD="wazideploy-deploy \
- --workingFolder $outputDir \
+ --workingFolder ./work \
  --deploymentPlan $outputDir/deploymentPlan.yaml \
  --envFile $DEPLOY_ENV_FILE \
  -e application=$APP_BASE_NAME \
@@ -184,7 +173,7 @@ tmp_rc="/tmp/cmd_rc_deploy_$$"
 (
   ${CMD}
   echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/02-wazideploy-deploy.log" | while IFS= read -r line
+) 2>&1 | tee "${outputDir}/wazideploy-deploy.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY] ${NC} [DEPLOY] $line"
 done

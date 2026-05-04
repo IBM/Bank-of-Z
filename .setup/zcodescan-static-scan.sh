@@ -1,5 +1,5 @@
 #!/bin/env bash
-
+set -eu
 # -----------------------------------------------------------------------------
 # Summary:
 # This script runs an IBM ZCodeScan static analysis on a remote z/OS environment.
@@ -12,8 +12,6 @@
 # - Always exposes scan result paths if available
 # - Preserves real return code (RC)
 # -----------------------------------------------------------------------------
-
-set +e
 
 # =========================
 # Source library scripts
@@ -36,12 +34,10 @@ TMP_LOG="/tmp/zcodescan_$$.log"
 : > "$TMP_LOG"
 
 LOG_DIR="$SCRIPTS_DIR/logs"
-LOG_TAR="$LOG_DIR/zcodescan-log.tar"
+LOG_TAR="$SCRIPTS_DIR/zcodescan-log.tar"
 
 finalize_results() {
     RC=$?
-
-    mkdir -p "$LOG_DIR"
 
     if [ -f "$TMP_LOG" ]; then
         cp "$TMP_LOG" "$LOG_DIR/zcodescan-console.log" 2>/dev/null || true
@@ -67,8 +63,7 @@ trap finalize_results EXIT
 # Step 1: DBB preview
 # =========================
 print_info "Run DBB in preview mode to have the list of sources to scan"
-
-$SCRIPTS_DIR/dbb-build.sh preview 2>&1 | tee "$TMP_LOG" | while read line
+bash $SCRIPTS_DIR/dbb-build.sh preview 2>&1 | tee "$TMP_LOG" | while read line
 do
     case "$line" in
         ">"*)
@@ -97,7 +92,7 @@ BUILD_LIST=$(sed -n 's/.*\[BUILD-LIST\][[:space:]]*//p' "$TMP_LOG" | tail -1)
 # Environment
 # =========================
 export JAVA_HOME=${JAVA_HOME_REMOTE:-$(get_section_value 'zcodescan' 'java_home')}
-export PATH="${JAVA_HOME}/bin:${REMOTE_EXTRA_PATH}:$PATH"
+export PATH="${JAVA_HOME}/bin:${REMOTE_EXTRA_PATH:-}:$PATH"
 export PYENV_ACTIVATE_PATH=${PYENV_ACTIVATE_PATH:-$(get_section_value 'zcodescan' 'zcodescan_home')/bin/activate}
 export SCAN_CWD_FOLDER=${SCAN_CWD_FOLDER:-$(get_section_value 'zcodescan' 'cwd_folder')}
 export SCAN_SOURCE_FOLDER=${SCAN_SOURCE_FOLDER:-$(get_section_value 'zcodescan' 'src_folder')}
@@ -111,6 +106,20 @@ source "${PYENV_ACTIVATE_PATH}"
 # Step 2: ZCodeScan
 # =========================
 : > "$TMP_LOG"
+
+export SCAN_CONFIG_FILE="$SCRIPTS_DIR/config.yml"
+echo "license_server:" > ${SCAN_CONFIG_FILE}
+echo "  url: https://127.0.0.1:8195" >> ${SCAN_CONFIG_FILE}
+echo "  user: IBMUSER" >> ${SCAN_CONFIG_FILE}
+echo "  password: SYS1SYS1" >> ${SCAN_CONFIG_FILE}
+echo "  verify: false" >> ${SCAN_CONFIG_FILE}
+
+export ZCS_AUTO_GEN_KEY=True
+export ZCS_GEN_KEY=True
+
+rm -rf "$LOG_DIR"
+rm -f "*.log"
+mkdir -p "$LOG_DIR"
 
 PYTHONUNBUFFERED=1 zcodescan \
   -sfl "$BUILD_LIST" \
@@ -130,6 +139,7 @@ do
             ;;
     esac
 done
+cp zcodescan.log "$LOG_DIR"
 
 # =========================
 # Extract result paths
@@ -138,15 +148,15 @@ while IFS= read -r line; do
     case "$line" in
         *"Generate SonarQube export to "*)
             path=$(echo "$line" | sed 's/.*Generate SonarQube export to //')
-            print_result "${GREEN}[ZCODESCAN][SONARQUBE-PATH]${NC} $path"
+            cp -f "$path" "$LOG_DIR"
             ;;
         *"Generate JUnit export to "*)
             path=$(echo "$line" | sed 's/.*Generate JUnit export to //')
-            print_result "${GREEN}[ZCODESCAN][JUNIT-PATH]${NC} $path"
+            cp -f "$path" "$LOG_DIR"
             ;;
         *"Generate output to "*)
             path=$(echo "$line" | sed 's/.*Generate output to //')
-            print_result "${GREEN}[ZCODESCAN][JSON-PATH]${NC} $path"
+            cp -f "$path" "$LOG_DIR"
             ;;
     esac
 done < "$TMP_LOG"

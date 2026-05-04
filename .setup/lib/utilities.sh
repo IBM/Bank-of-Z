@@ -46,6 +46,8 @@ expand_vars() {
     value=$(echo "$value" | sed "s|\$USER|$USER|g")
 
     # Replace $CICS_CMCI_USER
+    CICS_CMCI_USER={CICS_CMCI_USER:-""}
+    CICS_CMCI_PASSWORD={CICS_CMCI_PASSWORD:-""}
     value="${value//\$CICS_CMCI_USER/$CICS_CMCI_USER}"
 
     # Replace $CICS_CMCI_PASSWORD

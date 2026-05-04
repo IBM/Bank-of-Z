@@ -1,5 +1,5 @@
 #!/bin/env bash
-
+set -eu
 # -----------------------------------------------------------------------------
 # Summary:
 # This script runs TAZ unit tests on a remote z/OS environment.
@@ -12,8 +12,6 @@
 # - Always produces TAR-PATH result when test XML files exist
 # - Preserves real return code (RC)
 # -----------------------------------------------------------------------------
-
-set +e
 
 # =========================
 # Source library scripts
@@ -44,43 +42,27 @@ export TAZ_CLI="${TAZ_INSTALL_DIR}/bin/taz"
 TMP_LOG="/tmp/taz_unittest_$$.log"
 : > "$TMP_LOG"
 
-TAZ_RESULTS_DIR="$PWD/.taz-edt-results"
-TAZ_LOG_DIR="$PWD/.taz-edt/logs"
-TAZ_TAR_FILE="$TAZ_RESULTS_DIR/taz-junit-results.tar"
-TAZ_LOG_TAR="$PWD/taz-unittest-log.tar"
+TAZ_RESULTS_DIR="$SCRIPTS_DIR/.taz-edt-results"
+TAZ_LOG_DIR="$SCRIPTS_DIR/.taz-edt/logs"
+TAZ_LOG_TAR="$SCRIPTS_DIR/taz-unittest-log.tar"
 
 finalize_results() {
     RC=$?
-
-    # ----------------------------------------------------------
-    # Create TAR when XML result files exist
-    # ----------------------------------------------------------
-    if [ -d "$TAZ_RESULTS_DIR" ]; then
-        XML_FILES=$(find "$TAZ_RESULTS_DIR" -name "*.xml" 2>/dev/null)
-
-        if [ -n "$XML_FILES" ]; then
-            tar -cf "$TAZ_TAR_FILE" $XML_FILES 2>/dev/null || true
-
-            if [ -f "$TAZ_TAR_FILE" ]; then
-                print_result "${GREEN}[TAZ-UNITTEST][TAR-PATH]${NC} $TAZ_TAR_FILE"
-            else
-                print_result "${GREEN}[TAZ-UNITTEST][TAR-PATH]${NC} NONE"
-            fi
-        else
-            print_result "${GREEN}[TAZ-UNITTEST][TAR-PATH]${NC} NONE"
-        fi
-    else
-        print_result "${GREEN}[TAZ-UNITTEST][TAR-PATH]${NC} NONE"
-    fi
-
     # ----------------------------------------------------------
     # Create LOG archive when possible
     # ----------------------------------------------------------
     if [ -d "$TAZ_LOG_DIR" ] && ls "$TAZ_LOG_DIR"/* >/dev/null 2>&1; then
+        if [ -d "$TAZ_RESULTS_DIR" ]; then
+            set +e
+            for file in $(find "$TAZ_RESULTS_DIR" -name "*.xml")
+            do
+                cp -f "$file" "$TAZ_LOG_DIR"
+            done
+            set -e
+        fi
         tar -cf "$TAZ_LOG_TAR" -C "$TAZ_LOG_DIR" . 2>/dev/null || true
     else
-        echo "No TAZ log files found" > "$TMP_LOG"
-        tar -cf "$TAZ_LOG_TAR" "$TMP_LOG" 2>/dev/null || true
+        print_warning "No TAZ log files found"
     fi
 
     if [ -f "$TAZ_LOG_TAR" ]; then
@@ -96,8 +78,6 @@ finalize_results() {
 
 trap finalize_results EXIT
 
-print_info "${CYAN}[TAZ-UNITTEST]${NC} Starting unit tests ..."
-
 # Run TAZ unit tests with:
 # --procLib     : procedure library used by the tests
 # --userLibrary : user load library used by the tests
@@ -105,7 +85,10 @@ print_info "${CYAN}[TAZ-UNITTEST]${NC} Starting unit tests ..."
 # -k0           : keep test artifacts according to TAZ CLI behavior
 
 # Run TAZ unit tests and capture logs
+cd "$SCRIPTS_DIR"
 rm -rf .taz-edt*
+print_info "${CYAN}[TAZ-UNITTEST]${NC} Starting unit tests in $PWD ..."
+
 
 "${TAZ_CLI}" unittest run "${TAZ_TEST_PATH}" \
   --procLib "${PROCLIB}" \
@@ -144,4 +127,5 @@ if [[ "$failures" -ne 0 || "$errors" -ne 0 ]]; then
 fi
 
 print_info "${CYAN}[TAZ-UNITTEST]${NC} Tests succeed ..."
+
 exit 0

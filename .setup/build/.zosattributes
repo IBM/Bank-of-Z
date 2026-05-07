@@ -1,7 +1,0 @@
-# pattern local-encoding remote-encoding
-# Don't upload the node_modules directory
-.* -
-*.jpg binary binary
-
-*.profile UTF-8 EBCDIC
-*.yaml UTF-8 UTF-8

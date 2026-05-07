@@ -47,6 +47,7 @@ fi
 
 PIPELINE_BASE_WORKSPACE=$PIPELINE_WORKSPACE
 
+RSE_PROFILE=$(get_section_value 'zowe' 'rse-profile')
 PIPELINE_SCRIPT_SOURCE="$SCRIPT_DIR/$(get_section_value 'pipeline_script' 'source')"
 PIPELINE_SCRIPT_TARGET=$(expand_vars "$(get_section_value 'pipeline_script' 'target')")
 PIPELINE_SCRIPT_WORKSPACE=$(expand_vars "$(get_section_value 'pipeline_script' 'workspace')")
@@ -78,18 +79,18 @@ fi
 # Ensure parent directory exists on USS
 SCRIPT_PARENT_DIR=$(dirname "$PIPELINE_SCRIPT_TARGET")
 print_info "Ensuring parent directory exists: $SCRIPT_PARENT_DIR"
-zowe rse-api-for-zowe-cli create uss-directory "$SCRIPT_PARENT_DIR" &> /dev/null || true
+zowe rse-api-for-zowe-cli create uss-directory "$SCRIPT_PARENT_DIR" --rse-profile "$RSE_PROFILE" &> /dev/null || true
 
 # Delete existing file if it exists
 print_info "Removing existing pipeline script if present..."
-zowe rse-api-for-zowe-cli delete uss-file "$PIPELINE_SCRIPT_TARGET" &> /dev/null || true
+zowe rse-api-for-zowe-cli delete uss-file "$PIPELINE_SCRIPT_TARGET" --rse-profile "$RSE_PROFILE" &> /dev/null || true
 
 # Upload the script directly (no sed modifications needed)
 print_info "Uploading pipeline simulation build script to USS..."
-if zowe rse-api-for-zowe-cli upload file-to-uss "$PIPELINE_SCRIPT_SOURCE" "$PIPELINE_SCRIPT_TARGET" --encoding IBM-1047; then
+if zowe rse-api-for-zowe-cli upload file-to-uss "$PIPELINE_SCRIPT_SOURCE" "$PIPELINE_SCRIPT_TARGET" --rse-profile "$RSE_PROFILE" --encoding IBM-1047; then
     # Make script executable
     print_info "Making script executable..."
-    zowe rse-api-for-zowe-cli issue unix "chmod +x $(basename $PIPELINE_SCRIPT_TARGET)" --cwd "$SCRIPT_PARENT_DIR"
+    zowe rse-api-for-zowe-cli issue unix "chmod +x $(basename $PIPELINE_SCRIPT_TARGET)" --cwd "$SCRIPT_PARENT_DIR" --rse-profile "$RSE_PROFILE"
     
     print_success "Pipeline simulation build script uploaded successfully"
 else
@@ -98,7 +99,7 @@ else
 fi
 
 print_info "Uploading pipeline simulation deploy scripts to USS..."
-if zowe rse-api-for-zowe-cli upload dir-to-uss "$(dirname "$PIPELINE_SCRIPT_SOURCE")/deploy" "$(dirname $PIPELINE_SCRIPT_TARGET)/deploy" --encoding UTF-8; then
+if zowe rse-api-for-zowe-cli upload dir-to-uss "$(dirname "$PIPELINE_SCRIPT_SOURCE")/deploy" "$(dirname $PIPELINE_SCRIPT_TARGET)/deploy" --rse-profile "$RSE_PROFILE" --encoding UTF-8; then
     print_success "Pipeline simulation deploy scripts uploaded successfully"
 else
     print_error "Failed to upload pipeline simulation script"
@@ -122,6 +123,6 @@ export PIPELINE_WORKSPACE='$PIPELINE_WORKSPACE' && \
 export JAVA_HOME='$JAVA_HOME' && \
 $PIPELINE_SCRIPT_TARGET $GIT_REPO $GIT_BRANCH"
 
-zowe rse-api-for-zowe-cli issue unix-shell "$EXEC_CMD" --cwd "$SCRIPT_PARENT_DIR"
+zowe rse-api-for-zowe-cli issue unix-shell "$EXEC_CMD" --cwd "$SCRIPT_PARENT_DIR" --rse-profile "$RSE_PROFILE"
 
 # Made with Bob

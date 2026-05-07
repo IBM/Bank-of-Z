@@ -66,6 +66,12 @@ application:
         - name: doLinkEdit
           value: true
 
+        # List of statically called submodules that need to be proccessed first
+        - name: fileBuildRank
+          value: 1
+          forFiles: "**/src/base/cics/cobol/EMLVALID.cbl"
+            
+
         # ----- Compiler parameters (default) -----
         # Base option: LIB enables the COPY statement.
         # Conditional suffixes are appended at build time:

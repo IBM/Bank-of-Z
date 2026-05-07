@@ -24,6 +24,7 @@ tasks:
       # conditional variable builds compile parameters i.e CICS,SQL
       - name: LOAD_LLQ
         value: LOAD
+      
       - name: compileParms
         value: LIB
         append:

@@ -92,6 +92,7 @@
            05  AMOUNT-HIST     PIC  S9(13)V9(2) COMP-3.
            05  REFTXID-HIST    PIC  S9(18) COMP-5.
            05  ACCID-HIST      PIC  S9(18) COMP-5.
+           05  BALANCE-HIST    PIC  S9(13)V9(2) COMP-3.
 
 
       ******************************************************************
@@ -184,24 +185,24 @@
            05  FILLER          PIC X(1) VALUE '0'.
 
        LOCAL-STORAGE SECTION.
-      * Local Java class reference
-       01 DB2InsertTran-class-ref
-           object reference DB2InsertHist value null.
+      * Local Java class reference (8-byte for 64-bit Java)
+       01 DB2InsertTran-class-ref  PIC 9(18) COMP-5 VALUE 0.
 
-       01 INSERT-METHOD-ID  PIC S9(9) BINARY.
+       01 INSERT-METHOD-ID  PIC 9(18) COMP-5 VALUE 0.
 
-       01 class-name          PICTURE X(50).
-       01 METHOD-NAME       PIC X(30).
+      * Exact-sized fields for JNI strings (length + 1 for null)
+       01 class-name          PICTURE X(36).
+       01 METHOD-NAME       PIC X(11).
        01 METHOD-NAME-PTR   USAGE POINTER.
-       01 SIGNATURE-NAME    PIC X(30).
+       01 SIGNATURE-NAME    PIC X(25).
        01 SIGNATURE-NAME-PTR USAGE POINTER.
 
        01 len               pic 9(9) binary.
        01 JAVA-PRIMED       PIC X(1) VALUE 'N'.
        01 HISTSEG-PTR       USAGE POINTER.
        01 HISTSEG-LEN       PIC  S9(18) COMP-5.
-       01 HISTSEG-BUFF-PTR  USAGE POINTER.
-       01 HISTSEG-BUFF      PIC X(56).
+       01 HISTSEG-BUFF-PTR  PIC 9(18) COMP-5 VALUE 0.
+       01 HISTSEG-BUFF      PIC X(64).
 
        LINKAGE SECTION.
        COPY JNI.
@@ -337,6 +338,17 @@
                  MOVE 'Y' TO JAVA-PRIMED
                END-IF
 
+      * UPDATE THE BALANCE AND LASTTXID IN THE ACCOUNT SEGMENT FIRST
+               COMPUTE LASTTXID-ACC = LASTTXID-ACC + 1
+               IF IN-TRXTYPE = 'w'
+                 COMPUTE BALANCE-ACC = BALANCE-ACC - AMOUNT-HIST
+               ELSE
+                 COMPUTE BALANCE-ACC = BALANCE-ACC + AMOUNT-HIST
+               END-IF
+               
+      * SET THE BALANCE IN HISTORY SEGMENT
+               COMPUTE BALANCE-HIST = BALANCE-ACC
+
                IF JAVA-PRIMED = 'Y'
                THEN
                  DISPLAY 'SAVE HISTORY TO DB2'
@@ -350,13 +362,6 @@
                IF DBSTAT NOT = SPACES
                  DISPLAY 'BAD STATUS CODE: ' DBSTAT
                  MOVE 1 TO TERM-IO
-               END-IF
-      * UPDATE THE BALANCE AND LASTTXID IN THE ACCOUNT SEGMENT
-               COMPUTE LASTTXID-ACC = LASTTXID-ACC + 1
-               IF IN-TRXTYPE = 'w'
-                 COMPUTE BALANCE-ACC = BALANCE-ACC - AMOUNT-HIST
-               ELSE
-                 COMPUTE BALANCE-ACC = BALANCE-ACC + AMOUNT-HIST
                END-IF
 
                SET ADDRESS OF DBPCB TO ADDRESS OF DBPCB1
@@ -454,75 +459,123 @@
       *    insertHist(HISTSEG-BUFF-PTR)
        JAVA-SAVEHIST.
 
-      *    DISPLAY 'NewDirectByteBuffer'.
-      *    DISPLAY 'txid =             ' TXID-HIST.
-      *    DISPLAY 'HIST-SEG =         ' HISTORY-SEG.
+           DISPLAY '========================================'.
+           DISPLAY 'JAVA-SAVEHIST: Starting Java call'.
+           DISPLAY 'Transaction ID: ' TXID-HIST.
+           DISPLAY 'Timestamp:      ' TIMESTMP-HIST.
+           DISPLAY 'Trans Type:     ' TRANSTYP-HIST.
+           DISPLAY 'Amount:         ' AMOUNT-HIST.
+           DISPLAY 'Account ID:     ' ACCID-HIST.
+           
            COMPUTE HISTSEG-LEN = LENGTH OF HISTORY-SEG.
+           DISPLAY 'History segment length: ' HISTSEG-LEN.
+           
            SET HISTSEG-PTR TO ADDRESS OF HISTORY-SEG
+           DISPLAY 'Creating ByteBuffer from COBOL memory...'.
+           DISPLAY 'JNIEnvPtr value: ' JNIEnvPtr.
+           
            Call NewDirectByteBuffer USING BY VALUE JNIEnvPtr,
                                              HISTSEG-PTR,
                                                   HISTSEG-LEN
                                        returning  HISTSEG-BUFF-PTR.
 
-      *    DISPLAY 'HISTSEG-LEN  = ' HISTSEG-LEN.
-      *    DISPLAY 'HIST BUFFER  = ' HISTSEG-BUFF-PTR.
-           DISPLAY 'calling Java Method   '.
+           IF HISTSEG-BUFF-PTR = 0
+              DISPLAY 'ERROR: NewDirectByteBuffer returned NULL'
+              DISPLAY 'Failed to create ByteBuffer'
+           ELSE
+              DISPLAY 'ByteBuffer created successfully'
+              DISPLAY 'ByteBuffer pointer: ' HISTSEG-BUFF-PTR
+           END-IF.
+           
+           DISPLAY 'Calling Java static method insertHist...'.
+           DISPLAY 'Calling CallStaticVoidMethod'.
+           
            CALL CallStaticVoidMethod using by value JNIEnvPtr
                                       by value DB2InsertTran-class-ref
                                       by value INSERT-METHOD-ID
                                       by value HISTSEG-BUFF-PTR.
 
+           DISPLAY 'Java method call completed'.
+           DISPLAY '========================================'.
+
        JAVA-SAVEHIST-END.
 
       * PROCEDURE PRIME-JAVA
        PRIME-JAVA.
-      *    DISPLAY 'Setting address of JNIEnvPtr'.
+           DISPLAY '========================================'.
+           DISPLAY 'PRIME-JAVA: Initializing Java environment'.
+           DISPLAY '========================================'.
+           
+           DISPLAY 'Step 1: Setting address of JNIEnvPtr'.
+           DISPLAY 'JNIEnvPtr value: ' JNIEnvPtr.
            Set address of JNIEnv to JNIEnvPtr.
 
-      *    DISPLAY 'Setting address of JavaNativeInterface (JNI)'.
+           DISPLAY 'Step 2: Setting address of JNINativeInterface'.
            Set address of JNINativeInterface to JNIEnv.
+           DISPLAY 'JNI interface initialized'.
 
-      *    DISPLAY 'Convert class name from EBCDIC to ASCII'.
+           DISPLAY 'Step 3: Loading Java class'.
+      *    Following IBM example pattern
            Move z"nazare/jmp/controller/InsertHist" to class-name.
-           Call "__etoa" using by value address of class-name
-               returning len.
-
-      *    DISPLAY 'FindClass - attempt to load Java class'.
+           DISPLAY 'Class name: nazare/jmp/controller/InsertHist'.
+           DISPLAY 'Converting to ASCII...'.
+           Call "__etoa" using class-name.
+           DISPLAY 'Calling FindClass...'.
+           
            Call FindClass using by value JNIEnvPtr
               address of class-name returning DB2InsertTran-class-ref.
 
-           If DB2InsertTran-class-ref = null
-             DISPLAY "ERROR LOADING CLASS: " class-name
+           DISPLAY 'FindClass returned: ' DB2InsertTran-class-ref.
+           
+           If DB2InsertTran-class-ref = 0
+             DISPLAY '**************************************'
+             DISPLAY 'ERROR: Failed to load Java class'
+             DISPLAY 'Class: nazare/jmp/controller/InsertHist'
+             DISPLAY 'Check CLASSPATH and class availability'
+             DISPLAY '**************************************'
              Goback
            End-if.
 
-      *    DISPLAY 'FindClass worked'.
+           DISPLAY 'SUCCESS: Java class loaded'.
 
-      *    Look up doTest method DB2InsertHist
-      *    ([B)V indicates no parms and a void return
+           DISPLAY 'Step 4: Looking up static method'.
+      *    Following IBM example pattern
            Move z"insertHist" to METHOD-NAME.
-           Call "__etoa" using by value address of
-                                           METHOD-NAME
-                         returning len.
-
            Move z"(Ljava/nio/ByteBuffer;)V" to SIGNATURE-NAME.
-           Call "__etoa" using by value address of
-                                           SIGNATURE-NAME
-                         returning len.
+           DISPLAY 'Method name: insertHist'.
+           DISPLAY 'Method signature: (Ljava/nio/ByteBuffer;)V'.
+           
+           DISPLAY 'Converting method name to ASCII...'.
+           Call "__etoa" using METHOD-NAME.
+           DISPLAY 'Converting signature to ASCII...'.
+           Call "__etoa" using SIGNATURE-NAME.
 
            SET METHOD-NAME-PTR TO ADDRESS OF METHOD-NAME.
            SET SIGNATURE-NAME-PTR TO ADDRESS OF SIGNATURE-NAME.
 
-      *    DISPLAY 'Call GetStaticMethodId insertHist(ByteBuffer)'.
+           DISPLAY 'Calling GetStaticMethodId...'.
            CALL GetStaticMethodId USING BY VALUE JNIEnvPtr
                                            DB2InsertTran-class-ref
                                            METHOD-NAME-PTR
                                            SIGNATURE-NAME-PTR
                             RETURNING INSERT-METHOD-ID.
 
+           DISPLAY 'GetStaticMethodId returned: ' INSERT-METHOD-ID.
+           
            If INSERT-METHOD-ID = 0
-              Display "Error occurred while getting INSERT-METHOD-ID"
+              DISPLAY '**************************************'
+              DISPLAY 'ERROR: Failed to get method ID'
+              DISPLAY 'Method: insertHist'
+              DISPLAY 'Signature: (Ljava/nio/ByteBuffer;)V'
+              DISPLAY 'Verify method exists in Java class'
+              DISPLAY '**************************************'
               Stop run
            End-if.
+
+           DISPLAY 'SUCCESS: Method ID obtained'.
+           DISPLAY 'Method ID: ' INSERT-METHOD-ID.
+           DISPLAY '========================================'.
+           DISPLAY 'PRIME-JAVA: Initialization complete'.
+           DISPLAY '========================================'.
 
        PRIME-JAVA-END.

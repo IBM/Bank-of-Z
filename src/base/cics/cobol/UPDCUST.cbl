@@ -337,6 +337,13 @@
               MOVE COMM-STATUS TO HV-CUSTOMER-STATUS
            END-IF.
 
+           IF COMM-DOB-YEAR NOT = 0
+              COMPUTE HV-CUSTOMER-DOB =
+                 (COMM-DOB-YEAR * 10000) +
+                 (COMM-DOB-MONTH * 100) +
+                 COMM-DOB-DAY
+           END-IF.
+
       *
       *    Update the customer record in DB2
       *
@@ -345,14 +352,14 @@
                  SET CUSTOMER_TITLE = :HV-CUSTOMER-TITLE,
                      CUSTOMER_FIRST_NAME = :HV-CUSTOMER-FIRST-NAME,
                      CUSTOMER_LAST_NAME = :HV-CUSTOMER-LAST-NAME,
+                     CUSTOMER_DATE_OF_BIRTH = :HV-CUSTOMER-DOB,
                      CUSTOMER_PHONE = :HV-CUSTOMER-PHONE,
                      CUSTOMER_ADDR_LINE1 = :HV-CUSTOMER-ADDR-LINE1,
                      CUSTOMER_ADDR_LINE2 = :HV-CUSTOMER-ADDR-LINE2,
                      CUSTOMER_CITY = :HV-CUSTOMER-CITY,
                      CUSTOMER_POSTCODE = :HV-CUSTOMER-POSTCODE,
                      CUSTOMER_COUNTRY = :HV-CUSTOMER-COUNTRY,
-                     CUSTOMER_STATUS = :HV-CUSTOMER-STATUS,
-                     CUSTOMER_CREATED_DATE = :HV-CUSTOMER-CREATE-DATE
+                     CUSTOMER_STATUS = :HV-CUSTOMER-STATUS
                WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
                  AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.

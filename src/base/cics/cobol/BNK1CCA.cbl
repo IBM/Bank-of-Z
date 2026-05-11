@@ -79,9 +79,21 @@
           03 WS-COMM-EYE               PIC X(4).
           03 WS-COMM-SCODE             PIC X(6).
           03 WS-COMM-CUSTNO            PIC X(10).
-          03 WS-COMM-NAME              PIC X(60).
-          03 WS-COMM-ADDR              PIC X(160).
-          03 WS-COMM-DOB               PIC 9(8).
+          03 WS-COMM-NAME.
+             05 WS-COMM-TITLE          PIC X(10).
+             05 WS-COMM-FIRST-NAME     PIC X(50).
+             05 WS-COMM-LAST-NAME      PIC X(50).
+          03 WS-COMM-DOB.
+             05 WS-COMM-DOB-DAY        PIC 99 DISPLAY.
+             05 WS-COMM-DOB-MONTH      PIC 99 DISPLAY.
+             05 WS-COMM-DOB-YEAR       PIC 9999 DISPLAY.
+          03 WS-COMM-PHONE             PIC X(20).
+          03 WS-COMM-ADDR.
+             05 WS-COMM-ADDR-LINE1     PIC X(50).
+             05 WS-COMM-ADDR-LINE2     PIC X(50).
+             05 WS-COMM-CITY           PIC X(50).
+             05 WS-COMM-POSTCODE       PIC X(10).
+             05 WS-COMM-COUNTRY        PIC X(50).
 
        01 WS-CONVERSION.
           03 WS-AVAIL-BAL-9            PIC 9(10)V99.
@@ -143,9 +155,21 @@
           03 COMM-EYE                  PIC X(4).
           03 COMM-SCODE                PIC X(6).
           03 COMM-CUSTNO               PIC X(10).
-          03 COMM-NAME                 PIC X(60).
-          03 COMM-ADDR                 PIC X(160).
-          03 COMM-DOB                  PIC 9(8).
+          03 COMM-NAME.
+             05 COMM-TITLE             PIC X(10).
+             05 COMM-FIRST-NAME        PIC X(50).
+             05 COMM-LAST-NAME         PIC X(50).
+          03 COMM-DOB.
+             05 COMM-DOB-DAY           PIC 99 DISPLAY.
+             05 COMM-DOB-MONTH         PIC 99 DISPLAY.
+             05 COMM-DOB-YEAR          PIC 9999 DISPLAY.
+          03 COMM-PHONE                PIC X(20).
+          03 COMM-ADDR.
+             05 COMM-ADDR-LINE1        PIC X(50).
+             05 COMM-ADDR-LINE2        PIC X(50).
+             05 COMM-CITY              PIC X(50).
+             05 COMM-POSTCODE          PIC X(10).
+             05 COMM-COUNTRY           PIC X(50).
 
 
 

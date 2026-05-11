@@ -95,8 +95,7 @@ CREATE TABLE CUSTOMER (
                     CUSTOMER_ADDRESS               CHAR(160),
                     CUSTOMER_DATE_OF_BIRTH         INTEGER,
                     CUSTOMER_CREDIT_SCORE          SMALLINT,
-                    CUSTOMER_CS_REVIEW_DATE        INTEGER,
-                    CUSTOMER_EMAIL                 CHAR(60)
+                    CUSTOMER_CS_REVIEW_DATE        INTEGER
                    )
 IN BANKZ.CUSTOMER  NOT VOLATILE
 CARDINALITY  AUDIT NONE  DATA CAPTURE NONE;

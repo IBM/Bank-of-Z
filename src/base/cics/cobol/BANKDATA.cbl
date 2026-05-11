@@ -60,7 +60,6 @@
           03 HV-CUSTOMER-NUMBER         PIC X(10).
           03 HV-CUSTOMER-NAME           PIC X(60).
           03 HV-CUSTOMER-ADDRESS        PIC X(160).
-          03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
@@ -77,9 +76,6 @@
        77 WS-ACCOUNT-OPENED-DAY         PIC 99.
        77 WS-ACCOUNT-OPENED-MONTH       PIC 99.
        77 WS-ACCOUNT-OPENED-YEAR        PIC 9999.
-       77 WS-EMAIL-WORK                 PIC X(60).
-       77 WS-EMAIL-DOMAIN               PIC X(16)
-                                         VALUE '@bankofz.example'.
 
       * ACCOUNT Host variables for DB2
        01 HOST-ACCOUNT-ROW.
@@ -599,14 +595,6 @@
                    MOVE CUSTOMER-NUMBER TO HV-CUSTOMER-NUMBER
                    MOVE CUSTOMER-NAME TO HV-CUSTOMER-NAME
                    MOVE CUSTOMER-ADDRESS TO HV-CUSTOMER-ADDRESS
-                   MOVE SPACES TO WS-EMAIL-WORK
-                   STRING 'cust' DELIMITED BY SIZE
-                          CUSTOMER-NUMBER DELIMITED BY SIZE
-                          WS-EMAIL-DOMAIN DELIMITED BY SIZE
-                      INTO WS-EMAIL-WORK
-                   END-STRING
-                   MOVE WS-EMAIL-WORK TO CUSTOMER-EMAIL
-                   MOVE CUSTOMER-EMAIL TO HV-CUSTOMER-EMAIL
 
       *
       * Convert date of birth to INTEGER format (YYYYMMDD)
@@ -637,7 +625,6 @@
                           CUSTOMER_NUMBER,
                           CUSTOMER_NAME,
                           CUSTOMER_ADDRESS,
-                          CUSTOMER_EMAIL,
                           CUSTOMER_DATE_OF_BIRTH,
                           CUSTOMER_CREDIT_SCORE,
                           CUSTOMER_CS_REVIEW_DATE)
@@ -646,7 +633,6 @@
                           :HV-CUSTOMER-NUMBER,
                           :HV-CUSTOMER-NAME,
                           :HV-CUSTOMER-ADDRESS,
-                          :HV-CUSTOMER-EMAIL,
                           :HV-CUSTOMER-DOB,
                           :HV-CUSTOMER-CREDIT-SCORE,
                           :HV-CUSTOMER-CS-REVIEW-DATE)

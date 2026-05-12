@@ -135,12 +135,9 @@
           03 WS-COMM-DOB              PIC 9(8).
           03 WS-COMM-CREDIT-SCORE     PIC 9(3).
           03 WS-COMM-CS-REVIEW-DATE   PIC 9(8).
-          03 WS-COMM-EMAIL            PIC X(60).
           03 WS-COMM-DEL-SUCCESS      PIC X.
           03 WS-COMM-DEL-FAIL-CD      PIC X.
           03 WS-COMM-UPDATE           PIC X.
-
-       77 WS-COMM-AREA-LEN            PIC S9(4) COMP VALUE 0.
 
        01 WS-VALIDATE-NAME            PIC X(60)  VALUE ' '.
        01 WS-UNSTR-TITLE              PIC X(9)   VALUE ' '.
@@ -173,9 +170,6 @@
 
        01 WS-ABEND-PGM                PIC X(8)   VALUE 'ABNDPROC'.
 
-       01 WS-EMAIL-COMMAREA.
-           COPY EMLVALID.
-
        01 ABNDINFO-REC.
            COPY ABNDINFO.
 
@@ -191,7 +185,6 @@
           03 COMM-DOB                 PIC 9(8).
           03 COMM-CREDIT-SCORE        PIC 9(3).
           03 COMM-CS-REVIEW-DATE      PIC 9(8).
-          03 COMM-EMAIL               PIC X(60).
           03 COMM-DEL-SUCCESS         PIC X.
           03 COMM-DEL-FAIL-CD         PIC X.
           03 COMM-UPD                 PIC X.
@@ -332,16 +325,13 @@
                  TO WS-COMM-CREDIT-SCORE
               MOVE COMM-CS-REVIEW-DATE OF DFHCOMMAREA
                  TO WS-COMM-CS-REVIEW-DATE
-              MOVE COMM-EMAIL OF DFHCOMMAREA TO WS-COMM-EMAIL
               MOVE COMM-UPD OF DFHCOMMAREA TO WS-COMM-UPDATE
            END-IF.
-
-           MOVE LENGTH OF WS-COMM-AREA TO WS-COMM-AREA-LEN.
 
            EXEC CICS
                 RETURN TRANSID('ODCS')
                 COMMAREA(WS-COMM-AREA)
-                LENGTH(WS-COMM-AREA-LEN)
+                LENGTH(266)
                 RESP(WS-CICS-RESP)
                 RESP2(WS-CICS-RESP2)
                 END-EXEC.
@@ -801,24 +791,6 @@
               MOVE -1 TO CUSTAD1L
            END-IF.
 
-      *
-      *    Validate the Email Address
-      *
-           INITIALIZE WS-EMAIL-COMMAREA.
-           SET EMLVALID-EMAIL-REQUIRED TO TRUE.
-
-           IF CUSTEMLL > 0
-              MOVE CUSTEMLI TO EMLVALID-EMAIL
-           END-IF.
-
-           CALL 'EMLVALID' USING WS-EMAIL-COMMAREA.
-
-           IF EMLVALID-EMAIL-INVALID
-              MOVE EMLVALID-MESSAGE TO MESSAGEO
-              MOVE 'N' TO VALID-DATA-SW
-              MOVE -1 TO CUSTEMLL
-           END-IF.
-
        ED2999.
            EXIT.
 
@@ -942,8 +914,6 @@
               MOVE SPACES TO SORTCO
               MOVE SPACES TO CUSTNO2O CUSTNAMO
               MOVE SPACES TO CUSTAD1O CUSTAD2O CUSTAD3O
-              MOVE SPACES TO CUSTEMLO
-              MOVE SPACES TO COMM-EMAIL OF DFHCOMMAREA
               MOVE SPACES TO DOBDDO DOBMMO DOBYYO
               MOVE SPACES TO CREDSCO SCRDTDDO SCRDTMMO SCRDTYYO
               MOVE -1 TO CUSTNOL
@@ -975,8 +945,6 @@
               SCRDTMMO.
            MOVE INQCUST-CS-REVIEW-YYYY TO
               SCRDTYYO.
-           MOVE INQCUST-EMAIL TO CUSTEMLO.
-           MOVE CUSTEMLO TO COMM-EMAIL OF DFHCOMMAREA.
 
            MOVE SPACES TO MESSAGEO.
            IF CUSTNOI = ZERO OR CUSTNOI = '9999999999'
@@ -1133,7 +1101,6 @@
            MOVE SPACES TO CUSTAD1O.
            MOVE SPACES TO CUSTAD2O.
            MOVE SPACES TO CUSTAD3O.
-           MOVE SPACES TO CUSTEMLO.
            MOVE SPACES TO DOBDDO.
            MOVE SPACES TO DOBMMO.
            MOVE SPACES TO DOBYYO.
@@ -1141,7 +1108,6 @@
            MOVE SPACES TO SCRDTDDO.
            MOVE SPACES TO SCRDTMMO.
            MOVE SPACES TO SCRDTYYO.
-           MOVE SPACES TO COMM-EMAIL OF DFHCOMMAREA.
 
            MOVE SPACES TO MESSAGEO.
 
@@ -1187,8 +1153,6 @@
            MOVE SCRDTYYI TO COMM-CS-REVIEWX-YYYY.
            MOVE COMM-CS-REVIEW-UPD-9
               TO COMM-CS-REVIEW-DATE OF UPDCUST-COMMAREA.
-           MOVE SPACES TO COMM-EMAIL OF UPDCUST-COMMAREA.
-           MOVE EMLVALID-EMAIL TO COMM-EMAIL OF UPDCUST-COMMAREA.
 
            MOVE SPACE TO COMM-UPD-SUCCESS.
            MOVE SPACE TO COMM-UPD-FAIL-CD.
@@ -1345,7 +1309,6 @@
               TO SCRDTMMO.
            MOVE COMM-CS-YEAR OF UPDCUST-COMMAREA
               TO SCRDTYYO.
-           MOVE COMM-EMAIL OF UPDCUST-COMMAREA TO CUSTEMLO.
 
            MOVE SPACES TO MESSAGEO.
            STRING 'Customer ' DELIMITED BY SIZE,
@@ -1391,7 +1354,6 @@
            MOVE SCRDTYYO TO COMM-CS-REVIEWX-YYYY.
            MOVE COMM-CS-REVIEW-UPD-9
               TO COMM-CS-REVIEW-DATE OF DFHCOMMAREA.
-           MOVE CUSTEMLO TO COMM-EMAIL OF DFHCOMMAREA.
 
       *
       *    Set a flag to indicate that this is preserved
@@ -1426,10 +1388,6 @@
            MOVE DFHGREEN TO CUSTAD3C.
            MOVE 'A' TO CUSTAD3A.
            MOVE DFHUNDLN TO CUSTAD3H.
-
-           MOVE DFHGREEN TO CUSTEMLC.
-           MOVE 'A' TO CUSTEMLA.
-           MOVE DFHUNDLN TO CUSTEMLH.
 
       *
       *    The Customer Number field is editable and we
@@ -2015,7 +1973,6 @@
            MOVE CUSTAD2O TO COMM-ADDR-UPD2.
            MOVE CUSTAD3O TO COMM-ADDR-UPD3.
            MOVE COMM-ADDR-UPD-SPLIT TO COMM-ADDR OF DFHCOMMAREA.
-           MOVE CUSTEMLO TO COMM-EMAIL OF DFHCOMMAREA.
 
 
            MOVE DOBDDO TO COMM-DOBX-DD.
@@ -2070,10 +2027,6 @@
            MOVE DFHNEUTR TO CUSTAD3C.
            MOVE DFHBMPRF TO CUSTAD3A.
            MOVE HIGH-VALUES TO CUSTAD3H.
-
-           MOVE DFHNEUTR TO CUSTEMLC.
-           MOVE DFHBMPRF TO CUSTEMLA.
-           MOVE HIGH-VALUES TO CUSTEMLH.
 
       *
       *    The Customer Number field is editable and we

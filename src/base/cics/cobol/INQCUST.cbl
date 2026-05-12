@@ -51,7 +51,6 @@
           03 HV-CUSTOMER-NUMBER         PIC X(10).
           03 HV-CUSTOMER-NAME           PIC X(60).
           03 HV-CUSTOMER-ADDRESS        PIC X(160).
-          03 HV-CUSTOMER-EMAIL          PIC X(60).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
@@ -252,8 +251,6 @@
                 TO INQCUST-NAME
              MOVE CUSTOMER-ADDRESS OF OUTPUT-DATA
                 TO INQCUST-ADDR
-             MOVE CUSTOMER-EMAIL OF OUTPUT-DATA
-                TO INQCUST-EMAIL
              MOVE CUSTOMER-DATE-OF-BIRTH OF OUTPUT-DATA
                 TO INQCUST-DOB
              MOVE CUSTOMER-CREDIT-SCORE OF OUTPUT-DATA
@@ -297,7 +294,6 @@
                      CUSTOMER_NUMBER,
                      CUSTOMER_NAME,
                      CUSTOMER_ADDRESS,
-                     CUSTOMER_EMAIL,
                      CUSTOMER_DATE_OF_BIRTH,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
@@ -306,7 +302,6 @@
                      :HV-CUSTOMER-NUMBER,
                      :HV-CUSTOMER-NAME,
                      :HV-CUSTOMER-ADDRESS,
-                     :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-DOB,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
@@ -326,7 +321,6 @@
               MOVE HV-CUSTOMER-NUMBER TO CUSTOMER-NUMBER
               MOVE HV-CUSTOMER-NAME TO CUSTOMER-NAME
               MOVE HV-CUSTOMER-ADDRESS TO CUSTOMER-ADDRESS
-              MOVE HV-CUSTOMER-EMAIL TO CUSTOMER-EMAIL
               MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH
               MOVE HV-CUSTOMER-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE
               MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE
@@ -608,7 +602,6 @@
                      CUSTOMER_NUMBER,
                      CUSTOMER_NAME,
                      CUSTOMER_ADDRESS,
-                     CUSTOMER_EMAIL,
                      CUSTOMER_DATE_OF_BIRTH,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
@@ -617,7 +610,6 @@
                      :HV-CUSTOMER-NUMBER,
                      :HV-CUSTOMER-NAME,
                      :HV-CUSTOMER-ADDRESS,
-                     :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-DOB,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE

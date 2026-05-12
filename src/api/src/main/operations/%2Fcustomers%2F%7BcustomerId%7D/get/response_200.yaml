@@ -29,10 +29,6 @@ mappings:
           }}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"INQCUST-DOB-MM\"\
           }}-{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-DOB\".\"INQCUST-DOB-DD\"\
           }}"
-    - email:
-        required: true
-        nullable: false
-        template: "{{$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-EMAIL\"}}"
     - phoneNumber:
         required: false
         nullable: false

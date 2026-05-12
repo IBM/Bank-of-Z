@@ -1,0 +1,52 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "message" : {
+      "type" : "object",
+      "properties" : {
+        "INPUT-AREA" : {
+          "type" : "object",
+          "properties" : {
+            "LL-IN" : {
+              "minimum" : 0,
+              "maximum" : 9999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 LL-IN PIC 9(4) USAGE COMP.",
+                "name" : "LL-IN"
+              }
+            },
+            "ZZ-IN" : {
+              "minimum" : 0,
+              "maximum" : 9999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 ZZ-IN PIC 9(4) USAGE COMP.",
+                "name" : "ZZ-IN"
+              }
+            },
+            "TRAN-CODE" : {
+              "maxLength" : 8,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 TRAN-CODE PIC X(8) USAGE DISPLAY.",
+                "name" : "TRAN-CODE"
+              }
+            },
+            "IN-CUSTID" : {
+              "maxLength" : 9,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 IN-CUSTID PIC X(9) USAGE DISPLAY.",
+                "name" : "IN-CUSTID"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "message" ],
+  "description" : "General wrapper for IMS Transaction message z/OS Asset requests"
+}

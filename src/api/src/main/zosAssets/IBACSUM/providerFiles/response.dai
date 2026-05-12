@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1" name="OUTPUT-IBACSUM" originalName="OUTPUT-IBACSUM">
+            <field name="OUTPUT-AREA" originalName="OUTPUT-AREA" included="Y" path="OUTPUT-AREA" fileName="IBACSUM.cbl" structureIndex="0" structSrcFileName="OUTPUT-AREA_response_0.cpy" srcLine="01 OUTPUT-AREA.">
+                <startPos>1</startPos>
+                <bytes>139</bytes>
+                <maxBytes>0</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL-OUT" originalName="LL-OUT" included="Y" path="OUTPUT-AREA.LL-OUT" srcLine="05 LL-OUT PIC 9(4) USAGE COMP.">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ-OUT" originalName="ZZ-OUT" included="Y" path="OUTPUT-AREA.ZZ-OUT" srcLine="05 ZZ-OUT PIC 9(4) USAGE COMP.">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="MSG-OUT" originalName="MSG-OUT" included="Y" path="OUTPUT-AREA.MSG-OUT" srcLine="05 MSG-OUT PIC X(32) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>32</bytes>
+                    <maxBytes>32</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="TOTAL-ACCS" originalName="TOTAL-ACCS" included="N" path="OUTPUT-AREA.TOTAL-ACCS" dependedOn="true" srcLine="05 TOTAL-ACCS PIC 9 USAGE DISPLAY.">
+                    <startPos>37</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="1" scale="0"/>
+                </field>
+                <field name="ACCOUNT-SUMMARY" originalName="ACCOUNT-SUMMARY" included="Y" path="OUTPUT-AREA.ACCOUNT-SUMMARY" dependsOn="TOTAL-ACCS" dependsOnPath="OUTPUT-AREA.TOTAL-ACCS" minOccurs="1" maxOccurs="6" srcLine="05 ACCOUNT-SUMMARY OCCURS 1 TO 6 TIMES DEPENDING ON TOTAL-ACCS.">
+                    <startPos>38</startPos>
+                    <bytes>102</bytes>
+                    <maxBytes>0</maxBytes>
+                    <marshaller alignment="NATURAL"/>
+                    <applicationDatatype datatype="ARRAY"/>
+                    <field name="BALANCE-AS" originalName="BALANCE-AS" included="Y" path="OUTPUT-AREA.ACCOUNT-SUMMARY.BALANCE-AS" srcLine="10 BALANCE-AS PIC S9(13)V9(2) USAGE COMP-3.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="Y">
+                            <typeConverter>PACKEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="15" scale="2"/>
+                    </field>
+                    <field name="ACCTYPE-AS" originalName="ACCTYPE-AS" included="Y" path="OUTPUT-AREA.ACCOUNT-SUMMARY.ACCTYPE-AS" srcLine="10 ACCTYPE-AS PIC X USAGE DISPLAY.">
+                        <bytes>1</bytes>
+                        <maxBytes>1</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="ACCID-AS" originalName="ACCID-AS" included="Y" path="OUTPUT-AREA.ACCOUNT-SUMMARY.ACCID-AS" srcLine="10 ACCID-AS PIC S9(18) USAGE COMP-5.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isNativeInteger="Y" alignment="NATURAL"/>
+                        <applicationDatatype datatype="LONG"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

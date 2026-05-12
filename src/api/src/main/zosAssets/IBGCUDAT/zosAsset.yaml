@@ -1,0 +1,8 @@
+---
+version: 1.0
+type: "imsTransaction-1.0"
+description: ""
+providerProperties:
+  language: "COBOL"
+  transactionCode: "IBGCUDAT"
+  connectionRef: "imsConn"

@@ -1,0 +1,8 @@
+---
+version: 1.0
+type: "imsTransaction-1.0"
+description: "GET CUSTOMER ACCOUNTS"
+providerProperties:
+  language: "COBOL"
+  transactionCode: "IBACSUM"
+  connectionRef: "imsConn"

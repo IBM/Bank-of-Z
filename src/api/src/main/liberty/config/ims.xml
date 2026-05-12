@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<server description="Connection to IMS">
+
+    <featureManager> 
+        <feature>zosconnect:ims-1.0</feature> 
+    </featureManager>
+
+    <zosconnect_imsConnection id="imsConn" connectionFactoryRef="imsConnectionFactory" imsDatastoreName="IMS2"/>
+
+    <connectionFactory id="imsConnectionFactory" containerAuthDataRef="IMSCredentials">
+        <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
+    </connectionFactory>
+
+    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+</server>

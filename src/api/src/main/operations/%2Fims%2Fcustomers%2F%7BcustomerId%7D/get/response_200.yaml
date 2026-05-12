@@ -1,0 +1,47 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - customerId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTID-OUT\"}}"
+    - firstName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"FIRSTNAME-OUT\"}}"
+    - lastName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"LASTNAME-OUT\"}}"
+    - email:
+        required: true
+        nullable: false
+        template: "customer@bankofz.com"
+    - phoneNumber:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"PHONE-OUT\"}}"
+    - address:
+        required: false
+        nullable: false
+        mappings:
+        - addressLine1:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ADDRESS-OUT\"}}"
+        - city:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CITY-OUT\"}}"
+        - postalCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ZIPCODE-OUT\"}}"
+    - customerStatus:
+        required: false
+        nullable: false
+        template: "ACTIVE"
+
+# Made with Bob

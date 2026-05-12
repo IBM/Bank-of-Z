@@ -28,6 +28,72 @@ security:
       - customers
 
 paths:
+  /ims/customers/{customerId}:
+    get:
+      tags:
+        - Customers
+      summary: Get customer information
+      description: Retrieve detailed information about a specific customer
+      operationId: getIMSCustomer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "CUST123456"
+      responses:
+        '200':
+          description: Customer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /ims/customers/{customerId}/accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Get customer accounts
+      description: Retrieve all accounts associated with a customer
+      operationId: getIMSCustomerAccounts
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "CUST123456"
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /customers/{customerId}:
     get:
       tags:
@@ -142,7 +208,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321"
+            example: "ACC987654321" #pragma: allowlist secret
       responses:
         '200':
           description: Account details retrieved successfully
@@ -175,7 +241,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321"
+            example: "ACC987654321" #pragma: allowlist secret
       responses:
         '200':
           description: Balance information retrieved successfully
@@ -208,7 +274,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321"
+            example: "ACC987654321" #pragma: allowlist secret
         - name: fromDate
           in: query
           description: Start date for transaction history (ISO 8601 format)
@@ -270,7 +336,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321"
+            example: "ACC987654321" #pragma: allowlist secret
         - name: transactionId
           in: path
           required: true
@@ -406,7 +472,7 @@ components:
         accountId:
           type: string
           description: Unique identifier for the account
-          example: "ACC987654321"
+          example: "ACC987654321" #pragma: allowlist secret
         accountType:
           type: string
           enum: [CURRENT, SAVINGS, CREDIT_CARD, LOAN]
@@ -534,7 +600,7 @@ components:
         accountId:
           type: string
           description: Account identifier
-          example: "ACC987654321"
+          example: "ACC987654321" #pragma: allowlist secret
         amount:
           type: number
           format: double

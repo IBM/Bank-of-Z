@@ -7,6 +7,10 @@ services:
       - CICS_PASSWORD=
       - CICS_HOST=
       - CICS_PORT=
+      - IMS_USER=
+      - IMS_PASSWORD=
+      - IMS_HOST=
+      - IMS_PORT=
       - HTTP_PORT=9080
       - zosconnect_remote_download_allowlist=BLOCK_ALL
     ports:

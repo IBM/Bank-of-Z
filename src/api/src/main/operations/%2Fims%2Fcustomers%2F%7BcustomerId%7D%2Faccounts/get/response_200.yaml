@@ -1,0 +1,31 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accounts:
+        required: true
+        nullable: false
+        foreach:
+          input: "$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\""
+          mappings:
+          - accountId:
+              required: true
+              nullable: false
+              template: "{{$item.\"ACCID-AS\"}}"
+          - accountType:
+              required: true
+              nullable: false
+              template: "{{$item.\"ACCTYPE-AS\"}}"
+          - currency:
+              required: true
+              nullable: false
+              template: "USD"
+          - status:
+              required: true
+              nullable: false
+              template: "ACTIVE"
+          - customerId:
+              required: false
+              nullable: false
+              template: "{{$apiRequest.pathParameters.customerId}}"

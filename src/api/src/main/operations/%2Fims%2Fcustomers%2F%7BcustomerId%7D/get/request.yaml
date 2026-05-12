@@ -1,0 +1,17 @@
+---
+version: "1.2"
+mappings:
+- message:
+    mappings:
+    - INPUT-AREA:
+        required: false
+        nullable: false
+        mappings:
+        - TRAN-CODE:
+            required: false
+            nullable: false
+            template: "IBGCUDAT"
+        - IN-CUSTID:
+            required: false
+            nullable: false
+            template: "{{$pathParameters.customerId}}"

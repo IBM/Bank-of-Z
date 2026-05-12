@@ -1,0 +1,15 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "NOT_FOUND"
+    - message:
+        required: true
+        nullable: false
+        template: "The requested resource was not found"
+
+# Made with Bob

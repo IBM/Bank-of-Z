@@ -6,8 +6,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/.setup/setup.sh",
-                "${input:sandbox}"
+                "${workspaceFolder}/.setup/setup.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/.setup"
@@ -32,9 +31,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/.setup/run_pipeline.sh",
-                "${input:gitRepository}",
-                "${input:gitBranch}"
+                "${workspaceFolder}/.setup/run_pipeline.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/.setup"
@@ -53,26 +50,6 @@
                 "isDefault": false
             },
             "detail": "Update pipeline script with config values, upload to USS, and execute with git repository and branch"
-        }
-    ],
-    "inputs": [
-        {
-            "id": "gitRepository",
-            "type": "promptString",
-            "description": "Git repository URL",
-            "default": "https://github.com/IBM/Bank-of-Z"
-        },
-        {
-            "id": "gitBranch",
-            "type": "promptString",
-            "description": "Git branch name",
-            "default": "main"
-        },
-        {
-            "id": "sandbox",
-            "type": "promptString",
-            "description": "Sandbox location",
-            "default": "/usr/local/sandboxes/bank-of-z"
         }
     ]
 }

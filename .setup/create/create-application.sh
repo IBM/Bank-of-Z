@@ -28,14 +28,14 @@ source "$LIB_DIR/prerequisites.sh"
 # Stage 2: DBB Build
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 1: Build Module"
+print_stage "STAGE 2: DBB Build"
 bash ../tasks/task-dbb-build.sh full
 
 # =========================
 # Stage 3: Deploy Build
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 1: Deploy Build"
+print_stage "STAGE 3: Deploy Build"
 bash ../tasks/task-wazi-deploy.sh true&
 # ZOAU Issue with ZOWE
 PID=$!
@@ -45,20 +45,20 @@ wait $PID
 # Stage 4: Create DB2 database
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 2: Create DB2 database"
+print_stage "STAGE 4: Create DB2 database"
 bash ./create-db2-tables.sh
 
 # =========================
 # Stage 5: Create CICS region
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 1: Create CICS region with zconfig"
+print_stage "STAGE 5: Create CICS region with zconfig"
 bash ./create-cics-region.sh&
 # ZOAU Issue with ZOWE
 PID=$!
 wait $PID
 RC=$?
-
+print_stage "Creation done with RC=$RC"
 
 # =========================
 # Stage 6: Create z/OS Connect Server

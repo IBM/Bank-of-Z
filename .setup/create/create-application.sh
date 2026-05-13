@@ -57,6 +57,7 @@ bash ./create-cics-region.sh&
 # ZOAU Issue with ZOWE
 PID=$!
 wait $PID
+RC=$?
 
 
 # =========================
@@ -79,3 +80,5 @@ wait $PID
 #cd "$SCRIPTS_DIR"
 #print_stage "STAGE 5: Install TAZ in CICS region"
 #bash ./create-taz-configuration.sh
+
+exit $RC

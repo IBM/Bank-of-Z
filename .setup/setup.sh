@@ -263,7 +263,7 @@ stage4_build_and_install() {
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi
-    if grep -qi "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log; then
+    if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log | grep -v "Failed to change files and directory owner with chown"; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi

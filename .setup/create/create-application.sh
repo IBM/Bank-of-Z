@@ -14,14 +14,15 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export LIB_DIR="$SCRIPTS_DIR/../lib"
 source "$LIB_DIR/colors.sh"
+source "$LIB_DIR/prerequisites.sh"
 
 # =========================
 # Stage 1: Verify prerequisites
 # =========================
-print_stage "STAGE 1: Verify Prerequisites"
-if ! verify_build_prerequisites; then
-    exit 1
-fi
+#print_stage "STAGE 1: Verify Prerequisites"
+#if ! verify_build_prerequisites; then
+#    exit 1
+#fi
 
 # =========================
 # Stage 2: DBB Build

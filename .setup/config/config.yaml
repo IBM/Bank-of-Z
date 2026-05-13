@@ -128,5 +128,6 @@ zoau:
 cics:
   user: ${CICS_USER} # env var
   password: ${CICS_PASSWORD} # env var
-  cmci_port: 27101
+  cmci_port: 27100
+  ipic_port: 4320
 

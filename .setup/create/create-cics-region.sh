@@ -22,6 +22,7 @@ exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-INSTALL]${NC} $
 # Environment
 # =========================
 export CMCI_PORT=${CMCI_PORT:-$(get_section_value 'cics' 'cmci_port')}
+export IPIC_PORT=${IPIC_PORT:-$(get_section_value 'cics' 'ipic_port')}
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")

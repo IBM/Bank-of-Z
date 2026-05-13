@@ -23,33 +23,34 @@ branchName=$(git branch --show-current)
 echo "Pipeline Simulation Parameters:"
 echo "  Git Repository: $gitRepository"
 echo "  Branch: $branchName"
-echo "  Application: $APP_NAME"
 echo "  Temporary HLQ: $TMPHLQ"
 
-# =========================
+# =======================================
 # Stage 1: Verify prerequisites
-# =========================
+# =======================================
 #print_stage "STAGE 1: Verify Prerequisites"
 #if ! verify_build_prerequisites; then
 #    exit 1
 #fi
 
-# =========================
-# Stage 2: Refresh git
-# =========================
-git reset --hard
-git pull
+# =======================================
+# Stage 2: Refresh git (not for Grub)
+# =======================================
+if [ "${GRUB:-}" == "False" ]; then
+    git reset --hard
+    git pull
+fi
 
-# =========================
+# =======================================
 # Stage 3: DBB Build
-# =========================
+# =======================================
 cd "$SCRIPTS_DIR"
 print_stage "STAGE 2: DBB Build"
 bash tasks/task-dbb-build.sh
 
-# =========================
+# =======================================
 # Stage 4: Deploy Build
-# =========================
+# =======================================
 cd "$SCRIPTS_DIR"
 print_stage "STAGE 3: Deploy Build"
 bash tasks/task-wazi-deploy.sh&

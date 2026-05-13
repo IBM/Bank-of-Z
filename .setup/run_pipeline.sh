@@ -63,7 +63,8 @@ echo ""
 
 # Build the command with environment variable exports
 set -o pipefail
-if ! zowe rse-api-for-zowe-cli issue unix-shell "bash $PIPELINE_SCRIPT_TARGET" --cwd "$(dirname $PIPELINE_SCRIPT_TARGET)" 2>&1 | tee /tmp/deploy.log; then
+
+if ! zowe rse-api-for-zowe-cli issue unix-shell "export GRUB='False' && bash $PIPELINE_SCRIPT_TARGET" --cwd "$(dirname $PIPELINE_SCRIPT_TARGET)" 2>&1 | tee /tmp/deploy.log; then
     print_error "Failed install Bank of Z on the target!!"
     exit 1
 fi

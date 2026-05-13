@@ -208,7 +208,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321"
+            example: "987654-3000"
         - name: fromDate
           in: query
           description: Start date for transaction history (ISO 8601 format)
@@ -222,7 +222,7 @@ paths:
           schema:
             type: string
             format: date
-            example: "2026-03-13"
+            example: "2027-03-13"
         - name: limit
           in: query
           description: Maximum number of transactions to return

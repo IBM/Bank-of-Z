@@ -1,0 +1,15 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "INTERNAL_ERROR"
+    - message:
+        required: true
+        nullable: false
+        template: "{{commarea.INQTRAND-COMMAREA.INQTRAND-FAIL-CODE ? 'Database error:\
+          \ ' & commarea.INQTRAND-COMMAREA.INQTRAND-FAIL-CODE : 'An unexpected error\
+          \ occurred'}}"

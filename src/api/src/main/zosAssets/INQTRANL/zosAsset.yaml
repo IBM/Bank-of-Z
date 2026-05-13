@@ -1,0 +1,12 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: "Inquire Transaction List - Query transactions by account with date filtering\
+  \ and pagination"
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "ITRL"
+  language: "COBOL"
+  program: "INQTRANL"
+  connectionRef: "cbsaCicsConnection"
+  ccsid: "037"

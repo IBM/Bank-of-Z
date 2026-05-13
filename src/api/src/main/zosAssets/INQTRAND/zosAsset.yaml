@@ -1,0 +1,11 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: "Inquire Transaction Detail - Query single transaction by composite key"
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "ITRD"
+  language: "COBOL"
+  program: "INQTRAND"
+  connectionRef: "cbsaCicsConnection"
+  ccsid: "037"

@@ -1,0 +1,260 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "INQTRANL-COMMAREA" : {
+          "type" : "object",
+          "properties" : {
+            "INQTRANL-EYE" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-EYE PIC X(4) USAGE DISPLAY.",
+                "name" : "INQTRANL-EYE"
+              }
+            },
+            "INQTRANL-SORTCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-SORTCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQTRANL-SORTCODE"
+              }
+            },
+            "INQTRANL-ACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-ACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRANL-ACCNO"
+              }
+            },
+            "INQTRANL-FROM-DATE" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-FROM-DATE PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRANL-FROM-DATE"
+              }
+            },
+            "INQTRANL-TO-DATE" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-TO-DATE PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRANL-TO-DATE"
+              }
+            },
+            "INQTRANL-LIMIT" : {
+              "minimum" : 0,
+              "maximum" : 999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-LIMIT PIC 9(3) USAGE DISPLAY.",
+                "name" : "INQTRANL-LIMIT"
+              }
+            },
+            "INQTRANL-OFFSET" : {
+              "minimum" : 0,
+              "maximum" : 99999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-OFFSET PIC 9(5) USAGE DISPLAY.",
+                "name" : "INQTRANL-OFFSET"
+              }
+            },
+            "INQTRANL-TOTAL-COUNT" : {
+              "minimum" : 0,
+              "maximum" : 99999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-TOTAL-COUNT PIC 9(5) USAGE DISPLAY.",
+                "name" : "INQTRANL-TOTAL-COUNT"
+              }
+            },
+            "INQTRANL-RETURNED-COUNT" : {
+              "minimum" : 0,
+              "maximum" : 999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-RETURNED-COUNT PIC 9(3) USAGE DISPLAY.",
+                "name" : "INQTRANL-RETURNED-COUNT"
+              }
+            },
+            "INQTRANL-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRANL-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "INQTRANL-SUCCESS"
+              }
+            },
+            "INQTRANL-TRANSACTIONS" : {
+              "type" : "array",
+              "maxItems" : 100,
+              "minItems" : 100,
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "INQTRANL-TRAN-ID" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-ID PIC X(50) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-ID"
+                    }
+                  },
+                  "INQTRANL-TRAN-SORTCODE" : {
+                    "minimum" : 0,
+                    "maximum" : 999999,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-SORTCODE PIC 9(6) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-SORTCODE"
+                    }
+                  },
+                  "INQTRANL-TRAN-ACCNO" : {
+                    "minimum" : 0,
+                    "maximum" : 99999999,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-ACCNO PIC 9(8) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-ACCNO"
+                    }
+                  },
+                  "INQTRANL-TRAN-DATE" : {
+                    "minimum" : 0,
+                    "maximum" : 99999999,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-DATE PIC 9(8) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-DATE"
+                    }
+                  },
+                  "INQTRANL-TRAN-DATE-GRP" : {
+                    "type" : "object",
+                    "properties" : {
+                      "INQTRANL-TRAN-DATE-YYYY" : {
+                        "minimum" : 0,
+                        "maximum" : 9999,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-DATE-YYYY PIC 9(4) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-DATE-YYYY"
+                        }
+                      },
+                      "INQTRANL-TRAN-DATE-MM" : {
+                        "minimum" : 0,
+                        "maximum" : 99,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-DATE-MM PIC 9(2) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-DATE-MM"
+                        }
+                      },
+                      "INQTRANL-TRAN-DATE-DD" : {
+                        "minimum" : 0,
+                        "maximum" : 99,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-DATE-DD PIC 9(2) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-DATE-DD"
+                        }
+                      }
+                    }
+                  },
+                  "INQTRANL-TRAN-TIME" : {
+                    "minimum" : 0,
+                    "maximum" : 999999,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-TIME PIC 9(6) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-TIME"
+                    }
+                  },
+                  "INQTRANL-TRAN-TIME-GRP" : {
+                    "type" : "object",
+                    "properties" : {
+                      "INQTRANL-TRAN-TIME-HH" : {
+                        "minimum" : 0,
+                        "maximum" : 99,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-TIME-HH PIC 9(2) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-TIME-HH"
+                        }
+                      },
+                      "INQTRANL-TRAN-TIME-MM" : {
+                        "minimum" : 0,
+                        "maximum" : 99,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-TIME-MM PIC 9(2) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-TIME-MM"
+                        }
+                      },
+                      "INQTRANL-TRAN-TIME-SS" : {
+                        "minimum" : 0,
+                        "maximum" : 99,
+                        "type" : "integer",
+                        "x-ibm-zcon-metadata" : {
+                          "type" : "07 INQTRANL-TRAN-TIME-SS PIC 9(2) USAGE DISPLAY.",
+                          "name" : "INQTRANL-TRAN-TIME-SS"
+                        }
+                      }
+                    }
+                  },
+                  "INQTRANL-TRAN-REF" : {
+                    "minimum" : 0,
+                    "maximum" : 999999999999,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-REF PIC 9(12) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-REF"
+                    }
+                  },
+                  "INQTRANL-TRAN-TYPE" : {
+                    "maxLength" : 3,
+                    "type" : "string",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-TYPE PIC X(3) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-TYPE"
+                    }
+                  },
+                  "INQTRANL-TRAN-DESC" : {
+                    "maxLength" : 40,
+                    "type" : "string",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-DESC PIC X(40) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-DESC"
+                    }
+                  },
+                  "INQTRANL-TRAN-AMOUNT" : {
+                    "multipleOf" : 0.01,
+                    "minimum" : -9.99999999999E9,
+                    "maximum" : 9.99999999999E9,
+                    "type" : "number",
+                    "format" : "decimal",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "05 INQTRANL-TRAN-AMOUNT PIC S9(10)V9(2) USAGE DISPLAY.",
+                      "name" : "INQTRANL-TRAN-AMOUNT"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

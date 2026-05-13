@@ -572,6 +572,42 @@ resourceDefinitions:
                   executionset: FULLAPI
                   jvm: "NO"
         - program:
+                  name: INQTRANL
+                  group: BANKZGRP
+                  description: Inquire Transaction List for Account
+                  language: COBOL
+                  reload: "NO"
+                  resident: "NO"
+                  usage: NORMAL
+                  uselpacopy: "NO"
+                  status: ENABLED
+                  cedf: "YES"
+                  datalocation: ANY
+                  execkey: USER
+                  concurrency: THREADSAFE
+                  api: CICSAPI
+                  dynamic: "NO"
+                  executionset: FULLAPI
+                  jvm: "NO"
+        - program:
+                  name: INQTRAND
+                  group: BANKZGRP
+                  description: Inquire Transaction Detail
+                  language: COBOL
+                  reload: "NO"
+                  resident: "NO"
+                  usage: NORMAL
+                  uselpacopy: "NO"
+                  status: ENABLED
+                  cedf: "YES"
+                  datalocation: ANY
+                  execkey: USER
+                  concurrency: THREADSAFE
+                  api: CICSAPI
+                  dynamic: "NO"
+                  executionset: FULLAPI
+                  jvm: "NO"
+        - program:
                   name: UPDACC
                   group: BANKZGRP
                   description: BANK Update Account
@@ -608,6 +644,24 @@ resourceDefinitions:
                   executionset: FULLAPI
                   jvm: "NO"
         - program:
+                  name: TESTINQL
+                  group: BANKZGRP
+                  description: Test program for INQTRANL
+                  language: COBOL
+                  reload: "NO"
+                  resident: "NO"
+                  usage: NORMAL
+                  uselpacopy: "NO"
+                  status: ENABLED
+                  cedf: "YES"
+                  datalocation: ANY
+                  execkey: USER
+                  concurrency: THREADSAFE
+                  api: CICSAPI
+                  dynamic: "NO"
+                  executionset: FULLAPI
+                  jvm: "NO"
+        - program:
                   name: GETCOMPY
                   group: BANKZGRP
                   language: COBOL
@@ -628,6 +682,37 @@ resourceDefinitions:
                   concurrency: THREADSAFE
                   api: CICSAPI
                   datalocation: ANY
+        - transaction:
+                  name: TITL
+                  group: BANKZGRP
+                  description: Test transaction for INQTRANL
+                  program: TESTINQL
+                  twasize: 0
+                  profile: DFHCICST
+                  status: ENABLED
+                  taskdataloc: ANY
+                  taskdatakey: USER
+                  storageclear: "NO"
+                  runaway: SYSTEM
+                  shutdown: DISABLED
+                  isolate: "YES"
+                  dynamic: "NO"
+                  routable: "NO"
+                  priority: 1
+                  tranclass: DFHTCL00
+                  dtimout: "NO"
+                  restart: "NO"
+                  spurge: "NO"
+                  tpurge: "NO"
+                  dump: "YES"
+                  trace: "YES"
+                  confdata: "NO"
+                  otstimeout: "NO"
+                  action: BACKOUT
+                  wait: "YES"
+                  waittime: "0,0,0"
+                  ressec: "NO"
+                  cmdsec: "NO"
 
         # TRANSACTION Definitions
         - transaction:

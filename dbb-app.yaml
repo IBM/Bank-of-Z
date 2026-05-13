@@ -16,7 +16,7 @@
 
 version: 1.0.0
 application:
-  name: bank-of-z-zos-native
+  name: BANKZ
 
   tasks:
 

@@ -3,7 +3,7 @@ resourceDefinitions:
         # FILE Definitions
         - file:
                   name: ABNDFILE
-                  group: CBSAGRP
+                  group: BANKZGRP
                   description: Abend file VSAM
                   dsname: BANKZ.V0R1M0.ABNDFILE
                   rlsaccess: "NO"

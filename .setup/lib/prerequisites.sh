@@ -9,8 +9,8 @@
 # Function to check if DBB is installed
 # Usage: check_dbb_installation
 check_dbb_installation() {
-    if [ ! -d "$DBB_HOME" ]; then
-        print_error "DBB not found at $DBB_HOME"
+    if [ ! -d "${DBB_HOME:-/usr/lpp/IBM/dbb}" ]; then
+        print_error "DBB not found at ${DBB_HOME:-/usr/lpp/IBM/dbb}"
         print_info "Please ensure DBB is installed on z/OS"
         return 1
     fi
@@ -21,7 +21,7 @@ check_dbb_installation() {
 # Function to check if Java is installed and valid
 # Usage: check_java_installation
 check_java_installation() {
-    if [ -z "$JAVA_HOME" ]; then
+    if [ -z "${JAVA_HOME:-}" ]; then
         print_error "JAVA_HOME is not set"
         print_info "Please set JAVA_HOME environment variable or add it to the build script"
         print_info "Common z/OS Java locations: /usr/lpp/java/J8.0_64, /usr/lpp/java/J8.0"
@@ -40,11 +40,10 @@ check_java_installation() {
 # Function to check if DBB build configuration exists
 # Usage: check_dbb_build_config [dbb_build_path]
 check_dbb_build_config() {
-    local dbb_build_path=${1:-$DBB_BUILD_PATH}
+    local dbb_build_path=${1:-${DBB_BUILD_PATH:-.}}
     
     if [ ! -f "$dbb_build_path/dbb-build.yaml" ]; then
         print_error "DBB build configuration not found at $dbb_build_path/dbb-build.yaml"
-        print_info "Expected location: $WORKSPACE_DIR/.setup/build/dbb-build.yaml"
         return 1
     fi
     print_success "DBB build configuration found at $dbb_build_path"

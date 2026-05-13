@@ -16,6 +16,16 @@ export LIB_DIR="$SCRIPTS_DIR/lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 
+TMPHLQ=$(printf '%s' "${PIPELINE_TMPHLQ:-$(basename "$HOME")}" | tr '[:lower:]' '[:upper:]')
+gitRepository=$(git remote get-url origin | sed 's#.*/##' | sed 's/\.git$//')
+branchName=$(git branch --show-current)
+
+echo "Pipeline Simulation Parameters:"
+echo "  Git Repository: $gitRepository"
+echo "  Branch: $branchName"
+echo "  Application: $APP_NAME"
+echo "  Temporary HLQ: $TMPHLQ"
+
 # =========================
 # Stage 1: Verify prerequisites
 # =========================
@@ -25,14 +35,20 @@ source "$LIB_DIR/prerequisites.sh"
 #fi
 
 # =========================
-# Stage 2: DBB Build
+# Stage 2: Refresh git
+# =========================
+git reset --hard
+git pull
+
+# =========================
+# Stage 3: DBB Build
 # =========================
 cd "$SCRIPTS_DIR"
 print_stage "STAGE 2: DBB Build"
 bash tasks/task-dbb-build.sh
 
 # =========================
-# Stage 3: Deploy Build
+# Stage 4: Deploy Build
 # =========================
 cd "$SCRIPTS_DIR"
 print_stage "STAGE 3: Deploy Build"

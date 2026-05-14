@@ -30,18 +30,20 @@ print_info "Git Branch: $GIT_BRANCH"
 PIPELINE_SCRIPT_TARGET="$(get_section_value 'sandbox' 'path')/Bank-of-Z/.setup/pipeline_simulation.sh"
 SCRIPT_PARENT_DIR=$(dirname "$PIPELINE_SCRIPT_TARGET")
 print_info "Ensuring parent directory exists: $SCRIPT_PARENT_DIR"
-zowe rse-api-for-zowe-cli create uss-directory "$SCRIPT_PARENT_DIR" &> /dev/null || true
+print_info "Using RSE Profile: $ZOWE_RSE_PROFILE"
+
+zowe rse-api-for-zowe-cli create uss-directory "$SCRIPT_PARENT_DIR" $RSE_PROFILE_ARG &> /dev/null || true
 
 # Delete existing file if it exists
 print_info "Removing existing pipeline script if present..."
-zowe rse-api-for-zowe-cli delete uss-file "$PIPELINE_SCRIPT_TARGET" &> /dev/null || true
+zowe rse-api-for-zowe-cli delete uss-file "$PIPELINE_SCRIPT_TARGET" $RSE_PROFILE_ARG &> /dev/null || true
 
 # Upload the script directly (no sed modifications needed)
 print_info "Uploading pipeline simulation build script to USS..."
-if zowe rse-api-for-zowe-cli upload file-to-uss "$PIPELINE_SCRIPT_SOURCE" "$PIPELINE_SCRIPT_TARGET" --encoding IBM-1047; then
+if zowe rse-api-for-zowe-cli upload file-to-uss "$PIPELINE_SCRIPT_SOURCE" "$PIPELINE_SCRIPT_TARGET" --encoding IBM-1047 $RSE_PROFILE_ARG; then
     # Make script executable
     print_info "Making script executable..."
-    zowe rse-api-for-zowe-cli issue unix "chmod +x $(basename $PIPELINE_SCRIPT_TARGET)" --cwd "$SCRIPT_PARENT_DIR"
+    zowe rse-api-for-zowe-cli issue unix "chmod +x $(basename $PIPELINE_SCRIPT_TARGET)" --cwd "$SCRIPT_PARENT_DIR" $RSE_PROFILE_ARG
     
     print_success "Pipeline simulation build script uploaded successfully"
 else
@@ -50,7 +52,7 @@ else
 fi
 
 print_info "Uploading pipeline simulation deploy scripts to USS..."
-if zowe rse-api-for-zowe-cli upload dir-to-uss "$(dirname "$PIPELINE_SCRIPT_SOURCE")/deploy" "$(dirname $PIPELINE_SCRIPT_TARGET)/deploy" --encoding UTF-8; then
+if zowe rse-api-for-zowe-cli upload dir-to-uss "$(dirname "$PIPELINE_SCRIPT_SOURCE")/deploy" "$(dirname $PIPELINE_SCRIPT_TARGET)/deploy" --encoding UTF-8 $RSE_PROFILE_ARG; then
     print_success "Pipeline simulation deploy scripts uploaded successfully"
 else
     print_error "Failed to upload pipeline simulation script"
@@ -64,7 +66,7 @@ echo ""
 # Build the command with environment variable exports
 set -o pipefail
 
-if ! zowe rse-api-for-zowe-cli issue unix-shell "export GRUB='False' && bash $PIPELINE_SCRIPT_TARGET" --cwd "$(dirname $PIPELINE_SCRIPT_TARGET)" 2>&1 | tee /tmp/deploy.log; then
+if ! zowe rse-api-for-zowe-cli issue unix-shell "export GRUB='False' && bash $PIPELINE_SCRIPT_TARGET" --cwd "$(dirname $PIPELINE_SCRIPT_TARGET)" $RSE_PROFILE_ARG 2>&1 | tee /tmp/deploy.log; then
     print_error "Failed install Bank of Z on the target!!"
     exit 1
 fi

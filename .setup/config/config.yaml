@@ -124,6 +124,12 @@ fronted:
 zoau:
   zoau_home: /usr/lpp/IBM/zoautil
 
+# Zowe CLI configuration
+zowe:
+  # RSE profile name to use (optional, defaults to 'rse')
+  # Set via environment variable: export ZOWE_RSE_PROFILE=manzanita
+  rse_profile: manzanita
+
 # CICS attibutes
 cics:
   user: ${CICS_USER} # env var

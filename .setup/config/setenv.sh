@@ -20,9 +20,15 @@ source "$LIB_DIR/prerequisites.sh"
 # =========================
 export APP_BASE_NAME=$(get_section_value 'app' 'base_name')
 export APP_SHORT_NAME=$(get_section_value 'app' 'short_name')
-export APP_BASE_NAME_LOWER=${APP_BASE_NAME,,}
+export APP_BASE_NAME_LOWER=$(echo "$APP_BASE_NAME" | tr '[:upper:]' '[:lower:]')
 export APP_ZOS_VERSION=$(get_section_value 'app' 'zos_version')
 export APP_VERSION=$(get_section_value 'app' 'zos_version')
 export SANDBOX_DIR=${SANDBOX_DIR:-$(get_section_value 'sandbox' 'path')}
 export _BPXK_AUTOCVT=ON
+
+# =========================
+# Zowe Configuration
+# =========================
+export ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')
+export RSE_PROFILE_ARG="--rse-profile ${ZOWE_RSE_PROFILE}"
 

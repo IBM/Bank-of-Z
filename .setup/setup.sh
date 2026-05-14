@@ -31,10 +31,10 @@ upload_directory_recursive() {
         local target_parent=$(dirname "$target_path")
         
         # Create parent directory on USS if it doesn't exist (ignore errors if already exists)
-        zowe rse-api-for-zowe-cli create uss-directory "$target_parent" &> /dev/null
+        zowe rse-api-for-zowe-cli create uss-directory "$target_parent" $RSE_PROFILE_ARG &> /dev/null
         
         # Upload file
-        if zowe rse-api-for-zowe-cli upload file-to-uss "$file" "$target_path" &> /dev/null; then
+        if zowe rse-api-for-zowe-cli upload file-to-uss "$file" "$target_path" $RSE_PROFILE_ARG &> /dev/null; then
             ((file_count++))
             if [ $((file_count % 10)) -eq 0 ]; then
                 print_info "Uploaded $file_count files..."
@@ -92,13 +92,13 @@ stage1_initialize_workspace() {
     # Check if directory exists on remote system
     print_info "Checking if workspace directory exists on remote system..."
     
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "Workspace directory already exists: $PIPELINE_WORKSPACE"
         read -p "Do you want to delete and recreate it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_info "Deleting existing workspace directory..."
-            zowe rse-api-for-zowe-cli delete uss "$PIPELINE_WORKSPACE"
+            zowe rse-api-for-zowe-cli delete uss "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
             print_success "Existing workspace deleted"
         else
             print_info "Keeping existing workspace directory"
@@ -108,7 +108,7 @@ stage1_initialize_workspace() {
     
     # Create workspace directory
     print_info "Creating workspace directory: $PIPELINE_WORKSPACE"
-    zowe rse-api-for-zowe-cli create uss-directory "$PIPELINE_WORKSPACE"
+    zowe rse-api-for-zowe-cli create uss-directory "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
     
     rm -rf $HOME/.dbb
     print_success "DBB metadata cache purged"
@@ -130,7 +130,7 @@ stage2_clone_accelerators() {
 
     # Check if git is available on the remote system
     print_info "Checking git availability on remote system..."
-    if ! zowe rse-api-for-zowe-cli issue unix "which git" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
+    if ! zowe rse-api-for-zowe-cli issue unix "which git" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG &> /dev/null; then
         print_error "Git is not available on the remote z/OS system"
         print_info "Please ensure git is installed and in the PATH on z/OS USS"
         exit 1
@@ -139,13 +139,13 @@ stage2_clone_accelerators() {
     
     # Check if dbb directory already exists
     print_info "Checking if dbb directory already exists..."
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/dbb" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/dbb" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "DBB directory already exists: $PIPELINE_WORKSPACE/dbb"
         read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_info "Removing existing dbb directory..."
-            zowe rse-api-for-zowe-cli issue unix "rm -rf dbb" --cwd "$PIPELINE_WORKSPACE"
+            zowe rse-api-for-zowe-cli issue unix "rm -rf dbb" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
             print_success "Existing dbb directory removed"
         else
             print_info "Keeping existing dbb directory"
@@ -155,7 +155,7 @@ stage2_clone_accelerators() {
     
     # Clone repository on remote system
     print_info "Cloning repository on remote z/OS system (this may take a few minutes)..."
-    if zowe rse-api-for-zowe-cli issue unix "git clone $DBB_REPO_URL" --cwd "$PIPELINE_WORKSPACE"; then
+    if zowe rse-api-for-zowe-cli issue unix "git clone $DBB_REPO_URL" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG; then
         print_success "DBB repository cloned successfully on remote system"
     else
         print_error "Failed to clone DBB repository on remote system"
@@ -168,7 +168,7 @@ stage2_clone_accelerators() {
     
     # Verify the clone
     print_info "Verifying cloned repository..."
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/dbb" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/dbb" $RSE_PROFILE_ARG &> /dev/null; then
         print_success "Repository verification successful"
     else
         print_error "Repository verification failed"
@@ -205,13 +205,13 @@ stage3_upload_framework() {
     
     # Check if target directory already exists
     print_info "Checking if zBuilder directory already exists..."
-    if zowe rse-api-for-zowe-cli list uss "$ZBUILDER_TARGET" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$ZBUILDER_TARGET" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
         read -p "Do you want to delete and re-upload it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_info "Removing existing zBuilder directory..."
-            zowe rse-api-for-zowe-cli issue unix "rm -rf $(basename $ZBUILDER_TARGET)" --cwd "$(dirname $ZBUILDER_TARGET)"
+            zowe rse-api-for-zowe-cli issue unix "rm -rf $(basename $ZBUILDER_TARGET)" --cwd "$(dirname $ZBUILDER_TARGET)" $RSE_PROFILE_ARG
             print_success "Existing zBuilder directory removed"
         else
             print_info "Keeping existing zBuilder directory, skipping upload"
@@ -222,15 +222,15 @@ stage3_upload_framework() {
     # Create parent directory if needed
     PARENT_DIR=$(dirname "$ZBUILDER_TARGET")
     print_info "Ensuring parent directory exists: $PARENT_DIR"
-    if ! zowe rse-api-for-zowe-cli list uss "$PARENT_DIR" &> /dev/null; then
-        zowe rse-api-for-zowe-cli create uss-directory "$PARENT_DIR"
+    if ! zowe rse-api-for-zowe-cli list uss "$PARENT_DIR" $RSE_PROFILE_ARG &> /dev/null; then
+        zowe rse-api-for-zowe-cli create uss-directory "$PARENT_DIR" $RSE_PROFILE_ARG
     else
         print_info "Parent directory already exists: $PARENT_DIR"
     fi
     
     # Create target directory
     print_info "Creating target directory: $ZBUILDER_TARGET"
-    if ! zowe rse-api-for-zowe-cli create uss-directory "$ZBUILDER_TARGET" &> /dev/null; then
+    if ! zowe rse-api-for-zowe-cli create uss-directory "$ZBUILDER_TARGET" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "Target directory may already exist or creation failed"
     fi
 
@@ -253,13 +253,29 @@ stage3_upload_framework() {
 #########################################################
 stage4_build_and_install() {
     print_stage "STAGE 4: Build and install Bank of Z into $PIPELINE_WORKSPACE"
-    if ! zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $(git rev-parse --abbrev-ref HEAD)" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
+    
+    # Clone the repository (show output for debugging)
+    print_info "Cloning Bank-of-Z repository..."
+    if ! zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $(git rev-parse --abbrev-ref HEAD)" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG; then
         print_error "Failed to clone https://github.com/IBM/Bank-of-Z.git on the target!!"
         exit 1
     fi
-    print_success "Clone of https://github.com/IBM/Bank-of-Z.git branch $(git rev-parse --abbrev-ref HEAD) runs successfully"
+    
+    # Verify the clone succeeded by checking if directory exists
+    print_info "Verifying clone..."
+    if ! zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/Bank-of-Z" $RSE_PROFILE_ARG &> /dev/null; then
+        print_error "Clone appeared to succeed but directory $PIPELINE_WORKSPACE/Bank-of-Z does not exist!"
+        print_info "Checking workspace contents..."
+        zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
+        exit 1
+    fi
+    
+    print_success "Clone of https://github.com/IBM/Bank-of-Z.git branch $(git rev-parse --abbrev-ref HEAD) completed successfully"
+    
+    # Run the installation script
+    print_info "Running installation script..."
     set -o pipefail
-    if ! zowe rse-api-for-zowe-cli issue unix-shell "bash $PIPELINE_WORKSPACE/Bank-of-Z/.setup/create/create-application.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/build.log; then
+    if ! zowe rse-api-for-zowe-cli issue unix-shell "bash $PIPELINE_WORKSPACE/Bank-of-Z/.setup/create/create-application.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" $RSE_PROFILE_ARG 2>&1 | tee /tmp/build.log; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi

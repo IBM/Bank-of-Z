@@ -206,7 +206,11 @@ application:
         #   IMSLOAD  - IMS program library (for all programs under ims/pli/)
         - name: deployType
           value: IMSLOAD
-
+          
+    - task: MetadataInit
+      variables: 
+       - name: fileLocation # Location of file system metadata store.
+         value: /usr/local/sandboxes  # Default is the $HOME environment variable.
 
     # ----------------------------------------------------------
     # Assembler task

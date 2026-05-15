@@ -37,21 +37,16 @@ export GRADLE_USER_HOME="$(get_section_value 'sandbox' 'path')/.gradle"
 export GRADLE_OPTS="-Dfile.encoding=UTF-8"
 
 # =========================
-# Convert Groovy scripts to IBM-1047 encoding
+# Tag Groovy scripts with proper encoding
 # =========================
-print_info "Converting DBB Groovy scripts to IBM-1047 encoding..."
-GROOVY_CONVERT_SCRIPT="$SCRIPTS_DIR/../build/groovy/convert-encoding.sh"
-if [ -f "$GROOVY_CONVERT_SCRIPT" ]; then
-    chmod +x "$GROOVY_CONVERT_SCRIPT"
-    cd "$SCRIPTS_DIR/../build/groovy" && ./convert-encoding.sh
-    if [ $? -eq 0 ]; then
-        print_success "Groovy script encoding conversion successful"
-    else
-        print_warning "Groovy script encoding conversion failed, but continuing..."
-    fi
-    cd - > /dev/null
+print_info "Tagging Groovy scripts with UTF-8 encoding..."
+GROOVY_DIR="$SCRIPTS_DIR/../build/groovy"
+if [ -d "$GROOVY_DIR" ]; then
+    # Tag all .groovy files as UTF-8
+    find "$GROOVY_DIR" -name "*.groovy" -type f -exec chtag -tc UTF-8 {} \; 2>/dev/null || true
+    print_success "Groovy scripts tagged with UTF-8 encoding"
 else
-    print_warning "Groovy encoding conversion script not found, skipping..."
+    print_warning "Groovy directory not found at: $GROOVY_DIR"
 fi
 
 # =========================

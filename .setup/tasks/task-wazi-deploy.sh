@@ -197,28 +197,36 @@ print_info "${CYAN}[WAZIDEPLOY]${NC} Deploying z/OS Connect artifacts"
 # Find the extraction directory from wazi-deploy work folder
 EXTRACT_DIR="$SCRIPTS_DIR/work"
 
+# Check if z/OS Connect artifacts exist in the extracted package
 if [ -d "$EXTRACT_DIR" ]; then
-    ZOSCONNECT_DEPLOY_SCRIPT="$SCRIPTS_DIR/../deploy/zosconnect-deploy.sh"
-    
-    if [ -f "$ZOSCONNECT_DEPLOY_SCRIPT" ]; then
-        print_info "${CYAN}[WAZIDEPLOY]${NC} Calling z/OS Connect deployment script"
+    # Check for WAR files or z/OS Connect config
+    if [ -d "$EXTRACT_DIR/war" ] || [ -d "$EXTRACT_DIR/zosconnect-config" ]; then
+        ZOSCONNECT_DEPLOY_SCRIPT="$SCRIPTS_DIR/../deploy/zosconnect-deploy.sh"
         
-        # Get z/OS Connect server directory from config.yaml
-        ZOSCONNECT_SERVER_DIR=$(get_section_value 'zosconnect' 'server_dir')
-        
-        bash "$ZOSCONNECT_DEPLOY_SCRIPT" "$EXTRACT_DIR" "$ZOSCONNECT_SERVER_DIR"
-        
-        if [ $? -eq 0 ]; then
-            print_success "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment completed"
+        if [ -f "$ZOSCONNECT_DEPLOY_SCRIPT" ]; then
+            print_info "${CYAN}[WAZIDEPLOY]${NC} Found z/OS Connect artifacts in package"
+            print_info "${CYAN}[WAZIDEPLOY]${NC} Calling z/OS Connect deployment script"
+            
+            # Get z/OS Connect server directory from config.yaml
+            ZOSCONNECT_SERVER_DIR=$(get_section_value 'zosconnect' 'server_dir')
+            
+            bash "$ZOSCONNECT_DEPLOY_SCRIPT" "$EXTRACT_DIR" "$ZOSCONNECT_SERVER_DIR"
+            
+            if [ $? -eq 0 ]; then
+                print_success "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment completed"
+            else
+                print_error "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment failed"
+                exit 1
+            fi
         else
-            print_error "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment failed"
-            exit 1
+            print_warning "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment script not found at: $ZOSCONNECT_DEPLOY_SCRIPT"
         fi
     else
-        print_warning "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment script not found at: $ZOSCONNECT_DEPLOY_SCRIPT"
+        print_info "${CYAN}[WAZIDEPLOY]${NC} No z/OS Connect artifacts found in package - skipping deployment"
+        print_info "${CYAN}[WAZIDEPLOY]${NC} (Checked for: $EXTRACT_DIR/war and $EXTRACT_DIR/zosconnect-config)"
     fi
 else
-    print_warning "${CYAN}[WAZIDEPLOY]${NC} Extraction directory not found - skipping z/OS Connect deployment"
+    print_warning "${CYAN}[WAZIDEPLOY]${NC} Extraction directory not found at: $EXTRACT_DIR"
 fi
 
 # =========================

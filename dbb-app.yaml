@@ -20,6 +20,16 @@ application:
   name: BANKZ
 
   tasks:
+      # Variable overrides for the FullAnalysis task
+    - task: FullAnalysis
+      variables:
+        - name: sourceDirs
+          value:
+            - "src/base"
+            - "src/api/src/main/api"
+            - "src/frontend"
+        - name: continueOnScanFailure
+          value: true
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -29,6 +39,13 @@ application:
     # ----------------------------------------------------------
     - task: ImpactAnalysis
       variables:
+      - name: sourceDirs
+        value:
+            - "src/base"
+            - "src/api/src/main/api"
+            - "src/frontend"
+      - name: continueOnScanFailure
+        value: true
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems
         #  value: true
@@ -245,7 +262,18 @@ application:
           value: src/api/src/main/liberty/config/server.xml
         - name: cicsXmlPath
           value: src/api/src/main/liberty/config/cics.xml
-
+    
+    - task: zOSConnect
+      variables:
+        - name: configSources
+          value:
+            - "**/openapi.yaml"
+        - name: gradleDebug
+          value: true
+        - name: gradlePath
+          value: "/usr/local/sandboxes/tools/gradle-9.4.1/bin/gradle"
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
     # ----------------------------------------------------------
     # Assembler task
     # Handles IMS control block sources: PSBs (Program Specification

@@ -217,8 +217,34 @@ application:
     # Custom Groovy tasks for frontend and configuration packaging
     # Defined in: .setup/build/groovy/CustomTasks.yaml
     # ----------------------------------------------------------
+    # VanillaFrontend task
+    # Packages the vanilla JavaScript/HTML frontend into a WAR file
+    # for deployment to z/OS Connect Liberty server.
+    # ----------------------------------------------------------
     - task: VanillaFrontend
+      variables:
+        - name: shellEnvironment
+          value: /bin/bash
+        - name: vanillaFrontendPath
+          value: src/frontend
+        - name: vanillaWarName
+          value: bank-of-z-frontend.war
+
+    # ----------------------------------------------------------
+    # ServerXmlPackager task
+    # Packages Liberty server.xml and cics.xml configuration files
+    # for z/OS Connect deployment. These files contain placeholders
+    # that will be replaced with environment-specific values during
+    # deployment.
+    # ----------------------------------------------------------
     - task: ServerXmlPackager
+      variables:
+        - name: shellEnvironment
+          value: /bin/bash
+        - name: serverXmlPath
+          value: src/api/src/main/liberty/config/server.xml
+        - name: cicsXmlPath
+          value: src/api/src/main/liberty/config/cics.xml
 
     # ----------------------------------------------------------
     # Assembler task
@@ -256,36 +282,3 @@ application:
         - name: deployType
           forFiles: "**/src/base/ims/DBD/*.asm"
           value: DBDLOAD
-    # ----------------------------------------------------------
-    # VanillaFrontend task
-    # Packages the vanilla JavaScript/HTML frontend into a WAR file
-    # for deployment to z/OS Connect Liberty server.
-    # ----------------------------------------------------------
-    - name: VanillaFrontend
-      type: groovy
-      script: ${dbb.build}/groovy/VanillaFrontend.groovy
-      variables:
-        - name: shellEnvironment
-          value: /bin/bash
-        - name: vanillaFrontendPath
-          value: src/frontend
-        - name: vanillaWarName
-          value: bank-of-z-frontend.war
-
-    # ----------------------------------------------------------
-    # ServerXmlPackager task
-    # Packages Liberty server.xml and cics.xml configuration files
-    # for z/OS Connect deployment. These files contain placeholders
-    # that will be replaced with environment-specific values during
-    # deployment.
-    # ----------------------------------------------------------
-    - name: ServerXmlPackager
-      type: groovy
-      script: ${dbb.build}/groovy/ServerXmlPackager.groovy
-      variables:
-        - name: shellEnvironment
-          value: /bin/bash
-        - name: serverXmlPath
-          value: src/api/src/main/liberty/config/server.xml
-        - name: cicsXmlPath
-          value: src/api/src/main/liberty/config/cics.xml

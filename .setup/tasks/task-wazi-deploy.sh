@@ -56,7 +56,7 @@ finalize_results() {
     cd "$SCRIPTS_DIR"
 
     if ls logs/*.log >/dev/null 2>&1; then
-        chtag -tc ISO8859-1 logs/*.log
+        chtag -r logs/*.log
         a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate.console.log"
         a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy.console.log"
         rm -f "$outputDir/wazideploy-generate.console.log"

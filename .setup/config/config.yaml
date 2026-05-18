@@ -49,6 +49,9 @@ dbb:
   dbb_cwd: ${sandbox.path}/Bank-of-Z/
   # DBB log directory
   dbb_log_dir: ${sandbox.path}/Bank-of-Z/logs
+  dbb_cwd: ${sandbox.path}//Bank-of-Z/
+  # DBB log directory
+  dbb_log_dir: ${sandbox.path}//Bank-of-Z/logs
   # API build output directory
   api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
 

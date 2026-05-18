@@ -82,6 +82,7 @@ else
     exit 1
 fi
 
+<<<<<<< HEAD
 # =============================================
 # Stage 2: Create CICS resource overrides file
 # =============================================
@@ -142,10 +143,26 @@ deactivate
 
 # =========================
 # Stage 4 - Start CICS region
+deactivate
+
+# =========================
+# Stage 2 - Start CICS region
 # =========================
 jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" &
 sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10
+
+# =========================
+# Stage 3 - Configure CICS IPC connection
+# =========================
+submit_jcl "$SCRIPTS_DIR/../jcl/Cics-ipc.jcl"
+sleep 3
+opercmd "F CICS${APP_SHORT_NAME},CEDA INSTALL TCPIPSERVICE(ZOSCONN) GROUP(${APP_BASE_NAME}GRP)" &
+sleep 2
+opercmd "F CICS${APP_SHORT_NAME},CEDA INSTALL IPCONN(ZOSCONN) GROUP(${APP_BASE_NAME}GRP)" &
+sleep 2
+opercmd "F CICS${APP_SHORT_NAME},CEMT SET TCPIPSERVICE(ZOSCONN) OPEN" &
+sleep 2
 
 exit 0

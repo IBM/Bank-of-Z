@@ -40,84 +40,24 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 rm -rf "$SCRIPTS_DIR/logs"
 
 # =========================
-# Cancel CICS region (ignore errors if already cancelled)
+# Cancel CICS region
+# Ignore errors if already cancelled
 # =========================
 set +e
-jcan P "CICS${APP_SHORT_NAME}" & 2>/dev/null
-opercmd "C CICS${APP_SHORT_NAME}" & 2>/dev/null
+jcan P "CICSBOZ" & 2>/dev/null
+opercmd "C CICSBOZ" & 2>/dev/null
 sleep 10
-drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.CICSBOZ.*" & 2>/dev/null
 set -e
 
-# =========================
-# Stage 1: Create CICS instance with zconfig
-# =========================
-print_stage "STAGE 1: Create CICS instance with zconfig"
-
-export PATH="$ZCS_HOME/bin:$PATH"
-
-if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
-    source "$ZCONFIG_HOME/bin/activate"
-else
-    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
-fi
-
-cd "$SCRIPTS_DIR/../zconfig"
-rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
-zconfig apply \
-  -e applid="CICS${APP_SHORT_NAME}" \
-  -e sysid="${APP_SHORT_NAME}" \
-  -e region_hlq="${APP_BASE_NAME}" \
-  -e region_uss_dir="$SANDBOX_DIR" \
-  -e java_home="/usr/lpp/java/java21/current_64" \
-  -e cmci_port="$CMCI_PORT" \
-  cics-region.yaml
-
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "ZConfig completed successfully!"
-else
-    print_error "ZConfig failed with return code: $RC"
-    print_error "Check logs in: $SCRIPTS_DIR/logs"
-    exit 1
-fi
-
 # =============================================
-# Stage 2: Create CICS resource overrides file
+# Stage 1: Create JVM profile file
 # =============================================
-print_stage "STAGE 2: Create CICS resource overrides file"
-
-uss_config_dir="$SANDBOX_DIR/CICS$APP_SHORT_NAME/config"
-rm -rf $uss_config_dir
-mkdir -p $uss_config_dir/resourceoverrides
-
-cat > $uss_config_dir/resourceoverrides/resourceOverrides.cicsoverrides.yaml <<EOF
-schemaVersion: resourceOverrides/1.200
-resourceOverrides:
-  - tcpipservice:
-    - selector:
-        name: ZOSEE
-        group: BANKZGRP
-      overrides:
-        portnumber: $IPIC_PORT
-  - ipconn:
-    - selector:
-        name: ZOSCONN
-        group: BANKZGRP
-      overrides:
-        port: $IPIC_PORT
-EOF
-
-print_success "Overrides file created succesfully!"
-
-# =============================================
-# Stage 3: Create JVM profile file
-# =============================================
-print_stage "STAGE 3: Create JVM profile file"
+print_stage "STAGE 1: Create JVM profile file"
 
 zconfig_dir="$SCRIPTS_DIR/../zconfig"
 
-cat > $zconfig_dir/EYUSMSSJ.jvmprofile <<EOF
+cat > "$zconfig_dir/EYUSMSSJ.jvmprofile" <<EOF
 JAVA_HOME=/usr/lpp/java/java21/current_64
 WORK_DIR=$SANDBOX_DIR
 -Xms128M
@@ -138,30 +78,78 @@ EOF
 
 print_success "JVM profile file created successfully!"
 
+# =============================================
+# Stage 2: Create CICS resource overrides file
+# =============================================
+print_stage "STAGE 2: Create CICS resource overrides file"
+
+uss_config_dir="$SANDBOX_DIR/CICS$APP_SHORT_NAME/config"
+rm -rf "$uss_config_dir"
+mkdir -p "$uss_config_dir/resourceoverrides"
+
+cat > "$uss_config_dir/resourceoverrides/resourceOverrides.cicsoverrides.yaml" <<EOF
+schemaVersion: resourceOverrides/1.200
+resourceOverrides:
+  - tcpipservice:
+    - selector:
+        name: ZOSEE
+        group: BANKZGRP
+      overrides:
+        portnumber: $IPIC_PORT
+  - ipconn:
+    - selector:
+        name: ZOSCONN
+        group: BANKZGRP
+      overrides:
+        port: $IPIC_PORT
+EOF
+
+print_success "Overrides file created successfully!"
+
+# =========================
+# Stage 3: Create CICS instance with zconfig
+# =========================
+print_stage "STAGE 3: Create CICS instance with zconfig"
+
+export PATH="$ZCS_HOME/bin:$PATH"
+
+if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
+    source "$ZCONFIG_HOME/bin/activate"
+else
+    print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
+fi
+
+cd "$SCRIPTS_DIR/../zconfig"
+rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
+
+zconfig apply \
+  -e applid="CICSBOZ" \
+  -e sysid="BOZ" \
+  -e region_hlq="${APP_BASE_NAME}" \
+  -e region_uss_dir="$SANDBOX_DIR" \
+  -e java_home="/usr/lpp/java/java21/current_64" \
+  -e cmci_port="$CMCI_PORT" \
+  cics-region.yaml
+
+RC=$?
+if [ "$RC" -eq 0 ]; then
+    print_success "ZConfig completed successfully!"
+else
+    print_error "ZConfig failed with return code: $RC"
+    print_error "Check logs in: $SCRIPTS_DIR/logs"
+    exit 1
+fi
+
 deactivate
 
 # =========================
-# Stage 4 - Start CICS region
-deactivate
+# Stage 4: Start CICS region
+# =========================
+print_stage "STAGE 4: Start CICS region"
 
-# =========================
-# Stage 2 - Start CICS region
-# =========================
-jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" &
+jsub "${APP_BASE_NAME}.CICSBOZ.DFHSTART" &
 sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10
-
-# =========================
-# Stage 3 - Configure CICS IPC connection
-# =========================
-submit_jcl "$SCRIPTS_DIR/../jcl/Cics-ipc.jcl"
-sleep 3
-opercmd "F CICS${APP_SHORT_NAME},CEDA INSTALL TCPIPSERVICE(ZOSCONN) GROUP(${APP_BASE_NAME}GRP)" &
-sleep 2
-opercmd "F CICS${APP_SHORT_NAME},CEDA INSTALL IPCONN(ZOSCONN) GROUP(${APP_BASE_NAME}GRP)" &
-sleep 2
-opercmd "F CICS${APP_SHORT_NAME},CEMT SET TCPIPSERVICE(ZOSCONN) OPEN" &
-sleep 2
 
 exit 0

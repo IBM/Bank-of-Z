@@ -16,7 +16,7 @@ set -e  # Exit on error
 # Source library scripts
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPTS_DIR/config/setenv.sh $*"
+source "$SCRIPTS_DIR/config/setenv.sh" "$@"
 
 
 #########################################################

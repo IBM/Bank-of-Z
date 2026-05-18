@@ -2,11 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Setup Pipeline Environment",
+            "label": "Setup Bank of Z Environment",
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/.setup/setup.sh"
+                "${workspaceFolder}/.setup/setup-local.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/.setup"
@@ -24,14 +24,14 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "detail": "Initialize workspace, clone accelerators, and upload build framework to z/OS USS"
+            "detail": "Setup Bank of Z on z/OS USS via Zowe CLI (clones branch, runs setup-common.sh remotely)"
         },
         {
             "label": "Run Pipeline Simulation",
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/.setup/run_pipeline.sh"
+                "${workspaceFolder}/.setup/pipeline-local.sh"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/.setup"
@@ -49,7 +49,7 @@
                 "kind": "test",
                 "isDefault": false
             },
-            "detail": "Update pipeline script with config values, upload to USS, and execute with git repository and branch"
+            "detail": "Run Bank of Z pipeline (rebuild and redeploy) via Zowe CLI (runs pipeline-common.sh remotely)"
         }
     ]
 }

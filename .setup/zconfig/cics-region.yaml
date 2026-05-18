@@ -1,10 +1,10 @@
-# yaml-language-server: $schema=./cics_region_0.3.0.schema.json
+# yaml-language-server: $schema=./cics_region_0.4.1.dev1.schema.json
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
   region_hlq: "BANKZ"
   java_home: "/usr/lpp/java/java21/current_64"
-  jvm_profile_dir: "/usr/local/sandboxes/bank-of-z"
+  region_uss_dir: "/usr/local/sandboxes/bank-of-z"
   cmci_port: "27100"
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
@@ -48,6 +48,8 @@ cics_region:
     sec: "NO"
     db2conn: "YES"
     securetcpip: "NO"
+    ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
+    resoverrides: resourceOverrides.cicsoverrides.yaml
 
   extensions:
     cics_cmci:
@@ -56,24 +58,6 @@ cics_region:
       authentication: "NO"
       ssl: "NO"
 
-  jvm_profile_dir: "{{ vars.jvm_profile_dir }}/{{ vars.applid }}/JVMProfiles"
+  jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
-    - name: EYUSMSSJ
-      source_type: inline
-      properties: |
-        JAVA_HOME={{ vars.java_home }}
-        WORK_DIR=.
-        -Xms128M
-        -Xmx1G
-        -Xmso1M
-        -Dfile.encoding=ISO-8859-1
-        WLP_INSTALL_DIR={{ vars.cics_uss_dir }}/wlp
-        STDOUT=//DD:JVMOUT
-        STDERR=//DD:JVMERR
-        JVMTRACE=//DD:JVMTRACE
-        JVMLOG=//DD:JVMLOG
-        -Xgcpolicy:gencon
-        -Xscmx128M
-        -Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
-        _BPXK_DISABLE_SHLIB=YES
-        -Dcom.ibm.tools.attach.enable=no
+    - "EYUSMSSJ.jvmprofile"

@@ -46,9 +46,9 @@ dbb:
   # DBB application configuration file
   dbb_app_conf: ${sandbox.path}/Bank-of-Z/dbb-app.yaml
   # DBB working directory (source root)
-  dbb_cwd: ${sandbox.path}//Bank-of-Z/
+  dbb_cwd: ${sandbox.path}/Bank-of-Z/
   # DBB log directory
-  dbb_log_dir: ${sandbox.path}//Bank-of-Z/logs
+  dbb_log_dir: ${sandbox.path}/Bank-of-Z/logs
   # API build output directory
   api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
 

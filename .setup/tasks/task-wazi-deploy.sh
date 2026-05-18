@@ -57,10 +57,10 @@ finalize_results() {
 
     if ls logs/*.log >/dev/null 2>&1; then
         chtag -tc ISO8859-1 logs/*.log
-        iconv -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate.log" > "$outputDir/wazideploy-generate.console.log"
-        iconv -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy.log"   > "$outputDir/wazideploy-deploy.console.log"
-        rm -f "$outputDir/wazideploy-generate.log"
-        rm -f "$outputDir/wazideploy-deploy.log"
+        a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate.console.log"
+        a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy.console.log"
+        rm -f "$outputDir/wazideploy-generate.console.log"
+        rm -f "$outputDir/wazideploy-deploy.console.log"
         tar cf "$LOG_TAR" "logs" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$outputDir/wazi-deploy-console.log"
@@ -117,7 +117,7 @@ tmp_rc="/tmp/cmd_rc_gen_$$"
 (
     ${CMD}
     echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-generate.log" | while IFS= read -r line
+) 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE] $line"
 done
@@ -174,7 +174,7 @@ tmp_rc="/tmp/cmd_rc_deploy_$$"
 (
     ${CMD}
     echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-deploy.log" | while IFS= read -r line
+) 2>&1 | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
 done

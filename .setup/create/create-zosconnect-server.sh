@@ -115,9 +115,9 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.ebcdic"
-chtag -r "/tmp/BAQ${APP_BASE_NAME}.ebcdic"
-dcp "/tmp/BAQ${APP_BASE_NAME}.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
+chtag -r "/tmp/BAQ${APP_BASE_NAME}"
+dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 # =========================
 # Start server

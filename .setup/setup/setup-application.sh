@@ -17,42 +17,42 @@ source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 
 # =========================
-# Stage 1: Verify prerequisites
+# Stage: Verify prerequisites
 # =========================
-#print_stage "STAGE 1: Verify Prerequisites"
+#print_stage "STAGE: Verify Prerequisites"
 #if ! verify_build_prerequisites; then
 #    exit 1
 #fi
 
 # =========================
-# Stage 2: DBB Build
+# Stage: DBB Build
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 2: DBB Build"
+print_stage "STAGE: DBB Build"
 bash ../tasks/task-dbb-build.sh full
 
 # =========================
-# Stage 3: Deploy Build
+# Stage: Deploy Build
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 3: Deploy Build"
+print_stage "STAGE: Deploy Build"
 bash ../tasks/task-wazi-deploy.sh true&
 # ZOAU Issue with ZOWE
 PID=$!
 wait $PID
 
 # =========================
-# Stage 4: Create DB2 database
+# Stage: Create DB2 database
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 4: Create DB2 database"
+print_stage "STAGE: Create DB2 database"
 bash ./setup-db2-tables.sh
 
 # =========================
-# Stage 5: Create CICS region
+# Stage: Create CICS region
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 5: Create CICS region with zconfig"
+print_stage "STAGE: Create CICS region with zconfig"
 bash ./setup-cics-region.sh&
 # ZOAU Issue with ZOWE
 PID=$!
@@ -61,24 +61,24 @@ RC=$?
 print_stage "Creation done with RC=$RC"
 
 # =========================
-# Stage 6: Create z/OS Connect Server
+# Stage: Create z/OS Connect Server
 # =========================
 #cd "$SCRIPTS_DIR"
-#print_stage "STAGE 3: Create z/OS Connect Server"
+#print_stage "STAGE: Create z/OS Connect Server"
 #bash ./setup-zosconnect-server.sh
 
 # =========================
-# Stage 7: Create application frontend
+# Stage: Create application frontend
 # =========================
 #cd "$SCRIPTS_DIR"
-#print_stage "STAGE 4: Create application frontend"
+#print_stage "STAGE: Create application frontend"
 #bash ./setup-application-frontend.sh
 
 # =========================
-# Stage 8: Install TAZ in CICS region
+# Stage: Install TAZ in CICS region
 # =========================
 #cd "$SCRIPTS_DIR"
-#print_stage "STAGE 5: Install TAZ in CICS region"
+#print_stage "STAGE: Install TAZ in CICS region"
 #bash ./setup-taz-configuration.sh
 
 exit $RC

@@ -36,15 +36,8 @@ stage_execute_common_setup() {
     # Execute the common setup script on remote
     print_info "Running: bash .setup/setup-common.sh"
     
-    set -o pipefail
-    if bash ${SCRIPTS_DIR}/setup-common.sh $PIPELINE_WORKSPACE 2>&1 | tee /tmp/remote-setup.log; then
-        # Check for errors in the log
-        if grep -i "error\|failed" /tmp/remote-setup.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
-            print_warning "Setup completed but some warnings were detected"
-            print_info "Review /tmp/remote-setup.log for details"
-        else
-            print_success "Remote setup completed successfully"
-        fi
+    if ${SCRIPTS_DIR}/setup-common.sh $PIPELINE_WORKSPACE; then
+        print_success "Remote setup completed successfully"
     else
         print_error "Failed to execute setup on remote system"
         print_info "Check /tmp/remote-setup.log for details"
@@ -58,12 +51,15 @@ stage_execute_common_setup() {
 main() {
     echo ""
     echo -e "${GREEN}######################################################${NC}"
-    echo -e "${GREEN}#  Bank of Z - Remote Orchestrator (Zowe CLI)         #${NC}"
+    echo -e "${GREEN}#  Bank of Z - Common Setup Script (z/OS USS)        #${NC}"
     echo -e "${GREEN}######################################################${NC}"
     echo ""
     
     print_info "This script runs on the remote machine"
     echo ""
+    
+    # Load configuration
+    load_config "$1"
     
     # Execute stages
     stage_execute_common_setup

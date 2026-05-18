@@ -19,31 +19,6 @@ set -e  # Exit on error
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
-# =========================
-# Load configuration
-# =========================
-load_config() {
-    print_info "Loading configuration from $CONFIG_FILE..."
-    
-    if [ ! -f "$CONFIG_FILE" ]; then
-        print_error "Configuration file not found: $CONFIG_FILE"
-        exit 1
-    fi
-    
-    # Parse configuration values
-    if [[ -n "$1" ]]; then
-        PIPELINE_WORKSPACE="$1"
-    else
-        PIPELINE_WORKSPACE=$(get_section_value 'sandbox' 'path')
-    fi
-    DBB_REPO_URL=$(get_section_value 'repositories' 'url')
-    ZBUILDER_SOURCE="$SCRIPTS_DIR/$(get_section_value 'zbuilder' 'source_dir')"
-    ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
-    
-    print_success "Configuration loaded successfully"
-    echo "  Workspace: $PIPELINE_WORKSPACE"
-}
-
 #########################################################
 # STAGE: Initialize Working Directory
 #########################################################
@@ -101,16 +76,21 @@ stage_clone_accelerators() {
     
     # Check if dbb directory already exists
     if [ -d "$PIPELINE_WORKSPACE/dbb" ]; then
-        print_warning "DBB directory already exists: $PIPELINE_WORKSPACE/dbb"
-        read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Removing existing dbb directory..."
+        if [[ "$EXECUTION_MODE" == "grub" ]]; then
             rm -rf "$PIPELINE_WORKSPACE/dbb"
             print_success "Existing dbb directory removed"
         else
-            print_info "Keeping existing dbb directory"
-            return 0
+            print_warning "DBB directory already exists: $PIPELINE_WORKSPACE/dbb"
+            read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Removing existing dbb directory..."
+                rm -rf "$PIPELINE_WORKSPACE/dbb"
+                print_success "Existing dbb directory removed"
+            else
+                print_info "Keeping existing dbb directory"
+                return 0
+            fi
         fi
     fi
     
@@ -167,16 +147,21 @@ stage_copy_framework() {
     
     # Check if target directory already exists
     if [ -d "$ZBUILDER_TARGET" ]; then
-        print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
-        read -p "Do you want to delete and re-copy it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Removing existing zBuilder directory..."
+        if [[ "$EXECUTION_MODE" == "grub" ]]; then
             rm -rf "$ZBUILDER_TARGET"
             print_success "Existing zBuilder directory removed"
         else
-            print_info "Keeping existing zBuilder directory, skipping copy"
-            return 0
+            print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
+            read -p "Do you want to delete and re-copy it? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Removing existing zBuilder directory..."
+                rm -rf "$ZBUILDER_TARGET"
+                print_success "Existing zBuilder directory removed"
+            else
+                print_info "Keeping existing zBuilder directory, skipping copy"
+                return 0
+            fi
         fi
     fi
     
@@ -247,13 +232,7 @@ stage_setup_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/setup/setup-application.sh 2>&1 | tee /tmp/build.log; then
-        # Check for errors in the log
-        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
-            print_error "Installation completed with errors (see /tmp/build.log)"
-            print_warning "Review the log file for details"
-            exit 1
-        fi
+    if bash .setup/setup/setup-application.sh; then
         print_success "Bank of Z installation completed successfully"
     else
         print_error "Failed to install Bank of Z"
@@ -267,20 +246,16 @@ stage_setup_bank_of_z() {
 #########################################################
 main() {
     echo ""
-    echo -e "${GREEN}######################################################${NC}"
-    echo -e "${GREEN}#  Bank of Z - Common Setup Script (z/OS USS)        #${NC}"
-    echo -e "${GREEN}######################################################${NC}"
-    echo ""
     
     print_info "This script runs directly on z/OS USS"
     print_info "Execution mode: Native USS commands"
     echo ""
     
-    # Load configuration
-    load_config "$1"
+    # Detect Execution Mode
+    detect_execution_mode
     
     # Execute stages
-    if [[ "$uname" != "OS/390" ]]; then
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
         stage_initialize_workspace
     fi
     stage_clone_accelerators

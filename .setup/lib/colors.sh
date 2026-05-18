@@ -52,12 +52,23 @@ print_error() {
 }
 
 
+if [ -z "${STAGE_COUNTER:-}" ]; then
+    export STAGE_COUNTER=0
+fi
+
 print_stage() {
+    local msg="$1"
+    case "$msg" in
+        STAGE:*)
+            STAGE_COUNTER=`expr $STAGE_COUNTER + 1`
+            suffix=`echo "$msg" | sed 's/^STAGE:[ ]*//'`
+            msg="STAGE $STAGE_COUNTER: $suffix"
+            ;;
+    esac
     echo ""
-    echo -e "${GREEN}========================================${NC}"
-    echo -e "${GREEN}$1${NC}"
-    echo -e "${GREEN}========================================${NC}"
+    echo -e "${GREEN}=================================================================${NC}"
+    echo -e "${GREEN}= ${msg}${NC}"
+    echo -e "${GREEN}=================================================================${NC}"
     echo ""
 }
-
 # Made with Bob

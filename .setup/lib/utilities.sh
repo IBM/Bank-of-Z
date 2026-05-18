@@ -249,3 +249,53 @@ load_config() {
 
     echo "  Workspace: $PIPELINE_WORKSPACE"
 }
+
+
+# ============================================================
+# Detects how the pipeline/script is being executed.
+#
+# Supported execution modes:
+#
+# 1. GRUB mode
+#    - Triggered when running directly inside the Bank-of-Z
+#      Git repository.
+#    - Uses the repository root as the workspace directory.
+#
+# 2. VSCode mode
+#    - Triggered when not running inside a Git repository.
+#    - Assumes execution is orchestrated externally
+#      (e.g. VSCode task, CI pipeline, remote runner).
+#    - Uses PIPELINE_WORKSPACE if provided, otherwise the
+#      current working directory.
+#
+# This function initializes:
+#   - EXECUTION_MODE
+#   - WORKSPACE_DIR
+#
+# Possible values for EXECUTION_MODE:
+#   - grub
+#   - vscode
+#   - unknown
+# ============================================================
+detect_execution_mode() {
+    # Check if running from within Bank-of-Z repository
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+        if [[ "$repo_name" == "Bank-of-Z" ]]; then
+            EXECUTION_MODE="grub"
+            WORKSPACE_DIR="$(git rev-parse --show-toplevel)"
+            print_info "Execution mode: GRUB (running from repository)"
+        else
+            EXECUTION_MODE="unknown"
+            print_warning "Running from git repository but not Bank-of-Z"
+        fi
+    else
+        # Not in a git repo, assume VSCode workflow with cloned repo
+        EXECUTION_MODE="vscode"
+        # Workspace should be set by orchestrator or use current directory
+        WORKSPACE_DIR="${PIPELINE_WORKSPACE:-$(pwd)}"
+        print_info "Execution mode: VSCode (orchestrated)"
+    fi
+    
+    print_info "Workspace directory: $WORKSPACE_DIR"
+}

@@ -48,17 +48,14 @@ dbb:
   # DBB working directory (source root)
   dbb_cwd: ${sandbox.path}/Bank-of-Z/
   # DBB log directory
-  dbb_log_dir: ${sandbox.path}/Bank-of-Z/logs
-  dbb_cwd: ${sandbox.path}//Bank-of-Z/
-  # DBB log directory
-  dbb_log_dir: ${sandbox.path}//Bank-of-Z/logs
+  dbb_log_dir: ${sandbox.path}/logs/dbb
   # API build output directory
   api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
 
 # zBuilder framework configuration
 zbuilder:
-  # Local source directory (relative to .setup)
-  source_dir: build
+  # Local source directory
+  source_dir: ${sandbox.path}/Bank-of-Z/.setup/build
   # Target USS directory for upload
   target_dir: ${sandbox.path}/zBuilder
   # Java home (min version 17)
@@ -71,11 +68,11 @@ zcodescan:
   # Java runtime for scanning tools
   java_home: /usr/lpp/java/java21/current_64
   # Working directory
-  cwd_folder: ${sandbox.path}/zDevOps/applications/CBSA/application
+  cwd_dir: ${sandbox.path}/zDevOps/applications/CBSA/application
   # Source directory to scan
-  src_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/src/base
+  src_dir: ${sandbox.path}/zDevOps/applications/CBSA/application/src/base
   # Output directory for scan reports
-  output_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/zcodescan
+  output_dir: ${sandbox.path}/zDevOps/applications/CBSA/application/zcodescan
   # Rules file to apply
   rule_file: ${sandbox.path}/zDevOps/zcodescan/zcodescan-rules.yaml
   # Source encoding (z/OS default encoding)
@@ -97,15 +94,17 @@ wazideploy:
   deployment_envfile: ${sandbox.path}/Bank-of-Z/.setup/deploy/Development.yml
   # Deploy types mapping file
   types_pattern_mapping: ${sandbox.path}/Bank-of-Z/.setup/deploy/types_pattern_mapping.yml
-  # zDeploy root folder
-  zdeploy_folder: ${sandbox.path}/dbb/WaziDeploy/zDeploy
+  # zDeploy root directory
+  zdeploy_dir: ${sandbox.path}/dbb/WaziDeploy/zDeploy
+  # Deploy log directory
+  deploy_log_dir: ${sandbox.path}/logs/deploy
 
 # TAZ Unit Test configuration
 taz:
   # TAZ CLI installation directory
   taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
-  # Root folder containing test suites
-  test_folder: ${sandbox.path}/zDevOps
+  # Root directory containing test suites
+  test_dir: ${sandbox.path}/zDevOps
   # JES procedure library
   proclib: SYS1.PROCLIB
   # Load library used during execution
@@ -123,7 +122,7 @@ fronted:
   # Node.js runtime for z/OS
   node_home: /usr/lpp/IBM/cnj/IBM/node-latest-os390-s390x
 
-# ZOAU installtion folder
+# ZOAU installtion directory
 zoau:
   zoau_home: /usr/lpp/IBM/zoautil
 

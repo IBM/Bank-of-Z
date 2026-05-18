@@ -208,6 +208,67 @@ submit_jcl() {
 }
 
 # ============================================================
+# Submit a JCL job and wait until completion.
+#
+# This function:
+#   1. Submits a JCL file using `jsub`
+#   2. Extracts the generated JOBID
+#   3. Polls JES status using `jls`
+#   4. Waits until the job reaches a final state
+#   5. Displays final job status and JESYSMSG output
+#   6. Returns:
+#        - 0 if the job ends with CC=0000 or CC=0004
+#        - 8 for ABEND, JCL error, security error,
+#          cancellation, or any non-supported return code
+#
+# Parameters:
+#   $1 -> Path to the JCL file to submit
+#
+# Dependencies:
+#   - jsub
+#   - jls
+#   - pjdd
+#
+# Example:
+#   run_job_and_wait "./MYJOB.jcl"
+# ============================================================
+run_job_and_wait() {
+  local JCLFILE="$1"
+
+  echo "==> Submitting $JCLFILE via jsub..."
+  OUT=$(jsub -f "$JCLFILE")
+  echo "$OUT"
+
+  JOBID=$(echo "$OUT" | awk '{
+    for (i=1; i<=NF; i++) {
+      if ($i ~ /^JOB[0-9]+$/) { print $i; exit }
+    }
+  }')
+
+  [ -z "$JOBID" ] && { echo "ERROR: no JOBID returned by jsub"; return 8; }
+  echo "Waiting for job $JOBID..."
+
+  while :; do
+    LINE=$(jls "$JOBID" 2>/dev/null | grep "$JOBID" | tail -1 || true)
+    [ -n "$LINE" ] && echo "$LINE"
+    echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break
+    sleep 5
+  done
+
+  echo "===== FINAL STATUS ====="
+  jls "$JOBID" || true
+
+  echo "===== JESYSMSG ====="
+  pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
+
+  FINAL=$(jls "$JOBID" | grep "$JOBID" | tail -1)
+  echo "$FINAL" | awk '{ if ($4=="CC" && ($5=="0000" || $5=="0004")) exit 0; else exit 1 }' && return 0
+
+  echo "ERROR: Job failed: $JOBID"
+  return 8
+}
+
+# ============================================================
 # Configuration loader
 # ============================================================
 

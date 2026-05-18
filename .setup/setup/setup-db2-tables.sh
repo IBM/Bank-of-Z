@@ -28,11 +28,7 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Create DB2 tables
 # =========================
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-drop.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-create.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"
-sleep 3
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-drop.jcl"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-create.jcl"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"

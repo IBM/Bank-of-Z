@@ -14,3 +14,23 @@ propertyGroups:
         type: local
         locations:
           - '**'
+
+profiles:
+  # TAZ
+  - name: taz-test
+    type: test
+    settings:
+      unitTest:
+        procLib:
+          - SYS1.PROCLIB # Required: Procedure libraries
+        userLibraries:
+          - BANKZ.V0R1M0.LOAD # Application load libraries
+          
+  # Custom ZCodeScan rules example
+  - name: zcodescan
+    type: zcodescan
+    settings:
+      rules:
+        - type: local
+          locations:
+            - "zcodescan/zcodescan-rules.yaml"

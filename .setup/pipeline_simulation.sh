@@ -42,17 +42,24 @@ if [ "${GRUB:-}" == "False" ]; then
 fi
 
 # =======================================
-# Stage 3: DBB Build
+# Stage 3: ZCodeScan static scan
 # =======================================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 2: DBB Build"
+print_stage "STAGE 3: ZCodeScan static scan"
+bash tasks/task-zcodescan-static-scan.sh
+
+# =======================================
+# Stage 4: DBB Build
+# =======================================
+cd "$SCRIPTS_DIR"
+print_stage "STAGE 4: DBB Build"
 bash tasks/task-dbb-build.sh
 
 # =======================================
-# Stage 4: Deploy Build
+# Stage 5: Deploy Build
 # =======================================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE 3: Deploy Build"
+print_stage "STAGE 5: Deploy Build"
 bash tasks/task-wazi-deploy.sh&
 # ZOAU Issue with ZOWE
 PID=$!

@@ -20,10 +20,10 @@ source "$SCRIPTS_DIR/config/setenv.sh" "$@"
 
 
 #########################################################
-# STAGE 1: Execute Common Setup Script on Remote
+# STAGE: Execute Common Setup Script on Remote
 #########################################################
-stage3_execute_common_setup() {
-    print_stage "STAGE 1: Execute Common Setup Script on Remote"
+stage_execute_common_setup() {
+    print_stage "STAGE: Execute Common Setup Script on Remote"
     
     print_info "Executing setup-common.sh on remote z/OS USS..."
     print_info "This will:"
@@ -65,13 +65,8 @@ main() {
     print_info "This script runs on the remote machine"
     echo ""
     
-    # Load configuration
-    load_config "$1"
-    
     # Execute stages
-    #stage1_initialize_remote_workspace
-    #stage2_clone_bank_of_z
-    stage3_execute_common_setup
+    stage_execute_common_setup
     
     # Summary
     print_stage "ORCHESTRATION COMPLETE"

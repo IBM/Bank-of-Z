@@ -45,10 +45,10 @@ load_config() {
 }
 
 #########################################################
-# STAGE 1: Initialize Working Directory
+# STAGE: Initialize Working Directory
 #########################################################
-stage1_initialize_workspace() {
-    print_stage "STAGE 1: Initialize Working Directory"
+stage_initialize_workspace() {
+    print_stage "STAGE: Initialize Working Directory"
     
     print_info "Target workspace: $PIPELINE_WORKSPACE"
     
@@ -81,10 +81,10 @@ stage1_initialize_workspace() {
 }
 
 #########################################################
-# STAGE 2: Clone Required Accelerators
+# STAGE: Clone Required Accelerators
 #########################################################
-stage2_clone_accelerators() {
-    print_stage "STAGE 2: Clone Required Accelerators"
+stage_clone_accelerators() {
+    print_stage "STAGE: Clone Required Accelerators"
     
     print_info "Cloning DBB repository..."
     print_info "Repository: $DBB_REPO_URL"
@@ -138,10 +138,10 @@ stage2_clone_accelerators() {
 }
 
 #########################################################
-# STAGE 3: Copy Build Framework
+# STAGE: Copy Build Framework
 #########################################################
-stage3_copy_framework() {
-    print_stage "STAGE 3: Copy Build Framework"
+stage_copy_framework() {
+    print_stage "STAGE: Copy Build Framework"
     
     # Print datasets configuration info
     print_info "Datasets configuration from datasets.yaml:"
@@ -198,10 +198,10 @@ stage3_copy_framework() {
 }
 
 #########################################################
-# STAGE 4: Setup Bank of Z
+# STAGE: Setup Bank of Z
 #########################################################
-stage4_setup_bank_of_z() {
-    print_stage "STAGE 4: Setup Bank of Z"
+stage_setup_bank_of_z() {
+    print_stage "STAGE: Setup Bank of Z"
     
     local BANK_DIR
     local IN_REPO=false
@@ -236,18 +236,18 @@ stage4_setup_bank_of_z() {
     fi
     
     # Verify installation script exists
-    if [ ! -f "$BANK_DIR/.setup/create/create-application.sh" ]; then
-        print_error "Installation script not found: $BANK_DIR/.setup/create/create-application.sh"
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-application.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-application.sh"
         exit 1
     fi
     
     # Run installation script
     print_info "Running Bank of Z installation script..."
-    print_info "Executing: bash $BANK_DIR/.setup/create/create-application.sh"
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-application.sh"
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/create/create-application.sh 2>&1 | tee /tmp/build.log; then
+    if bash .setup/setup/setup-application.sh 2>&1 | tee /tmp/build.log; then
         # Check for errors in the log
         if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_error "Installation completed with errors (see /tmp/build.log)"
@@ -280,10 +280,12 @@ main() {
     load_config "$1"
     
     # Execute stages
-    stage1_initialize_workspace
-    stage2_clone_accelerators
-    stage3_copy_framework
-    stage4_setup_bank_of_z
+    if [[ "$uname" != "OS/390" ]]; then
+        stage_initialize_workspace
+    fi
+    stage_clone_accelerators
+    stage_copy_framework
+    stage_setup_bank_of_z
     
     # Summary
     print_stage "SETUP COMPLETE"

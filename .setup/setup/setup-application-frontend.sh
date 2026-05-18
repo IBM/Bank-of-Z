@@ -1,7 +1,7 @@
 #!/bin/env bash
 set -eu
 # =============================================================================
-# Script  : create-application-frontend.sh
+# Script  : setup-application-frontend.sh
 # Summary : Build and deploy React frontend as WAR file
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.

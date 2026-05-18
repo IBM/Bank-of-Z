@@ -81,10 +81,10 @@ get_pipeline_parameters() {
 }
 
 # =======================================
-# Stage 1: Refresh git (VSCode only)
+# Stage: Refresh git (VSCode only)
 # =======================================
-stage1_refresh_git() {
-    print_stage "STAGE 1: Refresh Git Repository"
+stage_refresh_git() {
+    print_stage "STAGE: Refresh Git Repository"
     
     if [ "$EXECUTION_MODE" = "grub" ]; then
         print_info "GRUB mode: Skipping git refresh (already synced)"
@@ -111,10 +111,10 @@ stage1_refresh_git() {
 }
 
 # =======================================
-# Stage 2: DBB Build
+# Stage: DBB Build
 # =======================================
-stage2_dbb_build() {
-    print_stage "STAGE 2: DBB Build"
+stage_dbb_build() {
+    print_stage "STAGE: DBB Build"
     
     cd "$SCRIPTS_DIR"
     
@@ -130,10 +130,10 @@ stage2_dbb_build() {
 }
 
 # =======================================
-# Stage 3: Deploy Build
+# Stage: Deploy Build
 # =======================================
-stage3_deploy_build() {
-    print_stage "STAGE 3: Deploy Build"
+stage_deploy_build() {
+    print_stage "STAGE: Deploy Build"
     
     cd "$SCRIPTS_DIR"
     
@@ -177,9 +177,9 @@ main() {
     get_pipeline_parameters
     
     # Execute stages
-    stage1_refresh_git
-    stage2_dbb_build
-    stage3_deploy_build
+    stage_refresh_git
+    stage_dbb_build
+    stage_deploy_build
     
     # Summary
     print_stage "PIPELINE COMPLETE"

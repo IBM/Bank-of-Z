@@ -1,7 +1,7 @@
 #!/bin/env bash
 set -eu
 # =============================================================================
-# Script  : create-zosconnect-server.sh
+# Script  : setup-zosconnect-server.sh
 # Summary : Create and configure z/OS Connect Server
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.

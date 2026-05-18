@@ -1,7 +1,7 @@
 #!/bin/env bash
 set -eu
 # =============================================================================
-# Script  : create-cics-region.sh
+# Script  : setup-cics-region.sh
 # Summary : Create and configure CICS region with zconfig
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.

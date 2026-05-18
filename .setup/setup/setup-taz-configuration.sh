@@ -1,7 +1,7 @@
 #!/bin/env bash
 set -eu
 # =============================================================================
-# Script  : create-taz-configuration.sh
+# Script  : setup-taz-configuration.sh
 # Summary : Configure TAZ in CICS region
 #
 # - Configures TAZ CSD dataset

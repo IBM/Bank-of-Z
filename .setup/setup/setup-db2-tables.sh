@@ -1,7 +1,7 @@
 #!/bin/env bash
 set -eu
 # =============================================================================
-# Script  : create-db2-tables.sh
+# Script  : setup-db2-tables.sh
 # Summary : DB2 table creation
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.

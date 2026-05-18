@@ -43,21 +43,7 @@
 
 
        01 WS-CONT-IN.
-          03 WS-CONT-IN-EYECATCHER      PIC X(4).
-          03 WS-CONT-IN-KEY.
-             05 WS-CONT-IN-SORTCODE     PIC 9(6) DISPLAY.
-             05 WS-CONT-IN-NUMBER       PIC 9(10) DISPLAY.
-          03 WS-CONT-IN-NAME            PIC X(60).
-          03 WS-CONT-IN-ADDRESS         PIC X(160).
-          03 WS-CONT-IN-DATE-OF-BIRTH   PIC 9(8).
-          03 WS-CONT-IN-DOB-GROUP REDEFINES WS-CONT-IN-DATE-OF-BIRTH.
-             05 WS-CONT-IN-BIRTH-DAY    PIC 99.
-             05 WS-CONT-IN-BIRTH-MONTH  PIC 99.
-             05 WS-CONT-IN-BIRTH-YEAR   PIC 9999.
-          03 WS-CONT-IN-CREDIT-SCORE    PIC 999.
-          03 WS-CONT-IN-CS-REVIEW-DATE  PIC 9(8).
-          03 WS-CONT-IN-SUCCESS         PIC X.
-          03 WS-CONT-IN-FAIL-CODE       PIC X.
+          COPY CUSTOMER.
 
        01 WS-CICS-WORK-AREA.
           05 WS-CICS-RESP               PIC S9(8) COMP.
@@ -217,7 +203,8 @@
            COMPUTE WS-NEW-CREDSCORE = ((999 - 1)
                             * FUNCTION RANDOM) + 1.
 
-           MOVE WS-NEW-CREDSCORE TO WS-CONT-IN-CREDIT-SCORE.
+           MOVE WS-NEW-CREDSCORE TO CUSTOMER-CREDIT-SCORE
+              OF WS-CONT-IN.
 
       *
       *    Now PUT the data back into a container

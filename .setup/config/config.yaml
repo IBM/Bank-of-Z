@@ -1,0 +1,136 @@
+---
+#########################################################
+# Setup Configuration for Pipeline Simulation
+#########################################################
+
+version: 1.0.0
+
+# Git repositories to clone
+repositories:
+  - name: dbb
+    url: https://github.com/IBM/dbb.git
+    target_dir: dbb
+
+# Application metadata
+app:
+  # Application name
+  base_name: BANKZ
+  # Application short name (max 4 chars)
+  short_name: BOZ
+  # z/OS version used for dataset naming
+  zos_version: V0R1M0
+
+# Sandbox root directory (USS)
+sandbox:
+  # Root path of the project on the remote server
+  path: /usr/local/sandboxes/bank-of-z
+
+# Z configuration tools
+zconfig:
+  # Z Config installation directory
+  zconfig_home: /usr/local/sandboxes/tools/zconfig
+  # CICS Resource Builder installation
+  zcb_home: /usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6
+  # Java runtime for Z tools
+  java_home: /usr/lpp/java/java21/current_64
+
+
+# DBB (Dependency Based Build)
+dbb:
+  # DBB installation directory
+  dbb_home: /usr/lpp/IBM/dbb
+  # Java runtime for DBB
+  java_home: /usr/lpp/java/java21/current_64
+  # DBB build output directory
+  dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
+  # DBB application configuration file
+  dbb_app_conf: ${sandbox.path}/Bank-of-Z/dbb-app.yaml
+  # DBB working directory (source root)
+  dbb_cwd: ${sandbox.path}/Bank-of-Z/
+  # DBB log directory
+  dbb_log_dir: ${sandbox.path}/Bank-of-Z/logs
+  dbb_cwd: ${sandbox.path}//Bank-of-Z/
+  # DBB log directory
+  dbb_log_dir: ${sandbox.path}//Bank-of-Z/logs
+  # API build output directory
+  api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
+
+# zBuilder framework configuration
+zbuilder:
+  # Local source directory (relative to .setup)
+  source_dir: build
+  # Target USS directory for upload
+  target_dir: ${sandbox.path}/zBuilder
+  # Java home (min version 17)
+  java_home: /usr/lpp/java/java21/current_64
+
+# ZCodeScan (static analysis)
+zcodescan:
+  # ZCodeScan installation (Python environment)
+  zcodescan_home: /global/opt/pyenv/akf
+  # Java runtime for scanning tools
+  java_home: /usr/lpp/java/java21/current_64
+  # Working directory
+  cwd_folder: ${sandbox.path}/zDevOps/applications/CBSA/application
+  # Source directory to scan
+  src_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/src/base
+  # Output directory for scan reports
+  output_folder: ${sandbox.path}/zDevOps/applications/CBSA/application/zcodescan
+  # Rules file to apply
+  rule_file: ${sandbox.path}/zDevOps/zcodescan/zcodescan-rules.yaml
+  # Source encoding (z/OS default encoding)
+  src_encoding: IBM-1047
+  # ZCodeScan RESAPI connection info to check for IDZ EE license.
+  rseapi_url: https://127.0.0.1:8195
+  rseapi_user: ${RESAPI_USER} # env var
+  rseapi_password: ${RESAPI_PASSWORD} # env var
+  rseapi_verify: false
+  
+
+# Wazi Deploy (deployment automation)
+wazideploy:
+  # Wazi Deploy installation
+  wazideploy_home: /global/opt/pyenv/gdp
+  # Deployment method configuration file
+  deployment_method: ${sandbox.path}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml
+  # Environment-specific deployment configuration
+  deployment_envfile: ${sandbox.path}/Bank-of-Z/.setup/deploy/Development.yml
+  # Deploy types mapping file
+  types_pattern_mapping: ${sandbox.path}/Bank-of-Z/.setup/deploy/types_pattern_mapping.yml
+  # zDeploy root folder
+  zdeploy_folder: ${sandbox.path}/dbb/WaziDeploy/zDeploy
+
+# TAZ Unit Test configuration
+taz:
+  # TAZ CLI installation directory
+  taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
+  # Root folder containing test suites
+  test_folder: ${sandbox.path}/zDevOps
+  # JES procedure library
+  proclib: SYS1.PROCLIB
+  # Load library used during execution
+  library: ${app.base_name}.${app.zos_version}.LOAD
+  # STEPLIB for runtime/debug
+  steplib: EQAW.VHR0M0.PTF.SEQAMOD
+
+# z/OS Connect (API exposure)
+zosconnect:
+  # z/OS Connect installation
+  zosconnect_home: /usr/lpp/IBM/zosconnect/bin/
+
+# Frontend (Node.js runtime)
+fronted:
+  # Node.js runtime for z/OS
+  node_home: /usr/lpp/IBM/cnj/IBM/node-latest-os390-s390x
+
+# ZOAU installtion folder
+zoau:
+  zoau_home: /usr/lpp/IBM/zoautil
+
+# CICS attibutes
+cics:
+  user: ${CICS_USER} # env var
+  password: ${CICS_PASSWORD} # env var
+  cmci_port: 27100
+  ipic_port: 4320
+

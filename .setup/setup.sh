@@ -8,22 +8,11 @@
 
 set -e  # Exit on error
 
-# Script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_FILE="$SCRIPT_DIR/config.yaml"
-
+# =========================
 # Source library scripts
-LIB_DIR="$SCRIPT_DIR/lib"
-source "$LIB_DIR/colors.sh"
-source "$LIB_DIR/config.sh"
-source "$LIB_DIR/prerequisites.sh"
-
-# Function to parse YAML config (simple parser for our needs)
-get_config_value() {
-    local key=$1
-    local value=$(grep "^[[:space:]]*${key}:" "$CONFIG_FILE" | head -1 | sed 's/^[[:space:]]*[^:]*:[[:space:]]*//' | sed 's/#.*//' | sed 's/[[:space:]]*$//')
-    echo "$value"
-}
+# =========================
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPTS_DIR/config/setenv.sh"
 
 # Function to recursively upload directory contents file by file
 upload_directory_recursive() {
@@ -65,7 +54,9 @@ upload_directory_recursive() {
 }
 
 
+# =========================
 # Load configuration
+# =========================
 load_config() {
     print_info "Loading configuration from $CONFIG_FILE..."
     
@@ -78,13 +69,13 @@ load_config() {
     if [[ -n "$1" ]]; then
         PIPELINE_WORKSPACE="$1"
     else
-        PIPELINE_WORKSPACE=$(expand_vars "$(get_section_value 'global' 'sandbox')")
+        PIPELINE_WORKSPACE=$(get_section_value 'sandbox' 'path')
     fi
-    DBB_REPO_URL=$(get_config_value 'url')
-    ZBUILDER_SOURCE="$SCRIPT_DIR/$(get_section_value 'zbuilder' 'source_dir')"
-    ZBUILDER_TARGET=$(expand_vars "$(get_section_value 'zbuilder' 'target_dir')")
-    PIPELINE_SCRIPT_SOURCE="$SCRIPT_DIR/$(get_section_value 'pipeline_script' 'source')"
-    PIPELINE_SCRIPT_TARGET=$(expand_vars "$(get_section_value 'pipeline_script' 'target')")
+    DBB_REPO_URL=$(get_section_value 'repositories' 'url')
+    ZBUILDER_SOURCE="$SCRIPTS_DIR/$(get_section_value 'zbuilder' 'source_dir')"
+    ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
+    PIPELINE_SCRIPT_SOURCE=$(get_section_value 'pipeline_script' 'source')
+    PIPELINE_SCRIPT_TARGET=$(get_section_value 'sandbox' 'path')
     
     print_success "Configuration loaded successfully"
     echo "  Workspace: $PIPELINE_WORKSPACE"
@@ -134,7 +125,9 @@ stage2_clone_accelerators() {
     print_info "Cloning DBB repository on remote z/OS system..."
     print_info "Repository: $DBB_REPO_URL"
     print_info "Target: $PIPELINE_WORKSPACE/dbb"
-    
+
+    # FIXME -> zowe rse check status
+
     # Check if git is available on the remote system
     print_info "Checking git availability on remote system..."
     if ! zowe rse-api-for-zowe-cli issue unix "which git" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
@@ -240,7 +233,8 @@ stage3_upload_framework() {
     if ! zowe rse-api-for-zowe-cli create uss-directory "$ZBUILDER_TARGET" &> /dev/null; then
         print_warning "Target directory may already exist or creation failed"
     fi
-    
+
+
     # Upload directory recursively file by file
     print_info "Uploading zBuilder framework files (this may take a few minutes)..."
     if upload_directory_recursive "$ZBUILDER_SOURCE" "$ZBUILDER_TARGET"; then
@@ -258,18 +252,18 @@ stage3_upload_framework() {
 # STAGE 4: Build and Install Bank of Z
 #########################################################
 stage4_build_and_install() {
-    print_stage "STAGE 4: Build and install Bank of Z"
+    print_stage "STAGE 4: Build and install Bank of Z into $PIPELINE_WORKSPACE"
     if ! zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $(git rev-parse --abbrev-ref HEAD)" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
         print_error "Failed to clone https://github.com/IBM/Bank-of-Z.git on the target!!"
         exit 1
     fi
     print_success "Clone of https://github.com/IBM/Bank-of-Z.git branch $(git rev-parse --abbrev-ref HEAD) runs successfully"
     set -o pipefail
-    if ! zowe rse-api-for-zowe-cli issue unix-shell "$PIPELINE_WORKSPACE/Bank-of-Z/.setup/build.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/build.log; then
+    if ! zowe rse-api-for-zowe-cli issue unix-shell "bash $PIPELINE_WORKSPACE/Bank-of-Z/.setup/create/create-application.sh" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/build.log; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi
-    if grep -qi "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log; then
+    if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log | grep -v "Failed to change files and directory owner with chown"; then
         print_error "Failed install Bank of Z on the target!!"
         exit 1
     fi
@@ -282,9 +276,9 @@ stage4_build_and_install() {
 #########################################################
 main() {
     echo ""
-    echo -e "${GREEN}╔════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║  Pipeline Simulation Environment Setup Script      ║${NC}"
-    echo -e "${GREEN}╚════════════════════════════════════════════════════╝${NC}"
+    echo -e "${GREEN}######################################################${NC}"
+    echo -e "${GREEN}#  Pipeline Simulation Environment Setup Script      #${NC}"
+    echo -e "${GREEN}######################################################${NC}"
     echo ""
     
     # Check prerequisites

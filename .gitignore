@@ -6,6 +6,6 @@ provisioning/
 /.pydevproject
 build.log
 /bin/
-logs/
+/logs/
 .DS_Store
 src/base/ims/java/src/main/java/nazare/jmp/standalone/*

@@ -269,7 +269,7 @@
                                         PIC X(14).
 
        01 INQCUST-COMMAREA.
-          COPY INQCUST.
+          COPY INQCUSTZ.
 
        01 INQACCCU-COMMAREA.
            COPY INQACCCU REPLACING ==NUMBER-OF-ACCOUNTS.==

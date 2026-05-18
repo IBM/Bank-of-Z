@@ -1,166 +1,255 @@
-# Pipeline Simulation Setup
+# Bank of Z - Setup Guide
 
-This directory contains the setup scripts and configuration for preparing a z/OS USS environment for pipeline simulation.
+Automated setup for the Bank of Z pipeline simulation environment on z/OS USS.
 
-## Prerequisites
+## 🎯 Overview
 
-### Local Machine Requirements
+This setup automates the preparation of your z/OS USS environment for Bank of Z development by:
+- Creating workspace directories
+- Cloning required repositories (DBB accelerators)
+- Deploying the zBuilder framework
+- Installing the Bank of Z application
 
-1. **Zowe CLI** must be installed:
-   ```bash
-   npm install -g @zowe/cli
-   ```
+**Key Feature**: Two complementary scripts that work together to support different workflows.
 
-2. **Zowe RSE API Plugin** must be installed:
-   ```bash
-   zowe plugins install @zowe/rse-api-for-zowe-cli
-   ```
+## 📋 Prerequisites
 
-3. **Zowe Profile** must be configured with your z/OS connection details:
-   ```bash
-   zowe profiles create zosmf-profile <profile-name> --host <host> --port <port> --user <user> --password <password>
-   ```
+### For All Workflows
+- z/OS USS access with appropriate permissions
+- Git installed on z/OS USS
+- Network connectivity to GitHub
+- Configured `.setup/config/config.yaml`
 
-### Remote z/OS System Requirements
+### Additional for VSCode Task Workflow
+- Zowe CLI installed: `npm install -g @zowe/cli`
+- Zowe RSE API plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+- Configured Zowe profile for your z/OS system
 
-1. **Git** must be installed and available in PATH on z/OS USS
-   - Used to clone repositories directly on the z/OS system
-   - Verify with: `zowe rse-api-for-zowe-cli issue unix "which git" --cwd "/u/$USER"`
+## 🚀 Quick Start
 
-## Configuration
+### Option 1: GRUB Workflow (Recommended for Active Development)
 
-Edit [`config.yaml`](config.yaml) to customize your environment:
+**Best for**: Rapid iteration with uncommitted changes
 
-- **repositories**: Git repositories to clone
-- **zbuilder**: zBuilder framework configuration
-- **pipeline_script**: Pipeline simulation script configuration
-- **pipeline_script.workspace**: USS directory for pipeline workspace (default: `/u/$USER/sandbox`)
-- **pipeline_script.application**: Application name (default: `MortgageApplication`)
-- **pipeline_script.tmphlq**: Temporary high-level qualifier for datasets
-- **pipeline_script.run_deploy**: Enable Wazi Deploy step (default false)
-- **pipeline_script.target_hlq**: Bank of Z high-level qualifier for datasets
-- **pipeline_script.java_home**: Java Home on the target
-- **pipeline_script.dbb_hlq**:  DBB build HLQ
-- **pipeline_script.dbb_hlq**: Bank of Z target HLQ for Wazi Deploy
-- **pipeline_script.target_hlq**: Java Home on the target
+1. Make changes locally
+2. Run GRUB to sync and setup
 
-## Files
+GRUB automatically syncs your changes to USS and runs [`setup-common.sh`](.setup/setup-common.sh:1) natively.
 
-- **[`config.yaml`](config.yaml)**: Configuration file for the setup process
-- **[`setup.sh`](setup.sh)**: Main setup script that prepares the environment
-- **[`pipeline_simulation.sh`](pipeline_simulation.sh)**: Pipeline simulation script to be uploaded to USS
-- **`build/`**: zBuilder framework directory containing language configurations
+📖 [Detailed GRUB Guide →](docs/WORKFLOW-GRUB.md)
 
-## Usage
+### Option 2: VSCode Task Workflow
 
-### Option 1: Using VS Code Tasks (Recommended)
+**Best for**: Branch-based development with version control
 
-1. Open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux)
-2. Type "Tasks: Run Task"
-3. Select **"Setup Pipeline Environment"**
-4. The script will guide you through the setup process
+1. Commit and push changes
+git add .
+git commit -m "Update menu logic"
+git push
 
-### Option 2: Running Directly from Terminal
+2. Run VSCode task
+Press: Ctrl+Shift+P (or Cmd+Shift+P on Mac)
+Select: "Tasks: Run Task"
+Choose: "Setup Bank of Z Environment"
+
+The task runs [`setup-local.sh`](.setup/setup-local.sh:1) which orchestrates the remote setup via Zowe CLI.
+
+📖 [Detailed VSCode Guide →](docs/WORKFLOW-VSCODE.md)
+
+### Option 3: Manual USS Execution
+
+**Best for**: Direct USS access or troubleshooting
 
 ```bash
-cd .setup
-./setup.sh
+# 1. SSH to z/OS USS
+ssh user@zos-host
+
+# 2. Clone repository
+git clone https://github.com/IBM/Bank-of-Z.git
+cd Bank-of-Z
+
+# 3. Edit configuration
+vi .setup/config/config.yaml
+
+# 4. Run setup
+bash .setup/setup-common.sh
 ```
 
-## Setup Process
+## ⚙️ Configuration
 
-The setup script performs three stages:
+Before running setup, edit [`.setup/config/config.yaml`](.setup/config/config.yaml:1):
 
-### Stage 1: Initialize Working Directory
-- Checks if the workspace directory exists on USS
-- Optionally deletes and recreates the directory
-- Creates a fresh workspace at the configured location
+```yaml
+# Workspace location on z/OS USS
+sandbox:
+  path: /usr/local/sandboxes/bank-of-z
 
-### Stage 2: Clone Required Accelerators
-- Verifies git is available on the remote z/OS system
-- Clones the IBM DBB repository directly on z/OS USS using git
-- Checks for existing dbb directory and prompts before overwriting
-- Verifies successful clone
+# Application identity
+app:
+  base_name: BANKZ    # Dataset prefix (max 8 chars)
+  short_name: BOZ     # Short identifier (max 4 chars)
+  zos_version: V0R1M0 # Version for dataset naming
 
-### Stage 3: Upload Build Framework and Scripts
-- Displays dataset configuration from Languages.yaml
-- Uploads the zBuilder framework to USS
-- Uploads the pipeline simulation script to USS
-- Makes the pipeline script executable
-
-## Running the Pipeline Simulation
-
-After setup is complete, you can run the pipeline simulation:
-
-### Option 1: Using VS Code Tasks
-
-1. Open the Command Palette
-2. Type "Tasks: Run Task"
-3. Select **"Run Pipeline Simulation"**
-4. Enter the path to the pipeline script on USS (or use the default)
-
-### Option 2: Using Zowe CLI Directly
-
-```bash
-zowe rse-api-for-zowe-cli issue ssh "bash /u/$USER/sandbox/pipeline_simulation.sh"
+# DBB configuration
+dbb:
+  dbb_home: /usr/lpp/IBM/dbb
+  java_home: /usr/lpp/java/java21/current_64
 ```
 
-## Troubleshooting
+📖 [Full Configuration Guide →](docs/CONFIGURATION.md)
 
-### Zowe CLI Not Found
-Ensure Zowe CLI is installed and in your PATH:
+## 📁 Scripts
+
+### Setup Scripts
+
+#### [`setup-common.sh`](.setup/setup-common.sh:1)
+**Purpose**: Main setup script that runs natively on z/OS USS
+
+**Used by**: Both GRUB and VSCode workflows
+
+**What it does**:
+1. Initializes workspace directory
+2. Clones DBB accelerators repository
+3. Deploys zBuilder framework
+4. Installs Bank of Z application
+
+**Execution**: Native USS commands (no Zowe CLI needed)
+
+#### [`setup-local.sh`](.setup/setup-local.sh:1)
+**Purpose**: Local orchestrator for VSCode task workflow
+
+**Used by**: VSCode tasks only
+
+**What it does**:
+1. Creates workspace on remote USS (via Zowe CLI)
+2. Clones Bank of Z branch on remote
+3. Executes [`setup-common.sh`](.setup/setup-common.sh:1) on remote
+
+**Execution**: Runs locally, uses Zowe CLI for remote operations
+
+### Pipeline Scripts
+
+#### [`pipeline-common.sh`](.setup/pipeline-common.sh:1)
+**Purpose**: Pipeline simulation script that runs natively on z/OS USS
+
+**Used by**: Both GRUB and VSCode workflows
+
+**What it does**:
+1. Refreshes git repository (VSCode workflow only)
+2. Runs DBB build
+3. Deploys to CICS
+
+**Execution**: Native USS commands (no Zowe CLI needed)
+
+#### [`pipeline-local.sh`](.setup/pipeline-local.sh:1)
+**Purpose**: Local orchestrator for pipeline execution
+
+**Used by**: VSCode tasks only
+
+**What it does**:
+1. Uploads pipeline script to USS (via Zowe CLI)
+2. Uploads deploy configurations
+3. Executes [`pipeline-common.sh`](.setup/pipeline-common.sh:1) on remote
+
+**Execution**: Runs locally, uses Zowe CLI for remote operations
+
+## 📂 What Gets Created
+
+After successful setup:
+
+```
+/usr/local/sandboxes/bank-of-z/  (your configured path)
+├── dbb/                          # DBB accelerators from GitHub
+│   ├── Pipeline/
+│   ├── Build/
+│   └── ...
+├── zBuilder/                     # Build framework
+│   ├── languages/
+│   ├── datasets.yaml
+│   └── ...
+└── Bank-of-Z/                    # Application source
+    ├── src/                      # COBOL, BMS, copybooks
+    │   ├── base/
+    │   ├── api/
+    │   └── frontend/
+    ├── .setup/                   # Setup scripts
+    └── dbb-app.yaml              # DBB configuration
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### "Zowe CLI not found" (VSCode workflow only)
 ```bash
-which zowe
+# Install Zowe CLI
+npm install -g @zowe/cli
+
+# Install RSE API plugin
+zowe plugins install @zowe/rse-api-for-zowe-cli
+
+# Verify installation
 zowe --version
 ```
 
-### RSE API Plugin Not Available
-Install the plugin:
-```bash
-zowe plugins install @zowe/rse-api-for-zowe-cli
+#### "Git not available on remote"
+- Ensure git is installed on z/OS USS
+- Check that git is in the PATH
+- Test via SSH: `git --version`
+
+#### "Permission denied" errors
+- Verify write access to sandbox path in [`config.yaml`](.setup/config/config.yaml:1)
+- Check directory ownership: `ls -la /usr/local/sandboxes/`
+- Ensure your user has appropriate USS permissions
+
+#### "Directory already exists" prompts
+- Answer `y` to delete and recreate (fresh start)
+- Answer `n` to keep existing (skip that stage)
+
+#### Setup fails during Bank of Z installation
+- Check `/tmp/build.log` for detailed error messages
+- Verify CICS region is available
+- Ensure required datasets are accessible
+
+📖 [More Troubleshooting →](docs/TROUBLESHOOTING.md)
+
+## 📚 Additional Documentation
+
+- [GRUB Workflow Guide](docs/WORKFLOW-GRUB.md) - Detailed GRUB setup and usage
+- [VSCode Task Workflow Guide](docs/WORKFLOW-VSCODE.md) - VSCode task configuration
+- [Configuration Reference](docs/CONFIGURATION.md) - Complete config.yaml guide
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Common issues and solutions
+
+## 🔄 Workflow Comparison
+
+| Feature | GRUB Workflow | VSCode Task Workflow |
+|---------|---------------|---------------------|
+| **Speed** | ⚡ Fast (patch-based sync) | 🐢 Slower (full clone) |
+| **Requires commit** | ❌ No | ✅ Yes |
+| **Works with uncommitted changes** | ✅ Yes | ❌ No |
+| **Requires Zowe CLI** | ❌ No | ✅ Yes |
+| **Requires SSH access** | ✅ Yes | ❌ No |
+| **Best for** | Active development | Branch-based workflow |
+
+## 📝 Next Steps After Setup
+
+### 1. Verify Bank of Z Installation
+
+Connect to CICS using x3270 emulator:
+
+```
+logon applid(CICSBOZ)
 ```
 
-### Connection Issues
-Verify your Zowe profile is configured correctly:
-```bash
-zowe profiles list zosmf
-zowe zosmf check status
-```
+Then test the application:
+- Transaction: `OMEN`
+- Customer ID: `1`
+- Account: `1234`
 
-### Permission Issues
-Ensure your z/OS user has:
-- Write access to the target USS directories
-- Ability to create directories and files
-- Execute permissions for scripts
+## 📄 License
 
-## Customization
+This project is part of the Bank of Z application. See the main project LICENSE file.
 
-### Modifying the Pipeline Script
+---
 
-Edit [`pipeline_simulation.sh`](pipeline_simulation.sh) to customize:
-- DBB_HOME location
-- Build parameters
-- Application-specific settings
-- Workspace locations
-
-After modifications, re-run the setup task to upload the updated script.
-
-### Adding Additional Repositories
-
-Edit [`config.yaml`](config.yaml) and add entries to the `repositories` section:
-
-```yaml
-repositories:
-  - name: my-repo
-    url: https://github.com/user/repo.git
-    target_dir: my-repo
-```
-
-Then modify [`setup.sh`](setup.sh) to handle the additional repository in Stage 2.
-
-## Support
-
-For issues related to:
-- **Zowe CLI**: https://docs.zowe.org/stable/user-guide/cli-using
-- **RSE API Plugin**: https://www.ibm.com/docs/en/wdfrhcw/1.4.0?topic=reference-rse-api-plug-in-zowe-cli-commands
-- **IBM DBB**: https://github.com/IBM/dbb
+**Made with Bob** 🤖

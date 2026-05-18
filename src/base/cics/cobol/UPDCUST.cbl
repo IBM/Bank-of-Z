@@ -57,9 +57,18 @@
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
@@ -161,52 +170,29 @@
        PREMIERE SECTION.
        A010.
 
-           MOVE SORTCODE TO COMM-SCODE
-                            DESIRED-SORT-CODE.
+           MOVE COMM-SCODE TO DESIRED-SORT-CODE.
 
       *
       *    You can change the customer's name, but the title must
       *    be a valid one. Check that here
       *
-           MOVE SPACES TO WS-UNSTR-TITLE.
-           UNSTRING COMM-NAME DELIMITED BY SPACE
-              INTO WS-UNSTR-TITLE.
+           MOVE COMM-TITLE TO WS-UNSTR-TITLE.
 
            MOVE ' ' TO WS-TITLE-VALID.
 
-           EVALUATE WS-UNSTR-TITLE
-              WHEN 'Professor'
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Mr       '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Mrs      '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Miss     '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Ms       '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Dr       '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Drs      '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Lord     '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Sir      '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN 'Lady     '
-                 MOVE 'Y' TO WS-TITLE-VALID
-
-              WHEN '         '
-                 MOVE 'Y' TO WS-TITLE-VALID
+           EVALUATE TRUE
+           WHEN WS-UNSTR-TITLE = 'Professor' OR
+              WS-UNSTR-TITLE = 'Mr' OR
+              WS-UNSTR-TITLE = 'Mrs' OR
+              WS-UNSTR-TITLE = 'Miss' OR
+              WS-UNSTR-TITLE = 'Ms' OR
+              WS-UNSTR-TITLE = 'Dr' OR
+              WS-UNSTR-TITLE = 'Drs' OR
+              WS-UNSTR-TITLE = 'Lord' OR
+              WS-UNSTR-TITLE = 'Sir' OR
+              WS-UNSTR-TITLE = 'Lady' OR
+              WS-UNSTR-TITLE = SPACES
+                MOVE 'Y' TO WS-TITLE-VALID
 
               WHEN OTHER
                  MOVE 'N' TO WS-TITLE-VALID
@@ -245,8 +231,10 @@
       *    Validate that name and address are provided
       *    (same validation logic as VSAM version)
       *
-           IF (COMM-NAME = SPACES OR COMM-NAME(1:1) = ' ') AND
-           (COMM-ADDR = SPACES OR COMM-ADDR(1:1) = ' ')
+           IF (COMM-FIRST-NAME = SPACES OR COMM-FIRST-NAME(1:1) = ' ')
+              AND (COMM-LAST-NAME = SPACES OR COMM-LAST-NAME(1:1) = ' ')
+              AND (COMM-ADDR-LINE1 = SPACES OR COMM-ADDR-LINE1(1:1) =
+              ' ')
               MOVE 'N' TO COMM-UPD-SUCCESS
               MOVE '4' TO COMM-UPD-FAIL-CD
               GO TO UCD999
@@ -262,17 +250,35 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER
@@ -302,19 +308,37 @@
       *    Update the fields based on what was provided
       *    (same logic as VSAM version)
       *
-           IF (COMM-NAME = SPACES OR COMM-NAME(1:1) = ' ') AND
-           (COMM-ADDR NOT = SPACES OR COMM-ADDR(1:1) NOT = ' ')
-              MOVE COMM-ADDR TO HV-CUSTOMER-ADDRESS
+           IF COMM-FIRST-NAME OF COMM-NAME (1:1) NOT = ' '
+              MOVE COMM-TITLE OF COMM-NAME TO HV-CUSTOMER-TITLE
+              MOVE COMM-FIRST-NAME OF COMM-NAME
+                 TO HV-CUSTOMER-FIRST-NAME
+              MOVE COMM-LAST-NAME OF COMM-NAME
+                 TO HV-CUSTOMER-LAST-NAME
            END-IF.
 
-           IF (COMM-ADDR = SPACES OR COMM-ADDR(1:1) = ' ') AND
-           (COMM-NAME NOT = SPACES OR COMM-NAME(1:1) NOT = ' ')
-              MOVE COMM-NAME TO HV-CUSTOMER-NAME
+           IF COMM-PHONE(1:1) NOT = ' '
+              MOVE COMM-PHONE TO HV-CUSTOMER-PHONE
            END-IF.
 
-           IF COMM-ADDR(1:1) NOT = ' ' AND COMM-NAME(1:1) NOT = ' '
-              MOVE COMM-ADDR TO HV-CUSTOMER-ADDRESS
-              MOVE COMM-NAME TO HV-CUSTOMER-NAME
+           IF COMM-ADDR-LINE1 OF COMM-ADDR (1:1) NOT = ' '
+              MOVE COMM-ADDR-LINE1 OF COMM-ADDR
+                 TO HV-CUSTOMER-ADDR-LINE1
+              MOVE COMM-ADDR-LINE2 OF COMM-ADDR
+                 TO HV-CUSTOMER-ADDR-LINE2
+              MOVE COMM-CITY OF COMM-ADDR TO HV-CUSTOMER-CITY
+              MOVE COMM-POSTCODE OF COMM-ADDR TO HV-CUSTOMER-POSTCODE
+              MOVE COMM-COUNTRY OF COMM-ADDR TO HV-CUSTOMER-COUNTRY
+           END-IF.
+
+           IF COMM-STATUS(1:1) NOT = ' '
+              MOVE COMM-STATUS TO HV-CUSTOMER-STATUS
+           END-IF.
+
+           IF COMM-DOB-YEAR NOT = 0
+              COMPUTE HV-CUSTOMER-DOB =
+                 (COMM-DOB-YEAR * 10000) +
+                 (COMM-DOB-MONTH * 100) +
+                 COMM-DOB-DAY
            END-IF.
 
       *
@@ -322,8 +346,17 @@
       *
            EXEC SQL
               UPDATE CUSTOMER
-                 SET CUSTOMER_NAME = :HV-CUSTOMER-NAME,
-                     CUSTOMER_ADDRESS = :HV-CUSTOMER-ADDRESS
+                 SET CUSTOMER_TITLE = :HV-CUSTOMER-TITLE,
+                     CUSTOMER_FIRST_NAME = :HV-CUSTOMER-FIRST-NAME,
+                     CUSTOMER_LAST_NAME = :HV-CUSTOMER-LAST-NAME,
+                     CUSTOMER_DATE_OF_BIRTH = :HV-CUSTOMER-DOB,
+                     CUSTOMER_PHONE = :HV-CUSTOMER-PHONE,
+                     CUSTOMER_ADDR_LINE1 = :HV-CUSTOMER-ADDR-LINE1,
+                     CUSTOMER_ADDR_LINE2 = :HV-CUSTOMER-ADDR-LINE2,
+                     CUSTOMER_CITY = :HV-CUSTOMER-CITY,
+                     CUSTOMER_POSTCODE = :HV-CUSTOMER-POSTCODE,
+                     CUSTOMER_COUNTRY = :HV-CUSTOMER-COUNTRY,
+                     CUSTOMER_STATUS = :HV-CUSTOMER-STATUS
                WHERE CUSTOMER_SORTCODE = :HV-CUSTOMER-SORTCODE
                  AND CUSTOMER_NUMBER = :HV-CUSTOMER-NUMBER
            END-EXEC.
@@ -346,9 +379,31 @@
            MOVE HV-CUSTOMER-EYECATCHER TO COMM-EYE.
            MOVE HV-CUSTOMER-SORTCODE TO COMM-SCODE.
            MOVE HV-CUSTOMER-NUMBER TO COMM-CUSTNO.
-           MOVE HV-CUSTOMER-NAME TO COMM-NAME.
-           MOVE HV-CUSTOMER-ADDRESS TO COMM-ADDR.
-           MOVE HV-CUSTOMER-DOB TO COMM-DOB.
+           MOVE HV-CUSTOMER-TITLE TO COMM-TITLE OF COMM-NAME.
+           MOVE HV-CUSTOMER-FIRST-NAME TO COMM-FIRST-NAME
+              OF COMM-NAME.
+           MOVE HV-CUSTOMER-LAST-NAME TO COMM-LAST-NAME
+              OF COMM-NAME.
+           MOVE HV-CUSTOMER-PHONE TO COMM-PHONE.
+           MOVE HV-CUSTOMER-ADDR-LINE1 TO COMM-ADDR-LINE1
+              OF COMM-ADDR.
+           MOVE HV-CUSTOMER-ADDR-LINE2 TO COMM-ADDR-LINE2
+              OF COMM-ADDR.
+           MOVE HV-CUSTOMER-CITY TO COMM-CITY OF COMM-ADDR.
+           MOVE HV-CUSTOMER-POSTCODE TO COMM-POSTCODE OF COMM-ADDR.
+           MOVE HV-CUSTOMER-COUNTRY TO COMM-COUNTRY OF COMM-ADDR.
+           MOVE HV-CUSTOMER-STATUS TO COMM-STATUS.
+           COMPUTE COMM-CREATED-YEAR =
+              HV-CUSTOMER-CREATE-DATE / 10000.
+           COMPUTE COMM-CREATED-MONTH =
+              FUNCTION MOD(HV-CUSTOMER-CREATE-DATE / 100, 100).
+           COMPUTE COMM-CREATED-DAY =
+              FUNCTION MOD(HV-CUSTOMER-CREATE-DATE, 100).
+           COMPUTE COMM-DOB-YEAR = HV-CUSTOMER-DOB / 10000.
+           COMPUTE COMM-DOB-MONTH =
+              FUNCTION MOD(HV-CUSTOMER-DOB / 100, 100).
+           COMPUTE COMM-DOB-DAY =
+              FUNCTION MOD(HV-CUSTOMER-DOB, 100).
            MOVE HV-CUSTOMER-CREDIT-SCORE TO COMM-CREDIT-SCORE.
            MOVE HV-CUSTOMER-CS-REVIEW-DATE TO COMM-CS-REVIEW-DATE.
 

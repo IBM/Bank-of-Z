@@ -60,6 +60,7 @@
                         <div class="cds--col-md-4 cds--col-lg-4">
                             <cds-text-input id="accountNumber" label="Account ID" readonly></cds-text-input>
                             <cds-text-input id="customerNumber" label="Customer ID" readonly></cds-text-input>
+                            <cds-text-input id="availableBalance" label="Available Balance" readonly></cds-text-input>
                             <cds-text-input id="accountType" label="Account Type" readonly></cds-text-input>
                             <cds-text-input id="currency" label="Currency" readonly></cds-text-input>
                             <cds-text-input id="status" label="Status" readonly></cds-text-input>
@@ -99,7 +100,7 @@
     <script type="module">
         import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatCurrency } from './js/utils.js';
 
         let currentAccount = null;
 
@@ -140,14 +141,14 @@
                 const account = await api.accounts.getAccount(accountId);
                 currentAccount = account;
                 hideLoadingModal();
-                displayAccountDetails(account);
+                await displayAccountDetails(account);
             } catch (error) {
                 hideLoadingModal();
                 showErrorModal('Error', 'Account not found or error loading data');
             }
         }
 
-        function displayAccountDetails(account) {
+        async function displayAccountDetails(account) {
             document.getElementById('accountNumber').value = account.accountId || '';
             document.getElementById('customerNumber').value = account.customerId || '';
             document.getElementById('accountType').value = account.accountType || '';
@@ -158,8 +159,20 @@
             document.getElementById('iban').value = account.iban || '';
             document.getElementById('nickname').value = account.nickname || '';
             document.getElementById('openingDate').value = account.openingDate || '';
+            document.getElementById('availableBalance').value = 'Loading...';
 
             document.getElementById('details-section').style.display = 'block';
+
+            try {
+                const balance = await api.accounts.getAccountBalances(account.accountId);
+                document.getElementById('availableBalance').value =
+                    balance?.amount !== undefined
+                        ? formatCurrency(balance.amount, balance.currency)
+                        : 'N/A';
+            } catch (error) {
+                console.error(`Error loading balance for account ${account.accountId}:`, error);
+                document.getElementById('availableBalance').value = 'Error';
+            }
         }
 
         async function updateAccount() {

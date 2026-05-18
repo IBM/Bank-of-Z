@@ -156,7 +156,7 @@
           03 COMM-INTRT             PIC 9(4)V99.
           03 COMM-OVERDR            PIC 9(8).
 
-       PROCEDURE DIVISION USING DFHCOMMAREA.
+       PROCEDURE DIVISION.
        PREMIERE SECTION.
        A010.
 

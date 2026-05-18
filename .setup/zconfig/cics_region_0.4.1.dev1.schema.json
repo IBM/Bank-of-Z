@@ -720,30 +720,6 @@
       "title": "GlobalCatalogInputs",
       "type": "object"
     },
-    "InlineSourceType": {
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "description": "Name of the JVM profile",
-          "title": "name",
-          "type": "string"
-        },
-        "source_type": {
-          "const": "inline",
-          "default": "inline",
-          "description": "Defines the source of the JVM profile as inline",
-          "title": "Source Type",
-          "type": "string"
-        },
-        "properties": {
-          "type": "string",
-          "description": "Properties of JVM profile for inline source type",
-          "title": "Properties"
-        }
-      },
-      "title": "InlineSourceType",
-      "type": "object"
-    },
     "InputDd": {
       "additionalProperties": false,
       "properties": {
@@ -2828,19 +2804,46 @@
           "title": "extensions"
         },
         "jvm_profiles": {
-          "description": "List of JVM profiles to be created for this region",
+          "description": "List of JVM profile file paths to be created for this region",
           "items": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/InlineSourceType"
-              },
-              {
-                "$ref": "#/$defs/SymlinkSourceType"
-              }
-            ]
+            "type": "string"
           },
           "title": "jvm_profiles",
           "type": "array"
+        },
+        "ciphers": {
+          "description": "List of cipher suite configuration file paths for this region",
+          "items": {
+            "type": "string"
+          },
+          "title": "ciphers",
+          "type": "array"
+        },
+        "feature_toggle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Feature toggle properties file path to be created for this region",
+          "title": "feature_toggle"
+        },
+        "region_taggings": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Region tags YAML file path to be created for this region",
+          "title": "region_taggings"
         }
       },
       "required": [
@@ -3023,41 +3026,6 @@
       ],
       "title": "SslOptions",
       "type": "string"
-    },
-    "SymlinkSourceType": {
-      "additionalProperties": false,
-      "properties": {
-        "source_type": {
-          "const": "symlink",
-          "description": "Defines the source of the JVM profile as symlink",
-          "title": "Source Type",
-          "type": "string"
-        },
-        "name": {
-          "description": "Name of the JVM profile",
-          "title": "name",
-          "type": "string"
-        },
-        "source_path": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "File path of JVM profile for symlink source type",
-          "title": "Source Path"
-        }
-      },
-      "required": [
-        "source_type",
-        "name"
-      ],
-      "title": "SymlinkSourceType",
-      "type": "object"
     },
     "TdIntrapartitionInputs": {
       "additionalProperties": false,

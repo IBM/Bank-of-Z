@@ -69,6 +69,13 @@ finalize_results() {
 
     print_result "${GREEN}[WAZIDEPLOY][LOG-PATH]${NC} $LOG_TAR"
 
+
+    if [ $RC -eq 0 ]; then
+        print_success "${GREEN}[DBB-BUILD]${NC} Process completed"
+    else
+        print_error "${RED}[DBB-BUILD]${NC} Process failed"
+    fi
+
     exit "$RC"
 }
 
@@ -169,22 +176,4 @@ rm -f message.log
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-tmp_rc="/tmp/cmd_rc_deploy_$$"
-
-(
-    ${CMD}
-    echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
-do
-    print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
-done
-
-rc=$(cat "$tmp_rc")
-rm -f "$tmp_rc"
-
-if [ "$rc" -ne 0 ]; then
-    print_error "${RED}[WAZIDEPLOY]${NC} wazideploy-deploy failed"
-    exit "$rc"
-fi
-
-print_info "${CYAN}[WAZIDEPLOY]${NC} Deployment process completed successfully"
+${CMD}

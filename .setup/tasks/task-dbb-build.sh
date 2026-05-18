@@ -72,6 +72,8 @@ finalize_results() {
 
     if [ $RC -eq 0 ]; then
         print_success "${GREEN}[DBB-BUILD]${NC} Process completed"
+    else
+        print_error "${RED}[DBB-BUILD]${NC} Process failed"
     fi
 
     exit "$RC"

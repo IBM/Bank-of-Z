@@ -38,7 +38,7 @@ PROC_TMP="/tmp/cics-proc-$$.jcl"
 # Cleanup temp files on exit
 # =========================
 cleanup() {
-    rm -f "$TAZ_JCL_TMP" "$PROC_TMP" "$PROC_TMP.iconv"
+    rm -f "$TAZ_JCL_TMP" "$PROC_TMP"
 }
 
 trap cleanup EXIT
@@ -77,7 +77,7 @@ cat > "$tmp_ascii" << 'EOF'
          END DFHPLT
 EOF
 
-iconv -f ISO8859-1 -t IBM-1047 "$tmp_ascii" > "$tmp_ebcdic"
+a2e -f ISO8859-1 -t IBM-1047 "$tmp_ascii" > "$tmp_ebcdic"
 dcp "$tmp_ebcdic" "${TAZ_CICS_PDS}(DFHPLTPI)"
 
 # =========================
@@ -210,14 +210,14 @@ EOF
 # =========================
 # Convert PROC to EBCDIC and copy to SYS1.PROCLIB
 # =========================
-if ! iconv -f ISO8859-1 -t IBM-1047 "$PROC_TMP" > "$PROC_TMP.iconv"; then
-    print_error "${RED}[TAZ-INSTALL]${NC} iconv to EBCDIC failed"
+if ! a2e -f ISO8859-1 -t IBM-1047 "$PROC_TMP"; then
+    print_error "${RED}[TAZ-INSTALL]${NC} e2a to EBCDIC failed"
     exit 1
 fi
 
-chtag -r "$PROC_TMP.iconv"
+chtag -r "$PROC_TMP"
 
-if ! cp "$PROC_TMP.iconv" "//'${PROCLIB}'"; then
+if ! cp "$PROC_TMP" "//'${PROCLIB}'"; then
     print_error "${RED}[TAZ-INSTALL]${NC} Unable to write to ${PROCLIB}"
     exit 8
 fi
@@ -275,7 +275,7 @@ print_info "${CYAN}[TAZ-INSTALL]${NC} Checking ${DTCN_PORTS} for CICS${APP_BASE_
 touch "${DTCN_PORTS}"
 
 TMP_DTCN="/tmp/dtcn.ports.$$"
-iconv -f IBM-1047 -t ISO8859-1 "${DTCN_PORTS}" > "${TMP_DTCN}.ascii" 2>/dev/null || cp "${DTCN_PORTS}" "${TMP_DTCN}.ascii"
+a2e -f IBM-1047 -t ISO8859-1 "${DTCN_PORTS}" 2>/dev/null || cp "${DTCN_PORTS}" "${TMP_DTCN}"
 
 if grep -Eq "^[[:space:]]*CICS${APP_BASE_NAME}:-1([[:space:]]*)$" "${TMP_DTCN}.ascii"; then
     print_info "${CYAN}[TAZ-INSTALL]${NC} CICS${APP_BASE_NAME} already present in ${DTCN_PORTS}"
@@ -284,9 +284,9 @@ else
     printf "\n%s\n" "${DTCN_ENTRY}" >> "${TMP_DTCN}.ascii"
 fi
 
-iconv -f ISO8859-1 -t IBM-1047 "${TMP_DTCN}.ascii" > "${DTCN_PORTS}"
+a2e -f ISO8859-1 -t IBM-1047 "${TMP_DTCN}"
 chtag -t -c IBM-1047 "${DTCN_PORTS}"
-rm -f "${TMP_DTCN}.ascii"
+rm -f "${TMP_DTCN}"
 
 # =========================
 # Restart CICS region

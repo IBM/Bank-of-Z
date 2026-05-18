@@ -49,9 +49,18 @@
           03 HV-CUSTOMER-EYECATCHER     PIC X(4).
           03 HV-CUSTOMER-SORTCODE       PIC X(6).
           03 HV-CUSTOMER-NUMBER         PIC X(10).
-          03 HV-CUSTOMER-NAME           PIC X(60).
-          03 HV-CUSTOMER-ADDRESS        PIC X(160).
+          03 HV-CUSTOMER-TITLE          PIC X(10).
+          03 HV-CUSTOMER-FIRST-NAME     PIC X(50).
+          03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
+          03 HV-CUSTOMER-PHONE          PIC X(20).
+          03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
+          03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
+          03 HV-CUSTOMER-CITY           PIC X(50).
+          03 HV-CUSTOMER-POSTCODE       PIC X(10).
+          03 HV-CUSTOMER-COUNTRY        PIC X(50).
+          03 HV-CUSTOMER-STATUS         PIC X(10).
+          03 HV-CUSTOMER-CREATE-DATE    PIC S9(9) COMP.
           03 HV-CUSTOMER-CREDIT-SCORE   PIC S9(4) COMP.
           03 HV-CUSTOMER-CS-REVIEW-DATE PIC S9(9) COMP.
 
@@ -181,7 +190,7 @@
 
        LINKAGE SECTION.
        01 DFHCOMMAREA.
-           COPY INQCUST.
+           COPY INQCUSTZ.
 
 
        PROCEDURE DIVISION USING DFHCOMMAREA.
@@ -197,7 +206,11 @@
            MOVE 'N' TO INQCUST-INQ-SUCCESS
            MOVE '0' TO INQCUST-INQ-FAIL-CD
 
-           MOVE SORTCODE TO REQUIRED-SORT-CODE.
+           IF INQCUST-SCODE = SPACES OR LOW-VALUES
+              MOVE SORTCODE TO REQUIRED-SORT-CODE
+           ELSE
+              MOVE INQCUST-SCODE TO REQUIRED-SORT-CODE
+           END-IF.
            MOVE INQCUST-CUSTNO TO REQUIRED-CUST-NUMBER.
       *
       *    Is the incoming CUSTOMER number set to 0's, 9's or
@@ -249,10 +262,16 @@
                 TO INQCUST-CUSTNO
              MOVE CUSTOMER-NAME OF OUTPUT-DATA
                 TO INQCUST-NAME
+              MOVE CUSTOMER-DOB OF OUTPUT-DATA
+                 TO INQCUST-DOB
+              MOVE CUSTOMER-PHONE OF OUTPUT-DATA
+                 TO INQCUST-PHONE
              MOVE CUSTOMER-ADDRESS OF OUTPUT-DATA
                 TO INQCUST-ADDR
-             MOVE CUSTOMER-DATE-OF-BIRTH OF OUTPUT-DATA
-                TO INQCUST-DOB
+             MOVE CUSTOMER-STATUS OF OUTPUT-DATA
+                 TO INQCUST-STATUS
+              MOVE CUSTOMER-CREATED-DATE OF OUTPUT-DATA
+                TO INQCUST-CREATED-DATE
              MOVE CUSTOMER-CREDIT-SCORE OF OUTPUT-DATA
                 TO INQCUST-CREDIT-SCORE
              MOVE CUSTOMER-CS-REVIEW-DATE OF OUTPUT-DATA
@@ -292,17 +311,35 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER
@@ -319,11 +356,42 @@
               MOVE HV-CUSTOMER-EYECATCHER TO CUSTOMER-EYECATCHER
               MOVE HV-CUSTOMER-SORTCODE TO CUSTOMER-SORTCODE
               MOVE HV-CUSTOMER-NUMBER TO CUSTOMER-NUMBER
-              MOVE HV-CUSTOMER-NAME TO CUSTOMER-NAME
-              MOVE HV-CUSTOMER-ADDRESS TO CUSTOMER-ADDRESS
-              MOVE HV-CUSTOMER-DOB TO CUSTOMER-DATE-OF-BIRTH
+              MOVE HV-CUSTOMER-TITLE TO CUSTOMER-TITLE
+                 OF CUSTOMER-NAME
+              MOVE HV-CUSTOMER-FIRST-NAME TO CUSTOMER-FIRST-NAME
+                 OF CUSTOMER-NAME
+              MOVE HV-CUSTOMER-LAST-NAME TO CUSTOMER-LAST-NAME
+                 OF CUSTOMER-NAME
+              COMPUTE CUSTOMER-DOB-YEAR = HV-CUSTOMER-DOB / 10000
+              COMPUTE CUSTOMER-DOB-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-DOB / 100, 100)
+              COMPUTE CUSTOMER-DOB-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-DOB, 100)
+              MOVE HV-CUSTOMER-PHONE TO CUSTOMER-PHONE
+              MOVE HV-CUSTOMER-ADDR-LINE1 TO CUSTOMER-ADDR-LINE1
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-ADDR-LINE2 TO CUSTOMER-ADDR-LINE2
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-CITY TO CUSTOMER-CITY
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-POSTCODE TO CUSTOMER-POSTCODE
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-COUNTRY TO CUSTOMER-COUNTRY
+                 OF CUSTOMER-ADDRESS
+              MOVE HV-CUSTOMER-STATUS TO CUSTOMER-STATUS
+              COMPUTE CUSTOMER-CREATED-YEAR =
+                 HV-CUSTOMER-CREATE-DATE / 10000
+              COMPUTE CUSTOMER-CREATED-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-CREATE-DATE / 100, 100)
+              COMPUTE CUSTOMER-CREATED-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-CREATE-DATE, 100)
               MOVE HV-CUSTOMER-CREDIT-SCORE TO CUSTOMER-CREDIT-SCORE
-              MOVE HV-CUSTOMER-CS-REVIEW-DATE TO CUSTOMER-CS-REVIEW-DATE
+              COMPUTE CUSTOMER-CS-REVIEW-YEAR =
+                 HV-CUSTOMER-CS-REVIEW-DATE / 10000
+              COMPUTE CUSTOMER-CS-REVIEW-MONTH =
+                 FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE / 100, 100)
+              COMPUTE CUSTOMER-CS-REVIEW-DAY =
+                 FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE, 100)
               GO TO RCD999
            END-IF.
 
@@ -372,8 +440,16 @@
               MOVE 'Y' TO EXIT-VSAM-READ
               MOVE 'N' TO INQCUST-INQ-SUCCESS
               MOVE '1' TO INQCUST-INQ-FAIL-CD
-              MOVE SPACES TO INQCUST-ADDR
-              MOVE SPACES TO INQCUST-NAME
+              MOVE SPACES TO INQCUST-TITLE
+              MOVE SPACES TO INQCUST-FIRST-NAME
+              MOVE SPACES TO INQCUST-LAST-NAME
+              MOVE SPACES TO INQCUST-PHONE
+              MOVE SPACES TO INQCUST-ADDR-LINE1
+              MOVE SPACES TO INQCUST-ADDR-LINE2
+              MOVE SPACES TO INQCUST-CITY
+              MOVE SPACES TO INQCUST-POSTCODE
+              MOVE SPACES TO INQCUST-COUNTRY
+              MOVE SPACES TO INQCUST-STATUS
               GO TO RCD999
            END-IF.
 
@@ -600,17 +676,35 @@
               SELECT CUSTOMER_EYECATCHER,
                      CUSTOMER_SORTCODE,
                      CUSTOMER_NUMBER,
-                     CUSTOMER_NAME,
-                     CUSTOMER_ADDRESS,
+                     CUSTOMER_TITLE,
+                     CUSTOMER_FIRST_NAME,
+                     CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
+                     CUSTOMER_PHONE,
+                     CUSTOMER_ADDR_LINE1,
+                     CUSTOMER_ADDR_LINE2,
+                     CUSTOMER_CITY,
+                     CUSTOMER_POSTCODE,
+                     CUSTOMER_COUNTRY,
+                     CUSTOMER_STATUS,
+                     CUSTOMER_CREATED_DATE,
                      CUSTOMER_CREDIT_SCORE,
                      CUSTOMER_CS_REVIEW_DATE
                 INTO :HV-CUSTOMER-EYECATCHER,
                      :HV-CUSTOMER-SORTCODE,
                      :HV-CUSTOMER-NUMBER,
-                     :HV-CUSTOMER-NAME,
-                     :HV-CUSTOMER-ADDRESS,
+                     :HV-CUSTOMER-TITLE,
+                     :HV-CUSTOMER-FIRST-NAME,
+                     :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
+                     :HV-CUSTOMER-PHONE,
+                     :HV-CUSTOMER-ADDR-LINE1,
+                     :HV-CUSTOMER-ADDR-LINE2,
+                     :HV-CUSTOMER-CITY,
+                     :HV-CUSTOMER-POSTCODE,
+                     :HV-CUSTOMER-COUNTRY,
+                     :HV-CUSTOMER-STATUS,
+                     :HV-CUSTOMER-CREATE-DATE,
                      :HV-CUSTOMER-CREDIT-SCORE,
                      :HV-CUSTOMER-CS-REVIEW-DATE
                 FROM CUSTOMER

@@ -182,7 +182,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BalanceList'
+                $ref: '#/components/schemas/Balance'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

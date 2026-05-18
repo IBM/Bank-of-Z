@@ -3,6 +3,10 @@ version: "1.2"
 mappings:
 - body:
     mappings:
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$apiRequest.pathParameters.accountId}}"
     - accountType:
         required: true
         nullable: false
@@ -13,7 +17,29 @@ mappings:
         required: true
         nullable: false
         template: "GBP"
+    - accountNumber:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-ACCNO\"\
+          }}"
+    - sortCode:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-SCODE\"\
+          }}"
     - status:
         required: true
         nullable: false
         template: "ACTIVE"
+    - openingDate:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-OPENED-GROUP\"\
+          .\"INQACC-OPENED-YEAR\"}}-{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\"\
+          .\"INQACC-OPENED-GROUP\".\"INQACC-OPENED-MONTH\"}}-{{$zosAssetResponse.commarea.\"\
+          INQACC-COMMAREA\".\"INQACC-OPENED-GROUP\".\"INQACC-OPENED-DAY\"}}"
+    - customerId:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQACC-COMMAREA\".\"INQACC-CUSTNO\"\
+          }}"

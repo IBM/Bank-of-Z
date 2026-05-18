@@ -1,0 +1,4 @@
+{
+  "grub.buildCommand": "./.setup/pipeline-common.sh",
+  "grub.serverRoot": "/usr/local/sandboxes/bank-of-z"
+}

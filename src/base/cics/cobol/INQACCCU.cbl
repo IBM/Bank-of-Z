@@ -155,7 +155,7 @@
        COPY CUSTOMER.
 
        01 INQCUST-COMMAREA.
-          COPY INQCUST.
+          COPY INQCUSTZ.
 
        01 WS-U-TIME                       PIC S9(15) COMP-3.
        01 WS-ORIG-DATE                    PIC X(10).

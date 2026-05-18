@@ -26,3 +26,7 @@ export APP_VERSION=$(get_section_value 'app' 'zos_version')
 export SANDBOX_DIR=${SANDBOX_DIR:-$(get_section_value 'sandbox' 'path')}
 export _BPXK_AUTOCVT=ON
 
+# =========================
+# Load configuration
+# =========================
+load_config "$*"

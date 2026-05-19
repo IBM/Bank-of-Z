@@ -164,7 +164,7 @@ stage_execute_common_setup() {
     print_info "Running: bash .setup/setup-common.sh"
     
     set -o pipefail
-    if zowe rse-api-for-zowe-cli issue unix-shell "bash .setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/remote-setup.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "bash .setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
         if grep -i "error\|failed" /tmp/remote-setup.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_warning "Setup completed but some warnings were detected"

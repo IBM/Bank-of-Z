@@ -208,32 +208,46 @@ submit_jcl() {
 }
 
 # ============================================================
-# Submit a JCL job and wait until completion.
+# Submit a JCL job and wait for completion.
 #
 # This function:
 #   1. Submits a JCL file using `jsub`
-#   2. Extracts the generated JOBID
-#   3. Polls JES status using `jls`
-#   4. Waits until the job reaches a final state
-#   5. Displays final job status and JESYSMSG output
+#   2. Extracts the generated JOBID from the submit output
+#   3. Monitors the job status using `jls`
+#   4. Waits until the job reaches a final JES state
+#   5. Displays:
+#        - Final job status
+#        - JESYSMSG spool content
 #   6. Returns:
-#        - 0 if the job ends with CC=0000 or CC=0004
-#        - 8 for ABEND, JCL error, security error,
-#          cancellation, or any non-supported return code
+#        - 0 if the job completes with an acceptable
+#          condition code (default: CC=0000 or CC=0004)
+#        - 8 if the job fails, including:
+#            * ABEND
+#            * JCL error
+#            * Security error
+#            * Job cancellation
+#            * Condition code higher than MAXRC
 #
 # Parameters:
 #   $1 -> Path to the JCL file to submit
+#   $2 -> Optional MAXRC value
+#         Default = 4
 #
 # Dependencies:
 #   - jsub
 #   - jls
 #   - pjdd
 #
-# Example:
+# Examples:
 #   run_job_and_wait "./MYJOB.jcl"
+#     -> Accepts CC=0000 to CC=0004
+#
+#   run_job_and_wait "./MYJOB.jcl" 8
+#     -> Accepts CC=0000 to CC=0008
 # ============================================================
 run_job_and_wait() {
   local JCLFILE="$1"
+  local MAXRC="${2:-4}"
 
   echo "==> Submitting $JCLFILE via jsub..."
   OUT=$(jsub -f "$JCLFILE")
@@ -246,26 +260,41 @@ run_job_and_wait() {
   }')
 
   [ -z "$JOBID" ] && { echo "ERROR: no JOBID returned by jsub"; return 8; }
+
   echo "Waiting for job $JOBID..."
 
   while :; do
     LINE=$(jls "$JOBID" 2>/dev/null | grep "$JOBID" | tail -1 || true)
     [ -n "$LINE" ] && echo "$LINE"
+
     echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break
-    sleep 5
+
+    sleep 3
   done
 
-  echo "===== FINAL STATUS ====="
   jls "$JOBID" || true
 
   echo "===== JESYSMSG ====="
   pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
 
-  FINAL=$(jls "$JOBID" | grep "$JOBID" | tail -1)
-  echo "$FINAL" | awk '{ if ($4=="CC" && ($5=="0000" || $5=="0004")) exit 0; else exit 1 }' && return 0
+FINAL=$(jls "$JOBID" | grep "$JOBID" | tail -1)
 
-  echo "ERROR: Job failed: $JOBID"
-  return 8
+STATUS=$(echo "$FINAL" | awk '{print $4}')
+RC=$(echo "$FINAL" | awk '{print $5}')
+
+if [ "$STATUS" = "CC" ]; then
+  case "$RC" in
+    0000|0004)
+      return 0
+      ;;
+    0008)
+      [ "$MAXRC" = "8" ] && return 0
+      ;;
+  esac
+fi
+
+echo "ERROR: Job failed: $JOBID"
+return 8
 }
 
 # ============================================================

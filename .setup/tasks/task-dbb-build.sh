@@ -103,7 +103,7 @@ fi
 # =========================
 # Run DBB build
 # =========================
-print_info "${CYAN}[DBB-BUILD]${NC} Starting DBB build in $DBB_CWD ..."
+print_info "${CYAN}[DBB-BUILD]${NC} Starting DBB build in $DBB_LOG_FOLDER ..."
 cd "$DBB_CWD" || exit 1
 
 set +e

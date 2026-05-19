@@ -40,22 +40,26 @@ if (!serverXmlRelativePath) {
     return 8
 }
 
-// Get cics.xml path from config variable (relative to workspace/appDirName)
+// Get cics.xml path from config variable (optional - relative to workspace/appDirName)
 def cicsXmlRelativePath = config.getVariable('cicsXmlPath')
-if (!cicsXmlRelativePath) {
-    log.error("cicsXmlPath configuration variable is required but not set")
-    log.error("Please add cicsXmlPath to the ServerXmlPackager task configuration in dbb-app.yaml")
-    return 8
+def processCicsXml = (cicsXmlRelativePath != null && !cicsXmlRelativePath.trim().isEmpty())
+
+if (processCicsXml) {
+    log.info("CICS XML path provided: ${cicsXmlRelativePath}")
+} else {
+    log.info("CICS XML path not provided - will only package server.xml")
 }
 
 // Construct full paths
 def serverXmlPath = "${workspace}/${appDirName}/${serverXmlRelativePath}"
-def cicsXmlPath = "${workspace}/${appDirName}/${cicsXmlRelativePath}"
+def cicsXmlPath = processCicsXml ? "${workspace}/${appDirName}/${cicsXmlRelativePath}" : null
 
 log.info("Server XML relative path: ${serverXmlRelativePath}")
 log.info("Looking for server.xml at: ${serverXmlPath}")
-log.info("CICS XML relative path: ${cicsXmlRelativePath}")
-log.info("Looking for cics.xml at: ${cicsXmlPath}")
+if (processCicsXml) {
+    log.info("CICS XML relative path: ${cicsXmlRelativePath}")
+    log.info("Looking for cics.xml at: ${cicsXmlPath}")
+}
 
 // Verify server.xml exists
 def serverXmlFile = new File(serverXmlPath)
@@ -64,14 +68,18 @@ if (!serverXmlFile.exists()) {
     return 8
 }
 
-// Verify cics.xml exists
-def cicsXmlFile = new File(cicsXmlPath)
-if (!cicsXmlFile.exists()) {
-    log.error("cics.xml not found at: ${cicsXmlPath}")
-    return 8
+// Verify cics.xml exists (only if path was provided)
+def cicsXmlFile = null
+if (processCicsXml) {
+    cicsXmlFile = new File(cicsXmlPath)
+    if (!cicsXmlFile.exists()) {
+        log.error("cics.xml not found at: ${cicsXmlPath}")
+        return 8
+    }
+    log.info("Found server.xml and cics.xml")
+} else {
+    log.info("Found server.xml")
 }
-
-log.info("Found server.xml and cics.xml")
 
 // Set environment
 def envList = []
@@ -130,55 +138,64 @@ try {
     buildList.add(serverXmlRelativePath)
     log.info("Added ${serverXmlRelativePath} to BUILD_LIST (total files: ${buildList.size()})")
     
-    // Process cics.xml
-    log.info("=" * 80)
-    log.info("Processing cics.xml")
-    log.info("=" * 80)
-    
-    // Step 5: Copy cics.xml to output directory root
-    log.info("Step 5: Copying cics.xml to output directory")
-    def targetCicsXml = new File("${outputDirectory}/cics.xml")
-    def copyCicsCmd = "cp ${cicsXmlFile.absolutePath} ${targetCicsXml.absolutePath}"
-    def copyCicsProc = [shell, "-c", copyCicsCmd].execute(env, new File(workspace))
-    copyCicsProc.waitFor()
-    
-    if (copyCicsProc.exitValue() != 0) {
-        log.error("Failed to copy cics.xml file")
-        return 8
+    // Process cics.xml (only if path was provided)
+    def targetCicsXml = null
+    if (processCicsXml) {
+        log.info("=" * 80)
+        log.info("Processing cics.xml")
+        log.info("=" * 80)
+        
+        // Step 5: Copy cics.xml to output directory root
+        log.info("Step 5: Copying cics.xml to output directory")
+        targetCicsXml = new File("${outputDirectory}/cics.xml")
+        def copyCicsCmd = "cp ${cicsXmlFile.absolutePath} ${targetCicsXml.absolutePath}"
+        def copyCicsProc = [shell, "-c", copyCicsCmd].execute(env, new File(workspace))
+        copyCicsProc.waitFor()
+        
+        if (copyCicsProc.exitValue() != 0) {
+            log.error("Failed to copy cics.xml file")
+            return 8
+        }
+        
+        log.info("cics.xml copied to: ${targetCicsXml.absolutePath}")
+        
+        // Step 6: Create BuildMap for cics.xml
+        log.info("Step 6: Creating BuildMap for cics.xml")
+        
+        // Delete existing build map if it exists
+        if (buildGroup.buildMapExists(cicsXmlRelativePath)) {
+            log.info("Deleting existing build map for ${cicsXmlRelativePath}")
+            buildGroup.deleteBuildMap(cicsXmlRelativePath)
+        }
+        
+        // Create new build map
+        def cicsBuildMap = buildGroup.createBuildMap(cicsXmlRelativePath)
+        log.info("BuildMap created for ${cicsXmlRelativePath}")
+        
+        // Step 7: Add output to build map
+        log.info("Step 7: Adding USS file output to BuildMap")
+        def cicsOutputFilePath = "${outputDirectory}/cics.xml"
+        cicsBuildMap.addOutput(cicsOutputFilePath, "ZOSCONNECT-CONFIG", null, null)
+        log.info("Output added to BuildMap: ${cicsOutputFilePath} with deployType=ZOSCONNECT-CONFIG")
+        
+        // Step 8: Add cics.xml to BUILD_LIST
+        log.info("Step 8: Adding cics.xml to BUILD_LIST for Package task")
+        buildList.add(cicsXmlRelativePath)
+        log.info("Added ${cicsXmlRelativePath} to BUILD_LIST (total files: ${buildList.size()})")
+    } else {
+        log.info("=" * 80)
+        log.info("Skipping cics.xml processing (path not provided)")
+        log.info("=" * 80)
     }
-    
-    log.info("cics.xml copied to: ${targetCicsXml.absolutePath}")
-    
-    // Step 6: Create BuildMap for cics.xml
-    log.info("Step 6: Creating BuildMap for cics.xml")
-    
-    // Delete existing build map if it exists
-    if (buildGroup.buildMapExists(cicsXmlRelativePath)) {
-        log.info("Deleting existing build map for ${cicsXmlRelativePath}")
-        buildGroup.deleteBuildMap(cicsXmlRelativePath)
-    }
-    
-    // Create new build map
-    def cicsBuildMap = buildGroup.createBuildMap(cicsXmlRelativePath)
-    log.info("BuildMap created for ${cicsXmlRelativePath}")
-    
-    // Step 7: Add output to build map
-    log.info("Step 7: Adding USS file output to BuildMap")
-    def cicsOutputFilePath = "${outputDirectory}/cics.xml"
-    cicsBuildMap.addOutput(cicsOutputFilePath, "ZOSCONNECT-CONFIG", null, null)
-    log.info("Output added to BuildMap: ${cicsOutputFilePath} with deployType=ZOSCONNECT-CONFIG")
-    
-    // Step 8: Add cics.xml to BUILD_LIST
-    log.info("Step 8: Adding cics.xml to BUILD_LIST for Package task")
-    buildList.add(cicsXmlRelativePath)
-    log.info("Added ${cicsXmlRelativePath} to BUILD_LIST (total files: ${buildList.size()})")
     
     log.info("=" * 80)
     log.info("ServerXmlPackager completed successfully")
     log.info("=" * 80)
     log.info("Packaged files:")
     log.info("  - server.xml: ${targetServerXml.absolutePath}")
-    log.info("  - cics.xml: ${targetCicsXml.absolutePath}")
+    if (processCicsXml && targetCicsXml != null) {
+        log.info("  - cics.xml: ${targetCicsXml.absolutePath}")
+    }
     log.info("=" * 80)
     
 } catch (Exception e) {

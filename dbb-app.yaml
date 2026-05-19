@@ -30,6 +30,25 @@ application:
             - "src/frontend"
         - name: continueOnScanFailure
           value: true
+        - name: excludeFileList
+          value:
+            - ".**"
+            - "**/.**"
+            - "**.properties"
+            - "**.groovy"
+            - "**.json"
+            - "**.md"
+            - "**.sh"
+            - "**.jcl"
+            - "**.tar"
+            - "**.war"
+            - "**.html"
+            - "**.log"
+            - "**/operations/**"
+            - "**/zosAssets/**"
+            - "**/dbb-app.yaml"
+            - "**/zapp.yaml"
+            - "**/docker-compose.yaml"
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -47,6 +66,26 @@ application:
         
         - name: continueOnScanFailure
           value: true
+        
+        - name: excludeFileList
+          value:
+            - ".**"
+            - "**/.**"
+            - "**.properties"
+            - "**.groovy"
+            - "**.json"
+            - "**.md"
+            - "**.sh"
+            - "**.jcl"
+            - "**.tar"
+            - "**.war"
+            - "**.html"
+            - "**.log"
+            - "**/operations/**"
+            - "**/zosAssets/**"
+            - "**/dbb-app.yaml"
+            - "**/zapp.yaml"
+            - "**/docker-compose.yaml"
         
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems

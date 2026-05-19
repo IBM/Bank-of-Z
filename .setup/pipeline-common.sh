@@ -22,32 +22,8 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export LIB_DIR="$SCRIPTS_DIR/lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
+source "$LIB_DIR/utilities.sh"
 
-# =========================
-# Detect execution context
-# =========================
-detect_execution_mode() {
-    # Check if running from within Bank-of-Z repository
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" == "Bank-of-Z" ]]; then
-            EXECUTION_MODE="grub"
-            WORKSPACE_DIR="$(git rev-parse --show-toplevel)"
-            print_info "Execution mode: GRUB (running from repository)"
-        else
-            EXECUTION_MODE="unknown"
-            print_warning "Running from git repository but not Bank-of-Z"
-        fi
-    else
-        # Not in a git repo, assume VSCode workflow with cloned repo
-        EXECUTION_MODE="vscode"
-        # Workspace should be set by orchestrator or use current directory
-        WORKSPACE_DIR="${PIPELINE_WORKSPACE:-$(pwd)}"
-        print_info "Execution mode: VSCode (orchestrated)"
-    fi
-    
-    print_info "Workspace directory: $WORKSPACE_DIR"
-}
 
 # =========================
 # Get pipeline parameters

@@ -119,25 +119,10 @@ CMD="wazideploy-generate \
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-tmp_rc="/tmp/cmd_rc_gen_$$"
-
-(
-    ${CMD}
-    echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE] $line"
 done
-
-rc=$(cat "$tmp_rc")
-rm -f "$tmp_rc"
-
-if [ "$rc" -ne 0 ]; then
-    print_error "${RED}[WAZIDEPLOY]${NC} wazideploy-generate failed"
-    exit "$rc"
-fi
-
-print_info "${CYAN}[WAZIDEPLOY]${NC} wazideploy-generate completed successfully"
 
 # =========================
 # Deploy
@@ -176,4 +161,7 @@ rm -f message.log
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-${CMD}
+${CMD} | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
+do
+    print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
+done

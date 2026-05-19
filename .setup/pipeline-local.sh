@@ -129,7 +129,7 @@ stage_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     
-    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash .setup/pipeline-common.sh" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/pipeline.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-common.sh" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/pipeline.log; then
         # Check for errors in the log
         if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_warning "Pipeline completed but some warnings were detected"

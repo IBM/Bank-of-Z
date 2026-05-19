@@ -138,15 +138,15 @@ print_result "${GREEN}[DBB-BUILD][BUILD-LIST]${NC} ${DBB_LOG_FOLDER}/buildList.t
 # Skip packaging if nothing processed
 # =========================
 set +e
+rm -rf ${DBB_LOG_FOLDER}
+mkdir -p ${DBB_LOG_FOLDER}
+mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
+rm -rf "$PWD/logs"
 grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_result "${GREEN}[DBB-BUILD][TAR-PATH]${NC} NONE"
     exit 0
 fi
-rm -rf ${DBB_LOG_FOLDER}
-mkdir -p ${DBB_LOG_FOLDER}
-mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
-rm -rf "$PWD/logs"
 set -e
 
 # =========================

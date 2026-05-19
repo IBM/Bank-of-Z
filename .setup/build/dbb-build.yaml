@@ -45,7 +45,9 @@ lifecycles:
       - MetadataInit
       - FullAnalysis
       - Languages    # Defined in Languages.yaml
-      #- zOSConnect
+      - VanillaFrontend
+      - ServerXmlPackager
+      - zOSConnect
       - Package
       - Finish
 
@@ -68,7 +70,10 @@ lifecycles:
       - MetadataInit
       - ImpactAnalysis
       - Languages    # Defined in Languages.yaml
-      #- zOSConnect
+      - VanillaFrontend
+      - ServerXmlPackager
+      - zOSConnect
+      - Package
       - Finish
 
   - lifecycle: pipeline
@@ -88,7 +93,9 @@ lifecycles:
       - MetadataInit
       - ImpactAnalysis
       - Languages    # Defined in Languages.yaml
-      #- zOSConnect
+      - VanillaFrontend
+      - ServerXmlPackager
+      - zOSConnect
       - Package
       - Finish
 
@@ -200,11 +207,25 @@ tasks:
             copyMode: LOAD
           - deployType: PSBLOAD
             copyMode: LOAD
+          - deployType: CONFIG
+            copyMode: TEXT
+          - deployType: ZOSCONNECT-CONFIG
+            copyMode: TEXT
+          - deployType: WAR
+            copyMode: BINARY
 
   # build finialization
   - task: Finish
 
   - task: zOSConnect
+
+    # Custom task for Vanilla JS frontend build
+  - task: VanillaFrontend
+    script: groovy/VanillaFrontend.groovy
+
+  # Custom task for server.xml packaging
+  - task: ServerXmlPackager
+    script: groovy/ServerXmlPackager.groovy
   
   # default empty Languages stage
   # to be replaced by content of Languges.yaml

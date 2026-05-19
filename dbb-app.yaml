@@ -15,10 +15,40 @@
 # ============================================================
 
 version: 1.0.0
+
 application:
   name: BANKZ
 
   tasks:
+      # Variable overrides for the FullAnalysis task
+    - task: FullAnalysis
+      variables:
+        - name: sourceDirs
+          value:
+            - "src/base"
+            - "src/api/src/main/api"
+            - "src/frontend"
+        - name: continueOnScanFailure
+          value: true
+        - name: excludeFileList
+          value:
+            - ".**"
+            - "**/.**"
+            - "**.properties"
+            - "**.groovy"
+            - "**.json"
+            - "**.md"
+            - "**.sh"
+            - "**.jcl"
+            - "**.tar"
+            - "**.war"
+            - "**.html"
+            - "**.log"
+            - "**/operations/**"
+            - "**/zosAssets/**"
+            - "**/dbb-app.yaml"
+            - "**/zapp.yaml"
+            - "**/docker-compose.yaml"
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -28,6 +58,35 @@ application:
     # ----------------------------------------------------------
     - task: ImpactAnalysis
       variables:
+        - name: sourceDirs
+          value:
+            - "src/base"
+            - "src/api/src/main/api"
+            - "src/frontend"
+        
+        - name: continueOnScanFailure
+          value: true
+        
+        - name: excludeFileList
+          value:
+            - ".**"
+            - "**/.**"
+            - "**.properties"
+            - "**.groovy"
+            - "**.json"
+            - "**.md"
+            - "**.sh"
+            - "**.jcl"
+            - "**.tar"
+            - "**.war"
+            - "**.html"
+            - "**.log"
+            - "**/operations/**"
+            - "**/zosAssets/**"
+            - "**/dbb-app.yaml"
+            - "**/zapp.yaml"
+            - "**/docker-compose.yaml"
+        
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems
         #  value: true
@@ -206,8 +265,59 @@ application:
         #   IMSLOAD  - IMS program library (for all programs under ims/pli/)
         - name: deployType
           value: IMSLOAD
+          
+    - task: MetadataInit
+      variables:
+       - name: fileLocation # Location of file system metadata store.
+         value: /usr/local/sandboxes  # Default is the $HOME environment variable.
 
+    # ----------------------------------------------------------
+    # Custom Groovy tasks for frontend and configuration packaging
+    # Defined in: .setup/build/groovy/CustomTasks.yaml
+    # ----------------------------------------------------------
+    # VanillaFrontend task
+    # Packages the vanilla JavaScript/HTML frontend into a WAR file
+    # for deployment to z/OS Connect Liberty server.
+    # ----------------------------------------------------------
+    - task: VanillaFrontend
+      variables:
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
+        - name: javaHome
+          value: "/usr/local/sandboxes/tools/J17.0_64"
+        - name: vanillaFrontendPath
+          value: "src/frontend"
+        - name: vanillaWarName
+          value: "bank-frontend-vanilla.war"
 
+    # ----------------------------------------------------------
+    # ServerXmlPackager task
+    # Packages Liberty server.xml and cics.xml configuration files
+    # for z/OS Connect deployment. These files contain placeholders
+    # that will be replaced with environment-specific values during
+    # deployment.
+    # ----------------------------------------------------------
+    
+    - task: ServerXmlPackager
+      variables:
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
+        - name: serverXmlPath
+          value: "src/api/src/main/liberty/config/server.xml"
+        - name: cicsXmlPath
+          value: "src/api/src/main/liberty/config/cics.xml"
+    
+    - task: zOSConnect
+      variables:
+        - name: configSources
+          value:
+            - "**/src/main/api/openapi.yaml"
+        - name: gradleDebug
+          value: true
+        - name: gradlePath
+          value: "/usr/local/sandboxes/tools/gradle-9.4.1/bin/gradle"
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
     # ----------------------------------------------------------
     # Assembler task
     # Handles IMS control block sources: PSBs (Program Specification

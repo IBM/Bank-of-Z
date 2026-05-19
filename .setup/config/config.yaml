@@ -116,6 +116,13 @@ taz:
 zosconnect:
   # z/OS Connect installation
   zosconnect_home: /usr/lpp/IBM/zosconnect/bin/
+  # z/OS Connect server directory
+  server_dir: ${sandbox.path}/zosconnect-server
+  # z/OS Connect server name
+  server_name: bankOfZServer
+  # HTTP/HTTPS ports
+  http_port: 9080
+  https_port: 9443
 
 # Frontend (Node.js runtime)
 fronted:
@@ -126,8 +133,15 @@ fronted:
 zoau:
   zoau_home: /usr/lpp/IBM/zoautil
 
-# CICS attibutes
+# Zowe CLI configuration
+zowe:
+  # RSE profile name to use (optional, defaults to 'rse')
+  # Set via environment variable: export ZOWE_RSE_PROFILE=manzanita
+  rse_profile: ${RSE_PROFILE}
+
+# CICS attributes
 cics:
+  host: localhost
   user: ${CICS_USER} # env var
   password: ${CICS_PASSWORD} # env var
   cmci_port: 27100

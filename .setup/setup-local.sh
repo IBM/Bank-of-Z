@@ -41,10 +41,10 @@ load_config() {
 }
 
 #########################################################
-# STAGE 1: Initialize Remote Workspace
+# STAGE: Initialize Remote Workspace
 #########################################################
-stage1_initialize_remote_workspace() {
-    print_stage "STAGE 1: Initialize Remote Workspace"
+stage_initialize_remote_workspace() {
+    print_stage "STAGE: Initialize Remote Workspace"
     
     print_info "Target workspace: $PIPELINE_WORKSPACE"
     
@@ -73,10 +73,10 @@ stage1_initialize_remote_workspace() {
 }
 
 #########################################################
-# STAGE 2: Clone Bank of Z on Remote
+# STAGE: Clone Bank of Z on Remote
 #########################################################
-stage2_clone_bank_of_z() {
-    print_stage "STAGE 2: Clone Bank of Z on Remote"
+stage_clone_bank_of_z() {
+    print_stage "STAGE: Clone Bank of Z on Remote"
     
     local current_branch
     
@@ -147,10 +147,10 @@ stage2_clone_bank_of_z() {
 }
 
 #########################################################
-# STAGE 3: Execute Common Setup Script on Remote
+# STAGE: Execute Common Setup Script on Remote
 #########################################################
-stage3_execute_common_setup() {
-    print_stage "STAGE 3: Execute Common Setup Script on Remote"
+stage_execute_common_setup() {
+    print_stage "STAGE: Execute Common Setup Script on Remote"
     
     print_info "Executing setup-common.sh on remote z/OS USS..."
     print_info "This will:"
@@ -164,7 +164,7 @@ stage3_execute_common_setup() {
     print_info "Running: bash .setup/setup-common.sh"
     
     set -o pipefail
-    if zowe rse-api-for-zowe-cli issue unix-shell "bash .setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE/Bank-of-Z" 2>&1 | tee /tmp/remote-setup.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "bash  $BANK_DIR/.setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
         if grep -i "error\|failed" /tmp/remote-setup.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_warning "Setup completed but some warnings were detected"
@@ -200,9 +200,9 @@ main() {
     load_config "$1"
     
     # Execute stages
-    stage1_initialize_remote_workspace
-    stage2_clone_bank_of_z
-    stage3_execute_common_setup
+    stage_initialize_remote_workspace
+    stage_clone_bank_of_z
+    stage_execute_common_setup
     
     # Summary
     print_stage "ORCHESTRATION COMPLETE"

@@ -1,7 +1,7 @@
 #!/bin/env bash
-set -eu
+set -e
 # =============================================================================
-# Script  : create-db2-tables.sh
+# Script  : setup-db2-tables.sh
 # Summary : DB2 table creation
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
@@ -28,11 +28,15 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Create DB2 tables
 # =========================
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-drop.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-create.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"
-sleep 3
-submit_jcl "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"
-sleep 3
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-drop.jcl" "8"&
+# Wait for deployment to complete (ZOAU ISSUE)
+wait $PID
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-create.jcl"&
+# Wait for deployment to complete (ZOAU ISSUE)
+wait $PID
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"&
+# Wait for deployment to complete (ZOAU ISSUE)
+wait $PID
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"&
+# Wait for deployment to complete (ZOAU ISSUE)
+wait $PID

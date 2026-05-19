@@ -22,32 +22,8 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export LIB_DIR="$SCRIPTS_DIR/lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
+source "$LIB_DIR/utilities.sh"
 
-# =========================
-# Detect execution context
-# =========================
-detect_execution_mode() {
-    # Check if running from within Bank-of-Z repository
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" == "Bank-of-Z" ]]; then
-            EXECUTION_MODE="grub"
-            WORKSPACE_DIR="$(git rev-parse --show-toplevel)"
-            print_info "Execution mode: GRUB (running from repository)"
-        else
-            EXECUTION_MODE="unknown"
-            print_warning "Running from git repository but not Bank-of-Z"
-        fi
-    else
-        # Not in a git repo, assume VSCode workflow with cloned repo
-        EXECUTION_MODE="vscode"
-        # Workspace should be set by orchestrator or use current directory
-        WORKSPACE_DIR="${PIPELINE_WORKSPACE:-$(pwd)}"
-        print_info "Execution mode: VSCode (orchestrated)"
-    fi
-    
-    print_info "Workspace directory: $WORKSPACE_DIR"
-}
 
 # =========================
 # Get pipeline parameters
@@ -81,10 +57,10 @@ get_pipeline_parameters() {
 }
 
 # =======================================
-# Stage 1: Refresh git (VSCode only)
+# Stage: Refresh git (VSCode only)
 # =======================================
-stage1_refresh_git() {
-    print_stage "STAGE 1: Refresh Git Repository"
+stage_refresh_git() {
+    print_stage "STAGE: Refresh Git Repository"
     
     if [ "$EXECUTION_MODE" = "grub" ]; then
         print_info "GRUB mode: Skipping git refresh (already synced)"
@@ -111,10 +87,10 @@ stage1_refresh_git() {
 }
 
 # =======================================
-# Stage 2: DBB Build
+# Stage: DBB Build
 # =======================================
-stage2_dbb_build() {
-    print_stage "STAGE 2: DBB Build"
+stage_dbb_build() {
+    print_stage "STAGE: DBB Build"
     
     cd "$SCRIPTS_DIR"
     
@@ -130,10 +106,10 @@ stage2_dbb_build() {
 }
 
 # =======================================
-# Stage 3: Deploy Build
+# Stage: Deploy Build
 # =======================================
-stage3_deploy_build() {
-    print_stage "STAGE 3: Deploy Build"
+stage_deploy_build() {
+    print_stage "STAGE: Deploy Build"
     
     cd "$SCRIPTS_DIR"
     
@@ -177,9 +153,9 @@ main() {
     get_pipeline_parameters
     
     # Execute stages
-    stage1_refresh_git
-    stage2_dbb_build
-    stage3_deploy_build
+    stage_refresh_git
+    stage_dbb_build
+    stage_deploy_build
     
     # Summary
     print_stage "PIPELINE COMPLETE"

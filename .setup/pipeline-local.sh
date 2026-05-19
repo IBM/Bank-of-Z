@@ -53,10 +53,10 @@ get_pipeline_parameters() {
 }
 
 #########################################################
-# STAGE 1: Upload Pipeline Script
+# STAGE: Upload Pipeline Script
 #########################################################
-stage1_upload_pipeline_script() {
-    print_stage "STAGE 1: Upload Pipeline Script"
+stage_upload_pipeline_script() {
+    print_stage "STAGE: Upload Pipeline Script"
     
     local PIPELINE_SCRIPT_SOURCE="$SCRIPTS_DIR/pipeline-common.sh"
     local PIPELINE_SCRIPT_TARGET="$BANK_DIR/.setup/pipeline-common.sh"
@@ -84,10 +84,10 @@ stage1_upload_pipeline_script() {
 }
 
 #########################################################
-# STAGE 2: Upload Deploy Scripts
+# STAGE: Upload Deploy Scripts
 #########################################################
-stage2_upload_deploy_scripts() {
-    print_stage "STAGE 2: Upload Deploy Scripts"
+stage_upload_deploy_scripts() {
+    print_stage "STAGE: Upload Deploy Scripts"
     
     local DEPLOY_SOURCE="$SCRIPTS_DIR/deploy"
     local DEPLOY_TARGET="$BANK_DIR/.setup/deploy"
@@ -108,10 +108,10 @@ stage2_upload_deploy_scripts() {
 }
 
 #########################################################
-# STAGE 3: Execute Pipeline on Remote
+# STAGE: Execute Pipeline on Remote
 #########################################################
-stage3_execute_pipeline() {
-    print_stage "STAGE 3: Execute Pipeline on Remote"
+stage_execute_pipeline() {
+    print_stage "STAGE: Execute Pipeline on Remote"
     
     print_info "Executing pipeline-common.sh on remote z/OS USS..."
     print_info "This will:"
@@ -129,7 +129,7 @@ stage3_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     
-    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash .setup/pipeline-common.sh" --cwd "$BANK_DIR" 2>&1 | tee /tmp/pipeline.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-common.sh" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/pipeline.log; then
         # Check for errors in the log
         if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_warning "Pipeline completed but some warnings were detected"
@@ -165,9 +165,9 @@ main() {
     get_pipeline_parameters
     
     # Execute stages
-    stage1_upload_pipeline_script
-    stage2_upload_deploy_scripts
-    stage3_execute_pipeline
+    stage_upload_pipeline_script
+    stage_upload_deploy_scripts
+    stage_execute_pipeline
     
     # Summary
     print_stage "PIPELINE ORCHESTRATION COMPLETE"

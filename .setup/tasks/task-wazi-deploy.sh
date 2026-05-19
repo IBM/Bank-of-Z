@@ -26,10 +26,11 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 export PYENV_ACTIVATE_PATH="${PYENV_ACTIVATE_PATH:-$(get_section_value 'wazideploy' 'wazideploy_home')/bin/activate}"
 export DEPLOYMENT_METHOD="${DEPLOYMENT_METHOD:-$(get_section_value 'wazideploy' 'deployment_method')}"
 export DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-$(get_section_value 'wazideploy' 'deployment_envfile')}"
-export ZDEPLOY_FOLDER="${ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_folder')}"
+export ZDEPLOY_FOLDER="${ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_dir')}"
 export TARGET_HLQ="${TARGET_HLQ:-"$APP_BASE_NAME.$APP_ZOS_VERSION"}"
 export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 export DBB_LOG_FOLDER="${DBB_LOG_FOLDER:-$(get_section_value 'dbb' 'dbb_log_dir')}"
+export DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 'deploy_log_dir')}"
 export TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
 export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)"
 export INSTALL_APP="${1:-""}"
@@ -39,11 +40,12 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # Output directories
 # =========================
 timestamp=$(date +%F_%H-%M-%S)
-outputDir="${SCRIPTS_DIR}/logs"
+outputDir="${DEPLOY_LOG_FOLDER}"
 evidenceDir="${outputDir}/evidences"
-LOG_TAR="${SCRIPTS_DIR}/wazi-deploy-log.tar"
+LOG_TAR="${outputDir}/wazi-deploy-log.tar"
 EVIDENCE_FILE="${evidenceDir}/evidence.yaml"
 
+rm -rf "$outputDir" "$evidenceDir"
 mkdir -p "$outputDir" "$evidenceDir"
 
 # =========================
@@ -53,14 +55,12 @@ finalize_results() {
     RC=$?
 
     mkdir -p "$outputDir" "$evidenceDir"
-    cd "$SCRIPTS_DIR"
+    cd "$outputDir"
 
-    if ls logs/wazideploy*.log >/dev/null 2>&1; then
-        chtag -tc IBM-1047 logs/wazideploy*.log
+    if ls wazideploy*.log >/dev/null 2>&1; then
+        chtag -tc IBM-1047 wazideploy*.log
         a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate.console.log"
         a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy.console.log"
-        rm -f "$outputDir/wazideploy-generate.console.log"
-        rm -f "$outputDir/wazideploy-deploy.console.log"
         tar cf "$LOG_TAR" "logs" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$outputDir/wazi-deploy-console.log"
@@ -68,6 +68,13 @@ finalize_results() {
     fi
 
     print_result "${GREEN}[WAZIDEPLOY][LOG-PATH]${NC} $LOG_TAR"
+
+
+    if [ $RC -eq 0 ]; then
+        print_success "${GREEN}[DBB-BUILD]${NC} Process completed"
+    else
+        print_error "${RED}[DBB-BUILD]${NC} Process failed"
+    fi
 
     exit "$RC"
 }
@@ -112,25 +119,10 @@ CMD="wazideploy-generate \
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-tmp_rc="/tmp/cmd_rc_gen_$$"
-
-(
-    ${CMD}
-    echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE] $line"
 done
-
-rc=$(cat "$tmp_rc")
-rm -f "$tmp_rc"
-
-if [ "$rc" -ne 0 ]; then
-    print_error "${RED}[WAZIDEPLOY]${NC} wazideploy-generate failed"
-    exit "$rc"
-fi
-
-print_info "${CYAN}[WAZIDEPLOY]${NC} wazideploy-generate completed successfully"
 
 # =========================
 # Deploy
@@ -151,10 +143,10 @@ if [ -n "${CICS_PASSWORD:-}" ]; then
     CICS_CREDS="$CICS_CREDS -e default_cics_password=$CICS_PASSWORD"
 fi
 
-rm -rf "./work"
+rm -rf "${DEPLOY_LOG_FOLDER}/work"
 
 CMD="wazideploy-deploy \
- --workingFolder ./work \
+ --workingFolder ${DEPLOY_LOG_FOLDER}/work \
  --deploymentPlan $outputDir/deploymentPlan.yaml \
  --envFile $DEPLOY_ENV_FILE \
  -e application=$APP_BASE_NAME \
@@ -169,22 +161,7 @@ rm -f message.log
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-tmp_rc="/tmp/cmd_rc_deploy_$$"
-
-(
-    ${CMD}
-    echo $? > "$tmp_rc"
-) 2>&1 | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
+${CMD} | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
 done
-
-rc=$(cat "$tmp_rc")
-rm -f "$tmp_rc"
-
-if [ "$rc" -ne 0 ]; then
-    print_error "${RED}[WAZIDEPLOY]${NC} wazideploy-deploy failed"
-    exit "$rc"
-fi
-
-print_info "${CYAN}[WAZIDEPLOY]${NC} Deployment process completed successfully"

@@ -19,36 +19,11 @@ set -e  # Exit on error
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
-# =========================
-# Load configuration
-# =========================
-load_config() {
-    print_info "Loading configuration from $CONFIG_FILE..."
-    
-    if [ ! -f "$CONFIG_FILE" ]; then
-        print_error "Configuration file not found: $CONFIG_FILE"
-        exit 1
-    fi
-    
-    # Parse configuration values
-    if [[ -n "$1" ]]; then
-        PIPELINE_WORKSPACE="$1"
-    else
-        PIPELINE_WORKSPACE=$(get_section_value 'sandbox' 'path')
-    fi
-    DBB_REPO_URL=$(get_section_value 'repositories' 'url')
-    ZBUILDER_SOURCE="$SCRIPTS_DIR/$(get_section_value 'zbuilder' 'source_dir')"
-    ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
-    
-    print_success "Configuration loaded successfully"
-    echo "  Workspace: $PIPELINE_WORKSPACE"
-}
-
 #########################################################
-# STAGE 1: Initialize Working Directory
+# STAGE: Initialize Working Directory
 #########################################################
-stage1_initialize_workspace() {
-    print_stage "STAGE 1: Initialize Working Directory"
+stage_initialize_workspace() {
+    print_stage "STAGE: Initialize Working Directory"
     
     print_info "Target workspace: $PIPELINE_WORKSPACE"
     
@@ -81,10 +56,10 @@ stage1_initialize_workspace() {
 }
 
 #########################################################
-# STAGE 2: Clone Required Accelerators
+# STAGE: Clone Required Accelerators
 #########################################################
-stage2_clone_accelerators() {
-    print_stage "STAGE 2: Clone Required Accelerators"
+stage_clone_accelerators() {
+    print_stage "STAGE: Clone Required Accelerators"
     
     print_info "Cloning DBB repository..."
     print_info "Repository: $DBB_REPO_URL"
@@ -101,16 +76,21 @@ stage2_clone_accelerators() {
     
     # Check if dbb directory already exists
     if [ -d "$PIPELINE_WORKSPACE/dbb" ]; then
-        print_warning "DBB directory already exists: $PIPELINE_WORKSPACE/dbb"
-        read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Removing existing dbb directory..."
+        if [[ "$EXECUTION_MODE" == "grub" ]]; then
             rm -rf "$PIPELINE_WORKSPACE/dbb"
             print_success "Existing dbb directory removed"
         else
-            print_info "Keeping existing dbb directory"
-            return 0
+            print_warning "DBB directory already exists: $PIPELINE_WORKSPACE/dbb"
+            read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Removing existing dbb directory..."
+                rm -rf "$PIPELINE_WORKSPACE/dbb"
+                print_success "Existing dbb directory removed"
+            else
+                print_info "Keeping existing dbb directory"
+                return 0
+            fi
         fi
     fi
     
@@ -138,10 +118,10 @@ stage2_clone_accelerators() {
 }
 
 #########################################################
-# STAGE 3: Copy Build Framework
+# STAGE: Copy Build Framework
 #########################################################
-stage3_copy_framework() {
-    print_stage "STAGE 3: Copy Build Framework"
+stage_copy_framework() {
+    print_stage "STAGE: Copy Build Framework"
     
     # Print datasets configuration info
     print_info "Datasets configuration from datasets.yaml:"
@@ -167,16 +147,21 @@ stage3_copy_framework() {
     
     # Check if target directory already exists
     if [ -d "$ZBUILDER_TARGET" ]; then
-        print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
-        read -p "Do you want to delete and re-copy it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Removing existing zBuilder directory..."
+        if [[ "$EXECUTION_MODE" == "grub" ]]; then
             rm -rf "$ZBUILDER_TARGET"
             print_success "Existing zBuilder directory removed"
         else
-            print_info "Keeping existing zBuilder directory, skipping copy"
-            return 0
+            print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
+            read -p "Do you want to delete and re-copy it? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Removing existing zBuilder directory..."
+                rm -rf "$ZBUILDER_TARGET"
+                print_success "Existing zBuilder directory removed"
+            else
+                print_info "Keeping existing zBuilder directory, skipping copy"
+                return 0
+            fi
         fi
     fi
     
@@ -198,10 +183,10 @@ stage3_copy_framework() {
 }
 
 #########################################################
-# STAGE 4: Setup Bank of Z
+# STAGE: Setup Bank of Z
 #########################################################
-stage4_setup_bank_of_z() {
-    print_stage "STAGE 4: Setup Bank of Z"
+stage_setup_bank_of_z() {
+    print_stage "STAGE: Setup Bank of Z"
     
     local BANK_DIR
     local IN_REPO=false
@@ -236,24 +221,18 @@ stage4_setup_bank_of_z() {
     fi
     
     # Verify installation script exists
-    if [ ! -f "$BANK_DIR/.setup/create/create-application.sh" ]; then
-        print_error "Installation script not found: $BANK_DIR/.setup/create/create-application.sh"
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-application.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-application.sh"
         exit 1
     fi
     
     # Run installation script
     print_info "Running Bank of Z installation script..."
-    print_info "Executing: bash $BANK_DIR/.setup/create/create-application.sh"
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-application.sh"
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/create/create-application.sh 2>&1 | tee /tmp/build.log; then
-        # Check for errors in the log
-        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/build.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
-            print_error "Installation completed with errors (see /tmp/build.log)"
-            print_warning "Review the log file for details"
-            exit 1
-        fi
+    if bash .setup/setup/setup-application.sh; then
         print_success "Bank of Z installation completed successfully"
     else
         print_error "Failed to install Bank of Z"
@@ -267,49 +246,26 @@ stage4_setup_bank_of_z() {
 #########################################################
 main() {
     echo ""
-    echo -e "${GREEN}######################################################${NC}"
-    echo -e "${GREEN}#  Bank of Z - Common Setup Script (z/OS USS)        #${NC}"
-    echo -e "${GREEN}######################################################${NC}"
-    echo ""
     
     print_info "This script runs directly on z/OS USS"
     print_info "Execution mode: Native USS commands"
     echo ""
     
-    # Load configuration
-    load_config "$1"
+    # Detect Execution Mode
+    detect_execution_mode
     
     # Execute stages
-    stage1_initialize_workspace
-    stage2_clone_accelerators
-    stage3_copy_framework
-    stage4_setup_bank_of_z
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        stage_initialize_workspace
+    fi
+    stage_clone_accelerators
+    stage_copy_framework
+    stage_setup_bank_of_z
     
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
     
-    # Save environment info
-    cat > "$SCRIPTS_DIR/.env" << EOF
-PIPELINE_WORKSPACE=$PIPELINE_WORKSPACE
-SETUP_DATE=$(date)
-SETUP_USER=$USER
-SETUP_MODE=common
-EOF
-    chmod +x "$SCRIPTS_DIR/.env"
-    
-    echo ""
-    echo "Next steps:"
-    echo "  1. Review the setup in: $PIPELINE_WORKSPACE"
-    echo "  2. Check the Bank of Z installation"
-    echo "  3. Connect to CICS using x3270:"
-    echo "     - Enter 'logon applid(CICSBOZ)'"
-    echo "     - Enter 'OMEN' as transaction name"
-    echo "     - Enter 1 then 1234 as customer"
-    echo "  4. Run pipeline builds from: $BANK_DIR"
-    echo ""
-    print_info "Environment details saved to: $SCRIPTS_DIR/.env"
-    echo ""
 }
 
 # Run main function

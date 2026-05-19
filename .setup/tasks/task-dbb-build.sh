@@ -106,6 +106,11 @@ fi
 print_info "${CYAN}[DBB-BUILD]${NC} Starting DBB build in $DBB_CWD ..."
 cd "$DBB_CWD" || exit 1
 
+set +e
+rm -rf ${DBB_LOG_FOLDER}
+mkdir -p ${DBB_LOG_FOLDER}
+set -e
+
 dbb build "$BUILD_TYPE" --hlq "${APP_BASE_NAME}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line
 do
     case "$line" in
@@ -138,8 +143,6 @@ print_result "${GREEN}[DBB-BUILD][BUILD-LIST]${NC} ${DBB_LOG_FOLDER}/buildList.t
 # Skip packaging if nothing processed
 # =========================
 set +e
-rm -rf ${DBB_LOG_FOLDER}
-mkdir -p ${DBB_LOG_FOLDER}
 mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
 rm -rf "$PWD/logs"
 grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1

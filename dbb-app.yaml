@@ -247,7 +247,7 @@ application:
         - name: javaHome
           value: "/usr/local/sandboxes/tools/J17.0_64"
         - name: vanillaFrontendPath
-          value: "src/bank-application-frontend-vanilla"
+          value: "src/frontend"
         - name: vanillaWarName
           value: "bank-frontend-vanilla.war"
 
@@ -272,7 +272,7 @@ application:
       variables:
         - name: configSources
           value:
-            - "**/openapi.yaml"
+            - "**/src/main/api/openapi.yaml"
         - name: gradleDebug
           value: true
         - name: gradlePath

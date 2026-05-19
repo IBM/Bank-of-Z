@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -eu
+set -e
 # =============================================================================
 # Script  : setup-db2-tables.sh
 # Summary : DB2 table creation

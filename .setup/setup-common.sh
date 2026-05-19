@@ -266,27 +266,6 @@ main() {
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
     
-    # Save environment info
-    cat > "$SCRIPTS_DIR/.env" << EOF
-PIPELINE_WORKSPACE=$PIPELINE_WORKSPACE
-SETUP_DATE=$(date)
-SETUP_USER=$USER
-SETUP_MODE=common
-EOF
-    chmod +x "$SCRIPTS_DIR/.env"
-    
-    echo ""
-    echo "Next steps:"
-    echo "  1. Review the setup in: $PIPELINE_WORKSPACE"
-    echo "  2. Check the Bank of Z installation"
-    echo "  3. Connect to CICS using x3270:"
-    echo "     - Enter 'logon applid(CICSBOZ)'"
-    echo "     - Enter 'OMEN' as transaction name"
-    echo "     - Enter 1 then 1234 as customer"
-    echo "  4. Run pipeline builds from: $BANK_DIR"
-    echo ""
-    print_info "Environment details saved to: $SCRIPTS_DIR/.env"
-    echo ""
 }
 
 # Run main function

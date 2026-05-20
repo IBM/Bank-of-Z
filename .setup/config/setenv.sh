@@ -24,6 +24,7 @@ export APP_BASE_NAME_LOWER=$(echo "$APP_BASE_NAME" | tr '[:upper:]' '[:lower:]')
 export APP_ZOS_VERSION=$(get_section_value 'app' 'zos_version')
 export APP_VERSION=$(get_section_value 'app' 'zos_version')
 export SANDBOX_DIR=${SANDBOX_DIR:-$(get_section_value 'sandbox' 'path')}
+export DBB_REPO_URL=$(get_section_value 'repositories' 'url')
 export _BPXK_AUTOCVT=ON
 
 # =========================

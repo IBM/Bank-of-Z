@@ -251,6 +251,12 @@ main() {
     print_info "Execution mode: Native USS commands"
     echo ""
     
+    # Set PIPELINE_WORKSPACE from parameter if provided
+    if [[ -n "$1" ]]; then
+        export PIPELINE_WORKSPACE="$1"
+        print_info "Using workspace from parameter: $PIPELINE_WORKSPACE"
+    fi
+    
     # Detect Execution Mode
     detect_execution_mode
     

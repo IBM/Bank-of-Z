@@ -215,11 +215,23 @@ if [ -d "$EXTRACT_DIR" ]; then
         cd "$EXTRACT_DIR"
         
         # Create ZIP with all z/OS Connect artifacts
-        zip -r "$ZOSCONNECT_ZIP" \
-            $(find . -name "*.war" -type f 2>/dev/null) \
-            $(find . -name "server.xml" -type f 2>/dev/null) \
-            $(find . -name "cics.xml" -type f 2>/dev/null) \
-            2>/dev/null
+        # Build file list first to avoid command substitution issues
+        FILE_LIST=""
+        for war in $(find . -name "*.war" -type f 2>/dev/null); do
+            FILE_LIST="$FILE_LIST $war"
+        done
+        for xml in $(find . -name "server.xml" -o -name "cics.xml" -type f 2>/dev/null); do
+            FILE_LIST="$FILE_LIST $xml"
+        done
+        
+        if [ -n "$FILE_LIST" ]; then
+            zip -r "$ZOSCONNECT_ZIP" $FILE_LIST 2>/dev/null || {
+                print_error "${CYAN}[WAZIDEPLOY]${NC} Failed to create ZIP file"
+                print_error "${CYAN}[WAZIDEPLOY]${NC} zip command may not be available"
+                cd - > /dev/null
+                exit 1
+            }
+        fi
         
         cd - > /dev/null
         

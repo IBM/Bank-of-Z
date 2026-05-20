@@ -4,17 +4,17 @@
 # z/OS Connect Deployment Script for Bank-of-Z
 # VERSION: 2026-05-20-v3
 #
-# This script deploys z/OS Connect artifacts from a ZIP file
+# This script deploys z/OS Connect artifacts from a TAR file
 # created by Wazi Deploy.
 #
 # Usage:
-#   zosconnect-deploy.sh <artifacts_zip> <server_dir>
+#   zosconnect-deploy.sh <artifacts_tar> <server_dir>
 #
 # Parameters:
-#   artifacts_zip: ZIP file containing z/OS Connect artifacts
+#   artifacts_tar: TAR file containing z/OS Connect artifacts
 #   server_dir: Liberty server directory (WLP_USER_DIR)
 #
-# Note: This script expects the ZIP to contain:
+# Note: This script expects the TAR to contain:
 #   - WAR files (frontend)
 #   - server.xml (with placeholders for config values)
 #   - cics.xml (with placeholders for CICS connection)
@@ -57,26 +57,26 @@ log_info "Loaded configuration from config.yaml"
 
 # Validate parameters
 if [ $# -lt 2 ]; then
-    log_error "Usage: $0 <artifacts_zip> <server_dir>"
-    log_error "  artifacts_zip: ZIP file containing z/OS Connect artifacts"
+    log_error "Usage: $0 <artifacts_tar> <server_dir>"
+    log_error "  artifacts_tar: TAR file containing z/OS Connect artifacts"
     log_error "  server_dir: Liberty server directory (WLP_USER_DIR)"
     exit 1
 fi
 
-ARTIFACTS_ZIP="$1"
+ARTIFACTS_TAR="$1"
 SERVER_DIR="$2"
 APPS_DIR="${SERVER_DIR}/servers/${SERVER_NAME}/apps"
 CONFIG_DIR="${SERVER_DIR}/servers/${SERVER_NAME}"
 
 log_stage "z/OS Connect Deployment for Bank-of-Z"
 
-# Validate ZIP file exists
-if [ ! -f "$ARTIFACTS_ZIP" ]; then
-    log_error "Artifacts ZIP file not found: $ARTIFACTS_ZIP"
+# Validate TAR file exists
+if [ ! -f "$ARTIFACTS_TAR" ]; then
+    log_error "Artifacts TAR file not found: $ARTIFACTS_TAR"
     exit 1
 fi
 
-log_info "Artifacts ZIP: $ARTIFACTS_ZIP"
+log_info "Artifacts TAR: $ARTIFACTS_TAR"
 
 #########################################################
 # STEP 1: Ensure z/OS Connect server exists
@@ -119,17 +119,17 @@ log_success "Server validated"
 echo ""
 
 #########################################################
-# STEP 2: Extract ZIP to temporary directory
+# STEP 2: Extract TAR to temporary directory
 #########################################################
 log_info "Extracting z/OS Connect artifacts..."
 
 TEMP_EXTRACT_DIR="${outputDir:-/tmp}/zosconnect-extract-$$"
 mkdir -p "$TEMP_EXTRACT_DIR"
 
-unzip -q "$ARTIFACTS_ZIP" -d "$TEMP_EXTRACT_DIR"
+tar xf "$ARTIFACTS_TAR" -C "$TEMP_EXTRACT_DIR"
 
 if [ $? -ne 0 ]; then
-    log_error "Failed to extract ZIP file: $ARTIFACTS_ZIP"
+    log_error "Failed to extract TAR file: $ARTIFACTS_TAR"
     rm -rf "$TEMP_EXTRACT_DIR"
     exit 1
 fi

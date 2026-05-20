@@ -23,7 +23,7 @@ app:
 # Sandbox root directory (USS)
 sandbox:
   # Root path of the project on the remote server
-  path: /usr/local/sandboxes/bank-of-meyer
+  path: /usr/local/sandboxes/bank-of-z
 
 # Z configuration tools
 zconfig:

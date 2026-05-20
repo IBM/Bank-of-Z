@@ -208,35 +208,23 @@ if [ -d "$EXTRACT_DIR" ]; then
         [ -n "$SERVER_XML" ] && print_info "${CYAN}[WAZIDEPLOY]${NC}   - server.xml"
         [ -n "$CICS_XML" ] && print_info "${CYAN}[WAZIDEPLOY]${NC}   - cics.xml"
         
-        # Create a ZIP file of z/OS Connect artifacts for the deployment script
-        ZOSCONNECT_ZIP="${outputDir}/zosconnect-artifacts.zip"
-        print_info "${CYAN}[WAZIDEPLOY]${NC} Creating ZIP of z/OS Connect artifacts: $ZOSCONNECT_ZIP"
+        # Create a TAR file of z/OS Connect artifacts for the deployment script
+        ZOSCONNECT_TAR="${outputDir}/zosconnect-artifacts.tar"
+        print_info "${CYAN}[WAZIDEPLOY]${NC} Creating TAR of z/OS Connect artifacts: $ZOSCONNECT_TAR"
         
         cd "$EXTRACT_DIR"
         
-        # Create ZIP with all z/OS Connect artifacts
-        # Build file list first to avoid command substitution issues
-        FILE_LIST=""
-        for war in $(find . -name "*.war" -type f 2>/dev/null); do
-            FILE_LIST="$FILE_LIST $war"
-        done
-        for xml in $(find . -name "server.xml" -o -name "cics.xml" -type f 2>/dev/null); do
-            FILE_LIST="$FILE_LIST $xml"
-        done
-        
-        if [ -n "$FILE_LIST" ]; then
-            zip -r "$ZOSCONNECT_ZIP" $FILE_LIST 2>/dev/null || {
-                print_error "${CYAN}[WAZIDEPLOY]${NC} Failed to create ZIP file"
-                print_error "${CYAN}[WAZIDEPLOY]${NC} zip command may not be available"
-                cd - > /dev/null
-                exit 1
-            }
-        fi
+        # Create TAR with all z/OS Connect artifacts
+        tar cf "$ZOSCONNECT_TAR" \
+            $(find . -name "*.war" -type f 2>/dev/null) \
+            $(find . -name "server.xml" -type f 2>/dev/null) \
+            $(find . -name "cics.xml" -type f 2>/dev/null) \
+            2>/dev/null
         
         cd - > /dev/null
         
-        if [ -f "$ZOSCONNECT_ZIP" ]; then
-            print_success "${CYAN}[WAZIDEPLOY]${NC} Created z/OS Connect artifacts ZIP"
+        if [ -f "$ZOSCONNECT_TAR" ]; then
+            print_success "${CYAN}[WAZIDEPLOY]${NC} Created z/OS Connect artifacts TAR"
             
             ZOSCONNECT_DEPLOY_SCRIPT="$SCRIPTS_DIR/../deploy/zosconnect-deploy.sh"
             
@@ -246,8 +234,8 @@ if [ -d "$EXTRACT_DIR" ]; then
                 # Get z/OS Connect server directory from config.yaml
                 ZOSCONNECT_SERVER_DIR=$(get_section_value 'zosconnect' 'server_dir')
                 
-                # Pass the ZIP file to the deployment script
-                bash "$ZOSCONNECT_DEPLOY_SCRIPT" "$ZOSCONNECT_ZIP" "$ZOSCONNECT_SERVER_DIR"
+                # Pass the TAR file to the deployment script
+                bash "$ZOSCONNECT_DEPLOY_SCRIPT" "$ZOSCONNECT_TAR" "$ZOSCONNECT_SERVER_DIR"
                 
                 if [ $? -eq 0 ]; then
                     print_success "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment completed"

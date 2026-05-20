@@ -2,19 +2,19 @@
 
 #########################################################
 # z/OS Connect Deployment Script for Bank-of-Z
-# VERSION: 2026-05-15-v2
+# VERSION: 2026-05-20-v3
 #
-# This script deploys z/OS Connect artifacts from the
-# Wazi Deploy package extraction.
+# This script deploys z/OS Connect artifacts from a ZIP file
+# created by Wazi Deploy.
 #
 # Usage:
-#   zosconnect-deploy.sh <package_extract_dir> <server_dir>
+#   zosconnect-deploy.sh <artifacts_zip> <server_dir>
 #
 # Parameters:
-#   package_extract_dir: Directory where Wazi Deploy extracted the package
+#   artifacts_zip: ZIP file containing z/OS Connect artifacts
 #   server_dir: Liberty server directory (WLP_USER_DIR)
 #
-# Note: This script expects DBB to have built and packaged:
+# Note: This script expects the ZIP to contain:
 #   - WAR files (frontend)
 #   - server.xml (with placeholders for config values)
 #   - cics.xml (with placeholders for CICS connection)
@@ -57,18 +57,26 @@ log_info "Loaded configuration from config.yaml"
 
 # Validate parameters
 if [ $# -lt 2 ]; then
-    log_error "Usage: $0 <package_extract_dir> <server_dir>"
-    log_error "  package_extract_dir: Directory where Wazi Deploy extracted the package"
+    log_error "Usage: $0 <artifacts_zip> <server_dir>"
+    log_error "  artifacts_zip: ZIP file containing z/OS Connect artifacts"
     log_error "  server_dir: Liberty server directory (WLP_USER_DIR)"
     exit 1
 fi
 
-PACKAGE_EXTRACT_DIR="$1"
+ARTIFACTS_ZIP="$1"
 SERVER_DIR="$2"
 APPS_DIR="${SERVER_DIR}/servers/${SERVER_NAME}/apps"
 CONFIG_DIR="${SERVER_DIR}/servers/${SERVER_NAME}"
 
 log_stage "z/OS Connect Deployment for Bank-of-Z"
+
+# Validate ZIP file exists
+if [ ! -f "$ARTIFACTS_ZIP" ]; then
+    log_error "Artifacts ZIP file not found: $ARTIFACTS_ZIP"
+    exit 1
+fi
+
+log_info "Artifacts ZIP: $ARTIFACTS_ZIP"
 
 #########################################################
 # STEP 1: Ensure z/OS Connect server exists
@@ -111,24 +119,40 @@ log_success "Server validated"
 echo ""
 
 #########################################################
-# STEP 2: Validate directories
+# STEP 2: Extract ZIP to temporary directory
 #########################################################
-log_info "Validating server directory structure..."
+log_info "Extracting z/OS Connect artifacts..."
 
-if [ ! -d "$PACKAGE_EXTRACT_DIR" ]; then
-    log_error "Package extract directory not found: $PACKAGE_EXTRACT_DIR"
+TEMP_EXTRACT_DIR="${outputDir:-/tmp}/zosconnect-extract-$$"
+mkdir -p "$TEMP_EXTRACT_DIR"
+
+unzip -q "$ARTIFACTS_ZIP" -d "$TEMP_EXTRACT_DIR"
+
+if [ $? -ne 0 ]; then
+    log_error "Failed to extract ZIP file: $ARTIFACTS_ZIP"
+    rm -rf "$TEMP_EXTRACT_DIR"
     exit 1
 fi
+
+log_success "Artifacts extracted to: $TEMP_EXTRACT_DIR"
+echo ""
+
+#########################################################
+# STEP 3: Validate directories
+#########################################################
+log_info "Validating server directory structure..."
 
 if [ ! -d "$APPS_DIR" ]; then
     log_error "Apps directory not found: $APPS_DIR"
     log_error "Server may not have been created properly"
+    rm -rf "$TEMP_EXTRACT_DIR"
     exit 1
 fi
 
 if [ ! -d "$CONFIG_DIR" ]; then
     log_error "Config directory not found: $CONFIG_DIR"
     log_error "Server may not have been created properly"
+    rm -rf "$TEMP_EXTRACT_DIR"
     exit 1
 fi
 
@@ -136,13 +160,13 @@ log_success "Directory structure validated"
 echo ""
 
 #########################################################
-# STEP 3: Deploy WAR files from package
+# STEP 4: Deploy WAR files from extracted ZIP
 #########################################################
-log_info "Deploying WAR files from package..."
+log_info "Deploying WAR files..."
 
-# Find all WAR files in the extracted package
+# Find all WAR files in the extracted directory
 WAR_COUNT=0
-for WAR_FILE in $(find "$PACKAGE_EXTRACT_DIR" -name "*.war" -type f 2>/dev/null); do
+for WAR_FILE in $(find "$TEMP_EXTRACT_DIR" -name "*.war" -type f 2>/dev/null); do
     WAR_NAME=$(basename "$WAR_FILE")
     log_info "  Copying $WAR_NAME to $APPS_DIR/"
     cp "$WAR_FILE" "$APPS_DIR/"
@@ -151,7 +175,7 @@ for WAR_FILE in $(find "$PACKAGE_EXTRACT_DIR" -name "*.war" -type f 2>/dev/null)
 done
 
 if [ $WAR_COUNT -eq 0 ]; then
-    log_warn "No WAR files found in $PACKAGE_EXTRACT_DIR"
+    log_warn "No WAR files found in ZIP"
 else
     log_success "Deployed $WAR_COUNT WAR file(s)"
 fi
@@ -159,12 +183,12 @@ fi
 echo ""
 
 #########################################################
-# STEP 4: Deploy server.xml from package
+# STEP 5: Deploy server.xml from extracted ZIP
 #########################################################
 log_info "Deploying server.xml configuration..."
 
-# Find server.xml in the extracted package
-SERVER_XML_SOURCE=$(find "$PACKAGE_EXTRACT_DIR" -name "server.xml" -type f 2>/dev/null | head -1)
+# Find server.xml in the extracted directory
+SERVER_XML_SOURCE=$(find "$TEMP_EXTRACT_DIR" -name "server.xml" -type f 2>/dev/null | head -1)
 
 if [ -z "$SERVER_XML_SOURCE" ]; then
     log_warn "server.xml not found in package - using default server configuration"
@@ -194,12 +218,12 @@ fi
 echo ""
 
 #########################################################
-# STEP 5: Deploy cics.xml from package with substitution
+# STEP 6: Deploy cics.xml from extracted ZIP with substitution
 #########################################################
 log_info "Deploying cics.xml configuration..."
 
-# Find cics.xml in the extracted package
-CICS_XML_SOURCE=$(find "$PACKAGE_EXTRACT_DIR" -name "cics.xml" -type f 2>/dev/null | head -1)
+# Find cics.xml in the extracted directory
+CICS_XML_SOURCE=$(find "$TEMP_EXTRACT_DIR" -name "cics.xml" -type f 2>/dev/null | head -1)
 
 if [ -z "$CICS_XML_SOURCE" ]; then
     log_warn "cics.xml not found in package - skipping CICS configuration"
@@ -239,7 +263,15 @@ fi
 echo ""
 
 #########################################################
-# STEP 6: Configure RACF STARTED profile (if needed)
+# STEP 7: Cleanup temporary extraction directory
+#########################################################
+log_info "Cleaning up temporary files..."
+rm -rf "$TEMP_EXTRACT_DIR"
+log_success "Cleanup complete"
+echo ""
+
+#########################################################
+# STEP 8: Configure RACF STARTED profile (if needed)
 #########################################################
 log_stage "Configuring RACF STARTED Profile"
 
@@ -267,7 +299,7 @@ log_success "RACF STARTED profile configured"
 echo ""
 
 #########################################################
-# STEP 7: Generate JCL Proc for Server Start/Stop
+# STEP 9: Generate JCL Proc for Server Start/Stop
 #########################################################
 log_stage "Generating JCL Procedure"
 
@@ -311,7 +343,7 @@ log_success "JCL proc created in SYS1.PROCLIB(${STARTED_PROC_NAME})"
 echo ""
 
 #########################################################
-# STEP 8: Summary
+# STEP 10: Summary
 #########################################################
 log_stage "Deployment Summary"
 log_success "z/OS Connect artifacts deployed successfully"

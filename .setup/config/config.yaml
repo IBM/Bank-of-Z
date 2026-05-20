@@ -23,7 +23,7 @@ app:
 # Sandbox root directory (USS)
 sandbox:
   # Root path of the project on the remote server
-  path: /usr/local/sandboxes/bank-of-z
+  path: /usr/local/sandboxes/bank-of-meyer
 
 # Z configuration tools
 zconfig:
@@ -40,7 +40,7 @@ dbb:
   # DBB installation directory
   dbb_home: /usr/lpp/IBM/dbb
   # Java runtime for DBB
-  java_home: /usr/lpp/java/java21/current_64
+  java_home: /usr/local/sandboxes/tools/J17.0_64/bin
   # DBB build output directory
   dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
   # DBB application configuration file
@@ -137,7 +137,7 @@ zoau:
 zowe:
   # RSE profile name to use (optional, defaults to 'rse')
   # Set via environment variable: export ZOWE_RSE_PROFILE=manzanita
-  rse_profile: ${RSE_PROFILE}
+  rse_profile: manzanita
 
 # CICS attributes
 cics:

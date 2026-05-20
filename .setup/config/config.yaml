@@ -40,7 +40,7 @@ dbb:
   # DBB installation directory
   dbb_home: /usr/lpp/IBM/dbb
   # Java runtime for DBB
-  java_home: /usr/local/sandboxes/tools/J17.0_64/bin
+  java_home: /usr/local/sandboxes/tools/J17.0_64
   # DBB build output directory
   dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
   # DBB application configuration file

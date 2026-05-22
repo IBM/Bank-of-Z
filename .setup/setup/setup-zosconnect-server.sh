@@ -73,17 +73,17 @@ print_info "${CYAN}[ZOSCONNECT]${NC} Generating JCL proc..."
 # =========================
 # Generate server JCL proc
 # =========================
-# Create JCL - split long paths to stay under 80 chars
-cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
-//BAQ${APP_BASE_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
+# Create JCL with each line padded to exactly 80 characters for FB80 dataset
+cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << 'EOF'
+//BAQBANKZ  PROC PARMS='bankzServer --clean'
 //*
 //* z/OS Connect Enterprise Edition 3.0.0
 //* Start the Liberty server
 //*
 // SET ZCONHOME='/usr/lpp/IBM/zosconnect'
-// SET WLPDIR='${SANDBOX_DIR}/zosconnect-server'
+// SET WLPDIR='/usr/local/sandboxes/bank-of-z/zosconnect-server'
 //*
-//BAQ${APP_BASE_NAME}     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
+//BAQBANKZ     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
 //    TIME=NOLIMIT,
 //    PARM='PGM &ZCONHOME./bin/zosconnect run &PARMS.'
 //STDOUT   DD   SYSOUT=*
@@ -102,13 +102,13 @@ EOF
 # Remove temp file if it exists from previous run
 rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
-# Convert to EBCDIC
-iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+# Convert to EBCDIC and pad lines to 80 characters
+awk '{printf "%-80s\n", $0}' "/tmp/BAQ${APP_BASE_NAME}.jcl" | iconv -f ISO8859-1 -t IBM-1047 > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 chtag -tc IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
-# Copy to PROCLIB using cp with proper record format
+# Copy to PROCLIB using dcp
 print_info "${CYAN}[ZOSCONNECT]${NC} Copying JCL to SYS1.PROCLIB..."
-cp -W "recfm=fb,lrecl=80" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "//SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 # Clean up temp files
 rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"

@@ -73,8 +73,7 @@ print_info "${CYAN}[ZOSCONNECT]${NC} Generating JCL proc..."
 # =========================
 # Generate server JCL proc
 # =========================
-# Use short variable name to stay under 80 chars
-WLPDIR="${SANDBOX_DIR}/zosconnect-server"
+# Create JCL - split long paths to stay under 80 chars
 cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //BAQ${APP_BASE_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
 //*
@@ -82,6 +81,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //* Start the Liberty server
 //*
 // SET ZCONHOME='/usr/lpp/IBM/zosconnect'
+// SET WLPDIR='${SANDBOX_DIR}/zosconnect-server'
 //*
 //BAQ${APP_BASE_NAME}     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
 //    TIME=NOLIMIT,
@@ -92,9 +92,8 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //STDENV   DD   *
 _BPX_SHAREAS=YES
 JAVA_HOME=/usr/lpp/java/java21/current_64
-WLP_USER_DIR=${WLPDIR}
+WLP_USER_DIR=&WLPDIR.
 JVM_OPTIONS=-Xmx2048M
-#JVM_OPTIONS=<Optional JVM parameters>
 //*
 // PEND
 //*
@@ -105,7 +104,9 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
 # Convert to EBCDIC
 iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-chtag -r "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+chtag -tc IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+
+# Copy to PROCLIB using dcp
 dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 # Clean up temp files

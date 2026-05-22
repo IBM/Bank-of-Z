@@ -88,8 +88,10 @@ zcodescan:
 wazideploy:
   # Wazi Deploy installation
   wazideploy_home: /global/opt/pyenv/gdp
-  # Deployment method configuration file (combined CICS/DB2 + z/OS Connect)
-  deployment_method: ${sandbox.path}/Bank-of-Z/.setup/deploy/combined-deployment-method.yml
+  # CICS/DB2 deployment method (from DBB repo)
+  deployment_method_cics: ${sandbox.path}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml
+  # z/OS Connect deployment method
+  deployment_method_zosconnect: ${sandbox.path}/Bank-of-Z/.setup/deploy/zosconnect-deployment-method.yml
   # Environment-specific deployment configuration
   deployment_envfile: ${sandbox.path}/Bank-of-Z/.setup/deploy/Development.yml
   # Deploy types mapping file

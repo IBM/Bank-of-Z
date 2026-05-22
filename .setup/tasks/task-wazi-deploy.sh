@@ -24,7 +24,8 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # Environment
 # =========================
 export PYENV_ACTIVATE_PATH="${PYENV_ACTIVATE_PATH:-$(get_section_value 'wazideploy' 'wazideploy_home')/bin/activate}"
-export DEPLOYMENT_METHOD="${DEPLOYMENT_METHOD:-$(get_section_value 'wazideploy' 'deployment_method')}"
+export DEPLOYMENT_METHOD_CICS="${DEPLOYMENT_METHOD_CICS:-$(get_section_value 'wazideploy' 'deployment_method_cics')}"
+export DEPLOYMENT_METHOD_ZOSCONNECT="${DEPLOYMENT_METHOD_ZOSCONNECT:-$(get_section_value 'wazideploy' 'deployment_method_zosconnect')}"
 export DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-$(get_section_value 'wazideploy' 'deployment_envfile')}"
 export ZDEPLOY_FOLDER="${ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_dir')}"
 export TARGET_HLQ="${TARGET_HLQ:-"$APP_BASE_NAME.$APP_ZOS_VERSION"}"
@@ -125,28 +126,29 @@ fi
 source "${PYENV_ACTIVATE_PATH}"
 
 # =========================
-# Generate deployment plan
+# CICS/DB2 Deployment
 # =========================
-print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate"
+print_info "${CYAN}[WAZIDEPLOY]${NC} ========================================="
+print_info "${CYAN}[WAZIDEPLOY]${NC} CICS/DB2 Deployment"
+print_info "${CYAN}[WAZIDEPLOY]${NC} ========================================="
+
+print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate for CICS/DB2"
 
 CMD="wazideploy-generate \
- --deploymentMethod $DEPLOYMENT_METHOD \
- --deploymentPlan $outputDir/deploymentPlan.yaml \
- --deploymentPlanReport $outputDir/deploymentPlanReport.html \
+ --deploymentMethod $DEPLOYMENT_METHOD_CICS \
+ --deploymentPlan $outputDir/deploymentPlan-cics.yaml \
+ --deploymentPlanReport $outputDir/deploymentPlanReport-cics.html \
  --packageInputFile $PACKAGE_URL"
 
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate.console.log" | while IFS= read -r line
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate-cics.console.log" | while IFS= read -r line
 do
-    print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE] $line"
+    print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE-CICS] $line"
 done
 
-# =========================
-# Deploy
-# =========================
-print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy"
+print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for CICS/DB2"
 
 if [ "$INSTALL_APP" = "true" ]; then
     TAGS="-pt deploy"
@@ -162,31 +164,83 @@ if [ -n "${CICS_PASSWORD:-}" ]; then
     CICS_CREDS="$CICS_CREDS -e default_cics_password=$CICS_PASSWORD"
 fi
 
-rm -rf "${DEPLOY_LOG_FOLDER}/work"
+rm -rf "${DEPLOY_LOG_FOLDER}/work-cics"
 
 CMD="wazideploy-deploy \
- --workingFolder ${DEPLOY_LOG_FOLDER}/work \
- --deploymentPlan $outputDir/deploymentPlan.yaml \
+ --workingFolder ${DEPLOY_LOG_FOLDER}/work-cics \
+ --deploymentPlan $outputDir/deploymentPlan-cics.yaml \
  --envFile $DEPLOY_ENV_FILE \
  -e application=$APP_BASE_NAME \
  -e hlq=$TARGET_HLQ \
  -e deploy_cfg_home=$ZDEPLOY_FOLDER \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
- --evidencesFileName $EVIDENCE_FILE $TAGS"
+ --evidencesFileName ${evidenceDir}/evidence-cics.yaml $TAGS"
 
 rm -f message.log
 
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-${CMD} 2>&1 | tee "${outputDir}/wazideploy-deploy.console.log" | while IFS= read -r line
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-deploy-cics.console.log" | while IFS= read -r line
 do
-    print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
+    print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY-CICS] $line"
 done
 
-print_success "${CYAN}[WAZIDEPLOY]${NC} Deployment process completed successfully"
-print_info "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect artifacts deployed via Wazi Deploy deployment method"
+print_success "${CYAN}[WAZIDEPLOY]${NC} CICS/DB2 deployment completed successfully"
+
+# =========================
+# z/OS Connect Deployment
+# =========================
+print_info "${CYAN}[WAZIDEPLOY]${NC} ========================================="
+print_info "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect Deployment"
+print_info "${CYAN}[WAZIDEPLOY]${NC} ========================================="
+
+print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate for z/OS Connect"
+
+CMD="wazideploy-generate \
+ --deploymentMethod $DEPLOYMENT_METHOD_ZOSCONNECT \
+ --deploymentPlan $outputDir/deploymentPlan-zosconnect.yaml \
+ --deploymentPlanReport $outputDir/deploymentPlanReport-zosconnect.html \
+ --packageInputFile $PACKAGE_URL"
+
+print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
+print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
+
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate-zosconnect.console.log" | while IFS= read -r line
+do
+    print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE-ZOSCONNECT] $line"
+done
+
+print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for z/OS Connect"
+
+rm -rf "${DEPLOY_LOG_FOLDER}/work-zosconnect"
+
+# Set z/OS Connect specific variables
+ZOSCONNECT_VARS="-e zos_connect_root=${WLP_USER_DIR:-/usr/local/sandboxes/bank-of-z/zosconnect-server}"
+
+CMD="wazideploy-deploy \
+ --workingFolder ${DEPLOY_LOG_FOLDER}/work-zosconnect \
+ --deploymentPlan $outputDir/deploymentPlan-zosconnect.yaml \
+ --envFile $DEPLOY_ENV_FILE \
+ -e application=$APP_BASE_NAME \
+ -e hlq=$TARGET_HLQ \
+ -e deploy_cfg_home=$ZDEPLOY_FOLDER \
+ $ZOSCONNECT_VARS \
+ --packageInputFile $PACKAGE_URL \
+ --evidencesFileName ${evidenceDir}/evidence-zosconnect.yaml $TAGS"
+
+rm -f message.log
+
+print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
+print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
+
+${CMD} 2>&1 | tee "${outputDir}/wazideploy-deploy-zosconnect.console.log" | while IFS= read -r line
+do
+    print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY-ZOSCONNECT] $line"
+done
+
+print_success "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment completed successfully"
 
 # =========================
 # Cleanup

@@ -19,6 +19,9 @@
         allowCredentials="false"
         maxAge="3600" />
   
+  <!-- API Application -->
+  <webApplication id="api" location="api.war" name="api"/>
+  
   <!-- Include CICS connection configuration -->
   <include optional="false" location="cics.xml"/>
 </server>

@@ -58,6 +58,11 @@ default_db2_action: "REPLACE"
 # z/OS Connect
 zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
 zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQSTRT' }}"
+zosconnect_http_port: "{{ extra_vars.zosconnect_http_port if extra_vars.zosconnect_http_port is defined else '9080' }}"
+cics_host: "{{ extra_vars.cics_host if extra_vars.cics_host is defined else 'localhost' }}"
+cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '2006' }}"
+cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else 'IBMUSER' }}"
+cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defined else '' }}"
 
 # z/OS Connect artifact types and destinations
 types:
@@ -70,19 +75,20 @@ types:
    is_binary: True
 
 -  pattern: .*\.(xml)$
-   uss:
-      dest: '{{zos_connect_root}}'
-      backup_dest: '{{zos_connect_root}}/backup'
-      mode: '0755'
-   mode: '0644'
-   is_binary: False
+   type_name: 'zosconnect-config'
 
-# Template for WAR application configuration
-template_name_config_dropins_overrides:
-  src: 'zos_connect_app_config.j2'
-  dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name}}.xml'
-  mode: '0755'
+# Template for z/OS Connect configuration files (server.xml, cics.xml)
+template_name_zosconnect_config:
+  src: '{% raw %}{{config_file}}{% endraw %}'
+  dest: '{{zos_connect_root}}/{% raw %}{{config_file}}{% endraw %}'
+  mode: '0644'
   delegate: False
+  vars:
+    ZOSCONNECT_HTTP_PORT: '{{zosconnect_http_port}}'
+    CICS_HOST: '{{cics_host}}'
+    CICS_PORT: '{{cics_port}}'
+    CICS_USER: '{{cics_user}}'
+    CICS_PASSWORD: '{{cics_password}}'
 
 # System commands for z/OS Connect server management
 system_command_start_server:

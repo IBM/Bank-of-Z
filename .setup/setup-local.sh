@@ -51,13 +51,13 @@ stage_initialize_remote_workspace() {
     # Check if directory exists on remote system
     print_info "Checking if workspace directory exists on remote system..."
     
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "Workspace directory already exists: $PIPELINE_WORKSPACE"
         read -p "Do you want to delete and recreate it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_info "Deleting existing workspace directory..."
-            zowe rse-api-for-zowe-cli delete uss "$PIPELINE_WORKSPACE"
+            zowe rse-api-for-zowe-cli delete uss "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
             print_success "Existing workspace deleted"
         else
             print_info "Keeping existing workspace directory"
@@ -67,7 +67,7 @@ stage_initialize_remote_workspace() {
     
     # Create workspace directory
     print_info "Creating workspace directory on remote: $PIPELINE_WORKSPACE"
-    zowe rse-api-for-zowe-cli create uss-directory "$PIPELINE_WORKSPACE"
+    zowe rse-api-for-zowe-cli create uss-directory "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
     
     print_success "Remote workspace directory initialized: $PIPELINE_WORKSPACE"
 }
@@ -91,7 +91,7 @@ stage_clone_bank_of_z() {
     
     # Check if git is available on remote
     print_info "Checking git availability on remote system..."
-    if ! zowe rse-api-for-zowe-cli issue unix "which git" --cwd "$PIPELINE_WORKSPACE" &> /dev/null; then
+    if ! zowe rse-api-for-zowe-cli issue unix "which git" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG &> /dev/null; then
         print_error "Git is not available on the remote z/OS system"
         print_info "Please ensure git is installed and in the PATH on z/OS USS"
         exit 1
@@ -100,13 +100,13 @@ stage_clone_bank_of_z() {
     
     # Check if Bank-of-Z already exists
     print_info "Checking if Bank-of-Z directory already exists..."
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/Bank-of-Z" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/Bank-of-Z" $RSE_PROFILE_ARG &> /dev/null; then
         print_warning "Bank-of-Z directory already exists: $PIPELINE_WORKSPACE/Bank-of-Z"
         read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             print_info "Removing existing Bank-of-Z directory..."
-            zowe rse-api-for-zowe-cli issue unix "rm -rf Bank-of-Z" --cwd "$PIPELINE_WORKSPACE"
+            zowe rse-api-for-zowe-cli issue unix "rm -rf Bank-of-Z" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG
             print_success "Existing Bank-of-Z directory removed"
         else
             print_info "Keeping existing Bank-of-Z directory"
@@ -119,12 +119,12 @@ stage_clone_bank_of_z() {
     print_info "Cloning Bank of Z repository on remote (branch: $current_branch)..."
     print_info "This may take a few minutes..."
     
-    if zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $current_branch" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/clone.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git -b $current_branch" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG 2>&1 | tee /tmp/clone.log; then
         print_success "Bank of Z cloned successfully on remote system"
     else
         # Try with main branch if current branch fails
         print_warning "Failed to clone branch '$current_branch', trying 'main' branch..."
-        if zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/clone.log; then
+        if zowe rse-api-for-zowe-cli issue unix-shell "git clone https://github.com/IBM/Bank-of-Z.git" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG 2>&1 | tee /tmp/clone.log; then
             print_success "Bank of Z cloned successfully (main branch)"
         else
             print_error "Failed to clone Bank of Z repository on remote system"
@@ -138,7 +138,7 @@ stage_clone_bank_of_z() {
     
     # Verify the clone
     print_info "Verifying cloned repository..."
-    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/Bank-of-Z" &> /dev/null; then
+    if zowe rse-api-for-zowe-cli list uss "$PIPELINE_WORKSPACE/Bank-of-Z" $RSE_PROFILE_ARG &> /dev/null; then
         print_success "Repository verification successful"
     else
         print_error "Repository verification failed"
@@ -152,6 +152,9 @@ stage_clone_bank_of_z() {
 stage_execute_common_setup() {
     print_stage "STAGE: Execute Common Setup Script on Remote"
     
+    # Define BANK_DIR
+    BANK_DIR="$PIPELINE_WORKSPACE/Bank-of-Z"
+    
     print_info "Executing setup-common.sh on remote z/OS USS..."
     print_info "This will:"
     print_info "  - Initialize workspace"
@@ -161,10 +164,10 @@ stage_execute_common_setup() {
     echo ""
     
     # Execute the common setup script on remote
-    print_info "Running: bash .setup/setup-common.sh"
+    print_info "Running: bash $BANK_DIR/.setup/setup-common.sh $PIPELINE_WORKSPACE"
     
     set -o pipefail
-    if zowe rse-api-for-zowe-cli issue unix-shell "bash  $BANK_DIR/.setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE" 2>&1 | tee /tmp/remote-setup.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "bash $BANK_DIR/.setup/setup-common.sh $PIPELINE_WORKSPACE" --cwd "$PIPELINE_WORKSPACE" $RSE_PROFILE_ARG 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
         if grep -i "error\|failed" /tmp/remote-setup.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
             print_warning "Setup completed but some warnings were detected"

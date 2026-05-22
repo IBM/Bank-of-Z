@@ -1,0 +1,112 @@
+#*******************************************************************************
+# Licensed Materials - Property of IBM
+# (c) Copyright IBM Corp. 2026. All Rights Reserved.
+#
+# Note to U.S. Government Users Restricted Rights:
+# Use, duplication or disclosure restricted by GSA ADP Schedule
+# Contract with IBM Corp.
+#*******************************************************************************
+---
+apiVersion: deploy.ibm.com/v1
+kind: DeploymentMethod
+metadata:
+  name: 'z/OS Connect V3 deployment method'
+  version: '1.0.0'
+
+activities:
+
+  - name: 'Package'
+    actions:
+        - name: Package
+          steps:
+          - name: Package
+    tags:
+    - zosconnect_package
+
+  - name: 'Deploy WAR files'
+    description: 'Copy the z/OS Connect WAR files into the destination folder' 
+    actions:
+        - name: 'Copy to USS'
+          steps:
+          - name: USS_ARCHIVE
+            when: environment.restore_artifact is not defined or environment.restore_artifact == False
+          - name: USS_COPY
+            when: environment.restore_artifact is not defined or environment.restore_artifact == False
+          - name: USS_RESTORE
+            when: environment.restore_artifact is defined and environment.restore_artifact == True
+    types:
+       - name: 'war'
+    tags:
+    - zosconnect_copy
+    is_artifact: True
+
+  - name: 'Deploy Config Files'
+    description: 'Copy the z/OS Connect configuration files (server.xml, cics.xml) into the destination folder' 
+    actions:
+        - name: 'Copy to USS'
+          steps:
+          - name: USS_ARCHIVE
+            when: environment.restore_artifact is not defined or environment.restore_artifact == False
+          - name: USS_COPY
+            when: environment.restore_artifact is not defined or environment.restore_artifact == False
+          - name: USS_RESTORE
+            when: environment.restore_artifact is defined and environment.restore_artifact == True
+    types:
+       - name: 'zosconnect-config'
+    tags:
+    - zosconnect_config
+    is_artifact: True
+
+  - name: 'Create WAR Config'
+    description: 'Create the z/OS Connect application config file for each WAR' 
+    actions:
+        - name: CONFIG_FILE
+          steps:
+          - name: TEMPLATE
+            properties:
+            - key: "var_template_name"
+              value: "template_name_config_dropins_overrides"
+            loop:
+               loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
+               loop_var: "api_name"
+    types:
+       - name: 'war'
+    tags:
+    - zosconnect_war_config
+    is_artifact: True
+
+  - name: 'Start z/OS Connect Server'
+    description: 'Start the z/OS Connect server if not already running'
+    actions:
+        - name: SYSTEM_COMMAND
+          steps:
+          - name: 'Start Server'
+            properties:
+            - key: 'template'
+              value: 'system_command'
+            - key: 'var_system_command'
+              value: 'system_command_start_server'
+    tags:
+    - zosconnect_start
+
+  - name: 'Refresh z/OS Connect'
+    description: 'Refresh z/OS Connect config and applications'
+    actions:
+        - name: SYSTEM_COMMAND
+          steps:
+          - name: 'Refresh z/OS Config'
+            properties:
+            - key: 'template'
+              value: 'system_command'
+            - key: 'var_system_command'
+              value: 'system_command_refresh_config'
+          - name: 'Refresh z/OS Applications'
+            properties:
+            - key: 'template'
+              value: 'system_command'
+            - key: 'var_system_command'
+              value: 'system_command_refresh_apps'
+    tags:
+    - zosconnect_refresh
+
+# Made with Bob

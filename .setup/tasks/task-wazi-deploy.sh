@@ -185,78 +185,8 @@ do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [DEPLOY] $line"
 done
 
-print_info "${CYAN}[WAZIDEPLOY]${NC} Deployment process completed successfully"
-
-# =========================
-# Deploy z/OS Connect artifacts
-# =========================
-print_info "${CYAN}[WAZIDEPLOY]${NC} Preparing z/OS Connect artifacts for deployment"
-
-# Find the extraction directory from wazi-deploy work folder
-EXTRACT_DIR="${DEPLOY_LOG_FOLDER}/work"
-
-# Check if z/OS Connect artifacts exist in the extracted package
-if [ -d "$EXTRACT_DIR" ]; then
-    # Look for WAR files or server.xml/cics.xml in the extracted package
-    WAR_FILES=$(find "$EXTRACT_DIR" -name "*.war" -type f 2>/dev/null | wc -l)
-    SERVER_XML=$(find "$EXTRACT_DIR" -name "server.xml" -type f 2>/dev/null | head -1)
-    CICS_XML=$(find "$EXTRACT_DIR" -name "cics.xml" -type f 2>/dev/null | head -1)
-    
-    if [ "$WAR_FILES" -gt 0 ] || [ -n "$SERVER_XML" ] || [ -n "$CICS_XML" ]; then
-        print_info "${CYAN}[WAZIDEPLOY]${NC} Found z/OS Connect artifacts in package:"
-        [ "$WAR_FILES" -gt 0 ] && print_info "${CYAN}[WAZIDEPLOY]${NC}   - $WAR_FILES WAR file(s)"
-        [ -n "$SERVER_XML" ] && print_info "${CYAN}[WAZIDEPLOY]${NC}   - server.xml"
-        [ -n "$CICS_XML" ] && print_info "${CYAN}[WAZIDEPLOY]${NC}   - cics.xml"
-        
-        # Create a TAR file of z/OS Connect artifacts for the deployment script
-        ZOSCONNECT_TAR="${outputDir}/zosconnect-artifacts.tar"
-        print_info "${CYAN}[WAZIDEPLOY]${NC} Creating TAR of z/OS Connect artifacts: $ZOSCONNECT_TAR"
-        
-        cd "$EXTRACT_DIR"
-        
-        # Create TAR with all z/OS Connect artifacts
-        tar cf "$ZOSCONNECT_TAR" \
-            $(find . -name "*.war" -type f 2>/dev/null) \
-            $(find . -name "server.xml" -type f 2>/dev/null) \
-            $(find . -name "cics.xml" -type f 2>/dev/null) \
-            2>/dev/null
-        
-        cd - > /dev/null
-        
-        if [ -f "$ZOSCONNECT_TAR" ]; then
-            print_success "${CYAN}[WAZIDEPLOY]${NC} Created z/OS Connect artifacts TAR"
-            
-            ZOSCONNECT_DEPLOY_SCRIPT="$SCRIPTS_DIR/../deploy/zosconnect-deploy.sh"
-            
-            if [ -f "$ZOSCONNECT_DEPLOY_SCRIPT" ]; then
-                print_info "${CYAN}[WAZIDEPLOY]${NC} Calling z/OS Connect deployment script"
-                
-                # Get z/OS Connect server directory from config.yaml
-                ZOSCONNECT_SERVER_DIR=$(get_section_value 'zosconnect' 'server_dir')
-                
-                # Pass the TAR file to the deployment script
-                bash "$ZOSCONNECT_DEPLOY_SCRIPT" "$ZOSCONNECT_TAR" "$ZOSCONNECT_SERVER_DIR"
-                
-                if [ $? -eq 0 ]; then
-                    print_success "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment completed"
-                else
-                    print_error "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment failed"
-                    exit 1
-                fi
-            else
-                print_warning "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect deployment script not found at: $ZOSCONNECT_DEPLOY_SCRIPT"
-            fi
-        else
-            print_error "${CYAN}[WAZIDEPLOY]${NC} Failed to create z/OS Connect artifacts ZIP"
-            exit 1
-        fi
-    else
-        print_info "${CYAN}[WAZIDEPLOY]${NC} No z/OS Connect artifacts found in package - skipping deployment"
-    fi
-else
-    print_warning "${CYAN}[WAZIDEPLOY]${NC} Extraction directory not found at: $EXTRACT_DIR"
-    print_info "${CYAN}[WAZIDEPLOY]${NC} Wazi Deploy may not have extracted the package yet"
-fi
+print_success "${CYAN}[WAZIDEPLOY]${NC} Deployment process completed successfully"
+print_info "${CYAN}[WAZIDEPLOY]${NC} z/OS Connect artifacts deployed via Wazi Deploy deployment method"
 
 # =========================
 # Cleanup

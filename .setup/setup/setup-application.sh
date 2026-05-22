@@ -5,7 +5,11 @@ set -e
 # Summary : Full application installation orchestrator
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
-# Sequentially executes all installation stages.
+# Sequentially executes all installation stages in the following order:
+#
+# 1. Install/Setup Middleware (CICS, IMS, z/OS Connect, DB2 Tables)
+# 2. DBB Build (LOAD, DBRM, PSB, DBD, WAR - API & Frontend)
+# 3. Wazi Deploy (deploys all artifacts including z/OS Connect)
 # =============================================================================
 
 # =========================
@@ -24,29 +28,17 @@ source "$LIB_DIR/prerequisites.sh"
 #    exit 1
 #fi
 
-# =========================
-# Stage: DBB Build
-# =========================
-cd "$SCRIPTS_DIR"
-print_stage "STAGE: DBB Build"
-bash ../tasks/task-dbb-build.sh full
+# =============================================================================
+# PHASE 1: Install/Setup Middleware
+# =============================================================================
+print_stage "PHASE 1: Install/Setup Middleware"
 
 # =========================
-# Stage: Deploy Build
+# Stage: Create z/OS Connect Server
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE: Deploy Build"
-bash ../tasks/task-wazi-deploy.sh true&
-# ZOAU Issue with ZOWE
-PID=$!
-wait $PID
-
-# =========================
-# Stage: Create DB2 database
-# =========================
-cd "$SCRIPTS_DIR"
-print_stage "STAGE: Create DB2 database"
-bash ./setup-db2-tables.sh
+print_stage "STAGE: Create z/OS Connect Server"
+bash ./setup-zosconnect-server.sh
 
 # =========================
 # Stage: Create CICS region
@@ -58,14 +50,46 @@ bash ./setup-cics-region.sh&
 PID=$!
 wait $PID
 RC=$?
-print_stage "Creation done with RC=$RC"
+print_stage "CICS region creation done with RC=$RC"
 
 # =========================
-# Stage: Create z/OS Connect Server
+# Stage: Create IMS (if applicable)
 # =========================
-#cd "$SCRIPTS_DIR"
-#print_stage "STAGE: Create z/OS Connect Server"
-#bash ./setup-zosconnect-server.sh
+# TODO: Add IMS setup when available
+# cd "$SCRIPTS_DIR"
+# print_stage "STAGE: Create IMS"
+# bash ./setup-ims.sh
+
+# =========================
+# Stage: Create DB2 database
+# =========================
+cd "$SCRIPTS_DIR"
+print_stage "STAGE: Create DB2 database"
+bash ./setup-db2-tables.sh
+
+print_success "PHASE 1: Middleware setup completed"
+
+# =============================================================================
+# PHASE 2: DBB Build
+# =============================================================================
+cd "$SCRIPTS_DIR"
+print_stage "PHASE 2: DBB Build"
+bash ../tasks/task-dbb-build.sh full
+
+print_success "PHASE 2: DBB Build completed"
+
+# =============================================================================
+# PHASE 3: Wazi Deploy
+# =============================================================================
+cd "$SCRIPTS_DIR"
+print_stage "PHASE 3: Wazi Deploy"
+bash ../tasks/task-wazi-deploy.sh true&
+# ZOAU Issue with ZOWE
+PID=$!
+wait $PID
+RC=$?
+
+print_success "PHASE 3: Wazi Deploy completed with RC=$RC"
 
 # =========================
 # Stage: Create application frontend

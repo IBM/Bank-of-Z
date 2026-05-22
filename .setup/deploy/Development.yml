@@ -55,6 +55,54 @@ default_db2_subsys: "DBD1"
 default_db2_plan_pklist: "NULLID.*,BANKZPACK.*"
 default_db2_action: "REPLACE"
 
+# z/OS Connect
+zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
+zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQSTRT' }}"
+
+# z/OS Connect artifact types and destinations
+types:
+-  pattern: .*\.war$
+   uss:
+      dest: '{{zos_connect_root}}/apps'
+      backup_dest: '{{zos_connect_root}}/backup/apps'
+      mode: '0755'
+   mode: '0777'
+   is_binary: True
+
+-  pattern: .*\.(xml)$
+   uss:
+      dest: '{{zos_connect_root}}'
+      backup_dest: '{{zos_connect_root}}/backup'
+      mode: '0755'
+   mode: '0644'
+   is_binary: False
+
+# Template for WAR application configuration
+template_name_config_dropins_overrides:
+  src: 'zos_connect_app_config.j2'
+  dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name}}.xml'
+  mode: '0755'
+  delegate: False
+
+# System commands for z/OS Connect server management
+system_command_start_server:
+  cmd: 'S {{zos_connect_job_name}}'
+  verbose: false
+  wait_time_s: 5
+  wait: true
+
+system_command_refresh_config:
+  cmd: 'MODIFY {{zos_connect_job_name}},REFRESH,CONFIG'
+  verbose: false
+  wait_time_s: 3
+  wait: true
+
+system_command_refresh_apps:
+  cmd: 'MODIFY {{zos_connect_job_name}},REFRESH,APPS'
+  verbose: false
+  wait_time_s: 3
+  wait: true
+
 # load shared configuration
 include_global_config:
   files_list:

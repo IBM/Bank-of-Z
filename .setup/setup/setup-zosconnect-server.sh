@@ -2,14 +2,14 @@
 set -eu
 # =============================================================================
 # Script  : setup-zosconnect-server.sh
-# Summary : Create and configure z/OS Connect Server
+# Summary : Create z/OS Connect Server (if it doesn't exist)
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
-# - Creates z/OS Connect server instance
+# - Creates z/OS Connect server instance if it doesn't exist
 # - Configures RACF STARTED profile
-# - Deploys API WAR file
 # - Generates server JCL proc in SYS1.PROCLIB
-# - Starts the server
+#
+# NOTE: Deployment of WAR files and configuration is handled by Wazi Deploy
 # =============================================================================
 
 # =========================
@@ -34,24 +34,25 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 export WLP_USER_DIR="${SANDBOX_DIR}/zosconnect-server"
 
 # =========================
-# Create z/OS Connect server
+# Create z/OS Connect server (if it doesn't exist)
 # =========================
 print_stage "Create z/OS Connect Server"
-print_info "${CYAN}[ZOSCONNECT]${NC} Creating z/OS Connect server at: $WLP_USER_DIR"
 
-if [ -d "$WLP_USER_DIR" ]; then
-    print_warning "Removing existing server at $WLP_USER_DIR"
-    rm -rf "$WLP_USER_DIR"
-fi
-
-"${ZOSCONNECT_HOME}/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
-
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "z/OS Connect server created successfully at $WLP_USER_DIR"
+if [ -d "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server" ]; then
+    print_info "${CYAN}[ZOSCONNECT]${NC} Server already exists at: ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server"
+    print_info "${CYAN}[ZOSCONNECT]${NC} Skipping server creation"
 else
-    print_error "Failed to create z/OS Connect server (RC=$RC)"
-    exit 1
+    print_info "${CYAN}[ZOSCONNECT]${NC} Creating z/OS Connect server at: $WLP_USER_DIR"
+    
+    "${ZOSCONNECT_HOME}/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
+    
+    RC=$?
+    if [ $RC -eq 0 ]; then
+        print_success "z/OS Connect server created successfully at ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server"
+    else
+        print_error "Failed to create z/OS Connect server (RC=$RC)"
+        exit 1
+    fi
 fi
 
 # =========================
@@ -64,29 +65,6 @@ tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH"
 mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 set -e
-
-# =========================
-# Deploy API WAR file
-# =========================
-cp "${SANDBOX_DIR}/zDevOps/applications/${APP_BASE_NAME}/application/src/logs/package/war/${APP_BASE_NAME_LOWER}-api.war" \
-   "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/apps"
-
-echo "<server><webApplication id=\"${APP_BASE_NAME_LOWER}-api\" location=\"\${server.config.dir}/apps/${APP_BASE_NAME_LOWER}-api.war\" name=\"${APP_BASE_NAME_LOWER}-api\" contextRoot=\"/${APP_BASE_NAME_LOWER}-api\"/></server>" \
-    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/${APP_BASE_NAME_LOWER}-api.xml"
-
-# =========================
-# Generate CICS connection config
-# =========================
-cat > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<server description="IPIC connection to CICS">
-    <featureManager>
-        <feature>zosconnect:cics-1.0</feature>
-    </featureManager>
-    <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="4321" sysid="ZC01" authDataRef="cicsCredentials" />
-    <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
-</server>
-EOF
 
 # =========================
 # Generate server JCL proc
@@ -119,9 +97,5 @@ a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
 chtag -r "/tmp/BAQ${APP_BASE_NAME}"
 dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
-# =========================
-# Start server
-# =========================
-opercmd "S BAQ${APP_BASE_NAME}" & 2>/dev/null
-sleep 10
-print_success "z/OS Connect server started successfully"
+print_success "z/OS Connect server setup completed"
+print_info "${CYAN}[ZOSCONNECT]${NC} Server will be started by Wazi Deploy after artifact deployment"

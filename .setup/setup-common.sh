@@ -19,6 +19,46 @@ set -e  # Exit on error
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
+
+# Function: detect_bank_of_z_location
+# Description: Detects whether running inside Bank-of-Z repo or uses cloned version
+# Returns: Sets BANK_DIR variable with the repository path
+# Exit codes: 0 on success, 1 if repository not found
+detect_bank_of_z_location() {
+    local IN_REPO=false
+    
+    # Detect if we're already in the Bank-of-Z repository
+    print_info "Detecting Bank of Z location..."
+    
+    # Check if current directory is a git repo and if it's Bank-of-Z
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+        if [[ "$repo_name" == "Bank-of-Z" ]]; then
+            IN_REPO=true
+            BANK_DIR="$(git rev-parse --show-toplevel)"
+            print_info "Running from within Bank-of-Z repository"
+            print_info "Repository location: $BANK_DIR"
+            print_success "Using current repository (GRUB workflow detected)"
+        fi
+    fi
+    
+    # If not in repo, use the cloned version in workspace
+    if [ "$IN_REPO" = false ]; then
+        BANK_DIR="$BANK_OF_Z_WORK_DIR/Bank-of-Z"
+        print_info "Using cloned repository at: $BANK_DIR"
+        
+        if [ ! -d "$BANK_DIR" ]; then
+            print_error "Bank-of-Z not found at: $BANK_DIR"
+            print_info "Expected location: $BANK_DIR"
+            print_info "This should have been cloned by the orchestrator script"
+            return 1
+        fi
+        print_success "Found Bank-of-Z at workspace location (VSCode workflow detected)"
+    fi
+    
+    return 0
+}
+
 #########################################################
 # STAGE: Initialize Working Directory
 #########################################################
@@ -183,42 +223,12 @@ stage_copy_framework() {
 }
 
 #########################################################
-# STAGE: Setup Bank of Z
+# STAGE: Setup Bank of Z application
 #########################################################
 stage_setup_bank_of_z() {
     print_stage "STAGE: Setup Bank of Z"
     
-    local BANK_DIR
-    local IN_REPO=false
-    
-    # Detect if we're already in the Bank-of-Z repository
-    print_info "Detecting Bank of Z location..."
-    
-    # Check if current directory is a git repo and if it's Bank-of-Z
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" == "Bank-of-Z" ]]; then
-            IN_REPO=true
-            BANK_DIR="$(git rev-parse --show-toplevel)"
-            print_info "Running from within Bank-of-Z repository"
-            print_info "Repository location: $BANK_DIR"
-            print_success "Using current repository (GRUB workflow detected)"
-        fi
-    fi
-    
-    # If not in repo, use the cloned version in workspace
-    if [ "$IN_REPO" = false ]; then
-        BANK_DIR="$BANK_OF_Z_WORK_DIR/Bank-of-Z"
-        print_info "Using cloned repository at: $BANK_DIR"
-        
-        if [ ! -d "$BANK_DIR" ]; then
-            print_error "Bank-of-Z not found at: $BANK_DIR"
-            print_info "Expected location: $BANK_DIR"
-            print_info "This should have been cloned by the orchestrator script"
-            exit 1
-        fi
-        print_success "Found Bank-of-Z at workspace location (VSCode workflow detected)"
-    fi
+    detect_bank_of_z_location
     
     # Verify installation script exists
     if [ ! -f "$BANK_DIR/.setup/setup/setup-application.sh" ]; then
@@ -227,18 +237,77 @@ stage_setup_bank_of_z() {
     fi
     
     # Run installation script
-    print_info "Running Bank of Z installation script..."
+    print_info "Running Bank of Z application script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-application.sh"
     cd "$BANK_DIR"
     
     set -o pipefail
     if bash .setup/setup/setup-application.sh; then
-        print_success "Bank of Z installation completed successfully"
+        print_success "Bank of Z application setup completed successfully"
     else
         print_error "Failed to install Bank of Z"
         print_info "Check /tmp/build.log for details"
         exit 1
     fi
+}
+#########################################################
+# STAGE: Setup Bank of Z databse
+#########################################################
+stage_setup_database() {
+    print_stage "STAGE: Create DB2 database"
+
+    detect_bank_of_z_location
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-db2-tables.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-db2-tables.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z database setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-db2-tables.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if bash .setup/setup/setup-db2-tables.sh; then
+        print_success "Bank of Z application setup completed successfully"
+    else
+        print_error "Failed to install Bank of Z"
+        print_info "Check /tmp/build.log for details"
+        exit 1
+    fi
+
+}
+
+#########################################################
+# STAGE: Setup Bank of Z databse
+#########################################################
+stage_setup_cics_region() {
+    print_stage "STAGE: Create CICS region with zconfig"
+
+    detect_bank_of_z_location
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-cics-region.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-cics-region.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z database setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-cics-region.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if bash .setup/setup/setup-cics-region.sh; then
+        print_success "Bank of Z application setup completed successfully"
+    else
+        print_error "Failed to install Bank of Z"
+        print_info "Check /tmp/build.log for details"
+        exit 1
+    fi
+
 }
 
 #########################################################
@@ -293,7 +362,12 @@ main_setup() {
     fi
     stage_clone_accelerators
     stage_copy_framework
+
+    # infrastructure
+    stage_setup_database
     
+    stage_setup_cics_region
+
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
@@ -331,13 +405,13 @@ main() {
     local phase="${1:-}"
 
     case "$phase" in
-        validation)
+        validate-prereqs)
             main_validation
             ;;
-        setup)
+        environment)
             main_setup
             ;;
-        build-baseline)
+        install-bank-of-z)
             main_build_baseline
             ;;
         -h|--help|help|"")

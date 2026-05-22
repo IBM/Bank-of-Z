@@ -328,7 +328,7 @@ load_config() {
     fi
 
     # Use provided workspace if available
-    if [! -f "$BANK_OF_Z_WORK_DIR" ]; then
+    if [ ! -f "$BANK_OF_Z_WORK_DIR" ]; then
         # Otherwise read from YAML configuration
         BANK_OF_Z_WORK_DIR=$(get_section_value 'sandbox' 'path')
     fi

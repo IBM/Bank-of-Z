@@ -217,7 +217,13 @@ print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for z/OS Connect
 rm -rf "${DEPLOY_LOG_FOLDER}/work-zosconnect"
 
 # Set z/OS Connect specific variables
-ZOSCONNECT_VARS="-e zos_connect_root=${WLP_USER_DIR:-/usr/local/sandboxes/bank-of-z/zosconnect-server}"
+# WLP_USER_DIR is set in setenv.sh as ${SANDBOX_DIR}/zosconnect-server
+export WLP_USER_DIR="${WLP_USER_DIR:-${SANDBOX_DIR}/zosconnect-server}"
+# Job name is BAQ${APP_BASE_NAME} (e.g., BAQBANKZ)
+export ZOSCONNECT_JOB_NAME="BAQ${APP_BASE_NAME}"
+
+ZOSCONNECT_VARS="-e zos_connect_root=${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server"
+ZOSCONNECT_VARS="$ZOSCONNECT_VARS -e zos_connect_job_name=${ZOSCONNECT_JOB_NAME}"
 
 CMD="wazideploy-deploy \
  --workingFolder ${DEPLOY_LOG_FOLDER}/work-zosconnect \

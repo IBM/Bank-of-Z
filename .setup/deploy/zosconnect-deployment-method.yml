@@ -22,9 +22,10 @@ activities:
           - name: Package
     tags:
     - zosconnect_package
+    - deploy
 
   - name: 'Deploy WAR files'
-    description: 'Copy the z/OS Connect WAR files into the destination folder' 
+    description: 'Copy the z/OS Connect WAR files into the destination folder'
     actions:
         - name: 'Copy to USS'
           steps:
@@ -38,6 +39,7 @@ activities:
        - name: 'war'
     tags:
     - zosconnect_copy
+    - deploy
     is_artifact: True
 
   # - name: 'Deploy Config Files'
@@ -71,6 +73,7 @@ activities:
               value: 'system_command_start_server'
     tags:
     - zosconnect_start
+    - deploy
 
   - name: 'Refresh z/OS Connect'
     description: 'Refresh z/OS Connect config and applications'
@@ -91,5 +94,6 @@ activities:
               value: 'system_command_refresh_apps'
     tags:
     - zosconnect_refresh
+    - deploy
 
 # Made with Bob

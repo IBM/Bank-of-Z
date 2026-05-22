@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -eu
+set -e
 # =============================================================================
 # Script  : setup-zosconnect-server.sh
 # Summary : Create and configure z/OS Connect Server

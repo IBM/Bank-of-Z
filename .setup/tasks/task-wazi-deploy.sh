@@ -60,8 +60,16 @@ finalize_results() {
 
     if ls wazideploy*.log >/dev/null 2>&1; then
         chtag -tc IBM-1047 wazideploy*.log
-        a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate.console.log"
-        a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy.console.log"
+        # Convert CICS/DB2 logs if they exist
+        [ -f "$outputDir/wazideploy-generate-cics.console.log" ] && \
+            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate-cics.console.log"
+        [ -f "$outputDir/wazideploy-deploy-cics.console.log" ] && \
+            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy-cics.console.log"
+        # Convert z/OS Connect logs if they exist
+        [ -f "$outputDir/wazideploy-generate-zosconnect.console.log" ] && \
+            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate-zosconnect.console.log"
+        [ -f "$outputDir/wazideploy-deploy-zosconnect.console.log" ] && \
+            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy-zosconnect.console.log"
         tar cf "$LOG_TAR" "logs" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$outputDir/wazi-deploy-console.log"

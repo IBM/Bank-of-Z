@@ -72,6 +72,8 @@ set -e
 # =========================
 # Generate server JCL proc
 # =========================
+# Create JCL with hardcoded sandbox path to avoid 80-char limit
+ZOSCONNECT_SERVER_DIR="${SANDBOX_DIR}/zosconnect-server"
 cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //BAQ${APP_BASE_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
 //*
@@ -88,7 +90,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //STDENV   DD   *
 _BPX_SHAREAS=YES
 JAVA_HOME=/usr/lpp/java/java21/current_64
-WLP_USER_DIR=${SANDBOX_DIR}/zosconnect-server
+WLP_USER_DIR=${ZOSCONNECT_SERVER_DIR}
 JVM_OPTIONS=-Xmx2048M
 #JVM_OPTIONS=<Optional JVM parameters>
 //*

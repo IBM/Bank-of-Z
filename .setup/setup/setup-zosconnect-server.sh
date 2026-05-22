@@ -57,23 +57,17 @@ fi
 # =========================
 # Configure RACF STARTED profile
 # =========================
-print_info "${CYAN}[ZOSCONNECT]${NC} Configuring RACF STARTED profile..."
 set +e
-opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null &
+opercmd "C BAQ${APP_BASE_NAME}" & 2>/dev/null
 sleep 5
-print_info "${CYAN}[ZOSCONNECT]${NC} Defining RACF STARTED class..."
-tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))" 2>/dev/null
-print_info "${CYAN}[ZOSCONNECT]${NC} Refreshing RACF..."
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-print_info "${CYAN}[ZOSCONNECT]${NC} Removing old PROCLIB member..."
-mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null
+tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))"
+tsocmd "SETROPTS RACLIST(STARTED) REFRESH"
+mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 set -e
 
 # =========================
 # Generate server JCL proc
 # =========================
-# Create JCL with hardcoded sandbox path to avoid 80-char limit
-ZOSCONNECT_SERVER_DIR="${SANDBOX_DIR}/zosconnect-server"
 cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //BAQ${APP_BASE_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
 //*
@@ -90,7 +84,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //STDENV   DD   *
 _BPX_SHAREAS=YES
 JAVA_HOME=/usr/lpp/java/java21/current_64
-WLP_USER_DIR=${ZOSCONNECT_SERVER_DIR}
+WLP_USER_DIR=${SANDBOX_DIR}/zosconnect-server
 JVM_OPTIONS=-Xmx2048M
 #JVM_OPTIONS=<Optional JVM parameters>
 //*
@@ -98,16 +92,7 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-# Remove temp file if it exists from previous run
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
+chtag -r "/tmp/BAQ${APP_BASE_NAME}"
+dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
-# Convert to EBCDIC
-iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-chtag -r "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
-
-# Clean up temp files
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-
-print_success "z/OS Connect server setup completed"
-print_info "${CYAN}[ZOSCONNECT]${NC} Server will be started by Wazi Deploy after artifact deployment"

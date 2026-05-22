@@ -77,18 +77,18 @@ types:
 -  pattern: .*\.(xml)$
    type_name: 'zosconnect-config'
 
-# Template for z/OS Connect configuration files (server.xml, cics.xml)
-template_name_zosconnect_config:
-  src: '{% raw %}{{config_file}}{% endraw %}'
-  dest: '{{zos_connect_root}}/{% raw %}{{config_file}}{% endraw %}'
-  mode: '0644'
-  delegate: False
-  vars:
-    ZOSCONNECT_HTTP_PORT: '{{zosconnect_http_port}}'
-    CICS_HOST: '{{cics_host}}'
-    CICS_PORT: '{{cics_port}}'
-    CICS_USER: '{{cics_user}}'
-    CICS_PASSWORD: '{{cics_password}}'
+# # Template for z/OS Connect configuration files (server.xml, cics.xml)
+# template_name_zosconnect_config:
+#   src: '{% raw %}{{config_file}}{% endraw %}'
+#   dest: '{{zos_connect_root}}/{% raw %}{{config_file}}{% endraw %}'
+#   mode: '0644'
+#   delegate: False
+#   vars:
+#     ZOSCONNECT_HTTP_PORT: '{{zosconnect_http_port}}'
+#     CICS_HOST: '{{cics_host}}'
+#     CICS_PORT: '{{cics_port}}'
+#     CICS_USER: '{{cics_user}}'
+#     CICS_PASSWORD: '{{cics_password}}'
 
 # System commands for z/OS Connect server management
 system_command_start_server:

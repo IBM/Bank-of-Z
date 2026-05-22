@@ -40,23 +40,23 @@ activities:
     - zosconnect_copy
     is_artifact: True
 
-  - name: 'Deploy Config Files'
-    description: 'Process and deploy z/OS Connect configuration files (server.xml, cics.xml) with variable substitution'
-    actions:
-        - name: 'Process Templates'
-          steps:
-          - name: TEMPLATE
-            properties:
-            - key: "var_template_name"
-              value: "template_name_zosconnect_config"
-            loop:
-               loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
-               loop_var: "config_file"
-    types:
-       - name: 'zosconnect-config'
-    tags:
-    - zosconnect_config
-    is_artifact: True
+  # - name: 'Deploy Config Files'
+  #   description: 'Process and deploy z/OS Connect configuration files (server.xml, cics.xml) with variable substitution'
+  #   actions:
+  #       - name: 'Process Templates'
+  #         steps:
+  #         - name: TEMPLATE
+  #           properties:
+  #           - key: "var_template_name"
+  #             value: "template_name_zosconnect_config"
+  #           loop:
+  #              loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
+  #              loop_var: "config_file"
+  #   types:
+  #      - name: 'zosconnect-config'
+  #   tags:
+  #   - zosconnect_config
+  #   is_artifact: True
 
   - name: 'Start z/OS Connect Server'
     description: 'Start the z/OS Connect server if not already running'

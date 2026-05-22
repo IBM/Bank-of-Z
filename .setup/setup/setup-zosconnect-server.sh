@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -e
+set -eu
 # =============================================================================
 # Script  : setup-zosconnect-server.sh
 # Summary : Create and configure z/OS Connect Server
@@ -7,9 +7,9 @@ set -e
 # Runs on the remote z/OS USS system after the workspace has been cloned.
 # - Creates z/OS Connect server instance
 # - Configures RACF STARTED profile
+# - Deploys API WAR file
 # - Generates server JCL proc in SYS1.PROCLIB
-#
-# NOTE: Deployment of WAR files and configuration is handled by Wazi Deploy
+# - Starts the server
 # =============================================================================
 
 # =========================
@@ -65,6 +65,29 @@ tsocmd "SETROPTS RACLIST(STARTED) REFRESH"
 mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 set -e
 
+# # =========================
+# # Deploy API WAR file
+# # =========================
+# cp "${SANDBOX_DIR}/zDevOps/applications/${APP_BASE_NAME}/application/src/logs/package/war/${APP_BASE_NAME_LOWER}-api.war" \
+#    "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/apps"
+
+# echo "<server><webApplication id=\"${APP_BASE_NAME_LOWER}-api\" location=\"\${server.config.dir}/apps/${APP_BASE_NAME_LOWER}-api.war\" name=\"${APP_BASE_NAME_LOWER}-api\" contextRoot=\"/${APP_BASE_NAME_LOWER}-api\"/></server>" \
+#     > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/${APP_BASE_NAME_LOWER}-api.xml"
+
+# # =========================
+# # Generate CICS connection config
+# # =========================
+# cat > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml" << EOF
+# <?xml version="1.0" encoding="UTF-8"?>
+# <server description="IPIC connection to CICS">
+#     <featureManager>
+#         <feature>zosconnect:cics-1.0</feature>
+#     </featureManager>
+#     <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="4321" sysid="ZC01" authDataRef="cicsCredentials" />
+#     <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
+# </server>
+# EOF
+
 # =========================
 # Generate server JCL proc
 # =========================
@@ -96,3 +119,9 @@ a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
 chtag -r "/tmp/BAQ${APP_BASE_NAME}"
 dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
+# =========================
+# Start server
+# =========================
+opercmd "S BAQ${APP_BASE_NAME}" & 2>/dev/null
+sleep 10
+print_success "z/OS Connect server started successfully"

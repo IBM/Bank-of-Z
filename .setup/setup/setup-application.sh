@@ -34,23 +34,23 @@ source "$LIB_DIR/prerequisites.sh"
 print_stage "PHASE 1: Install/Setup Middleware"
 
 # =========================
-# Stage: Create z/OS Connect Server
-# =========================
-cd "$SCRIPTS_DIR"
-print_stage "STAGE: Create z/OS Connect Server"
-bash ./setup-zosconnect-server.sh
-
-# =========================
 # Stage: Create CICS region
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE: Create CICS region with zconfig"
+print_stage "STAGE 1: Create CICS region with zconfig"
 bash ./setup-cics-region.sh&
 # ZOAU Issue with ZOWE
 PID=$!
 wait $PID
 RC=$?
 print_stage "CICS region creation done with RC=$RC"
+
+# =========================
+# Stage: Create z/OS Connect Server
+# =========================
+cd "$SCRIPTS_DIR"
+print_stage "STAGE 2: Create z/OS Connect Server"
+bash ./setup-zosconnect-server.sh
 
 # =========================
 # Stage: Create IMS (if applicable)
@@ -64,7 +64,7 @@ print_stage "CICS region creation done with RC=$RC"
 # Stage: Create DB2 database
 # =========================
 cd "$SCRIPTS_DIR"
-print_stage "STAGE: Create DB2 database"
+print_stage "STAGE 3: Create DB2 database"
 bash ./setup-db2-tables.sh
 
 print_success "PHASE 1: Middleware setup completed"

@@ -57,11 +57,15 @@ fi
 # =========================
 # Configure RACF STARTED profile
 # =========================
+print_info "${CYAN}[ZOSCONNECT]${NC} Configuring RACF STARTED profile..."
 set +e
-opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null
+opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null &
 sleep 5
+print_info "${CYAN}[ZOSCONNECT]${NC} Defining RACF STARTED class..."
 tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))" 2>/dev/null
+print_info "${CYAN}[ZOSCONNECT]${NC} Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
+print_info "${CYAN}[ZOSCONNECT]${NC} Removing old PROCLIB member..."
 mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null
 set -e
 

@@ -58,11 +58,11 @@ fi
 # Configure RACF STARTED profile
 # =========================
 set +e
-opercmd "C BAQ${APP_BASE_NAME}" & 2>/dev/null
+opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null
 sleep 5
-tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))"
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH"
-mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))" 2>/dev/null
+tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
+mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null
 set -e
 
 # =========================
@@ -92,9 +92,16 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
-chtag -r "/tmp/BAQ${APP_BASE_NAME}"
-dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+# Remove temp file if it exists from previous run
+rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+
+# Convert to EBCDIC
+iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+chtag -r "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+
+# Clean up temp files
+rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
 print_success "z/OS Connect server setup completed"
 print_info "${CYAN}[ZOSCONNECT]${NC} Server will be started by Wazi Deploy after artifact deployment"

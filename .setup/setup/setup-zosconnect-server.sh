@@ -106,8 +106,9 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 chtag -tc IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
-# Copy to PROCLIB using dcp
-dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+# Copy to PROCLIB using cp with proper record format
+print_info "${CYAN}[ZOSCONNECT]${NC} Copying JCL to SYS1.PROCLIB..."
+cp -W "recfm=fb,lrecl=80" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "//SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 # Clean up temp files
 rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"

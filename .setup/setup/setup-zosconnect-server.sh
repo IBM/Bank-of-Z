@@ -2,10 +2,10 @@
 set -eu
 # =============================================================================
 # Script  : setup-zosconnect-server.sh
-# Summary : Create z/OS Connect Server (if it doesn't exist)
+# Summary : Create and configure z/OS Connect Server
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
-# - Creates z/OS Connect server instance if it doesn't exist
+# - Creates z/OS Connect server instance
 # - Configures RACF STARTED profile
 # - Generates server JCL proc in SYS1.PROCLIB
 #
@@ -34,36 +34,35 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 export WLP_USER_DIR="${SANDBOX_DIR}/zosconnect-server"
 
 # =========================
-# Create z/OS Connect server (if it doesn't exist)
+# Create z/OS Connect server
 # =========================
 print_stage "Create z/OS Connect Server"
+print_info "${CYAN}[ZOSCONNECT]${NC} Creating z/OS Connect server at: $WLP_USER_DIR"
 
-if [ -d "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server" ]; then
-    print_info "${CYAN}[ZOSCONNECT]${NC} Server already exists at: ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server"
-    print_info "${CYAN}[ZOSCONNECT]${NC} Skipping server creation"
+if [ -d "$WLP_USER_DIR" ]; then
+    print_warning "Removing existing server at $WLP_USER_DIR"
+    rm -rf "$WLP_USER_DIR"
+fi
+
+"${ZOSCONNECT_HOME}/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
+
+RC=$?
+if [ $RC -eq 0 ]; then
+    print_success "z/OS Connect server created successfully at $WLP_USER_DIR"
 else
-    print_info "${CYAN}[ZOSCONNECT]${NC} Creating z/OS Connect server at: $WLP_USER_DIR"
-    
-    "${ZOSCONNECT_HOME}/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
-    
-    RC=$?
-    if [ $RC -eq 0 ]; then
-        print_success "z/OS Connect server created successfully at ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server"
-    else
-        print_error "Failed to create z/OS Connect server (RC=$RC)"
-        exit 1
-    fi
+    print_error "Failed to create z/OS Connect server (RC=$RC)"
+    exit 1
 fi
 
 # =========================
 # Configure RACF STARTED profile
 # =========================
 set +e
-opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null
+opercmd "C BAQ${APP_BASE_NAME}" & 2>/dev/null
 sleep 5
-tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))" 2>/dev/null
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null
+tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))"
+tsocmd "SETROPTS RACLIST(STARTED) REFRESH"
+mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 set -e
 
 # =========================
@@ -93,16 +92,9 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-# Remove temp file if it exists from previous run
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-
-# Convert to EBCDIC
-iconv -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-chtag -r "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
-
-# Clean up temp files
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
+chtag -r "/tmp/BAQ${APP_BASE_NAME}"
+dcp "/tmp/BAQ${APP_BASE_NAME}" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 print_success "z/OS Connect server setup completed"
 print_info "${CYAN}[ZOSCONNECT]${NC} Server will be started by Wazi Deploy after artifact deployment"

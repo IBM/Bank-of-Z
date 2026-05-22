@@ -66,8 +66,9 @@ tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))
 print_info "${CYAN}[ZOSCONNECT]${NC} Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
 print_info "${CYAN}[ZOSCONNECT]${NC} Removing old PROCLIB member..."
-mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null
+mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null || true
 set -e
+print_info "${CYAN}[ZOSCONNECT]${NC} Generating JCL proc..."
 
 # =========================
 # Generate server JCL proc

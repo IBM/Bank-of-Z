@@ -24,7 +24,7 @@ services:
       - bank-network
 
   frontend:
-    image: node:18-alpine
+    image: node:24-alpine
     working_dir: /app
     command: node server.js
     environment:

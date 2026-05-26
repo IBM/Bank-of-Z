@@ -83,7 +83,7 @@ print_success "PHASE 2: DBB Build completed"
 # =============================================================================
 cd "$SCRIPTS_DIR"
 print_stage "PHASE 3: Wazi Deploy"
-bash ../tasks/task-wazi-deploy.sh true&
+bash ../tasks/task-wazi-deploy.sh&
 # ZOAU Issue with ZOWE
 PID=$!
 wait $PID

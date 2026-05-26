@@ -7,5 +7,5 @@ providerProperties:
   transid: "OMEN"
   language: "COBOL"
   program: "INQACC"
-  connectionRef: "cbsaCicsConnection"
+  connectionRef: "bankzCicsConnection"
   ccsid: "037"

@@ -124,15 +124,13 @@ expand_vars() {
 
     # Resolve shell environment variables (${VAR})
     while [[ "$value" =~ \$\{([a-zA-Z_][a-zA-Z0-9_]*)\} ]]; do
-
+    
         varname="${BASH_REMATCH[1]}"
         ref="${BASH_REMATCH[0]}"
-
-        resolved="${!varname}"
-
-        # Stop if variable does not exist
-        [[ -z "${!varname+x}" ]] && break
-
+    
+        # Undefined env vars become empty strings
+        resolved="${!varname:-}"
+    
         value="${value//$ref/$resolved}"
     done
 

@@ -32,7 +32,6 @@ export DBB_APP_CONF=$(get_section_value 'dbb' 'dbb_app_conf')
 export DBB_LOG_FOLDER=$(get_section_value 'dbb' 'dbb_log_dir')
 export JAVA_HOME=$(get_section_value 'dbb' 'java_home')
 export API_BASE=$(get_section_value 'dbb' 'api_base')
-
 export PATH="$JAVA_HOME/bin:$DBB_HOME/bin:$PATH"
 export GRADLE_USER_HOME="$(get_section_value 'sandbox' 'path')/.gradle"
 export GRADLE_OPTS="-Dfile.encoding=UTF-8"

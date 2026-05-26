@@ -27,6 +27,7 @@ export CICS_USER=${CICS_USER:-$(get_section_value 'cics' 'user')}
 export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')}
 export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
+export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
@@ -81,7 +82,6 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << 'EOF'
 //* Start the Liberty server
 //*
 // SET ZCONHOME='/usr/lpp/IBM/zosconnect'
-// SET WLPDIR='/usr/local/sandboxes/bank-of-z/zosconnect-server'
 //*
 //BAQBANKZ     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
 //    TIME=NOLIMIT,
@@ -92,7 +92,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << 'EOF'
 //STDENV   DD   *
 _BPX_SHAREAS=YES
 JAVA_HOME=/usr/lpp/java/java21/current_64
-WLP_USER_DIR=&WLPDIR.
+WLP_USER_DIR=/usr/local/sandboxes/bank-of-z/zosconnect-server
 JVM_OPTIONS=-Xmx2048M
 //*
 // PEND
@@ -113,7 +113,27 @@ dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 # Clean up temp files
 rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
 
+# =========================
+# Generate CICS connection config
+# =========================
+cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="IPIC connection to CICS">
+    <featureManager>
+        <feature>zosconnect:cics-1.0</feature>
+    </featureManager>
+    <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="${CICS_IPIC_PORT}" sysid="ZC01" authDataRef="cicsCredentials" />
+    <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
+</server>
+EOF
+
+sed \
+  's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \
+   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp\
+   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml
+
+opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &
+sleep 5
 print_success "z/OS Connect server setup completed"
-print_info "${CYAN}[ZOSCONNECT]${NC} Server will be started by Wazi Deploy after artifact deployment"
 
 # Made with Bob

@@ -28,8 +28,7 @@ types:
     force_lock: true
     force: true
     use_native_copy: true
-  - type: "CICSLOAD"
-    pattern: .*\.CICSLOAD$
+  - pattern: .*\.CICSLOAD$
     pds: 
       name: "{{ hlq }}.LOADLIB"
       backup: "{{ hlq }}.BACK.LOADLIB"
@@ -40,8 +39,7 @@ types:
     use_native_copy: true
     cics_systems:
       - "{{ cics_sys_def }}"
-  - type: "MAPLOAD"
-    pattern: .*\.MAPLOAD$
+  - pattern: .*\.MAPLOAD$
     pds: 
       name: "{{ hlq }}.LOADLIB"
       backup: "{{ hlq }}.BACK.LOADLIB"
@@ -51,8 +49,7 @@ types:
     use_native_copy: true
     cics_systems:
       - "{{ cics_sys_def }}"
-  - type: "DBRM"
-    pattern: .*.DBRM$
+  - pattern: .*.DBRM$
     pds: 
       name: "{{ hlq }}.DBRM"
       backup: "{{ hlq }}.BACK.DBRM"
@@ -62,8 +59,7 @@ types:
     use_native_copy: true
     db2_systems:
       - "{{ db2_sys_def }}"
-  - type: "JCL"
-    pattern: .*.JCL$
+  - pattern: .*.JCL$
     pds: 
       name: "{{ hlq }}.JCL"
       backup: "{{ hlq }}.BACK.JCL"
@@ -71,8 +67,7 @@ types:
     force_lock: false
     use_native_copy: true
     text_subs: "{{ app_jcl_text_subs_patterns if app_jcl_text_subs_patterns is defined else [] }}"
-  - type: "BIN"
-    pattern: .*.BIN$
+  - pattern: .*.BIN$
     uss:
      directory: "{{ uss_root }}/bin/"
      directory_backup: "{{ uss_root }}/bin/back/"
@@ -80,13 +75,19 @@ types:
      artifact_mode: 0755
     is_binary: True
     use_native_copy: true
-  - type: "SH"
-    pattern: .*.SH$
+  - pattern: "SH"
     uss: 
      directory: "{{ uss_root }}/sh/"
      directory_backup: "{{ uss_root }}/sh/back/"
      dest_mode: 0777
      artifact_mode: 0755
+  - pattern: .*\.WAR$
+    uss:
+       dest: '{{zos_connect_root}}/apps'
+       backup_dest: '{{zos_connect_root}}/backup/apps'
+       mode: 0755
+    mode: 0777
+    is_binary: True
 
 type_dbrm_temp:
   - type: "DBRM"

@@ -9,7 +9,7 @@
  */
 export const config = {
     api: {
-        baseUrl: 'http://localhost:3001'
+        baseUrl: window.location.origin + '/api'
     },
     defaults: {
         sortCode: '987654'

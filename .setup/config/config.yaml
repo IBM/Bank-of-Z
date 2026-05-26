@@ -140,8 +140,8 @@ zoau:
 # Zowe CLI configuration
 zowe:
   # RSE profile name to use (optional, defaults to 'rse')
-  # Set via environment variable: export ZOWE_RSE_PROFILE=manzanita
-  rse_profile: manzanita
+  # Set via environment variable: export ZOWE_RSE_PROFILE=bankz
+  rse_profile: bankz
 
 # CICS attributes
 cics:

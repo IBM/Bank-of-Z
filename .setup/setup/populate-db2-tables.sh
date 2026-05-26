@@ -5,6 +5,7 @@ set -e
 # Summary : DB2 table populate
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
+# - Binds packages and Grant
 # - Inserts initial data
 # =============================================================================
 
@@ -25,6 +26,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Populate DB2 tables
 # =========================
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"&
+# Wait for deployment to complete (ZOAU ISSUE)
+wait $PID
 run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"&
 # Wait for deployment to complete (ZOAU ISSUE)
 wait $PID

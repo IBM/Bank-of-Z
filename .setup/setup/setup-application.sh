@@ -97,7 +97,7 @@ print_success "PHASE 3: Wazi Deploy completed with RC=$RC"
 # =========================
 cd "$SCRIPTS_DIR"
 print_stage "PHASE 4: Populate DB2 database"
-populate-db2-tables.sh
+bash ./populate-db2-tables.sh
 print_success "PHASE 4: Populate DB2 database completed"
 
 # =========================

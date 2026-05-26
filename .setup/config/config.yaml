@@ -40,7 +40,7 @@ zconfig:
 # DBB (Dependency Based Build)
 dbb:
   # DBB installation directory
-  dbb_home: /usr/lpp/IBM/dbb
+  dbb_home: /usr/local/sandboxes/tools/dbb
   # Java runtime for DBB
   java_home: ${java.java_home}
   # DBB build output directory

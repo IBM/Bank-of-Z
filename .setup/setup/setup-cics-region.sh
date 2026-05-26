@@ -44,10 +44,14 @@ rm -rf "$SCRIPTS_DIR/logs"
 # Ignore errors if already cancelled
 # =========================
 set +e
-jcan P "CICSBOZ" & 2>/dev/null
-opercmd "C CICSBOZ" & 2>/dev/null
+jcan P "CICS${APP_SHORT_NAME}" & 2>/dev/null
+opercmd "C CICS${APP_SHORT_NAME}" & 2>/dev/null
 sleep 10
-drm "${APP_BASE_NAME}.CICSBOZ.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.${APP_VERSION}.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.DBB.*" & 2>/dev/null
+sleep 5
+tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)"
 set -e
 
 # =============================================
@@ -123,8 +127,8 @@ cd "$SCRIPTS_DIR/../zconfig"
 rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
 
 zconfig apply \
-  -e applid="CICSBOZ" \
-  -e sysid="BOZ" \
+  -e applid="CICS${APP_SHORT_NAME}" \
+  -e sysid="${APP_SHORT_NAME}" \
   -e region_hlq="${APP_BASE_NAME}" \
   -e region_uss_dir="$SANDBOX_DIR" \
   -e java_home="/usr/lpp/java/java21/current_64" \
@@ -147,7 +151,7 @@ deactivate
 # =========================
 print_stage "STAGE 4: Start CICS region"
 
-jsub "${APP_BASE_NAME}.CICSBOZ.DFHSTART" &
+jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" &
 sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10

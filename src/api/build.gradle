@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 plugins {
-    id 'com.ibm.zosconnect.gradle' version '1.5.1'
+    id 'com.ibm.zosconnect.gradle' version '1.5.3'
 }
 
 repositories {

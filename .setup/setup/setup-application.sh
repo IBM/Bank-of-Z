@@ -19,6 +19,7 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export LIB_DIR="$SCRIPTS_DIR/../lib"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
+chmod +x $SCRIPTS_DIR/*.sh
 
 # =========================
 # Stage: Verify prerequisites
@@ -90,6 +91,14 @@ wait $PID
 RC=$?
 
 print_success "PHASE 3: Wazi Deploy completed with RC=$RC"
+
+# =========================
+# PHASE 4: Populate DB2 database
+# =========================
+cd "$SCRIPTS_DIR"
+print_stage "PHASE 4: Populate DB2 database"
+populate-db2-tables.sh
+print_success "PHASE 4: Populate DB2 database completed"
 
 # =========================
 # Stage: Create application frontend

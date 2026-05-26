@@ -99,19 +99,15 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-# Remove temp file if it exists from previous run
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-
-# Convert to EBCDIC and pad lines to 80 characters
-awk '{printf "%-80s\n", $0}' "/tmp/BAQ${APP_BASE_NAME}.jcl" | iconv -f ISO8859-1 -t IBM-1047 > "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
-chtag -tc IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+# Convert to EBCDIC
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # Copy to PROCLIB using dcp
 print_info "${CYAN}[ZOSCONNECT]${NC} Copying JCL to SYS1.PROCLIB..."
-dcp "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+dcp "/tmp/BAQ${APP_BASE_NAME}.jcl" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
 
 # Clean up temp files
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl" "/tmp/BAQ${APP_BASE_NAME}.jcl.ebcdic"
+rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config

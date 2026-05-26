@@ -77,7 +77,7 @@ cat > "$tmp_ascii" << 'EOF'
          END DFHPLT
 EOF
 
-a2e -f ISO8859-1 -t IBM-1047 "$tmp_ascii" > "$tmp_ebcdic"
+a2e -f ISO8859-1 -t IBM-1047 "$tmp_ascii" "$tmp_ebcdic"
 dcp "$tmp_ebcdic" "${TAZ_CICS_PDS}(DFHPLTPI)"
 
 # =========================

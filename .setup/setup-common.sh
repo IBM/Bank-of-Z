@@ -256,7 +256,10 @@ stage_setup_database() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/setup/setup-db2-tables.sh; then
+    bash .setup/setup/setup-db2-tables.sh&
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    wait $PID
+    if [ $? -eq 0 ]; then
         print_success "Bank of Z application setup completed successfully"
     else
         print_error "Failed to install Bank of Z"

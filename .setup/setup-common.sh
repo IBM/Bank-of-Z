@@ -446,7 +446,7 @@ main() {
             stage_populate_database
             ;;
         update-bank-of-z)
-            stage_build_bank_of_z full
+            stage_build_bank_of_z
             stage_deploy_bank_of_z
             ;;
         -h|--help|help|"")

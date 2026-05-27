@@ -248,7 +248,7 @@ run_job_and_wait() {
   local MAXRC="${2:-4}"
   local TMPJCL="/tmp/$(basename "$JCLFILE").$$"
 
-  sed "s/IBMUSER/${USER:-$LOGNAME}/g" "$JCLFILE" > "$TMPJCL"
+  sed "s/IBMUSER/${ZOS_USER}/g" "$JCLFILE" > "$TMPJCL"
   echo "==> Submitting $TMPJCL via jsub..."
 
   OUT=$(jsub -f "$TMPJCL")

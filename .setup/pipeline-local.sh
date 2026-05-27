@@ -110,7 +110,6 @@ main() {
     get_pipeline_parameters
     
     # Execute stages
-    stage_upload_deploy_scripts
     stage_execute_pipeline
     
     # Summary

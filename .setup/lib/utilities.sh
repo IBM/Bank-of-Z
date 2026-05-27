@@ -246,10 +246,14 @@ submit_jcl() {
 run_job_and_wait() {
   local JCLFILE="$1"
   local MAXRC="${2:-4}"
+  local TMPJCL="/tmp/$(basename "$JCLFILE").$$"
 
-  echo "==> Submitting $JCLFILE via jsub..."
-  OUT=$(jsub -f "$JCLFILE")
+  sed "s/IBMUSER/${USER}/g" "$JCLFILE" > "$TMPJCL"
+  echo "==> Submitting $TMPJCL via jsub..."
+
+  OUT=$(jsub -f "$TMPJCL")
   echo "$OUT"
+  rm -f "$TMPJCL"
 
   JOBID=$(echo "$OUT" | awk '{
     for (i=1; i<=NF; i++) {

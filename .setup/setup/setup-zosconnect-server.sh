@@ -63,7 +63,7 @@ set +e
 opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null &
 sleep 5
 print_info "${CYAN}[ZOSCONNECT]${NC} Defining RACF STARTED class..."
-tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(IBMUSER) TRUSTED(YES))" 2>/dev/null
+tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(${USER}) TRUSTED(YES))" 2>/dev/null
 print_info "${CYAN}[ZOSCONNECT]${NC} Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
 print_info "${CYAN}[ZOSCONNECT]${NC} Removing old PROCLIB member..."

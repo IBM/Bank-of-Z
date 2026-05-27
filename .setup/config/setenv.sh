@@ -33,6 +33,7 @@ export DBB_REPO_URL=$(get_section_value 'repositories' 'url')
 export ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 export ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
 export _BPXK_AUTOCVT=ON
+export ZOS_USER="$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')"
 
 # =========================
 # Zowe Configuration

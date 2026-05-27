@@ -44,11 +44,11 @@ dbb:
   # Java runtime for DBB
   java_home: ${java.java_home}
   # DBB build output directory
-  dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
+  dbb_build: ${sandbox.path}/${REPO_NAME}/.setup/build
   # DBB application configuration file
-  dbb_app_conf: ${sandbox.path}/Bank-of-Z/dbb-app.yaml
+  dbb_app_conf: ${sandbox.path}/${REPO_NAME}/dbb-app.yaml
   # DBB working directory (source root)
-  dbb_cwd: ${sandbox.path}/Bank-of-Z/
+  dbb_cwd: ${sandbox.path}/${REPO_NAME}/
   # DBB log directory
   dbb_log_dir: ${sandbox.path}/logs/dbb
   # API build output directory
@@ -57,7 +57,7 @@ dbb:
 # zBuilder framework configuration
 zbuilder:
   # Local source directory
-  source_dir: ${sandbox.path}/Bank-of-Z/.setup/build
+  source_dir: ${sandbox.path}/${REPO_NAME}/.setup/build
   # Target USS directory for upload
   target_dir: ${sandbox.path}/zBuilder
   # Java home (min version 17)
@@ -93,11 +93,11 @@ wazideploy:
   # CICS/DB2 deployment method (from DBB repo)
   deployment_method_cics: ${sandbox.path}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml
   # z/OS Connect deployment method
-  deployment_method: ${sandbox.path}/Bank-of-Z/.setup/deploy/deployment-method.yml
+  deployment_method: ${sandbox.path}/${REPO_NAME}/.setup/deploy/deployment-method.yml
   # Environment-specific deployment configuration
-  deployment_envfile: ${sandbox.path}/Bank-of-Z/.setup/deploy/Development.yml
+  deployment_envfile: ${sandbox.path}/${REPO_NAME}/.setup/deploy/Development.yml
   # Deploy types mapping file
-  types_pattern_mapping: ${sandbox.path}/Bank-of-Z/.setup/deploy/types_pattern_mapping.yml
+  types_pattern_mapping: ${sandbox.path}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml
   # zDeploy root directory
   zdeploy_dir: ${sandbox.path}/dbb/WaziDeploy/zDeploy
   # Deploy log directory

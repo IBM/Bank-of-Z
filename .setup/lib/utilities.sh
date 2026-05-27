@@ -363,46 +363,17 @@ load_config() {
 #   - vscode
 #   - unknown
 # ============================================================
-detect_execution_mode() {
-    # Check if running from within Bank-of-Z repository
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
-            EXECUTION_MODE="grub"
-            WORKSPACE_DIR="$(git rev-parse --show-toplevel)"
-            print_info "Execution mode: GRUB (running from repository)"
-            BANK_OF_Z_WORK_DIR=$WORKSPACE_DIR
-        else
-            EXECUTION_MODE="unknown"
-            print_warning "Running from git repository but not Bank-of-Z"
-        fi
-    else
-        # Not in a git repo, assume VSCode workflow with cloned repo
-        EXECUTION_MODE="vscode"
-        # Workspace should be set by orchestrator or use current directory
-        WORKSPACE_DIR="${BANK_OF_Z_WORK_DIR:-$(pwd)}"
-        print_info "Execution mode: VSCode (orchestrated)"
-    fi
-    
-    print_info "Workspace directory: $WORKSPACE_DIR"
-}
-
-
-# Function: detect_bank_of_z_location
-# Description: Detects whether running inside Bank-of-Z repo or uses cloned version
-# Returns: Sets BANK_DIR variable with the repository path
-# Exit codes: 0 on success, 1 if repository not found
 detect_bank_of_z_location() {
     local IN_REPO=false
-    
     # Detect if we're already in the Bank-of-Z repository
-    print_info "Detecting Bank of Z location..."
+    print_stage "Detecting Bank of Z location..."
     
     # Check if current directory is a git repo and if it's Bank-of-Z
     if git rev-parse --git-dir > /dev/null 2>&1; then
         local repo_name=$(basename "$(git rev-parse --show-toplevel)")
         if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
             IN_REPO=true
+            EXECUTION_MODE="grub"
             BANK_DIR="$(git rev-parse --show-toplevel)"
             print_info "Running from within Bank-of-Z repository"
             print_info "Repository location: $BANK_DIR"
@@ -414,7 +385,7 @@ detect_bank_of_z_location() {
     if [ "$IN_REPO" = false ]; then
         BANK_DIR="$BANK_OF_Z_WORK_DIR/Bank-of-Z"
         print_info "Using cloned repository at: $BANK_DIR"
-        
+        EXECUTION_MODE="vscode"
         if [ ! -d "$BANK_DIR" ]; then
             print_error "Bank-of-Z not found at: $BANK_DIR"
             print_info "Expected location: $BANK_DIR"
@@ -423,6 +394,6 @@ detect_bank_of_z_location() {
         fi
         print_success "Found Bank-of-Z at workspace location (VSCode workflow detected)"
     fi
-    
+    BANK_OF_Z_WORK_DIR=$(dirname $BANK_DIR)
     return 0
 }

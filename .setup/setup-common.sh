@@ -193,8 +193,6 @@ stage_copy_framework() {
 stage_setup_bank_of_z() {
     print_stage "STAGE: Setup Bank of Z"
     
-    detect_bank_of_z_location
-    
     # Verify installation script exists
     if [ ! -f "$BANK_DIR/.setup/setup/setup-application.sh" ]; then
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-application.sh"
@@ -221,9 +219,6 @@ stage_setup_bank_of_z() {
 stage_setup_database() {
     print_stage "STAGE: Create DB2 database"
 
-    detect_bank_of_z_location
-
-    # Verify script exists
     if [ ! -f "$BANK_DIR/.setup/setup/setup-db2-tables.sh" ]; then
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-db2-tables.sh"
         exit 1
@@ -250,8 +245,6 @@ stage_setup_database() {
 #########################################################
 stage_setup_cics_region() {
     print_stage "STAGE: Create CICS region with zconfig"
-
-    detect_bank_of_z_location
 
     # Verify script exists
     if [ ! -f "$BANK_DIR/.setup/setup/setup-cics-region.sh" ]; then
@@ -367,7 +360,7 @@ main() {
     local phase="${1:-}"
 
     # Detect Execution Mode
-    detect_execution_mode
+    detect_bank_of_z_location
 
     case "$phase" in
         validate-prereqs)

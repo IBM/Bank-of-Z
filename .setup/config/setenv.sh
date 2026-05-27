@@ -6,6 +6,11 @@ set -e
 # Source library scripts
 # =========================
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    export REPO_NAME="$(basename "$(git rev-parse --show-toplevel)")"
+else
+    export REPO_NAME="Bank-Of-Z"
+fi
 export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"

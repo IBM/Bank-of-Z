@@ -62,7 +62,7 @@ stage_execute_pipeline() {
     print_info "This will:"
     print_info "  - Refresh git repository (pull latest)"
     print_info "  - Run DBB build"
-    print_info "  - Deploy to CICS"
+    print_info "  - Deploy build"
     echo ""
     
     # Set environment variables for the remote execution

@@ -34,10 +34,7 @@ stage_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     
-    bash $SCRIPTS_DIR/setup-common.sh update-bank-of-z&
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    wait $PID
-    if [ $? -eq 0 ]; then
+    if $SCRIPTS_DIR/setup-common.sh update-bank-of-z; then
         print_success "Remote pipeline completed successfully"
     else
         print_error "Failed to execute pipeline on remote system"

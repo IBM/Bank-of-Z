@@ -19,46 +19,6 @@ set -e  # Exit on error
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
-
-# Function: detect_bank_of_z_location
-# Description: Detects whether running inside Bank-of-Z repo or uses cloned version
-# Returns: Sets BANK_DIR variable with the repository path
-# Exit codes: 0 on success, 1 if repository not found
-detect_bank_of_z_location() {
-    local IN_REPO=false
-    
-    # Detect if we're already in the Bank-of-Z repository
-    print_info "Detecting Bank of Z location..."
-    
-    # Check if current directory is a git repo and if it's Bank-of-Z
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" == "Bank-of-Z" ]]; then
-            IN_REPO=true
-            BANK_DIR="$(git rev-parse --show-toplevel)"
-            print_info "Running from within Bank-of-Z repository"
-            print_info "Repository location: $BANK_DIR"
-            print_success "Using current repository (GRUB workflow detected)"
-        fi
-    fi
-    
-    # If not in repo, use the cloned version in workspace
-    if [ "$IN_REPO" = false ]; then
-        BANK_DIR="$BANK_OF_Z_WORK_DIR/Bank-of-Z"
-        print_info "Using cloned repository at: $BANK_DIR"
-        
-        if [ ! -d "$BANK_DIR" ]; then
-            print_error "Bank-of-Z not found at: $BANK_DIR"
-            print_info "Expected location: $BANK_DIR"
-            print_info "This should have been cloned by the orchestrator script"
-            return 1
-        fi
-        print_success "Found Bank-of-Z at workspace location (VSCode workflow detected)"
-    fi
-    
-    return 0
-}
-
 #########################################################
 # STAGE: Initialize Working Directory
 #########################################################
@@ -69,16 +29,21 @@ stage_initialize_workspace() {
     
     # Check if directory exists
     if [ -d "$BANK_OF_Z_WORK_DIR" ]; then
-        print_warning "Workspace directory already exists: $BANK_OF_Z_WORK_DIR"
-        read -p "Do you want to delete and recreate it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Deleting existing workspace directory..."
-            rm -rf "$BANK_OF_Z_WORK_DIR"
-            print_success "Existing workspace deleted"
-        else
+        if [[ "$EXECUTION_MODE" == "grub" ]]; then
             print_info "Keeping existing workspace directory"
             return 0
+        else
+            print_warning "Workspace directory already exists: $BANK_OF_Z_WORK_DIR"
+            read -p "Do you want to delete and recreate it? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Deleting existing workspace directory..."
+                rm -rf "$BANK_OF_Z_WORK_DIR"
+                print_success "Existing workspace deleted"
+            else
+                print_info "Keeping existing workspace directory"
+                return 0
+            fi
         fi
     fi
     
@@ -339,7 +304,7 @@ print_usage() {
     echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
     echo ""
     echo "Examples:"
-    echo "  bash setup-common.sh validation"
+    echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
 }
@@ -352,16 +317,7 @@ main_setup() {
     SYS=$(uname -Ia)
     print_info "Running on: $SYS"
     echo ""
-    
-    # Set PIPELINE_WORKSPACE from parameter if provided
-    if [[ -n "$1" ]]; then
-        export PIPELINE_WORKSPACE="$1"
-        print_info "Using workspace from parameter: $PIPELINE_WORKSPACE"
-    fi
-    
-    # Detect Execution Mode
-    detect_execution_mode
-    
+
     # Execute stages
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
         stage_initialize_workspace
@@ -409,6 +365,9 @@ main_build_baseline() {
 
 main() {
     local phase="${1:-}"
+
+    # Detect Execution Mode
+    detect_execution_mode
 
     case "$phase" in
         validate-prereqs)

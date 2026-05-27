@@ -367,10 +367,11 @@ detect_execution_mode() {
     # Check if running from within Bank-of-Z repository
     if git rev-parse --git-dir > /dev/null 2>&1; then
         local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-        if [[ "$repo_name" == "Bank-of-Z" ]]; then
+        if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
             EXECUTION_MODE="grub"
             WORKSPACE_DIR="$(git rev-parse --show-toplevel)"
             print_info "Execution mode: GRUB (running from repository)"
+            BANK_OF_Z_WORK_DIR=$WORKSPACE_DIR
         else
             EXECUTION_MODE="unknown"
             print_warning "Running from git repository but not Bank-of-Z"
@@ -384,4 +385,44 @@ detect_execution_mode() {
     fi
     
     print_info "Workspace directory: $WORKSPACE_DIR"
+}
+
+
+# Function: detect_bank_of_z_location
+# Description: Detects whether running inside Bank-of-Z repo or uses cloned version
+# Returns: Sets BANK_DIR variable with the repository path
+# Exit codes: 0 on success, 1 if repository not found
+detect_bank_of_z_location() {
+    local IN_REPO=false
+    
+    # Detect if we're already in the Bank-of-Z repository
+    print_info "Detecting Bank of Z location..."
+    
+    # Check if current directory is a git repo and if it's Bank-of-Z
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+        if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
+            IN_REPO=true
+            BANK_DIR="$(git rev-parse --show-toplevel)"
+            print_info "Running from within Bank-of-Z repository"
+            print_info "Repository location: $BANK_DIR"
+            print_success "Using current repository (GRUB workflow detected)"
+        fi
+    fi
+    
+    # If not in repo, use the cloned version in workspace
+    if [ "$IN_REPO" = false ]; then
+        BANK_DIR="$BANK_OF_Z_WORK_DIR/Bank-of-Z"
+        print_info "Using cloned repository at: $BANK_DIR"
+        
+        if [ ! -d "$BANK_DIR" ]; then
+            print_error "Bank-of-Z not found at: $BANK_DIR"
+            print_info "Expected location: $BANK_DIR"
+            print_info "This should have been cloned by the orchestrator script"
+            return 1
+        fi
+        print_success "Found Bank-of-Z at workspace location (VSCode workflow detected)"
+    fi
+    
+    return 0
 }

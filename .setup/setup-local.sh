@@ -189,15 +189,6 @@ main() {
     print_stage "ORCHESTRATION COMPLETE"
     print_success "Remote environment setup completed successfully!"
     
-    # Save environment info locally
-    cat > "$SCRIPTS_DIR/.env" << EOF
-BANK_OF_Z_WORK_DIR=$BANK_OF_Z_WORK_DIR
-SETUP_DATE=$(date)
-SETUP_USER=$USER
-SETUP_MODE=local-orchestrator
-EOF
-    chmod +x "$SCRIPTS_DIR/.env"
-    
     echo ""
     echo "Next steps:"
     echo "  1. Review the setup on remote USS: $BANK_OF_Z_WORK_DIR"

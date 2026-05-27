@@ -371,11 +371,13 @@ print_usage() {
     echo "  validate-prereqs  Validate prerequisites (zConfig, DBB, wazi-deploy)"
     echo "  environment       Initialize workspace and infrastructure prerequisites"
     echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
+    echo "  update-bank-of-z  Build and deploy the Bank of Z updates"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
+    echo "  bash setup-common.sh update-bank-of-z"
 }
 
 #########################################################

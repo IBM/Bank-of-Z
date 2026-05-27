@@ -98,7 +98,7 @@ try {
     def warFile = new File("${outputDirectory}/${warName}")
     
     // Change to temp directory and create WAR
-    def createWarCmd = "cd ${tempWarDir.absolutePath} && jar -cvf ${warFile.absolutePath} *"
+    def createWarCmd = "cd ${tempWarDir.absolutePath} && chtag -r assets/images/* && jar -cvf ${warFile.absolutePath} *"
     def warProc = [shell, "-c", createWarCmd].execute(env, new File(workspace))
     warProc.waitFor()
     

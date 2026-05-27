@@ -108,6 +108,7 @@ cd "$DBB_CWD" || exit 1
 set +e
 rm -rf ${DBB_LOG_FOLDER}
 mkdir -p ${DBB_LOG_FOLDER}
+chtag -r src/api/src/main/api/openapi.yaml
 set -e
 
 dbb build "$BUILD_TYPE" --hlq "${APP_BASE_NAME}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line

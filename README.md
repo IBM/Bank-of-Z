@@ -230,7 +230,7 @@ Bank of Z requires a mainframe runtime environment.
 ### Setup Bank of Z
 
 * Take a fork this repository, or move it into your own git provider
-* Follow the initial setup instuctions in [.setup/README.md](.setup/README.md) to install and configure Bank of Z to your own runtime environment.
+* Follow the initial setup instuctions in [docs/README.md](docs/README.md) to install and configure Bank of Z to your own runtime environment.
 
 ### Setup IDE
 

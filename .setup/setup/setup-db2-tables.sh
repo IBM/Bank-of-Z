@@ -32,3 +32,4 @@ wait $PID
 run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-create.jcl"&
 # Wait for deployment to complete (ZOAU ISSUE)
 wait $PID
+exit $?

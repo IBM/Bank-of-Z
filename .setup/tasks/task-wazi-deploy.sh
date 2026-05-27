@@ -19,7 +19,7 @@ set -eu
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
-
+cd $SCRIPTS_DIR/..
 # =========================
 # Environment
 # =========================

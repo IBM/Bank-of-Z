@@ -437,7 +437,7 @@ main() {
             stage_deploy_bank_of_z
             stage_populate_database
             ;;
-        pipeline)
+        update-bank-of-z)
             stage_build_bank_of_z full
             stage_deploy_bank_of_z
             ;;

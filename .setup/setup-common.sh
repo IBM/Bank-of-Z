@@ -213,6 +213,7 @@ stage_setup_bank_of_z() {
         exit 1
     fi
 }
+
 #########################################################
 # STAGE: Setup Bank of Z databse
 #########################################################
@@ -239,6 +240,34 @@ stage_setup_database() {
     fi
 
 }
+
+#########################################################
+# STAGE: Setup zOS Connect server
+#########################################################
+stage_setup_zosconnect_server() {
+    print_stage "STAGE: Setup zOS Connect server"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-zosconnect-server.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-zosconnect-server.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z zOS Connect server setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-zosconnect-server.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if bash .setup/setup/setup-zosconnect-server.sh; then
+        print_success "Bank of Z application setup completed successfully"
+    else
+        print_error "Failed to install Bank of Z"
+        print_info "Check /tmp/build.log for details"
+        exit 1
+    fi
+
+}
+
 
 #########################################################
 # STAGE: Setup Bank of Z databse
@@ -322,7 +351,9 @@ main_setup() {
     stage_setup_database
     
     stage_setup_cics_region
-
+    
+    stage_setup_zosconnect_server
+    
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"

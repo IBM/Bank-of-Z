@@ -26,9 +26,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Populate DB2 tables
 # =========================
-run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"&
-# Wait for deployment to complete (ZOAU ISSUE)
-wait $PID
-run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"&
-# Wait for deployment to complete (ZOAU ISSUE)
-wait $PID
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-bind.jcl"
+if [ $? -ne 0 ];then
+  exit 1
+fi
+run_job_and_wait "$SCRIPTS_DIR/../jcl/Db2-insert.jcl"
+exit $?

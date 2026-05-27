@@ -325,7 +325,8 @@ activities:
           - name: USS_COPY
           - name: USS_RESTORE
             plan_tags:
-              - restore
+            - restore
+            - never
     types:
        - name: 'war'
     tags:

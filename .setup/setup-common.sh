@@ -285,7 +285,10 @@ stage_populate_database() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/setup/populate-db2-tables.sh; then
+    bash .setup/setup/populate-db2-tables.sh&
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    wait $PID
+    if [ $? -eq 0 ]; then
         print_success "Bank of Z application populate completed successfully"
     else
         print_error "Failed to populate Bank of Z database"

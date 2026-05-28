@@ -234,12 +234,18 @@ Bank of Z requires a mainframe runtime environment.
 
 ### Setup IDE
 
-*Using Bob*
+Install Bob IDE and/or VS Code IDE and required extensions:
 
-Install Bob IDE and required extensions:
-- Zowe Explorer
-- IBM Z Open Editor
-- DB2/CICS/IMS/MQ Extensions
+- [IDzEE Extension Pack](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack)
+  - IBM Z Open Editor
+  - IBM Z Open Debug
+  - IBM Compiled Code Coverage
+  - Zowe Explorer
+  - Zowe Explorer for IBM CICS Transaction Server
+- [CICS Interdependency Analyzer Extension for Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe)
+- [IBM IMS Explorer for VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode)
+- [IBM Db2 Developer Extension](https://marketplace.visualstudio.com/items?itemName=IBM.db2-for-luw)
+- MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
 
 ### Build and Install Bank of Z
 

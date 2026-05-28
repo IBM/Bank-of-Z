@@ -57,7 +57,7 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
 1. Edit configuration according to your environment setup
 
-   Feel free to use ZOWE Explorer or other ways to edit the configuration file.
+   Feel free to use ZOWE Explorer or other ways to edit the configuration file [../.setup/config/config.yaml](../.setup/config/config.yaml).
    ```bash
    vi .setup/config/config.yaml
    ```
@@ -67,6 +67,17 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
    .setup/setup-common.sh validate-prereqs
    ```
 
+1. Grant user for database creation (Only if user != IBMUSER)
+
+
+   Edit [../.setup/jcl/Db2-grant.jcl](../.setup/jcl/Db2-grant.jcl)
+   
+   ```bash
+   JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
+   jls $JOBID # CC must be 0004 max
+   pjdd $JOBID SYSPRINT
+   ```
+ 
 1. Run setup of middleware systems
    This sets up Db2 tables, a new CICS region and z/OS Connect instance via zConfig
     ```bash
@@ -79,6 +90,11 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
     .setup/setup-common.sh install-bank-of-z
     ```
 
+1. Open the application fronted
+   Here you should see the Bank of Z fronted:
+   - http://x.x.x.x:9080/bank-frontend-vanilla
+   - Where x.x.x.x is the ip/hostname of your z/OS.
+
 ### Option 1: GRUB Workflow (Recommended for Active Development)
 
 **Best for**: Rapid iteration with uncommitted changes
@@ -86,9 +102,9 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 1. Make changes locally
 2. Run GRUB to sync and setup
 
-GRUB automatically syncs your changes to USS and runs [`setup-common.sh`](.setup/setup-common.sh:1) natively.
+GRUB automatically syncs your changes to USS and runs [`setup-common.sh`](../.setup/setup-common.sh) natively.
 
-📖 [Detailed GRUB Guide →](docs/WORKFLOW-GRUB.md)
+📖 [Detailed GRUB Guide →](WORKFLOW-GRUB.md)
 
 ### Option 2: VSCode Task Workflow
 
@@ -104,13 +120,13 @@ Press: Ctrl+Shift+P (or Cmd+Shift+P on Mac)
 Select: "Tasks: Run Task"
 Choose: "Setup Bank of Z Environment"
 
-The task runs [`setup-local.sh`](.setup/setup-local.sh:1) which orchestrates the remote setup via Zowe CLI.
+The task runs [`setup-local.sh`](../.setup/setup-local.sh) which orchestrates the remote setup via Zowe CLI.
 
-📖 [Detailed VSCode Guide →](docs/WORKFLOW-VSCODE.md)
+📖 [Detailed VSCode Guide →](WORKFLOW-VSCODE.md)
 
 ## ⚙️ Configuration
 
-Before running setup, edit [`.setup/config/config.yaml`](.setup/config/config.yaml:1):
+Before running setup, edit [`../.setup/config/config.yaml`](../.setup/config/config.yaml):
 
 ```yaml
 # Workspace location on z/OS USS
@@ -129,13 +145,13 @@ dbb:
   java_home: /usr/lpp/java/java21/current_64
 ```
 
-📖 [Full Configuration Guide →](docs/CONFIGURATION.md)
+📖 [Full Configuration Guide →](CONFIGURATION.md)
 
 ## 📁 Scripts
 
 ### Setup Scripts
 
-#### [`setup-common.sh`](.setup/setup-common.sh:1)
+#### [`setup-common.sh`](../.setup/setup-common.sh)
 **Purpose**: Main setup script that runs natively on z/OS USS
 
 **Used by**: Both GRUB and VSCode workflows
@@ -148,7 +164,7 @@ dbb:
 
 **Execution**: Native USS commands (no Zowe CLI needed)
 
-#### [`setup-local.sh`](.setup/setup-local.sh:1)
+#### [`setup-local.sh`](../.setup/setup-local.sh)
 **Purpose**: Local orchestrator for VSCode task workflow
 
 **Used by**: VSCode tasks only
@@ -156,13 +172,13 @@ dbb:
 **What it does**:
 1. Creates workspace on remote USS (via Zowe CLI)
 2. Clones Bank of Z branch on remote
-3. Executes [`setup-common.sh`](.setup/setup-common.sh:1) on remote
+3. Executes [`setup-common.sh`](../.setup/setup-common.sh) on remote
 
 **Execution**: Runs locally, uses Zowe CLI for remote operations
 
 ### Pipeline Scripts
 
-#### [`pipeline-common.sh`](.setup/pipeline-common.sh:1)
+#### [`pipeline-remote.sh`](../.setup/pipeline-remote.sh)
 **Purpose**: Pipeline simulation script that runs natively on z/OS USS
 
 **Used by**: Both GRUB and VSCode workflows
@@ -174,7 +190,7 @@ dbb:
 
 **Execution**: Native USS commands (no Zowe CLI needed)
 
-#### [`pipeline-local.sh`](.setup/pipeline-local.sh:1)
+#### [`pipeline-local.sh`](../.setup/pipeline-local.sh)
 **Purpose**: Local orchestrator for pipeline execution
 
 **Used by**: VSCode tasks only
@@ -182,7 +198,7 @@ dbb:
 **What it does**:
 1. Uploads pipeline script to USS (via Zowe CLI)
 2. Uploads deploy configurations
-3. Executes [`pipeline-common.sh`](.setup/pipeline-common.sh:1) on remote
+3. Executes [`setup-common.sh`](../.setup/setup-common.sh) on remote
 
 **Execution**: Runs locally, uses Zowe CLI for remote operations
 

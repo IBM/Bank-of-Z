@@ -231,10 +231,7 @@ stage_deploy_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    bash .setup/tasks/task-wazi-deploy.sh&
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    wait $PID
-    if [ $? -eq 0 ]; then
+    if .setup/tasks/task-wazi-deploy.sh; then
         print_success "Bank of Z application deploy completed successfully"
     else
         print_error "Failed to deploy Bank of Z"
@@ -259,10 +256,7 @@ stage_setup_database() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    bash .setup/setup/setup-db2-tables.sh&
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    wait $PID
-    if [ $? -eq 0 ]; then
+    if .setup/setup/setup-db2-tables.sh; then
         print_success "Bank of Z application setup completed successfully"
     else
         print_error "Failed to install Bank of Z"
@@ -288,10 +282,7 @@ stage_populate_database() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    bash .setup/setup/populate-db2-tables.sh&
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    wait $PID
-    if [ $? -eq 0 ]; then
+    if .setup/setup/populate-db2-tables.sh; then
         print_success "Bank of Z application populate completed successfully"
     else
         print_error "Failed to populate Bank of Z database"
@@ -345,10 +336,7 @@ stage_setup_cics_region() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    bash .setup/setup/setup-cics-region.sh&
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    wait $PID
-    if [ $? -eq 0 ]; then
+    if  .setup/setup/setup-cics-region.sh; then
         print_success "Bank of Z application setup completed successfully"
     else
         print_error "Failed to install Bank of Z"

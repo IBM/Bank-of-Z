@@ -33,28 +33,33 @@ stage_execute_common_setup() {
     print_info "  - Install Bank of Z application"
     echo ""
     
-    # Execute the common setup script on remote
-    print_info "Running: bash .setup/setup-common.sh"
-    
-    if ${SCRIPTS_DIR}/setup-common.sh validate-prereqs $BANK_OF_Z_WORK_DIR; then
+    ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR" &
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
         print_success "Remote validate-prereqs completed successfully"
     else
         print_error "Failed to execute validate-prereqs on remote system"
-        print_info "Check /tmp/remote-setup.log for details"
         exit 1
     fi
-    if ${SCRIPTS_DIR}/setup-common.sh environment $BANK_OF_Z_WORK_DIR; then
+    
+    ${SCRIPTS_DIR}/setup-common.sh environment "$BANK_OF_Z_WORK_DIR" &
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
         print_success "Remote environment completed successfully"
     else
         print_error "Failed to execute environment on remote system"
-        print_info "Check /tmp/remote-setup.log for details"
         exit 1
     fi
-    if ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z $BANK_OF_Z_WORK_DIR; then
-        print_success "Remote install-bank-of-z  completed successfully"
+    
+    ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z "$BANK_OF_Z_WORK_DIR" &
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
+        print_success "Remote install-bank-of-z completed successfully"
     else
-        print_error "Failed to execute install-bank-of-z  on remote system"
-        print_info "Check /tmp/remote-setup.log for details"
+        print_error "Failed to execute install-bank-of-z on remote system"
         exit 1
     fi
 

@@ -164,7 +164,7 @@ stage_build_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash tasks/task-dbb-build.sh $1; then
+    if bash ${BANK_DIR}/.setup/tasks/task-dbb-build.sh $1; then
         print_success "Bank of Z application build completed successfully"
     else
         print_error "Failed to build Bank of Z"
@@ -190,7 +190,7 @@ stage_deploy_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    ${SCRIPTS_DIR}/.setup/tasks/task-wazi-deploy.sh&
+    ${BANK_DIR}/.setup/tasks/task-wazi-deploy.sh&
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then

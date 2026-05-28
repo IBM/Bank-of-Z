@@ -27,6 +27,17 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
 ## 🚀 Quick Start
 
+
+⚠️⚠️**NOTES**⚠️⚠️:
+- If you don't use `IBMUSER`  you need to grant your user for database creation.
+  Edit [../.setup/jcl/Db2-grant.jcl](../.setup/jcl/Db2-grant.jcl) and replace `MYUSER`with your user. Then issue the commands:
+   
+   ```bash
+   JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
+   jls $JOBID # CC must be 0004 max
+   pjdd $JOBID SYSPRINT
+   ```
+
 ### Option 1: Setup & Install via terminal
 
 **Best for**: Direct USS access, users without access to GRUB or ZOWE CLI for custom tasks
@@ -67,17 +78,6 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
    .setup/setup-common.sh validate-prereqs
    ```
 
-1. Grant user for database creation (Only if user != IBMUSER)
-
-
-   Edit [../.setup/jcl/Db2-grant.jcl](../.setup/jcl/Db2-grant.jcl)
-   
-   ```bash
-   JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
-   jls $JOBID # CC must be 0004 max
-   pjdd $JOBID SYSPRINT
-   ```
- 
 1. Run setup of middleware systems
    This sets up Db2 tables, a new CICS region and z/OS Connect instance via zConfig
     ```bash

@@ -33,6 +33,9 @@ stage_execute_common_setup() {
     print_info "  - Install Bank of Z application"
     echo ""
     
+    # Execute the common setup script on remote
+    print_info "Running: bash .setup/setup-common.sh"
+    
     ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR" &
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)

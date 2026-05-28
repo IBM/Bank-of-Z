@@ -20,47 +20,6 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
 #########################################################
-# STAGE: Initialize Working Directory
-#########################################################
-stage_initialize_workspace() {
-    print_stage "STAGE: Initialize Working Directory"
-    
-    print_info "Target workspace: $BANK_OF_Z_WORK_DIR"
-    
-    # Check if directory exists
-    if [ -d "$BANK_OF_Z_WORK_DIR" ]; then
-        if [[ "$EXECUTION_MODE" == "grub" ]]; then
-            print_info "Keeping existing workspace directory"
-            return 0
-        else
-            print_warning "Workspace directory already exists: $BANK_OF_Z_WORK_DIR"
-            read -p "Do you want to delete and recreate it? (y/N): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                print_info "Deleting existing workspace directory..."
-                rm -rf "$BANK_OF_Z_WORK_DIR"
-                print_success "Existing workspace deleted"
-            else
-                print_info "Keeping existing workspace directory"
-                return 0
-            fi
-        fi
-    fi
-    
-    # Create workspace directory
-    print_info "Creating workspace directory: $BANK_OF_Z_WORK_DIR"
-    mkdir -p "$BANK_OF_Z_WORK_DIR"
-    
-    # Purge DBB metadata cache
-    if [ -d "$HOME/.dbb" ]; then
-        rm -rf "$HOME/.dbb"
-        print_success "DBB metadata cache purged"
-    fi
-    
-    print_success "Workspace directory initialized: $BANK_OF_Z_WORK_DIR"
-}
-
-#########################################################
 # STAGE: Clone Required Accelerators
 #########################################################
 stage_clone_accelerators() {
@@ -389,10 +348,6 @@ main_setup() {
     print_info "Running on: $SYS"
     echo ""
 
-    # Execute stages
-    if [[ "$EXECUTION_MODE" != "grub" ]]; then
-        stage_initialize_workspace
-    fi
     stage_clone_accelerators
     stage_copy_framework
 

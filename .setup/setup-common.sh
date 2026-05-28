@@ -345,7 +345,10 @@ stage_setup_cics_region() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/setup/setup-cics-region.sh; then
+    bash .setup/setup/setup-cics-region.sh&
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    wait $PID
+    if [ $? -eq 0 ]; then
         print_success "Bank of Z application setup completed successfully"
     else
         print_error "Failed to install Bank of Z"

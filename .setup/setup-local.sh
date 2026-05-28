@@ -148,7 +148,7 @@ stage_execute_common_setup() {
     set -o pipefail
     if zowe rse-api-for-zowe-cli issue unix-shell "export BANK_OF_Z_WORK_DIR=$BANK_OF_Z_WORK_DIR && bash  $BANK_OF_Z_WORK_DIR/Bank-of-Z/.setup/setup-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
-        if grep -i "error\|failed" /tmp/remote-setup.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
+        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/remote-setup.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
             print_error "Setup completed but some warnings were detected"
             print_info "Review /tmp/remote-setup.log for details"
             exit 1

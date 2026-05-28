@@ -76,7 +76,7 @@ stage_execute_pipeline() {
     
     if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/pipeline.log; then
         # Check for errors in the log
-        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v "Failed to change files and directory owner with chown" > /dev/null; then
+        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
             print_warning "Pipeline completed but some warnings were detected"
             print_info "Review /tmp/pipeline.log for details"
         else

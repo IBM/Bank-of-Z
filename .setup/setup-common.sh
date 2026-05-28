@@ -164,7 +164,7 @@ stage_build_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    if bash .setup/tasks/task-dbb-build.sh $1; then
+    if bash tasks/task-dbb-build.sh $1; then
         print_success "Bank of Z application build completed successfully"
     else
         print_error "Failed to build Bank of Z"

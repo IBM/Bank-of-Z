@@ -22,9 +22,6 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-if [ -f "$HOME/.profile" ]; then
-    source "$HOME/.profile"
-fi
 export JAVA_HOME=${JAVA_HOME_REMOTE:-$(get_section_value 'zcodescan' 'java_home')}
 export PYENV_ACTIVATE_PATH=${PYENV_ACTIVATE_PATH:-$(get_section_value 'zcodescan' 'zcodescan_home')/bin/activate}
 export SCAN_CWD_FOLDER=${SCAN_CWD_FOLDER:-$(get_section_value 'zcodescan' 'cwd_dir')}
@@ -32,10 +29,7 @@ export SCAN_SOURCE_FOLDER=${SCAN_SOURCE_FOLDER:-$(get_section_value 'zcodescan' 
 export SCAN_OUTPUT_FOLDER=${SCAN_OUTPUT_FOLDER:-$(get_section_value 'zcodescan' 'output_dir')}
 export SCAN_RULE_FILE=${SCAN_RULE_FILE:-$(get_section_value 'zcodescan' 'rule_file')}
 export SCAN_ENCODING=${SCAN_ENCODING:-$(get_section_value 'zcodescan' 'src_encoding')}
-export ZCS_RESAPI_URL=${ZCS_RESAPI_URL:-$(get_section_value 'zcodescan' 'rseapi_url')}
-export ZCS_RESAPI_USER=${ZCS_RESAPI_USER:-$(get_section_value 'zcodescan' 'rseapi_user')}
-export ZCS_RESAPI_PASSWORD=${ZCS_RESAPI_PASSWORD:-$(get_section_value 'zcodescan' 'rseapi_password')}
-export ZCS_RESAPI_VERIFY=${ZCS_RESAPI_VERIFY:-$(get_section_value 'zcodescan' 'rseapi_verify')}
+export SCAN_CONFIG_FILE=${SCAN_CONFIG_FILE:-$(get_section_value 'zcodescan' 'config_file')}
 
 export PATH="${JAVA_HOME}/bin:${REMOTE_EXTRA_PATH:-}:$PATH"
 
@@ -114,16 +108,6 @@ source "${PYENV_ACTIVATE_PATH}"
 # =========================
 : > "$TMP_LOG"
 
-export SCAN_CONFIG_FILE="/tmp/config.yml"
-
-cat > "${SCAN_CONFIG_FILE}" << EOF
-license_server:
-  url: ${ZCS_RESAPI_URL}
-  user: ${ZCS_RESAPI_USER}
-  password: ${ZCS_RESAPI_PASSWORD}
-  verify: ${ZCS_RESAPI_VERIFY}
-EOF
-
 rm -rf "$LOG_DIR"
 rm -f ./*.log
 mkdir -p "$LOG_DIR"
@@ -149,7 +133,6 @@ do
     esac
 done
 
-rm -f $SCAN_CONFIG_FILE
 cp zcodescan.log "$LOG_DIR"
 
 # =========================

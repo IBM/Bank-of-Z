@@ -37,6 +37,18 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
    jls $JOBID # CC must be 0004 max
    pjdd $JOBID SYSPRINT
    ```
+- During the static scan step of the pipeline simulation flow, you must create the ZCodeScan configuration file
+  using the **ISO8859-1** encoding. By default, the `zcs_config_file.yml file must be located in your home directory.`
+  You can change the default in [../.setup/config/config.yaml](../.setup/config/config.yaml). Example:
+  
+  ```yaml
+  license_server:
+    url: https://127.0.0.1:8195
+    user: IBMUSER
+    password: MY_PASSWORD
+    verify: false
+  ``` 
+  The password will be encrypted after the very first scan.
 
 ### Option 1: Setup & Install via terminal
 

@@ -22,6 +22,9 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
+if [ -f "$HOME/.profile" ]; then
+    source "$HOME/.profile"
+fi
 export JAVA_HOME=${JAVA_HOME_REMOTE:-$(get_section_value 'zcodescan' 'java_home')}
 export PYENV_ACTIVATE_PATH=${PYENV_ACTIVATE_PATH:-$(get_section_value 'zcodescan' 'zcodescan_home')/bin/activate}
 export SCAN_CWD_FOLDER=${SCAN_CWD_FOLDER:-$(get_section_value 'zcodescan' 'cwd_dir')}
@@ -126,10 +129,6 @@ rm -f ./*.log
 mkdir -p "$LOG_DIR"
 
 print_info "${CYAN}[ZCODESCAN]${NC} Starting ZCodeScan analysis ..."
-
-if [ -f "$HOME/.profile" ]; then
-    source "$HOME/.profile"
-fi
 
 PYTHONUNBUFFERED=1 zcodescan \
   -sfl "$BUILD_LIST" \

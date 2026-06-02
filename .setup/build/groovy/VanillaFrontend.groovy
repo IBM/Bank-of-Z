@@ -48,6 +48,33 @@ if (!vanillaFrontendDir.exists() || !vanillaFrontendDir.isDirectory()) {
 
 log.info("Found vanilla frontend directory")
 
+// Check if this is an impact build and if frontend files have changed
+def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+def isFrontendChanged = false
+
+// Check if any files in BUILD_LIST are under the frontend directory
+buildList.each { file ->
+    if (file.startsWith(vanillaFrontendRelativePath)) {
+        isFrontendChanged = true
+        log.info("Frontend file changed: ${file}")
+    }
+}
+
+// If this is an impact build and no frontend files changed, skip the build
+def lifecycle = context.getVariable('lifecycle')
+def isUsingImpactAnalysis = lifecycle == 'impact' || lifecycle == 'pipeline'
+if (isUsingImpactAnalysis && !isFrontendChanged) {
+    log.info("Impact build detected with no frontend changes - skipping frontend build")
+    log.info("VanillaFrontend completed (skipped - no changes)")
+    return 0
+}
+
+if (isFrontendChanged) {
+    log.info("Frontend changes detected - proceeding with build")
+} else {
+    log.info("Full build - proceeding with build")
+}
+
 // Set environment
 def envList = []
 System.getenv().each { k, v -> envList << "$k=$v" }

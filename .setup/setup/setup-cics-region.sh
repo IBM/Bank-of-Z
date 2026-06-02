@@ -35,11 +35,6 @@ export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
 # =========================
-# Cleanup
-# =========================
-rm -rf "$SCRIPTS_DIR/logs"
-
-# =========================
 # Cancel CICS region
 # Ignore errors if already cancelled
 # =========================
@@ -52,6 +47,12 @@ drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*" & 2>/dev/null
 drm "${APP_BASE_NAME}.DBB.*" & 2>/dev/null
 sleep 5
 tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)"
+# =========================
+# Cleanup
+# =========================
+rm -rf "$SCRIPTS_DIR/logs"
+rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
+rm -rf "$SANDBOX_DIR/diagnostics"
 set -e
 
 # =============================================
@@ -156,4 +157,8 @@ sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10
 
+# =========================
+# Stage 5: Cleanup
+# =========================
+rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 exit 0

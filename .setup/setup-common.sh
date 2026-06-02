@@ -146,86 +146,6 @@ stage_copy_framework() {
     print_success "zBuilder framework setup completed successfully"
 }
 
-#########################################################
-# STAGE: Build Bank of Z
-#########################################################
-stage_build_bank_of_z() {
-    print_stage "STAGE: Build Bank of Z"
-    
-    # Verify installation script exists
-    if [ ! -f "$BANK_DIR/.setup/tasks/task-dbb-build.sh" ]; then
-        print_error "Installation script not found: $BANK_DIR/.setup/tasks/task-dbb-build.sh"
-        exit 1
-    fi
-    
-    # Run installation script
-    print_info "Running Bank of Z build script..."
-    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-dbb-build.sh"
-    cd "$BANK_DIR"
-    
-    set -o pipefail
-    if bash ${BANK_DIR}/.setup/tasks/task-dbb-build.sh $1; then
-        print_success "Bank of Z application build completed successfully"
-    else
-        print_error "Failed to build Bank of Z"
-        exit 1
-    fi
-}
-
-#########################################################
-# STAGE: Deploy Bank of Z
-#########################################################
-stage_deploy_bank_of_z() {
-    print_stage "STAGE: Deploy Bank of Z"
-    
-    # Verify installation script exists
-    if [ ! -f "$BANK_DIR/.setup/tasks/task-wazi-deploy.sh" ]; then
-        print_error "Installation script not found: $BANK_DIR/.setup/tasks/task-wazi-deploy.sh"
-        exit 1
-    fi
-    
-    # Run installation script
-    print_info "Running Bank of Z deploy script..."
-    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-wazi-deploy.sh"
-    cd "$BANK_DIR"
-    
-    set -o pipefail
-    ${BANK_DIR}/.setup/tasks/task-wazi-deploy.sh&
-    PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
-        print_success "Bank of Z application deploy completed successfully"
-    else
-        print_error "Failed to deploy Bank of Z"
-        exit 1
-    fi
-}
-
-#########################################################
-# STAGE: Static scan Bank of Z
-#########################################################
-stage_static_scan_bank_of_z() {
-    print_stage "STAGE: Static scan Bank of Z"
-    
-    # Verify installation script exists
-    if [ ! -f "$BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh" ]; then
-        print_error "Installation script not found: $BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
-        exit 1
-    fi
-    
-    # Run installation script
-    print_info "Running Bank of Z static scan script..."
-    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
-    cd "$BANK_DIR"
-    
-    set -o pipefail
-    if ${BANK_DIR}/.setup/tasks/task-zcodescan-static-scan.sh; then
-        print_success "Bank of Z application static scan completed successfully"
-    else
-        print_error "Failed to static scan Bank of Z"
-        exit 1
-    fi
-}
 
 #########################################################
 # STAGE: Setup Bank of Z databse
@@ -359,7 +279,6 @@ print_usage() {
     echo "  validate-prereqs  Validate prerequisites (zConfig, DBB, wazi-deploy)"
     echo "  environment       Initialize workspace and infrastructure prerequisites"
     echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
-    echo "  update-bank-of-z  Build and deploy the Bank of Z updates"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
@@ -419,14 +338,17 @@ main() {
             main_setup
             ;;
         install-bank-of-z)
-            stage_build_bank_of_z full
-            stage_deploy_bank_of_z
+            chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
+            bash ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full &
+            PID=$!
+            # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+            if wait "$PID"; then
+                print_success "Remote pipeline completed successfully"
+            else
+                print_error "Failed to execute pipeline on remote system"
+                exit 1
+            fi
             stage_populate_database
-            ;;
-        update-bank-of-z)
-            stage_static_scan_bank_of_z
-            stage_build_bank_of_z
-            stage_deploy_bank_of_z
             ;;
         -h|--help|help|"")
             print_usage

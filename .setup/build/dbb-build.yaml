@@ -51,17 +51,26 @@ lifecycles:
       - Package
       - Finish
 
+    cli:
+      usage: dbb build full [arguments] [options]
+      options:
+        - longOption: "debug"
+          hasArg: false
+          description: "Enables the debug options on load modules."
+
   # build only programs impacted by changes to the application
   - lifecycle: impact
 
-    # Optional argument to supply base line references for calculating change files
-    # See https://www.ibm.com/docs/en/dbb/3.0?topic=index-task-impactanalysis
     cli:
       usage: dbb build impact [arguments] [options]
       options:
         - longOption: "baselineRef"
           hasArg: true
           description: "Overrides the baseline reference to measure changes from."
+        - longOption: "debug"
+          hasArg: false
+          description: "Enables the debug options on load modules."
+
     
     # define the list of tasks to execute during the build lifecycle
     tasks:
@@ -86,6 +95,10 @@ lifecycles:
         - longOption: "build-id"
           hasArg: true
           description: "The build identifier for the package being created. ie: 20240415.7"
+        - longOption: "debug"
+          hasArg: false
+          description: "Enables the debug options on load modules."
+
     
     tasks:
       - Start
@@ -131,7 +144,7 @@ lifecycles:
         - longOption: "debug"
           hasArg: false
           description: "Enables the debug options on load modules."
-    
+
     # define the list of tasks to execute during the build lifecycle
     tasks:
       - Start

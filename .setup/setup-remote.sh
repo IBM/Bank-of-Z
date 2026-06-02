@@ -101,7 +101,6 @@ main() {
     echo "     - Enter 1 then 1234 as customer"
     echo "  4. Run pipeline builds from VSCode tasks"
     echo ""
-    print_info "Local environment details saved to: $SCRIPTS_DIR/.env"
     print_info "Remote setup logs available at: /tmp/remote-setup.log"
     echo ""
 }

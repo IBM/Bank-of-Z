@@ -99,6 +99,18 @@ wazideploy:
   # Deploy log directory
   deploy_log_dir: ${sandbox.path}/logs/deploy
 
+# TAZ Unit Test configuration
+taz:
+  # TAZ CLI installation directory
+  taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
+  # Root directory containing test suites
+  test_dir: ${sandbox.path}/${REPO_NAME}
+  # JES procedure library
+  proclib: SYS1.PROCLIB
+  # Load library used during execution
+  library: ${app.base_name}.${app.zos_version}.LOADLIB
+  # STEPLIB for runtime/debug
+  steplib: EQAW.VHR0M0.PTF.SEQAMOD
 
 # z/OS Connect (API exposure)
 zosconnect:

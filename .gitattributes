@@ -12,6 +12,7 @@
 *.properties zos-working-tree-encoding=ibm-1047 
 *.asm zos-working-tree-encoding=ibm-1047 
 *.jcl zos-working-tree-encoding=ibm-1047 
+*.csd zos-working-tree-encoding=ibm-1047 
 *.data zos-working-tree-encoding=ibm-1047 
 *.exec zos-working-tree-encoding=ibm-1047 
 *.mac zos-working-tree-encoding=ibm-1047 

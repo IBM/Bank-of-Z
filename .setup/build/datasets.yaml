@@ -118,3 +118,7 @@ variables:
   - name: SEQASAMP
     value: EQA.V16R0M0.SEQASAMP
 
+  # IBM ADFz Common Components
+  - name: SIPVMODA
+    value: IPV.SIPVMODA
+

@@ -33,7 +33,7 @@ export DBB_LOG_FOLDER=$(get_section_value 'dbb' 'dbb_log_dir')
 export JAVA_HOME=$(get_section_value 'dbb' 'java_home')
 export API_BASE=$(get_section_value 'dbb' 'api_base')
 export PATH="$JAVA_HOME/bin:$DBB_HOME/bin:$PATH"
-export GRADLE_USER_HOME="$(get_section_value 'sandbox' 'path')/.gradle"
+export GRADLE_USER_HOME="$(get_section_value 'sandbox' 'path')/../.gradle"
 export GRADLE_OPTS="-Dfile.encoding=UTF-8"
 
 # =========================
@@ -111,7 +111,7 @@ mkdir -p ${DBB_LOG_FOLDER}
 chtag -r src/api/src/main/api/openapi.yaml
 set -e
 
-dbb build "$BUILD_TYPE" --hlq "${APP_BASE_NAME}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line
+dbb build "$BUILD_TYPE" --debug --hlq "${APP_BASE_NAME}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line
 do
     case "$line" in
         ">"*)

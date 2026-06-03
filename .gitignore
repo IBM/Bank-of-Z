@@ -10,3 +10,4 @@ build.log
 .DS_Store
 src/base/ims/java/src/main/java/nazare/jmp/standalone/*
 /build/
+zowe.config.user.json

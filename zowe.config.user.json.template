@@ -5,7 +5,7 @@
         "bank-of-z": {
             "properties": {
                 // Enter the hostname or IP address of your remote system
-                "host": ""
+                "host": "YOUR_HOST_HERE"
             },
             "profiles": {
 
@@ -14,7 +14,7 @@
                     "properties": {
                         // Enter the absolute path of your private key.
                         // You can find this by running `ssh -v <hostname>`
-                        "privateKey": ""
+                        "privateKey": "/path/to/your/private/key"
                     }
                 },
 

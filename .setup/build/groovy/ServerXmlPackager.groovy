@@ -79,9 +79,40 @@ if (processCicsXml) {
     log.info("Found server.xml and cics.xml")
 } else {
     log.info("Found server.xml")
-}
-
-// Set environment
+    }
+    
+    // Check if this is an impact build and if config files have changed
+    def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+    def isConfigChanged = false
+    
+    // Check if any files in BUILD_LIST are server.xml or cics.xml
+    buildList.each { file ->
+        if (file == serverXmlRelativePath) {
+            isConfigChanged = true
+            log.info("Config file changed: ${file}")
+        }
+        if (processCicsXml && file == cicsXmlRelativePath) {
+            isConfigChanged = true
+            log.info("Config file changed: ${file}")
+        }
+    }
+    
+    // If this is an impact build and no config files changed, skip the build
+    def lifecycle = context.getVariable('lifecycle')
+    def isUsingImpactAnalysis = lifecycle == 'impact' || lifecycle == 'pipeline'
+    if (isUsingImpactAnalysis && !isConfigChanged) {
+        log.info("Impact build detected with no config file changes - skipping config packaging")
+        log.info("ServerXmlPackager completed (skipped - no changes)")
+        return 0
+    }
+    
+    if (isConfigChanged) {
+        log.info("Config file changes detected - proceeding with packaging")
+    } else {
+        log.info("Full build - proceeding with packaging")
+    }
+    
+    // Set environment
 def envList = []
 System.getenv().each { k, v -> envList << "$k=$v" }
 def env = envList as String[]
@@ -134,7 +165,6 @@ try {
     
     // Step 4: Add server.xml to BUILD_LIST
     log.info("Step 4: Adding server.xml to BUILD_LIST for Package task")
-    Set<String> buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
     buildList.add(serverXmlRelativePath)
     log.info("Added ${serverXmlRelativePath} to BUILD_LIST (total files: ${buildList.size()})")
     

@@ -174,7 +174,6 @@ try {
     // Use getSetStringVariable with default (like UnitTest.java line 175-176)
     // Do NOT call setVariable() from Groovy - it causes type conversion issues
     log.info("Adding ${relativeMarkerPath} to BUILD_LIST for Package task")
-    Set<String> buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
     buildList.add(relativeMarkerPath)  // Must match the path used in createBuildMap()
     // Set is modified in place - no setVariable() needed (and causes issues in Groovy)
     log.info("Added ${relativeMarkerPath} to BUILD_LIST (total files: ${buildList.size()})")

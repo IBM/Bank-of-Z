@@ -219,13 +219,14 @@ Bank of Z requires a mainframe runtime environment.
 
 - Appropriate permissions for USS directories and dataset creation
 - Git installed and available in PATH on USS
-- zConfig for provisioning the middleware configuration
+- [zconfig](https://ibm.biz/zconfig-join) for provisioning the middleware configuration
   - CICS region for application deployment
 - Db2 for z/OS
 - IMS 
 - IBM DBB 3.0.4.1 installed (typically at `/usr/lpp/IBM/dbb`)
 - ZOAU 1.4.1.0 installed (typically at `/usr/lpp/IBM/zoautil`)
 - Wazi Deploy 3.0.7.2 installed (typically at `/global/opt/pyenv/gdp`)
+- [CICS TS Resource Builde](https://www.ibm.com/docs/en/cics-resource-builder/1.0.x?topic=installing-planning-installation-cics-ts-resource-builder)r 
 
 
 ### Setup IDE

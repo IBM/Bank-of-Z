@@ -312,11 +312,39 @@ main_setup() {
     print_phase_next_step "setup"
 }
 
+#########################################################
+# STAGE: Validate Installation
+#########################################################
+stage_validate_install() {
+    print_stage "STAGE: Validate Installation"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/validate-install.sh" ]; then
+        print_error "Validation script not found: $BANK_DIR/.setup/setup/validate-install.sh"
+        exit 1
+    fi
+    
+    # Run validation script
+    print_info "Running Bank of Z installation validation script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/validate-install.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if bash .setup/setup/validate-install.sh; then
+        print_success "Installation validation completed successfully"
+    else
+        print_error "Installation validation failed"
+        exit 1
+    fi
+}
+
 main_validation() {
     echo ""
     SYS=$(uname -Ia)
     print_info "Running on: $SYS"
     echo ""
+
+    # Validate installation
+    stage_validate_install
 
     # Summary
     print_stage "VALIDATION COMPLETE"

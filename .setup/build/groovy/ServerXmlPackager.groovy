@@ -83,6 +83,25 @@ if (processCicsXml) {
     
     // Check if this is an impact build and if config files have changed
     def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+    
+    // DEBUG: Log BUILD_LIST contents at script start
+    log.info("=== DEBUG: ServerXmlPackager Script Start ===")
+    log.info("DEBUG: BUILD_LIST size = ${buildList.size()}")
+    if (buildList.isEmpty()) {
+        log.info("DEBUG: BUILD_LIST is EMPTY")
+    } else {
+        log.info("DEBUG: BUILD_LIST contents:")
+        buildList.each { file -> log.info("  - ${file}") }
+    }
+    
+    // DEBUG: Log context variables
+    def changedFiles = context.getVariable('changedFiles')
+    def impactedFiles = context.getVariable('impactedFiles')
+    log.info("DEBUG: changedFiles = ${changedFiles ? changedFiles.size() : 'null'}")
+    log.info("DEBUG: impactedFiles = ${impactedFiles ? impactedFiles.size() : 'null'}")
+    log.info("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
+    log.info("=== DEBUG: End of initial state ===")
+    
     def isConfigChanged = false
     
     // Check if any files in BUILD_LIST are server.xml or cics.xml

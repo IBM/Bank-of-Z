@@ -104,7 +104,7 @@ taz:
   # TAZ CLI installation directory
   taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
   # Root directory containing test suites
-  test_dir: ${sandbox.path}/${REPO_NAME}
+  test_dir: ${sandbox.path}/${REPO_NAME}/taz-unit-test
   # JES procedure library
   proclib: SYS1.PROCLIB
   # Load library used during execution

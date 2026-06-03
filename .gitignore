@@ -11,3 +11,4 @@ build.log
 src/base/ims/java/src/main/java/nazare/jmp/standalone/*
 /build/
 zowe.config.user.json
+/.taz-unit-test/

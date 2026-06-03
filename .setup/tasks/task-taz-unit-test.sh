@@ -40,6 +40,17 @@ TAZ_RESULTS_DIR="$SANDBOX_DIR/.taz-edt-results"
 TAZ_LOG_DIR="$SANDBOX_DIR/.taz-edt/logs"
 TAZ_LOG_TAR="$SANDBOX_DIR/taz-unittest-log.tar"
 
+if [ ! -d $TAZ_INSTALL_DIR ];then
+    print_warning "TAZ CLI not found in $TAZ_INSTALL_DIR"
+    exit 0
+fi
+
+
+if [ ! -d $TAZ_TEST_PATH ];then
+    print_warning "No unit test files found"
+    exit 0
+fi
+
 # =========================
 # Finalize: always publish log tar on exit
 # =========================

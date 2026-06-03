@@ -69,9 +69,21 @@ println("DEBUG: impactedFiles = ${impactedFiles ? impactedFiles.size() : 'null'}
 println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
 println("=== DEBUG: End of initial state ===")
 
-def isFrontendChanged = false
+// Check if ImpactAnalysis ran by looking for changedFiles/impactedFiles variables
+def changedFiles = context.getVariable('changedFiles')
+def impactedFiles = context.getVariable('impactedFiles')
+def isImpactBuild = (changedFiles != null || impactedFiles != null)
+
+// For impact builds, only proceed if BUILD_LIST is not empty
+// (meaning ImpactAnalysis or previous tasks found files to process)
+if (isImpactBuild && buildList.isEmpty()) {
+    log.info("Impact build with no files in BUILD_LIST - skipping frontend build")
+    log.info("VanillaFrontend completed (skipped - no changes)")
+    return 0
+}
 
 // Check if any files in BUILD_LIST are under the frontend directory
+def isFrontendChanged = false
 buildList.each { file ->
     if (file.startsWith(vanillaFrontendRelativePath)) {
         isFrontendChanged = true
@@ -79,11 +91,9 @@ buildList.each { file ->
     }
 }
 
-// If this is an impact build and no frontend files changed, skip the build
-def lifecycle = context.getVariable('lifecycle')
-def isUsingImpactAnalysis = lifecycle == 'impact' || lifecycle == 'pipeline'
-if (isUsingImpactAnalysis && !isFrontendChanged) {
-    log.info("Impact build detected with no frontend changes - skipping frontend build")
+// For impact builds, only proceed if frontend files are in BUILD_LIST
+if (isImpactBuild && !isFrontendChanged) {
+    log.info("Impact build with no frontend changes - skipping frontend build")
     log.info("VanillaFrontend completed (skipped - no changes)")
     return 0
 }

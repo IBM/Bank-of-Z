@@ -102,9 +102,21 @@ if (processCicsXml) {
     println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
     println("=== DEBUG: End of initial state ===")
     
-    def isConfigChanged = false
+    // Check if ImpactAnalysis ran by looking for changedFiles/impactedFiles variables
+    def changedFiles = context.getVariable('changedFiles')
+    def impactedFiles = context.getVariable('impactedFiles')
+    def isImpactBuild = (changedFiles != null || impactedFiles != null)
+    
+    // For impact builds, only proceed if BUILD_LIST is not empty
+    // (meaning ImpactAnalysis or previous tasks found files to process)
+    if (isImpactBuild && buildList.isEmpty()) {
+        log.info("Impact build with no files in BUILD_LIST - skipping config packaging")
+        log.info("ServerXmlPackager completed (skipped - no changes)")
+        return 0
+    }
     
     // Check if any files in BUILD_LIST are server.xml or cics.xml
+    def isConfigChanged = false
     buildList.each { file ->
         if (file == serverXmlRelativePath) {
             isConfigChanged = true
@@ -116,11 +128,9 @@ if (processCicsXml) {
         }
     }
     
-    // If this is an impact build and no config files changed, skip the build
-    def lifecycle = context.getVariable('lifecycle')
-    def isUsingImpactAnalysis = lifecycle == 'impact' || lifecycle == 'pipeline'
-    if (isUsingImpactAnalysis && !isConfigChanged) {
-        log.info("Impact build detected with no config file changes - skipping config packaging")
+    // For impact builds, only proceed if config files are in BUILD_LIST
+    if (isImpactBuild && !isConfigChanged) {
+        log.info("Impact build with no config file changes - skipping config packaging")
         log.info("ServerXmlPackager completed (skipped - no changes)")
         return 0
     }

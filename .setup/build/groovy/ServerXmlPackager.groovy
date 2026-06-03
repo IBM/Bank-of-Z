@@ -102,14 +102,13 @@ if (processCicsXml) {
     println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
     println("=== DEBUG: End of initial state ===")
     
-    // Check if ImpactAnalysis ran by looking for changedFiles/impactedFiles variables
-    // (already retrieved above in debug section)
-    def isImpactBuild = (changedFiles != null || impactedFiles != null)
-    
-    // For impact builds, only proceed if BUILD_LIST is not empty
-    // (meaning ImpactAnalysis or previous tasks found files to process)
-    if (isImpactBuild && buildList.isEmpty()) {
-        log.info("Impact build with no files in BUILD_LIST - skipping config packaging")
+    // Simple logic: If BUILD_LIST is empty, nothing needs to be built
+    // This works for all lifecycles:
+    // - Full build: BUILD_LIST won't be empty (FullAnalysis adds everything)
+    // - Impact/Pipeline with changes: BUILD_LIST won't be empty (ImpactAnalysis adds changed files)
+    // - Impact/Pipeline with NO changes: BUILD_LIST IS empty (nothing to build)
+    if (buildList.isEmpty()) {
+        log.info("BUILD_LIST is empty - no files to process, skipping config packaging")
         log.info("ServerXmlPackager completed (skipped - no changes)")
         return 0
     }
@@ -127,18 +126,14 @@ if (processCicsXml) {
         }
     }
     
-    // For impact builds, only proceed if config files are in BUILD_LIST
-    if (isImpactBuild && !isConfigChanged) {
-        log.info("Impact build with no config file changes - skipping config packaging")
-        log.info("ServerXmlPackager completed (skipped - no changes)")
+    // If no config files in BUILD_LIST, skip
+    if (!isConfigChanged) {
+        log.info("No config files in BUILD_LIST - skipping config packaging")
+        log.info("ServerXmlPackager completed (skipped - no config changes)")
         return 0
     }
     
-    if (isConfigChanged) {
-        log.info("Config file changes detected - proceeding with packaging")
-    } else {
-        log.info("Full build - proceeding with packaging")
-    }
+    log.info("Config file changes detected - proceeding with packaging")
     
     // Set environment
 def envList = []

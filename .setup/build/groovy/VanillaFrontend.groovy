@@ -69,14 +69,13 @@ println("DEBUG: impactedFiles = ${impactedFiles ? impactedFiles.size() : 'null'}
 println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
 println("=== DEBUG: End of initial state ===")
 
-// Check if ImpactAnalysis ran by looking for changedFiles/impactedFiles variables
-// (already retrieved above in debug section)
-def isImpactBuild = (changedFiles != null || impactedFiles != null)
-
-// For impact builds, only proceed if BUILD_LIST is not empty
-// (meaning ImpactAnalysis or previous tasks found files to process)
-if (isImpactBuild && buildList.isEmpty()) {
-    log.info("Impact build with no files in BUILD_LIST - skipping frontend build")
+// Simple logic: If BUILD_LIST is empty, nothing needs to be built
+// This works for all lifecycles:
+// - Full build: BUILD_LIST won't be empty (FullAnalysis adds everything)
+// - Impact/Pipeline with changes: BUILD_LIST won't be empty (ImpactAnalysis adds changed files)
+// - Impact/Pipeline with NO changes: BUILD_LIST IS empty (nothing to build)
+if (buildList.isEmpty()) {
+    log.info("BUILD_LIST is empty - no files to process, skipping frontend build")
     log.info("VanillaFrontend completed (skipped - no changes)")
     return 0
 }
@@ -90,18 +89,14 @@ buildList.each { file ->
     }
 }
 
-// For impact builds, only proceed if frontend files are in BUILD_LIST
-if (isImpactBuild && !isFrontendChanged) {
-    log.info("Impact build with no frontend changes - skipping frontend build")
-    log.info("VanillaFrontend completed (skipped - no changes)")
+// If no frontend files in BUILD_LIST, skip
+if (!isFrontendChanged) {
+    log.info("No frontend files in BUILD_LIST - skipping frontend build")
+    log.info("VanillaFrontend completed (skipped - no frontend changes)")
     return 0
 }
 
-if (isFrontendChanged) {
-    log.info("Frontend changes detected - proceeding with build")
-} else {
-    log.info("Full build - proceeding with build")
-}
+log.info("Frontend changes detected - proceeding with build")
 
 // Set environment
 def envList = []

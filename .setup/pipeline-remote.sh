@@ -23,7 +23,9 @@ stage_execute_pipeline() {
     
     print_info "Executing pipeline-common.sh on remote z/OS USS..."
     print_info "This will:"
-    print_info "  - Refresh git repository (pull latest)"
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        print_info "  - Refresh git repository (pull latest)"
+    fi
     print_info "  - Run DBB build"
     print_info "  - Deploy build"
     echo ""
@@ -47,6 +49,16 @@ stage_execute_pipeline() {
         print_error "Failed to execute pipeline on remote system"
         exit 1
     fi
+
+    bash ${SCRIPTS_DIR}/pipeline-common.sh unit-test&
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
+        print_success "Remote pipeline completed successfully"
+    else
+        print_error "Failed to execute pipeline on remote system"
+        exit 1
+    fi
 }
 
 #########################################################
@@ -62,6 +74,9 @@ main() {
     print_info "This script runs on your LOCAL machine"
     print_info "It uses Zowe CLI to coordinate pipeline execution on remote z/OS USS"
     echo ""
+
+    # Detect Execution Mode
+    detect_bank_of_z_location
     
     # Execute stages
     stage_execute_pipeline

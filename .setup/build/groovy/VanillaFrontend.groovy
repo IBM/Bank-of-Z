@@ -70,8 +70,7 @@ println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
 println("=== DEBUG: End of initial state ===")
 
 // Check if ImpactAnalysis ran by looking for changedFiles/impactedFiles variables
-def changedFiles = context.getVariable('changedFiles')
-def impactedFiles = context.getVariable('impactedFiles')
+// (already retrieved above in debug section)
 def isImpactBuild = (changedFiles != null || impactedFiles != null)
 
 // For impact builds, only proceed if BUILD_LIST is not empty

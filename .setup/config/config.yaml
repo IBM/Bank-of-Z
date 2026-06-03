@@ -146,4 +146,5 @@ cics:
   password: ${CICS_PASSWORD} # env var
   cmci_port: 27100
   ipic_port: 4320
+  debug_port: 27103
 

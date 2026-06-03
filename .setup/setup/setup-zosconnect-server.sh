@@ -24,7 +24,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 export ZOSCONNECT_HOME=$(get_section_value 'zosconnect' 'zosconnect_home')
 export ZOSCONNECT_HOME=$(echo "$ZOSCONNECT_HOME" | sed "s|~|$HOME|g")
 export CICS_USER=${CICS_USER:-$(get_section_value 'cics' 'user')}
-export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')}
+export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')}  # pragma: allowlist secret
 export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
@@ -99,8 +99,12 @@ JVM_OPTIONS=-Xmx2048M
 //*
 EOF
 
-# Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
+# Pad each line to exactly 80 characters for FB80 dataset
+awk '{printf "%-80s\n", substr($0, 1, 80)}' "/tmp/BAQ${APP_BASE_NAME}.jcl" > "/tmp/BAQ${APP_BASE_NAME}.jcl.padded"
+mv "/tmp/BAQ${APP_BASE_NAME}.jcl.padded" "/tmp/BAQ${APP_BASE_NAME}.jcl"
+
+# Convert to EBCDIC (force conversion even if already tagged)
+a2e -f ISO8859-1 -t IBM-1047 -F "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # Copy to PROCLIB using dcp
 print_info "${CYAN}[ZOSCONNECT]${NC} Copying JCL to SYS1.PROCLIB..."

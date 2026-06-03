@@ -145,7 +145,10 @@ else
     exit 1
 fi
 
-deactivate
+# Deactivate virtual environment only if it was activated
+if type deactivate &>/dev/null; then
+    deactivate
+fi
 
 # =========================
 # Stage 4: Start CICS region

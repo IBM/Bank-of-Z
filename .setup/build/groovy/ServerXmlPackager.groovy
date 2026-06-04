@@ -87,15 +87,24 @@ def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new Linke
 
 log.info("Lifecycle: ${lifecycle}")
 
-// For pipeline/impact builds: only proceed if config files are in BUILD_LIST
+// For pipeline/impact builds: check if any config files changed, deleted, or renamed
 if (lifecycle == 'pipeline' || lifecycle == 'impact') {
+    def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
+    def deletedFiles = context.getVariable(TaskConstants.DELETED_FILES) ?: []
+    def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
+    def allFiles = changedFiles + deletedFiles + renamedFiles
+    
     def isConfigChanged = false
-    buildList.each { file ->
-        if (file == serverXmlRelativePath) {
+    allFiles.each { file ->
+        // Files contain paths like "Bank-of-Z/src/api/src/main/liberty/config/server.xml"
+        // Check if the path ends with our config file paths
+        if (file.endsWith("/${serverXmlRelativePath}")) {
             isConfigChanged = true
+            log.info("Config file changed: ${file}")
         }
-        if (processCicsXml && file == cicsXmlRelativePath) {
+        if (processCicsXml && file.endsWith("/${cicsXmlRelativePath}")) {
             isConfigChanged = true
+            log.info("Config file changed: ${file}")
         }
     }
     

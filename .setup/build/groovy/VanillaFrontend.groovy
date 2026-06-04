@@ -54,12 +54,20 @@ def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new Linke
 
 log.info("Lifecycle: ${lifecycle}")
 
-// For pipeline/impact builds: only proceed if frontend files are in BUILD_LIST
+// For pipeline/impact builds: check if any frontend files changed, deleted, or renamed
 if (lifecycle == 'pipeline' || lifecycle == 'impact') {
+    def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
+    def deletedFiles = context.getVariable(TaskConstants.DELETED_FILES) ?: []
+    def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
+    def allFiles = changedFiles + deletedFiles + renamedFiles
+    
     def isFrontendChanged = false
-    buildList.each { file ->
-        if (file.startsWith(vanillaFrontendRelativePath)) {
+    allFiles.each { file ->
+        // Files contain paths like "Bank-of-Z/src/frontend/admin.html"
+        // Check if the path contains the frontend directory
+        if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
             isFrontendChanged = true
+            log.info("Frontend file changed: ${file}")
         }
     }
     

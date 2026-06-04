@@ -34,7 +34,7 @@ stage_build_bank_of_z() {
     
     # Run installation script
     print_info "Running Bank of Z build script..."
-    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-dbb-build.sh"
+    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-dbb-build.sh $1"
     cd "$BANK_DIR"
     
     set -o pipefail
@@ -183,13 +183,15 @@ main() {
             main_validation
             ;;
         build)
-            main_build $*
+            shift  # Remove 'build' from parameters
+            main_build "$@"
             ;;
         deploy)
             main_deploy
             ;;
         build-and-deploy)
-            main_build $*
+            shift  # Remove 'build-and-deploy' from parameters
+            main_build "$@"
             main_deploy
             ;;
         -h|--help|help|"")

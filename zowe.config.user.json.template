@@ -1,0 +1,33 @@
+{
+    "$schema": "./zowe.schema.json",
+    "profiles": {
+
+        "bank-of-z": {
+            "properties": {
+                // Enter the hostname or IP address of your remote system
+                "host": "YOUR_HOST_HERE"
+            },
+            "profiles": {
+
+                "ssh": {
+                    "type": "ssh",
+                    "properties": {
+                        // Enter the absolute path of your private key.
+                        // You can find this by running `ssh -v <hostname>`
+                        "privateKey": "/path/to/your/private/key"
+                    }
+                },
+
+                "cics": {
+                    "type": "cics",
+                    "properties": {
+                        // Change this is you're using a different CMCI port from standard
+                        "port": 27100
+                    }
+                }
+
+            }
+        }
+    },
+    "autoStore": true
+}

@@ -1,0 +1,62 @@
+{
+    "$schema": "./zowe.schema.json",
+    "profiles": {
+        "bank-of-z": {
+            "properties": {
+                "protocol": "https",
+                "rejectUnauthorized": false
+            },
+            "secure": [
+                "user",
+                "password"
+            ],
+            "profiles": {
+                "zosmf": {
+                    "type": "zosmf",
+                    "properties": {
+                        "port": 10443
+                    }
+                },
+                "ssh": {
+                    "type": "ssh",
+                    "properties": {
+                        "port": 22
+                    }
+                },
+                "rse": {
+                    "type": "rse",
+                    "properties": {
+                        "port": 8195,
+                        "basePath": "rseapi"
+                    }
+                },
+                "cics": {
+                    "type": "cics",
+                    "properties": {
+                        "protocol": "http"
+                    }
+                },
+                "zOpenDebug": {
+                    "type": "zOpenDebug",
+                    "properties": {
+                        "dpsPort": 8192,
+                        "dpsContextRoot": "api/v1",
+                        "dpsSecured": true,
+                        "authenticationType": "basic",
+                        "rdsPort": 8194,
+                        "rdsSecured": true,
+                        "uuid": "05a46db4-b73f-4c81-9f0a-51350d171355"
+                    }
+                }
+            }
+        }
+    },
+    "defaults": {
+        "zosmf": "bank-of-z.zosmf",
+        "ssh": "bank-of-z.ssh",
+        "rse": "bank-of-z.rse",
+        "cics": "bank-of-z.cics",
+        "zOpenDebug": "bank-of-z.zOpenDebug"
+    },
+    "autoStore": true
+}

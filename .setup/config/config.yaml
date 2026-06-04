@@ -112,11 +112,6 @@ zosconnect:
   http_port: 9080
   https_port: 9443
 
-# Frontend (Node.js runtime)
-fronted:
-  # Node.js runtime for z/OS
-  node_home: /usr/lpp/IBM/cnj/IBM/node-latest-os390-s390x
-
 # ZOAU installtion directory
 zoau:
   zoau_home: /usr/lpp/IBM/zoautil

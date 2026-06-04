@@ -102,13 +102,15 @@ if (processCicsXml) {
     println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
     println("=== DEBUG: End of initial state ===")
     
-    // Simple logic: If BUILD_LIST is empty, nothing needs to be built
-    // This works for all lifecycles:
-    // - Full build: BUILD_LIST won't be empty (FullAnalysis adds everything)
-    // - Impact/Pipeline with changes: BUILD_LIST won't be empty (ImpactAnalysis adds changed files)
-    // - Impact/Pipeline with NO changes: BUILD_LIST IS empty (nothing to build)
-    if (buildList.isEmpty()) {
-        log.info("BUILD_LIST is empty - no files to process, skipping config packaging")
+    // Detect if ImpactAnalysis ran by checking if changedFiles variable was set
+    // (ImpactAnalysis sets this variable even if it's null/empty)
+    // If changedFiles was never set, this is a full build (FullAnalysis doesn't set it)
+    def hasImpactAnalysis = context.hasVariable('changedFiles')
+    
+    // For impact/pipeline builds: skip if BUILD_LIST is empty (no changes detected)
+    // For full builds: always proceed (BUILD_LIST may be empty for non-source files)
+    if (hasImpactAnalysis && buildList.isEmpty()) {
+        log.info("Impact/Pipeline build with empty BUILD_LIST - skipping config packaging")
         log.info("ServerXmlPackager completed (skipped - no changes)")
         return 0
     }

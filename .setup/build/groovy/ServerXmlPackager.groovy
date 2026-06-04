@@ -81,63 +81,33 @@ if (processCicsXml) {
     log.info("Found server.xml")
     }
     
-    // Check if this is an impact build and if config files have changed
-    def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
-    
-    // DEBUG: Log BUILD_LIST contents at script start
-    println("=== DEBUG: ServerXmlPackager Script Start ===")
-    println("DEBUG: BUILD_LIST size = ${buildList.size()}")
-    if (buildList.isEmpty()) {
-        println("DEBUG: BUILD_LIST is EMPTY")
-    } else {
-        println("DEBUG: BUILD_LIST contents:")
-        buildList.each { file -> println("  - ${file}") }
-    }
-    
-    // DEBUG: Log context variables
-    def changedFiles = context.getVariable('changedFiles')
-    def impactedFiles = context.getVariable('impactedFiles')
-    println("DEBUG: changedFiles = ${changedFiles ? changedFiles.size() : 'null'}")
-    println("DEBUG: impactedFiles = ${impactedFiles ? impactedFiles.size() : 'null'}")
-    println("DEBUG: lifecycle = ${context.getVariable('lifecycle')}")
-    println("=== DEBUG: End of initial state ===")
-    
-    // Detect if ImpactAnalysis ran by checking if changedFiles variable was set
-    // (ImpactAnalysis sets this variable even if it's null/empty)
-    // If changedFiles was never set, this is a full build (FullAnalysis doesn't set it)
-    def hasImpactAnalysis = context.hasVariable('changedFiles')
-    
-    // For impact/pipeline builds: skip if BUILD_LIST is empty (no changes detected)
-    // For full builds: always proceed (BUILD_LIST may be empty for non-source files)
-    if (hasImpactAnalysis && buildList.isEmpty()) {
-        log.info("Impact/Pipeline build with empty BUILD_LIST - skipping config packaging")
-        log.info("ServerXmlPackager completed (skipped - no changes)")
-        return 0
-    }
-    
-    // Check if any files in BUILD_LIST are server.xml or cics.xml
+// Get lifecycle and BUILD_LIST
+def lifecycle = context.getVariable(TaskConstants.LIFECYCLE)
+def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+
+log.info("Lifecycle: ${lifecycle}")
+
+// For pipeline/impact builds: only proceed if config files are in BUILD_LIST
+if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def isConfigChanged = false
     buildList.each { file ->
         if (file == serverXmlRelativePath) {
             isConfigChanged = true
-            log.info("Config file changed: ${file}")
         }
         if (processCicsXml && file == cicsXmlRelativePath) {
             isConfigChanged = true
-            log.info("Config file changed: ${file}")
         }
     }
     
-    // If no config files in BUILD_LIST, skip
     if (!isConfigChanged) {
-        log.info("No config files in BUILD_LIST - skipping config packaging")
-        log.info("ServerXmlPackager completed (skipped - no config changes)")
+        log.info("${lifecycle} build with no config changes - skipping config packaging")
         return 0
     }
     
-    log.info("Config file changes detected - proceeding with packaging")
-    
-    // Set environment
+    log.info("${lifecycle} build with config changes - proceeding with packaging")
+}
+
+// Set environment
 def envList = []
 System.getenv().each { k, v -> envList << "$k=$v" }
 def env = envList as String[]

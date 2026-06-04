@@ -85,8 +85,6 @@ if (processCicsXml) {
 def lifecycle = context.getVariable(TaskConstants.LIFECYCLE)
 def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
 
-log.info("Lifecycle: ${lifecycle}")
-
 // For pipeline/impact builds: check if any config files changed, deleted, or renamed
 if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
@@ -100,20 +98,22 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
         // Check if the path ends with our config file paths
         if (file.endsWith("/${serverXmlRelativePath}")) {
             isConfigChanged = true
-            log.info("Config file changed: ${file}")
+            println("> Config file detected: ${file}")
         }
         if (processCicsXml && file.endsWith("/${cicsXmlRelativePath}")) {
             isConfigChanged = true
-            log.info("Config file changed: ${file}")
+            println("> Config file detected: ${file}")
         }
     }
     
     if (!isConfigChanged) {
-        log.info("${lifecycle} build with no config changes - skipping config packaging")
+        println("> No config changes detected - skipping config packaging")
         return 0
     }
     
-    log.info("${lifecycle} build with config changes - proceeding with packaging")
+    println("> Config changes detected - proceeding with packaging")
+} else {
+    println("> Full build - proceeding with config packaging")
 }
 
 // Set environment

@@ -52,8 +52,6 @@ log.info("Found vanilla frontend directory")
 def lifecycle = context.getVariable(TaskConstants.LIFECYCLE)
 def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
 
-log.info("Lifecycle: ${lifecycle}")
-
 // For pipeline/impact builds: check if any frontend files changed, deleted, or renamed
 if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
@@ -67,16 +65,18 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
         // Check if the path contains the frontend directory
         if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
             isFrontendChanged = true
-            log.info("Frontend file changed: ${file}")
+            println("> Frontend file detected: ${file}")
         }
     }
     
     if (!isFrontendChanged) {
-        log.info("${lifecycle} build with no frontend changes - skipping frontend build")
+        println("> No frontend changes detected - skipping frontend build")
         return 0
     }
     
-    log.info("${lifecycle} build with frontend changes - proceeding with build")
+    println("> Frontend changes detected - proceeding with build")
+} else {
+    println("> Full build - proceeding with frontend build")
 }
 
 // Set environment

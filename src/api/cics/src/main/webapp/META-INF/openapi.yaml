@@ -1,0 +1,1227 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: api-support@bankofz.com
+    name: Bank of Z API Support
+  description: |
+    OpenBanking-compliant API for Bank of Z providing access to customer information and account data.
+    This API follows the OpenBanking UK specification standards for secure access to banking data.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Bank of Z - OpenBanking API
+  version: 1.0.0
+servers:
+- url: /
+security:
+- OAuth2:
+  - accounts
+  - customers
+tags:
+- description: Customer information endpoints
+  name: Customers
+- description: Account information endpoints
+  name: Accounts
+- description: Account balance endpoints
+  name: Balances
+- description: Transaction history endpoints
+  name: Transactions
+paths:
+  /ims/customers/{customerId}:
+    get:
+      description: Retrieve detailed information about a specific customer
+      operationId: getIMSCustomer
+      parameters:
+      - description: Unique identifier for the customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          example: CUST123456
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Customer information retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get customer information
+      tags:
+      - Customers
+      x-accepts: application/json
+      x-tags:
+      - tag: Customers
+  /ims/customers/{customerId}/accounts:
+    get:
+      description: Retrieve all accounts associated with a customer
+      operationId: getIMSCustomerAccounts
+      parameters:
+      - description: Unique identifier for the customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          example: CUST123456
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+          description: Accounts retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get customer accounts
+      tags:
+      - Accounts
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+  /customers/{customerId}:
+    get:
+      description: Retrieve detailed information about a specific customer
+      operationId: getCustomer
+      parameters:
+      - description: Unique identifier for the customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          example: CUST123456
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Customer information retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get customer information
+      tags:
+      - Customers
+      x-accepts: application/json
+      x-tags:
+      - tag: Customers
+  /customers/{customerId}/accounts:
+    get:
+      description: Retrieve all accounts associated with a customer
+      operationId: getCustomerAccounts
+      parameters:
+      - description: Unique identifier for the customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          example: CUST123456
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+          description: Accounts retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get customer accounts
+      tags:
+      - Accounts
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+  /accounts:
+    get:
+      description: Retrieve all accounts accessible by the authenticated user
+      operationId: getAccounts
+      parameters:
+      - description: Filter by account type
+        explode: true
+        in: query
+        name: accountType
+        required: false
+        schema:
+          enum:
+          - CURRENT
+          - SAVINGS
+          - CREDIT_CARD
+          - LOAN
+          type: string
+        style: form
+      - description: Filter by account status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CLOSED
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+          description: Accounts retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get all accounts
+      tags:
+      - Accounts
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+  /accounts/{accountId}:
+    get:
+      description: Retrieve detailed information about a specific account
+      operationId: getAccount
+      parameters:
+      - description: Unique identifier for the account
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          example: ACC987654321
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: Account details retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get account details
+      tags:
+      - Accounts
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+  /accounts/{accountId}/balances:
+    get:
+      description: Retrieve current balance information for a specific account
+      operationId: getAccountBalances
+      parameters:
+      - description: Unique identifier for the account
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          example: ACC987654321
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+          description: Balance information retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get account balances
+      tags:
+      - Balances
+      x-accepts: application/json
+      x-tags:
+      - tag: Balances
+  /accounts/{accountId}/transactions:
+    get:
+      description: Retrieve transaction history for a specific account
+      operationId: getAccountTransactions
+      parameters:
+      - description: Unique identifier for the account
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          example: ACC987654321
+          type: string
+        style: simple
+      - description: Start date for transaction history (ISO 8601 format)
+        explode: true
+        in: query
+        name: fromDate
+        required: false
+        schema:
+          example: 2026-01-01
+          format: date
+          type: string
+        style: form
+      - description: End date for transaction history (ISO 8601 format)
+        explode: true
+        in: query
+        name: toDate
+        required: false
+        schema:
+          example: 2026-03-13
+          format: date
+          type: string
+        style: form
+      - description: Maximum number of transactions to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 50
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - description: Number of transactions to skip for pagination
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          minimum: 0
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionList'
+          description: Transactions retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get account transactions
+      tags:
+      - Transactions
+      x-accepts: application/json
+      x-tags:
+      - tag: Transactions
+  /accounts/{accountId}/transactions/{transactionId}:
+    get:
+      description: Retrieve detailed information about a specific transaction
+      operationId: getTransaction
+      parameters:
+      - description: Unique identifier for the account
+        explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          example: ACC987654321
+          type: string
+        style: simple
+      - description: Unique identifier for the transaction
+        explode: false
+        in: path
+        name: transactionId
+        required: true
+        schema:
+          example: TXN456789
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: Transaction details retrieved successfully
+        "400":
+          content:
+            application/json:
+              example:
+                code: BAD_REQUEST
+                message: Invalid request parameters
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request - invalid parameters
+        "401":
+          content:
+            application/json:
+              example:
+                code: UNAUTHORIZED
+                message: Authentication credentials are missing or invalid
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized - authentication required
+        "403":
+          content:
+            application/json:
+              example:
+                code: FORBIDDEN
+                message: You do not have permission to access this resource
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - insufficient permissions
+        "404":
+          content:
+            application/json:
+              example:
+                code: NOT_FOUND
+                message: The requested resource was not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found - resource does not exist
+        "500":
+          content:
+            application/json:
+              example:
+                code: INTERNAL_ERROR
+                message: An unexpected error occurred
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error
+      summary: Get transaction details
+      tags:
+      - Transactions
+      x-accepts: application/json
+      x-tags:
+      - tag: Transactions
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          example:
+            code: BAD_REQUEST
+            message: Invalid request parameters
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Bad request - invalid parameters
+    Unauthorized:
+      content:
+        application/json:
+          example:
+            code: UNAUTHORIZED
+            message: Authentication credentials are missing or invalid
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unauthorized - authentication required
+    Forbidden:
+      content:
+        application/json:
+          example:
+            code: FORBIDDEN
+            message: You do not have permission to access this resource
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Forbidden - insufficient permissions
+    NotFound:
+      content:
+        application/json:
+          example:
+            code: NOT_FOUND
+            message: The requested resource was not found
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Not found - resource does not exist
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            code: INTERNAL_ERROR
+            message: An unexpected error occurred
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Internal server error
+  schemas:
+    Customer:
+      example:
+        customerStatus: ACTIVE
+        firstName: John
+        lastName: Smith
+        phoneNumber: +44 20 7946 0958
+        address:
+          country: United Kingdom
+          city: London
+          postalCode: SW1A 1AA
+          addressLine1: 123 High Street
+          addressLine2: Apartment 4B
+        createdDate: 2020-01-15T10:30:00Z
+        customerId: CUST123456
+        dateOfBirth: 1985-06-15T00:00:00.000+00:00
+        title: Mr
+        email: john.smith@example.com
+      properties:
+        customerId:
+          description: Unique identifier for the customer
+          example: CUST123456
+          type: string
+        title:
+          description: Customer title
+          example: Mr
+          type: string
+        firstName:
+          description: Customer first name
+          example: John
+          type: string
+        lastName:
+          description: Customer last name
+          example: Smith
+          type: string
+        dateOfBirth:
+          description: Customer date of birth
+          example: 1985-06-15
+          format: date
+          type: string
+        email:
+          description: Customer email address
+          example: john.smith@example.com
+          format: email
+          type: string
+        phoneNumber:
+          description: Customer phone number
+          example: +44 20 7946 0958
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        customerStatus:
+          description: Current status of the customer
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - SUSPENDED
+          example: ACTIVE
+          type: string
+        createdDate:
+          description: Date when customer account was created
+          example: 2020-01-15T10:30:00Z
+          format: date-time
+          type: string
+      required:
+      - customerId
+      - email
+      - firstName
+      - lastName
+      type: object
+    Address:
+      example:
+        country: United Kingdom
+        city: London
+        postalCode: SW1A 1AA
+        addressLine1: 123 High Street
+        addressLine2: Apartment 4B
+      properties:
+        addressLine1:
+          example: 123 High Street
+          type: string
+        addressLine2:
+          example: Apartment 4B
+          type: string
+        city:
+          example: London
+          type: string
+        postalCode:
+          example: SW1A 1AA
+          type: string
+        country:
+          example: United Kingdom
+          type: string
+      type: object
+    AccountList:
+      example:
+        accounts:
+        - accountId: ACC987654321
+          accountSubType: PERSONAL_CURRENT
+          accountType: CURRENT
+          iban: GB29NWBK60161331926819
+          nickname: My Main Account
+          customerId: CUST123456
+          currency: GBP
+          accountNumber: "12345678"
+          sortCode: 12-34-56
+          openingDate: 2020-01-15T00:00:00.000+00:00
+          status: ACTIVE
+        - accountId: ACC987654321
+          accountSubType: PERSONAL_CURRENT
+          accountType: CURRENT
+          iban: GB29NWBK60161331926819
+          nickname: My Main Account
+          customerId: CUST123456
+          currency: GBP
+          accountNumber: "12345678"
+          sortCode: 12-34-56
+          openingDate: 2020-01-15T00:00:00.000+00:00
+          status: ACTIVE
+        totalCount: 3
+      properties:
+        accounts:
+          items:
+            $ref: '#/components/schemas/Account'
+          type: array
+        totalCount:
+          description: Total number of accounts
+          example: 3
+          type: integer
+      required:
+      - accounts
+      type: object
+    Account:
+      example:
+        accountId: ACC987654321
+        accountSubType: PERSONAL_CURRENT
+        accountType: CURRENT
+        iban: GB29NWBK60161331926819
+        nickname: My Main Account
+        customerId: CUST123456
+        currency: GBP
+        accountNumber: "12345678"
+        sortCode: 12-34-56
+        openingDate: 2020-01-15T00:00:00.000+00:00
+        status: ACTIVE
+      properties:
+        accountId:
+          description: Unique identifier for the account
+          example: ACC987654321
+          type: string
+        accountType:
+          description: Type of account
+          enum:
+          - CURRENT
+          - SAVINGS
+          - CREDIT_CARD
+          - LOAN
+          example: CURRENT
+          type: string
+        accountSubType:
+          description: Sub-type of account
+          example: PERSONAL_CURRENT
+          type: string
+        currency:
+          description: Currency code (ISO 4217)
+          example: GBP
+          type: string
+        nickname:
+          description: Customer-defined nickname for the account
+          example: My Main Account
+          type: string
+        accountNumber:
+          description: Account number
+          example: "12345678"
+          type: string
+        sortCode:
+          description: Bank sort code
+          example: 12-34-56
+          type: string
+        iban:
+          description: International Bank Account Number
+          example: GB29NWBK60161331926819
+          type: string
+        status:
+          description: Current status of the account
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CLOSED
+          example: ACTIVE
+          type: string
+        openingDate:
+          description: Date when account was opened
+          example: 2020-01-15
+          format: date
+          type: string
+        customerId:
+          description: Customer ID associated with this account
+          example: CUST123456
+          type: string
+      required:
+      - accountId
+      - accountType
+      - currency
+      - status
+      type: object
+    BalanceList:
+      properties:
+        balances:
+          items:
+            $ref: '#/components/schemas/Balance'
+          type: array
+      required:
+      - balances
+      type: object
+    Balance:
+      example:
+        dateTime: 2026-03-13T09:57:22Z
+        amount: 1234.56
+        balanceType: AVAILABLE
+        currency: GBP
+        creditDebitIndicator: CREDIT
+      properties:
+        balanceType:
+          description: Type of balance
+          enum:
+          - AVAILABLE
+          - CURRENT
+          - OPENING_AVAILABLE
+          - OPENING_BOOKED
+          example: AVAILABLE
+          type: string
+        amount:
+          description: Balance amount
+          example: 1234.56
+          format: double
+          type: number
+        currency:
+          description: Currency code (ISO 4217)
+          example: GBP
+          type: string
+        creditDebitIndicator:
+          description: Indicates if balance is credit or debit
+          enum:
+          - CREDIT
+          - DEBIT
+          example: CREDIT
+          type: string
+        dateTime:
+          description: Date and time of the balance
+          example: 2026-03-13T09:57:22Z
+          format: date-time
+          type: string
+      required:
+      - amount
+      - balanceType
+      - currency
+      - dateTime
+      type: object
+    TransactionList:
+      example:
+        offset: 0
+        limit: 50
+        transactions:
+        - accountId: ACC987654321
+          amount: 50.0
+          balance:
+            dateTime: 2026-03-13T09:57:22Z
+            amount: 1234.56
+            balanceType: AVAILABLE
+            currency: GBP
+            creditDebitIndicator: CREDIT
+          bookingDateTime: 2026-03-12T14:30:00Z
+          currency: GBP
+          valueDateTime: 2026-03-12T14:30:00Z
+          transactionInformation: Payment to ABC Store
+          merchantDetails:
+            merchantCategoryCode: "5411"
+            merchantName: ABC Store
+          creditDebitIndicator: DEBIT
+          transactionId: TXN456789
+          status: BOOKED
+        - accountId: ACC987654321
+          amount: 50.0
+          balance:
+            dateTime: 2026-03-13T09:57:22Z
+            amount: 1234.56
+            balanceType: AVAILABLE
+            currency: GBP
+            creditDebitIndicator: CREDIT
+          bookingDateTime: 2026-03-12T14:30:00Z
+          currency: GBP
+          valueDateTime: 2026-03-12T14:30:00Z
+          transactionInformation: Payment to ABC Store
+          merchantDetails:
+            merchantCategoryCode: "5411"
+            merchantName: ABC Store
+          creditDebitIndicator: DEBIT
+          transactionId: TXN456789
+          status: BOOKED
+        totalCount: 150
+      properties:
+        transactions:
+          items:
+            $ref: '#/components/schemas/Transaction'
+          type: array
+        totalCount:
+          description: Total number of transactions
+          example: 150
+          type: integer
+        limit:
+          description: Maximum number of transactions returned
+          example: 50
+          type: integer
+        offset:
+          description: Number of transactions skipped
+          example: 0
+          type: integer
+      required:
+      - transactions
+      type: object
+    Transaction:
+      example:
+        accountId: ACC987654321
+        amount: 50.0
+        balance:
+          dateTime: 2026-03-13T09:57:22Z
+          amount: 1234.56
+          balanceType: AVAILABLE
+          currency: GBP
+          creditDebitIndicator: CREDIT
+        bookingDateTime: 2026-03-12T14:30:00Z
+        currency: GBP
+        valueDateTime: 2026-03-12T14:30:00Z
+        transactionInformation: Payment to ABC Store
+        merchantDetails:
+          merchantCategoryCode: "5411"
+          merchantName: ABC Store
+        creditDebitIndicator: DEBIT
+        transactionId: TXN456789
+        status: BOOKED
+      properties:
+        transactionId:
+          description: Unique identifier for the transaction
+          example: TXN456789
+          type: string
+        accountId:
+          description: Account identifier
+          example: ACC987654321
+          type: string
+        amount:
+          description: Transaction amount
+          example: 50.0
+          format: double
+          type: number
+        currency:
+          description: Currency code (ISO 4217)
+          example: GBP
+          type: string
+        creditDebitIndicator:
+          description: Indicates if transaction is credit or debit
+          enum:
+          - CREDIT
+          - DEBIT
+          example: DEBIT
+          type: string
+        status:
+          description: Transaction status
+          enum:
+          - PENDING
+          - BOOKED
+          - CANCELLED
+          example: BOOKED
+          type: string
+        bookingDateTime:
+          description: Date and time when transaction was booked
+          example: 2026-03-12T14:30:00Z
+          format: date-time
+          type: string
+        valueDateTime:
+          description: Date and time when transaction value is applied
+          example: 2026-03-12T14:30:00Z
+          format: date-time
+          type: string
+        transactionInformation:
+          description: Additional information about the transaction
+          example: Payment to ABC Store
+          type: string
+        merchantDetails:
+          $ref: '#/components/schemas/MerchantDetails'
+        balance:
+          $ref: '#/components/schemas/Balance'
+      required:
+      - accountId
+      - amount
+      - bookingDateTime
+      - creditDebitIndicator
+      - currency
+      - status
+      - transactionId
+      type: object
+    MerchantDetails:
+      example:
+        merchantCategoryCode: "5411"
+        merchantName: ABC Store
+      properties:
+        merchantName:
+          description: Name of the merchant
+          example: ABC Store
+          type: string
+        merchantCategoryCode:
+          description: Merchant category code
+          example: "5411"
+          type: string
+      type: object
+    Error:
+      properties:
+        code:
+          description: Error code
+          example: INVALID_REQUEST
+          type: string
+        message:
+          description: Human-readable error message
+          example: The request parameters are invalid
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/Error_details_inner'
+          type: array
+      required:
+      - code
+      - message
+      type: object
+    Error_details_inner:
+      properties:
+        field:
+          example: accountId
+          type: string
+        issue:
+          example: Account ID must be a valid format
+          type: string
+      type: object
+  securitySchemes:
+    OAuth2:
+      description: OAuth2 authentication for secure API access
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.bankofz.com/oauth/authorize
+          scopes:
+            accounts: Access to account information
+            customers: Access to customer information
+            transactions: Access to transaction history
+          tokenUrl: https://auth.bankofz.com/oauth/token
+      type: oauth2
+

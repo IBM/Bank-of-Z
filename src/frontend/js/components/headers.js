@@ -14,7 +14,7 @@
  */
 export function createHeader(includeSideNav = false) {
     const indexLink = `<cds-header-name href="index.html" prefix="IBM">
-            CICS Banking Sample Application
+            Bank of Z Sample Application
         </cds-header-name>`
 
     const sideNavContent = includeSideNav ? `
@@ -92,7 +92,7 @@ export function createHeader(includeSideNav = false) {
     `;
 
     return `
-        <cds-header aria-label="CICS Banking Sample Application" class="cds--g100">
+        <cds-header aria-label="Bank of Z Sample Application" class="cds--g100">
             ${sideNavContent}
             
             <cds-header-global-bar>

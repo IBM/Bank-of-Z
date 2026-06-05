@@ -1,6 +1,6 @@
-# CICS Banking Sample Application - Vanilla JavaScript Frontend (Static HTML)
+# Bank of Z Sample Application - Vanilla JavaScript Frontend (Static HTML)
 
-A zero-dependency vanilla JavaScript implementation of the CICS Banking Sample Application frontend using **static HTML pages** and Carbon Design System Web Components.
+A zero-dependency vanilla JavaScript implementation of the Bank of Z Sample Application frontend using **static HTML pages** and Carbon Design System Web Components.
 
 ## 🎯 Overview
 
@@ -300,7 +300,7 @@ Example:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Page - CBSA</title>
+    <title>My Page - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
     <link rel="stylesheet" href="css/main.css">
 </head>

@@ -43,7 +43,7 @@ set +e
 jcan P "CICS${APP_SHORT_NAME}" & 2>/dev/null
 opercmd "C CICS${APP_SHORT_NAME}" & 2>/dev/null
 sleep 10
-drm "${APP_BASE_NAME}.${APP_VERSION}.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
 drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*" & 2>/dev/null
 drm "${APP_BASE_NAME}.DBB.*" & 2>/dev/null
 sleep 5

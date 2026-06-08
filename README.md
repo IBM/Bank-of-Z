@@ -234,12 +234,47 @@ Bank of Z requires a mainframe runtime environment.
 
 ### Setup IDE
 
-*Using Bob*
+Install Bob IDE and/or VS Code IDE and required extensions:
 
-Install Bob IDE and required extensions:
-- Zowe Explorer
-- IBM Z Open Editor
-- DB2/CICS/IMS/MQ Extensions
+- IDzEE Extension Pack: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/zopeneditor)
+  - IBM Z Open Editor
+  - IBM Z Open Debug
+  - IBM Compiled Code Coverage
+  - Zowe Explorer
+  - Zowe Explorer for IBM CICS Transaction Server
+- CICS Interdependency Analyzer Extension for Zowe Explorer: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe), Open VSX (n/a)
+- IBM IMS Explorer for VS Code: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode), Open VSX (n/a)
+- IBM Db2 for z/OS Developer Extension: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension)
+- IBM z/OS Connect development tools: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX (n/a)
+- MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
+
+Bob IDE uses Open VSX for it's marketplace.  For extension not in the Open VSX marketplace but exist in VS Code marketplace, use an alternative download method to obtain the .vsix from VS Code marketplace to be installed manually into Bob IDE.
+
+Using the browser to download, the URL will be comprised of the extensions Publisher ID, and Extension ID.
+
+For example:
+
+Example URL for CICS Interdependency Analyzer Extension for Zowe Explorer on the VS Code marketplace:
+`https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe`
+
+Publisher ID:
+`IBM`
+
+Extension ID:
+`cics-ia-extension-for-zowe`
+
+Construct the Download URL:
+
+The general structure is
+`https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<Publisher ID>/vsextensions/<Extension ID>/<Version>/vspackage`
+To find the correct Version, check the Version History tab on the extension's Marketplace page or use `latest` as the version to download the latest published version.
+
+Example for CICS Interdependency Analyzer Extension for Zowe Explorer (using the IDs above)
+`https://ibm.gallery.vsassets.io/_apis/public/gallery/publisher/IBM/extension/cics-ia-extension-for-zowe/latest/asset/Microsoft.VisualStudio.Services.VSIXPackage`
+
+Drop constructed URL into the browser and download should initiate.
+
+Once downloaded, to manually install the extension into the Bob IDE select the extensions icon located in the Activity Bar on the left side of the IDE.  Select the `...` icon for `Views and More Actions...`, then select `Install from VSIX...` selecting the download location of the extension from VS Code Marketplace.
 
 ### Build and Install Bank of Z
 

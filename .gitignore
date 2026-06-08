@@ -11,3 +11,7 @@ build.log
 src/base/ims/java/src/main/java/nazare/jmp/standalone/*
 /build/
 zowe.config.user.json
+
+# VSIX extension downloads
+vsix-extensions/
+*.vsix

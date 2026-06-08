@@ -233,7 +233,7 @@ If a `VS Code` or `Open VSX` link available, the extension can be installed via 
 
 Install Bob IDE and/or VS Code IDE and required extensions:
 
-- IDzEE Extension Pack: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/zopeneditor)
+- IDzEE Extension Pack: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack), [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage)
   - IBM Z Open Editor
   - IBM Z Open Debug
   - IBM Compiled Code Coverage
@@ -241,9 +241,46 @@ Install Bob IDE and/or VS Code IDE and required extensions:
   - Zowe Explorer for IBM CICS Transaction Server
 - CICS Interdependency Analyzer Extension for Zowe Explorer: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/cics-ia-extension-for-zowe/latest/vspackage)
 - IBM IMS Explorer for VS Code: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ims-explorer-for-vscode/latest/vspackage)
-- IBM Db2 for z/OS Developer Extension: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension)
+- IBM Db2 for z/OS Developer Extension: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension), [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/db2forzosdeveloperextension/latest/vspackage)
 - IBM z/OS Connect development tools: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ibm-zosconnect/latest/vspackage)
 - MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
+
+#### Automated Download of all VSIX packages
+
+Run the following command in the root of the repository:
+
+```bash
+node scripts/download-vsix.js [output-directory]
+```
+
+Default output directory is `./vsix-extensions`
+
+#### Automated Installation of VSIX into Bob IDE
+
+The following command will require the `bobide` command line tool installed and on the PATH. To do this from the Bob IDE GUI:
+
+- Open the command palette by selecting `View` -> `Command Palette`, then type `Shell Command: Install 'bobide' command in PATH`
+
+Run the following command in the root of the repository, no need to pass an output directory if default was used for download:
+
+```bash
+node scripts/install-bobide-vsix.js [output-directory]
+```
+
+#### Automated Installation of VSIX into VS Code
+
+The following command will require the `code` command line tool installed and on the PATH. To do this from the VS Code GUI:
+
+- Open the command palette by selecting `View` -> `Command Palette`, then type `Shell Command: Install 'code' command in PATH`
+
+Run the following command in the root of the repository, no need to pass an output directory if default was used for download:
+
+```bash
+node scripts/install-vscode-vsix.js [output-directory]
+```
+
+For more information regarding the download and install scripts see [scripts/README.md](scripts/README.md).
+
 
 #### Manual Installation of VSIX
 

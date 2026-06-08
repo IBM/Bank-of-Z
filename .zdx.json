@@ -1,7 +1,7 @@
 {
     "buildSettings": {
         "remoteOefDir": "/usr/lpp/IBM/foz/v1r1/bin",
-        "serverBuildTool": "/usr/local/sandboxes/grubServer/grub-main/bin/grub_server"
+        "serverBuildTool": "/usr/local/sandboxes/fultonm/grubServer/grub-main/bin/grub_server"
     },
     "listingFileDetails": {
         "remote": [

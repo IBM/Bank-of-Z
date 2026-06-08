@@ -232,16 +232,16 @@ Bank of Z requires a mainframe runtime environment.
 
 Install Bob IDE and/or VS Code IDE and required extensions:
 
-- IDzEE Extension Pack: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/zopeneditor)
+- IDzEE Extension Pack: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/zopeneditor)
   - IBM Z Open Editor
   - IBM Z Open Debug
   - IBM Compiled Code Coverage
   - Zowe Explorer
   - Zowe Explorer for IBM CICS Transaction Server
-- CICS Interdependency Analyzer Extension for Zowe Explorer: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe), Open VSX (n/a)
-- IBM IMS Explorer for VS Code: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode), Open VSX (n/a)
-- IBM Db2 for z/OS Developer Extension: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension)
-- IBM z/OS Connect development tools: [VSC](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX (n/a)
+- CICS Interdependency Analyzer Extension for Zowe Explorer: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe), Open VSX (n/a)
+- IBM IMS Explorer for VS Code: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode), Open VSX (n/a)
+- IBM Db2 for z/OS Developer Extension: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension)
+- IBM z/OS Connect development tools: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX (n/a)
 - MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
 
 Bob IDE uses Open VSX for it's marketplace.  For extension not in the Open VSX marketplace but exist in VS Code marketplace, use an alternative download method to obtain the .vsix from VS Code marketplace to be installed manually into Bob IDE.

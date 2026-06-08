@@ -245,6 +245,8 @@ Install Bob IDE and/or VS Code IDE and required extensions:
 - IBM z/OS Connect development tools: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ibm-zosconnect/latest/vspackage)
 - MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
 
+**Note:** Automated scripts require Node.js (version 22.22.1 or higher recommended)
+
 #### Automated Download of all VSIX packages
 
 Run the following command in the root of the repository:

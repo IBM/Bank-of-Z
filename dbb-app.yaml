@@ -26,7 +26,8 @@ application:
         - name: sourceDirs
           value:
             - "src/base"
-            - "src/api/src/main/api"
+            - "src/api/cics/src/main/api"
+            - "src/api/ims/src/main/api"
             - "src/frontend"
         - name: continueOnScanFailure
           value: true
@@ -61,7 +62,8 @@ application:
         - name: sourceDirs
           value:
             - "src/base"
-            - "src/api/src/main/api"
+            - "src/api/cics/src/main/api"
+            - "src/api/ims/src/main/api"
             - "src/frontend"
         
         - name: continueOnScanFailure
@@ -303,11 +305,13 @@ application:
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
         - name: serverXmlPath
-          value: "src/api/src/main/liberty/config/server.xml"
+          value: "src/api/cics/src/main/liberty/config/server.xml"
         - name: cicsXmlPath
-          value: "src/api/src/main/liberty/config/cics.xml"
+          value: "src/api/cics/src/main/liberty/config/cics.xml"
+        - name: imsXmlPath
+          value: "src/api/ims/src/main/liberty/config/cics.xml"
     
-    - task: zOSConnect
+    - task: zOSConnectCICS
       variables:
         - name: configSources
           value:

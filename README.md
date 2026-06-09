@@ -222,7 +222,7 @@ Bank of Z requires a mainframe runtime environment.
   - CICS region for application deployment
 - Db2 for z/OS
 - IMS
-- IBM DBB 3.0.4.1 installed (typically at `/usr/lpp/IBM/dbb`)
+- IBM DBB 3.0.5 installed (typically at `/usr/lpp/IBM/dbb`)
 - ZOAU 1.4.1.0 installed (typically at `/usr/lpp/IBM/zoautil`)
 - Wazi Deploy 3.0.7.3 installed (typically at `/global/opt/pyenv/gdp`)
 - ZCodeScan 1.0.2 installed (typically at `/global/opt/pyenv/akf`)

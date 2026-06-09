@@ -20,6 +20,7 @@ cics_region:
         model: ./resource-model.yaml
         definitions:
           - ./bank-of-z-definitions.yaml
+          - ./debug-definitions.yaml
 
   installation:
     data_sets:
@@ -36,6 +37,12 @@ cics_region:
     type: JOB
     job_parameters:
       region: 0M
+    dfhrpl:
+      top_data_sets:
+        - EQAW.SEQAMOD
+      data_sets:
+        - SYS1.SIEAMIGE
+        - SYS1.MIGLIB
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -45,11 +52,18 @@ cics_region:
     start: INITIAL
     grplist: DFHLIST,BANKZLST
     gmtext: SMSS Region provisioned with zconfig
-    sec: "NO"
+    gmtran: CESL
+    sec: "YES"
     db2conn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
     resoverrides: resourceOverrides.cicsoverrides.yaml
+    xtran: "NO"
+    xcmd: "NO"
+    xdb2: "NO"
+    xppt: "NO"
+    xuser: "NO"
+    xfct: "NO"
 
   extensions:
     cics_cmci:

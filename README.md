@@ -233,18 +233,16 @@ If a `VS Code` or `Open VSX` link available, the extension can be installed via 
 
 Install Bob IDE and/or VS Code IDE and required extensions:
 
-- IDzEE Extension Pack: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack), [Open VSX](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack), [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage)
-  - IBM Z Open Editor
-  - IBM Z Open Debug
-  - IBM Compiled Code Coverage
-  - Zowe Explorer
-  - Zowe Explorer for IBM CICS Transaction Server
-- CICS Interdependency Analyzer Extension for Zowe Explorer: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/cics-ia-extension-for-zowe/latest/vspackage)
-- IBM IMS Explorer for VS Code: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ims-explorer-for-vscode/latest/vspackage)
-- IBM Db2 for z/OS Developer Extension: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension), [Open VSX](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension), [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/db2forzosdeveloperextension/latest/vspackage)
-- IBM z/OS Connect development tools: [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect), Open VSX, [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ibm-zosconnect/latest/vspackage)
-- IBM TAZ Early Development Testing [VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.taz-edt-extension), [Open VSX](https://open-vsx.org/extension/IBM/taz-edt-extension), [Download VSIX](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/taz-edt-extension/latest/vspackage)
-- MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
+| Extension Name | VS Code Marketplace | Open VSX Marketplace | Download VSIX |
+|----------------|---------------------|----------------------|---------------|
+| IDzEE Extension Pack<br/>• IBM Z Open Editor<br/>• IBM Z Open Debug<br/>• IBM Compiled Code Coverage<br/>• Zowe Explorer<br/>• Zowe Explorer for IBM CICS Transaction Server | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack) | [Link](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage) |
+| CICS Interdependency Analyzer Extension for Zowe Explorer | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/cics-ia-extension-for-zowe/latest/vspackage) |
+| IBM IMS Explorer for VS Code | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ims-explorer-for-vscode/latest/vspackage) |
+| IBM Db2 for z/OS Developer Extension | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension) | [Link](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/db2forzosdeveloperextension/latest/vspackage) |
+| IBM z/OS Connect development tools | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ibm-zosconnect/latest/vspackage) |
+| IBM TAZ Early Development Testing | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.taz-edt-extension) | [Link](https://open-vsx.org/extension/IBM/taz-edt-extension) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/taz-edt-extension/latest/vspackage) |
+
+**Note:** For MQ, there is no IBM extension in the VS Code marketplace. See IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in the github.com/ibm-messaging group.
 
 **Note:** Automated scripts require Node.js (version 22.22.1 or higher recommended)
 

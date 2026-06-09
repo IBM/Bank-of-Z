@@ -224,7 +224,8 @@ Bank of Z requires a mainframe runtime environment.
 - IMS
 - IBM DBB 3.0.4.1 installed (typically at `/usr/lpp/IBM/dbb`)
 - ZOAU 1.4.1.0 installed (typically at `/usr/lpp/IBM/zoautil`)
-- Wazi Deploy 3.0.7.2 installed (typically at `/global/opt/pyenv/gdp`)
+- Wazi Deploy 3.0.7.3 installed (typically at `/global/opt/pyenv/gdp`)
+- ZCodeScan 1.0.2 installed (typically at `/global/opt/pyenv/akf`)
 - [CICS TS Resource Builder](https://www.ibm.com/docs/en/cics-resource-builder/1.0.x?topic=installing-planning-installation-cics-ts-resource-builder)
 
 ### Setup IDE

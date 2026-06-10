@@ -1,0 +1,73 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CRECUSTZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-KEY:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-SORTCODE:
+                required: false
+                nullable: false
+                expression: "987654"
+            - COMM-NUMBER:
+                required: false
+                nullable: false
+                expression: "0"
+        - COMM-DOB:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-DOB-DAY:
+                required: false
+                nullable: false
+                expression: "'15'"
+            - COMM-DOB-MONTH:
+                required: false
+                nullable: false
+                expression: "'01'"
+            - COMM-DOB-YEAR:
+                required: false
+                nullable: false
+                expression: "'1990'"
+        - COMM-CREATED-DATE:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-CREATED-DAY:
+                required: false
+                nullable: false
+                expression: "'0'"
+            - COMM-CREATED-MONTH:
+                required: false
+                nullable: false
+                expression: "'0'"
+            - COMM-CREATED-YEAR:
+                required: false
+                nullable: false
+                expression: "'0'"
+        - COMM-CREDIT-SCORE:
+            required: false
+            nullable: false
+            expression: "'0'"
+        - COMM-CS-REVIEW-DATE:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-CS-REVIEW-DAY:
+                required: false
+                nullable: false
+                expression: "'0'"
+            - COMM-CS-REVIEW-MONTH:
+                required: false
+                nullable: false
+                expression: "'0'"
+            - COMM-CS-REVIEW-YEAR:
+                required: false
+                nullable: false
+                expression: "'0'"

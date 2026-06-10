@@ -1,0 +1,8 @@
+---
+version: "1.0"
+response_201.yaml:
+  condition: "$zosAssetResponse.commarea.CRECUSTZ.\"COMM-SUCCESS\" = 'Y'"
+  httpStatusCode: 201
+response_500.yaml:
+  condition: true
+  httpStatusCode: 500

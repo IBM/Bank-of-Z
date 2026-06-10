@@ -34,8 +34,9 @@ const server = http.createServer((req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 
     // Check if this is an API request
-    if (req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
-        // Proxy API requests to backend
+    if (req.url.startsWith('/api/')) {
+        // Proxy API requests to backend (strip /api prefix)
+        req.url = req.url.replace('/api', '');
         proxyApiRequest(req, res);
         return;
     }

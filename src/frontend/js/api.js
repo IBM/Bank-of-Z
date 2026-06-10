@@ -101,15 +101,20 @@ class CustomersApi extends BaseApi {
         return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
     }
 
-    // Stub methods for legacy endpoints not in OpenAPI spec
     /**
-     * Create a new customer (stub - not in OpenAPI spec)
+     * Create a new customer
+     * POST /customers
      * @param {Object} customerData - Customer data
-     * @returns {Promise<Object>} Rejected promise
+     * @returns {Promise<CreateCustomerResponse>} Created customer details
      */
     async createCustomer(customerData) {
-        throw new Error('Customer creation is not supported in the OpenBanking API specification');
+        return this.request(`${this.configuration.baseUrl}/customers`, {
+            method: 'POST',
+            body: JSON.stringify(customerData)
+        });
     }
+
+    // Stub methods for legacy endpoints not in OpenAPI spec
 
     /**
      * Update customer (stub - not in OpenAPI spec)

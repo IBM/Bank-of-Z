@@ -136,14 +136,20 @@
             }
             
             // Prepare data
-            const customerAddress = `${addressLine1}, ${city}`;
-            const customerName = `${title} ${fullName}`;
+            const nameParts = fullName.trim().split(/\s+/);
+            const firstName = nameParts.shift();
+            const lastName = nameParts.join(' ') || firstName;
             const formattedDOB = dateOfBirth ? parseDate(dateOfBirth) : '';
             
             const customerData = {
-                customerName: customerName,
-                customerAddress: customerAddress,
+                title,
+                firstName,
+                lastName,
                 dateOfBirth: formattedDOB,
+                address: {
+                    addressLine1,
+                    city
+                },
                 sortCode: config.defaults.sortCode
             };
             
@@ -156,9 +162,9 @@
                 
                 showSuccessModal(
                     'Customer created successfully',
-                    `A customer profile for ${fullName} has been created. Customer ID: ${response.id}`,
+                    `A customer profile for ${fullName} has been created. Customer ID: ${response.customerId}`,
                     () => {
-                        window.location.href = 'customer-details.html';
+                        window.location.href = `customer-details.html?id=${encodeURIComponent(response.customerId)}`;
                     }
                 );
             } catch (error) {

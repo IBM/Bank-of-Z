@@ -94,6 +94,33 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /customers:
+    post:
+      tags:
+        - Customers
+      summary: Create a new customer
+      description: Create a new customer account in the banking system
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreate'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /customers/{customerId}:
     get:
       tags:
@@ -427,6 +454,53 @@ components:
           format: date-time
           description: Date when customer account was created
           example: "2020-01-15T10:30:00Z"
+
+    CustomerCreate:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - dateOfBirth
+      properties:
+        title:
+          type: string
+          description: Customer title
+          example: "Mr"
+        firstName:
+          type: string
+          description: Customer first name
+          example: "John"
+        lastName:
+          type: string
+          description: Customer last name
+          example: "Smith"
+        dateOfBirth:
+          type: string
+          format: date
+          description: Customer date of birth (YYYY-MM-DD)
+          example: "1985-06-15"
+        phoneNumber:
+          type: string
+          description: Customer phone number
+          example: "+44 20 7946 0958"
+        address:
+          $ref: '#/components/schemas/Address'
+
+    CustomerCreateResponse:
+      type: object
+      properties:
+        customerId:
+          type: string
+          description: Newly created customer ID
+          example: "0000000123"
+        sortCode:
+          type: string
+          description: Bank sort code
+          example: "987654"
+        message:
+          type: string
+          description: Success message
+          example: "Customer created successfully"
 
     Address:
       type: object

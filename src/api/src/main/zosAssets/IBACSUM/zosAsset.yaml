@@ -1,7 +1,7 @@
 ---
 version: 1.0
 type: "imsTransaction-1.0"
-description: "GET CUSTOMER ACCOUNTS"
+description: "GET CUSTOMER ACCOUNT BALANCES"
 providerProperties:
   language: "COBOL"
   transactionCode: "IBACSUM"

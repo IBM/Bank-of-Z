@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1" name="OUTPUT-IBSCUDAT" originalName="OUTPUT-IBSCUDAT">
+            <field name="OUTPUT-AREA" originalName="OUTPUT-AREA" included="Y" path="OUTPUT-AREA" fileName="IBSCUDAT.cbl" structureIndex="0" structSrcFileName="OUTPUT-AREA_response_0.cpy" srcLine="01 OUTPUT-AREA.">
+                <startPos>1</startPos>
+                <bytes>274</bytes>
+                <maxBytes>274</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL-OUT" originalName="LL-OUT" included="Y" path="OUTPUT-AREA.LL-OUT" srcLine="05 LL-OUT PIC 9(4) USAGE COMP.">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ-OUT" originalName="ZZ-OUT" included="Y" path="OUTPUT-AREA.ZZ-OUT" srcLine="05 ZZ-OUT PIC 9(4) USAGE COMP.">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="MSG-OUT" originalName="MSG-OUT" included="Y" path="OUTPUT-AREA.MSG-OUT" srcLine="05 MSG-OUT PIC X(32) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>32</bytes>
+                    <maxBytes>32</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="CUSTOMER-OUT" originalName="CUSTOMER-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT" srcLine="05 CUSTOMER-OUT.">
+                    <startPos>37</startPos>
+                    <bytes>238</bytes>
+                    <maxBytes>238</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="CUSTID-OUT" originalName="CUSTID-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.CUSTID-OUT" srcLine="10 CUSTID-OUT PIC S9(9) USAGE COMP-5.">
+                        <startPos>37</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isNativeInteger="Y" alignment="NATURAL"/>
+                        <applicationDatatype datatype="INT"/>
+                    </field>
+                    <field name="LASTNAME-OUT" originalName="LASTNAME-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.LASTNAME-OUT" srcLine="10 LASTNAME-OUT PIC X(50) USAGE DISPLAY.">
+                        <startPos>41</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="FIRSTNAME-OUT" originalName="FIRSTNAME-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.FIRSTNAME-OUT" srcLine="10 FIRSTNAME-OUT PIC X(50) USAGE DISPLAY.">
+                        <startPos>91</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="ADDRESS-OUT" originalName="ADDRESS-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.ADDRESS-OUT" srcLine="10 ADDRESS-OUT PIC X(80) USAGE DISPLAY.">
+                        <startPos>141</startPos>
+                        <bytes>80</bytes>
+                        <maxBytes>80</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="CITY-OUT" originalName="CITY-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.CITY-OUT" srcLine="10 CITY-OUT PIC X(25) USAGE DISPLAY.">
+                        <startPos>221</startPos>
+                        <bytes>25</bytes>
+                        <maxBytes>25</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="STATE-OUT" originalName="STATE-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.STATE-OUT" srcLine="10 STATE-OUT PIC X(2) USAGE DISPLAY.">
+                        <startPos>246</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="ZIPCODE-OUT" originalName="ZIPCODE-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.ZIPCODE-OUT" srcLine="10 ZIPCODE-OUT PIC X(15) USAGE DISPLAY.">
+                        <startPos>248</startPos>
+                        <bytes>15</bytes>
+                        <maxBytes>15</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="PHONE-OUT" originalName="PHONE-OUT" included="Y" path="OUTPUT-AREA.CUSTOMER-OUT.PHONE-OUT" srcLine="10 PHONE-OUT PIC X(12) USAGE DISPLAY.">
+                        <startPos>263</startPos>
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

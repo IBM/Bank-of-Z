@@ -9,7 +9,7 @@
   <!-- HTTP Endpoint Configuration -->
   <httpEndpoint id="defaultHttpEndpoint"
                 host="*"
-                httpPort="${ZOSCONNECT_HTTP_PORT}"/>
+                httpPort="${env.HTTP_PORT}"/>
   
   <!-- CORS Configuration for all API endpoints -->
   <cors domain="/"
@@ -20,10 +20,13 @@
         maxAge="3600" />
   
   <!-- API Application -->
-  <webApplication id="api" location="api.war" name="api"/>
+  <webApplication id="api" location="api.war" name="api" contextRoot="/"/>
   
   <!-- Include CICS connection configuration -->
   <include optional="false" location="cics.xml"/>
+  
+  <!-- Include IMS connection configuration -->
+  <include optional="false" location="ims.xml"/>
 </server>
 
 <!-- Made with Bob -->

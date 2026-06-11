@@ -1,8 +1,8 @@
 ---
 version: 1.0
 type: "imsTransaction-1.0"
-description: "Get Customer Profile"
+description: ""
 providerProperties:
   language: "COBOL"
-  transactionCode: "IBGCUDAT"
+  transactionCode: "IBSCUDAT"
   connectionRef: "imsConn"

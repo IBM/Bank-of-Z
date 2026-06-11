@@ -24,7 +24,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 export ZOSCONNECT_HOME=$(get_section_value 'zosconnect' 'zosconnect_home')
 export ZOSCONNECT_HOME=$(echo "$ZOSCONNECT_HOME" | sed "s|~|$HOME|g")
 export CICS_USER=${CICS_USER:-$(get_section_value 'cics' 'user')}
-export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')}
+export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')} #pragma: allowlist secret
 export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
@@ -120,6 +120,32 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     </featureManager>
     <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="${CICS_IPIC_PORT}" sysid="ZC01" authDataRef="cicsCredentials" />
     <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
+</server>
+EOF
+
+# =========================
+# Generate IMS connection config
+# =========================
+export IMS_HOST=$(get_section_value 'ims' 'host')
+export IMS_PORT=$(get_section_value 'ims' 'port')
+export IMS_USER=$(get_section_value 'ims' 'user')
+export IMS_PASSWORD=$(get_section_value 'ims' 'password')
+export IMS_DATASTORE=$(get_section_value 'ims' 'datastore')
+
+cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Connection to IMS">
+    <featureManager>
+        <feature>zosconnect:ims-1.0</feature>
+    </featureManager>
+
+    <zosconnect_imsConnection id="imsConn" connectionFactoryRef="imsConnectionFactory" imsDatastoreName="${IMS_DATASTORE}"/>
+
+    <connectionFactory id="imsConnectionFactory" containerAuthDataRef="IMSCredentials">
+        <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
+    </connectionFactory>
+
+    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
 

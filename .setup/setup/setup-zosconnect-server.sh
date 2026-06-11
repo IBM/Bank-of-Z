@@ -126,11 +126,11 @@ EOF
 # =========================
 # Generate IMS connection config
 # =========================
-export IMS_HOST=$(get_section_value 'ims' 'host')
-export IMS_PORT=$(get_section_value 'ims' 'port')
-export IMS_USER=$(get_section_value 'ims' 'user')
-export IMS_PASSWORD=$(get_section_value 'ims' 'password')
-export IMS_DATASTORE=$(get_section_value 'ims' 'datastore')
+export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
+export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
+export IMS_USER=${IMS_USER:-$(get_section_value 'ims' 'user')}
+export IMS_PASSWORD=${IMS_PASSWORD:-$(get_section_value 'ims' 'password')} #pragma: allowlist secret
+export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
 
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>

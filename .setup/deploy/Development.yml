@@ -43,6 +43,13 @@ default_cmci_insecure: True
 default_cmci_cert: ""
 default_cmci_key: ""
 
+# IMS
+default_ims_host: "127.0.0.1"
+default_ims_port: 9977
+default_ims_user: "deb"
+default_ims_password: ""
+default_ims_datastore: "IMS2"
+
 # Db2
 default_db2_sdsnload: "DB2V13.SDSNLOAD"
 default_pkg_jobcard: "BINDPKG JOB 'WD-PKGBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
@@ -62,7 +69,14 @@ zosconnect_http_port: "{{ extra_vars.zosconnect_http_port if extra_vars.zosconne
 cics_host: "{{ extra_vars.cics_host if extra_vars.cics_host is defined else 'localhost' }}"
 cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '2006' }}"
 cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else 'IBMUSER' }}"
-cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defined else '' }}"
+cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defined else '' }}" #pragma: allowlist secret
+
+# IMS
+ims_host: "{{ extra_vars.ims_host if extra_vars.ims_host is defined else 'localhost' }}"
+ims_port: "{{ extra_vars.ims_port if extra_vars.ims_port is defined else '9977' }}"
+ims_user: "{{ extra_vars.ims_user if extra_vars.ims_user is defined else 'deb' }}"
+ims_password: "{{ extra_vars.ims_password if extra_vars.ims_password is defined else '' }}" #pragma: allowlist secret
+ims_datastore: "{{ extra_vars.ims_datastore if extra_vars.ims_datastore is defined else 'IMS2' }}"
 
 
 template_name_zosconnect_config:

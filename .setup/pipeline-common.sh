@@ -31,7 +31,7 @@ stage_static_scan_bank_of_z() {
         exit 1
     fi
     
-    # Run installation script
+    # Run zcode scan task
     print_info "Running Bank of Z static scan script..."
     print_info "Executing: bash $BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
     cd "$BANK_DIR"

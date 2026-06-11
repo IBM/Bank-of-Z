@@ -207,7 +207,14 @@
                 );
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', error.message || 'Failed to delete customer');
+                
+                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
+                    showErrorModal('Feature Not Implemented', error.message);
+                } else if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', error.message || 'Failed to delete customer');
+                }
             }
         }
     </script>

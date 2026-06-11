@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - customerId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-NUMBER\"}}"
+    - sortCode:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-SORTCODE\"}}"

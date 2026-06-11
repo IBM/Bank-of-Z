@@ -1,0 +1,76 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CRECUSTZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-NAME:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-TITLE:
+                required: false
+                nullable: false
+                expression: "$body.title"
+            - COMM-FIRST-NAME:
+                required: false
+                nullable: false
+                expression: "$exists(body.firstName) ? $body.firstName : \"\""
+            - COMM-LAST-NAME:
+                required: false
+                nullable: false
+                expression: "$exists(body.lastName) ? $body.firstName : \"\""
+        - COMM-DOB:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-DOB-DAY:
+                required: false
+                nullable: false
+                expression: "$exists($body.dateOfBirth) and $length($body.dateOfBirth) = 10 
+                ? $number($substring($body.dateOfBirth, 8, 2)) : 0"
+            - COMM-DOB-MONTH:
+                required: false
+                nullable: false
+                expression: "$exists($body.dateOfBirth) and $length($body.dateOfBirth) = 10 
+                ? $number($substring($body.dateOfBirth, 5, 2)) : 0"
+            - COMM-DOB-YEAR:
+                required: false
+                nullable: false
+                expression: "$exists($body.dateOfBirth) and $length($body.dateOfBirth) = 10 
+                ? $number($substring($body.dateOfBirth, 0, 4)) : 0"
+        - COMM-PHONE:
+            required: false
+            nullable: false
+            expression: "$body.phoneNumber"
+        - COMM-ADDR:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-ADDR-LINE1:
+                required: false
+                nullable: false
+                expression: "$body.address.addressLine1"
+            - COMM-ADDR-LINE2:
+                required: false
+                nullable: false
+                expression: "$body.address.addressLine2"
+            - COMM-CITY:
+                required: false
+                nullable: false
+                expression: "$body.address.city"
+            - COMM-POSTCODE:
+                required: false
+                nullable: false
+                expression: "$body.address.postalCode"
+            - COMM-COUNTRY:
+                required: false
+                nullable: false
+                expression: "$body.address.country"
+        - COMM-STATUS:
+            required: false
+            nullable: false
+            expression: "$body.customerStatus"

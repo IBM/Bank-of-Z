@@ -143,7 +143,7 @@ print_phase_next_step() {
     echo ""
     case "$completed_phase" in
         validation)
-            print_info "Next step: static scan Bank of Z."
+            print_info "Next step: Execute ZCodeScan for Bank of Z."
             ;;
         static-scan)
             print_info "Next step: build Bank of Z."

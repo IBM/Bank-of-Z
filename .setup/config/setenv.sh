@@ -29,6 +29,7 @@ export APP_BASE_NAME_LOWER=$(echo "$APP_BASE_NAME" | tr '[:upper:]' '[:lower:]')
 export APP_ZOS_VERSION=$(get_section_value 'app' 'zos_version')
 export APP_VERSION=$(get_section_value 'app' 'zos_version')
 export SANDBOX_DIR=${SANDBOX_DIR:-$(get_section_value 'sandbox' 'path')}
+export JAVA_HOME=${JAVA_HOME:-$(get_section_value 'java' 'java_home')}
 export DBB_REPO_URL=$(get_section_value 'repositories' 'url')
 export ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 export ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')

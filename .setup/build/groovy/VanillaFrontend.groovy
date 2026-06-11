@@ -48,6 +48,37 @@ if (!vanillaFrontendDir.exists() || !vanillaFrontendDir.isDirectory()) {
 
 log.info("Found vanilla frontend directory")
 
+// Get lifecycle and BUILD_LIST
+def lifecycle = context.getVariable(TaskConstants.LIFECYCLE)
+def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+
+// For pipeline/impact builds: check if any frontend files changed, deleted, or renamed
+if (lifecycle == 'pipeline' || lifecycle == 'impact') {
+    def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
+    def deletedFiles = context.getVariable(TaskConstants.DELETED_FILES) ?: []
+    def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
+    def allFiles = changedFiles + deletedFiles + renamedFiles
+    
+    def isFrontendChanged = false
+    allFiles.each { file ->
+        // Files contain paths like "Bank-of-Z/src/frontend/admin.html"
+        // Check if the path contains the frontend directory
+        if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
+            isFrontendChanged = true
+            println("> Frontend file detected: ${file}")
+        }
+    }
+    
+    if (!isFrontendChanged) {
+        println("> No frontend changes detected - skipping frontend build")
+        return 0
+    }
+    
+    println("> Frontend changes detected - proceeding with build")
+} else {
+    println("> Full build - proceeding with frontend build")
+}
+
 // Set environment
 def envList = []
 System.getenv().each { k, v -> envList << "$k=$v" }
@@ -147,7 +178,6 @@ try {
     // Use getSetStringVariable with default (like UnitTest.java line 175-176)
     // Do NOT call setVariable() from Groovy - it causes type conversion issues
     log.info("Adding ${relativeMarkerPath} to BUILD_LIST for Package task")
-    Set<String> buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
     buildList.add(relativeMarkerPath)  // Must match the path used in createBuildMap()
     // Set is modified in place - no setVariable() needed (and causes issues in Groovy)
     log.info("Added ${relativeMarkerPath} to BUILD_LIST (total files: ${buildList.size()})")

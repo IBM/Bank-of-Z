@@ -79,6 +79,41 @@ if (processCicsXml) {
     log.info("Found server.xml and cics.xml")
 } else {
     log.info("Found server.xml")
+    }
+    
+// Get lifecycle and BUILD_LIST
+def lifecycle = context.getVariable(TaskConstants.LIFECYCLE)
+def buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
+
+// For pipeline/impact builds: check if any config files changed, deleted, or renamed
+if (lifecycle == 'pipeline' || lifecycle == 'impact') {
+    def changedFiles = context.getVariable(TaskConstants.CHANGED_FILES) ?: []
+    def deletedFiles = context.getVariable(TaskConstants.DELETED_FILES) ?: []
+    def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
+    def allFiles = changedFiles + deletedFiles + renamedFiles
+    
+    def isConfigChanged = false
+    allFiles.each { file ->
+        // Files contain paths like "Bank-of-Z/src/api/src/main/liberty/config/server.xml"
+        // Check if the path ends with our config file paths
+        if (file.endsWith("/${serverXmlRelativePath}")) {
+            isConfigChanged = true
+            println("> Config file detected: ${file}")
+        }
+        if (processCicsXml && file.endsWith("/${cicsXmlRelativePath}")) {
+            isConfigChanged = true
+            println("> Config file detected: ${file}")
+        }
+    }
+    
+    if (!isConfigChanged) {
+        println("> No config changes detected - skipping config packaging")
+        return 0
+    }
+    
+    println("> Config changes detected - proceeding with packaging")
+} else {
+    println("> Full build - proceeding with config packaging")
 }
 
 // Set environment
@@ -134,7 +169,6 @@ try {
     
     // Step 4: Add server.xml to BUILD_LIST
     log.info("Step 4: Adding server.xml to BUILD_LIST for Package task")
-    Set<String> buildList = context.getSetStringVariable(TaskConstants.BUILD_LIST, new LinkedHashSet<>())
     buildList.add(serverXmlRelativePath)
     log.info("Added ${serverXmlRelativePath} to BUILD_LIST (total files: ${buildList.size()})")
     

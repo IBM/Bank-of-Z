@@ -1,15 +1,15 @@
 {
     "buildSettings": {
         "remoteOefDir": "/usr/lpp/IBM/foz/v1r1/bin",
-        "serverBuildTool": "/usr/local/sandboxes/grubServer/grub-main/bin/grub_server"
+        "serverBuildTool": "/usr/local/sandboxes/?/grubServer/grub-main/bin/grub_server"
     },
     "listingFileDetails": {
         "remote": [
             {
-                "connectionName": "ibmuser@9.47.93.199",
+                "connectionName": "?@?.?.?.?",
                 "connectionType": "zosmf",
                 "uss-directories": [
-                    "/usr/local/sandboxes/bank-of-z/Bank-of-Z"
+                    "/usr/local/sandboxes/?/Bank-of-Z"
                 ]
             }
         ]

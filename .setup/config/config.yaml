@@ -81,6 +81,13 @@ zcodescan:
   src_encoding: IBM-1047
   # ZCodeScan RESAPI connection info to check for IDZ EE license.
   config_file: ${HOME}/zcs_config_file.yml
+  # ZCodeScan maximum return code when issue(s) in the scan
+  #  - 1 - The highest issue severity found is INFO.
+  #  - 2 - The highest issue severity found is LOW.
+  #  - 3 - The highest issue severity found is MEDIUM.
+  #  - 4 - The highest issue severity found is HIGH.
+  #  - 5 - The highest issue severity found is BLOCKER.
+  max_rc: 4
 
 # Wazi Deploy (deployment automation)
 wazideploy:
@@ -124,11 +131,6 @@ zosconnect:
   http_port: 9080
   https_port: 9443
 
-# Frontend (Node.js runtime)
-fronted:
-  # Node.js runtime for z/OS
-  node_home: /usr/lpp/IBM/cnj/IBM/node-latest-os390-s390x
-
 # ZOAU installtion directory
 zoau:
   zoau_home: /usr/lpp/IBM/zoautil
@@ -146,4 +148,5 @@ cics:
   password: ${CICS_PASSWORD} # env var
   cmci_port: 27100
   ipic_port: 4320
+  debug_port: 27103
 

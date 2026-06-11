@@ -104,7 +104,7 @@ function proxyApiRequest(req, res) {
 
 server.listen(PORT, () => {
     console.log('='.repeat(60));
-    console.log('CICS Banking Sample Application - Vanilla JavaScript Frontend');
+    console.log('Bank of Z Sample Application - Vanilla JavaScript Frontend');
     console.log('='.repeat(60));
     console.log(`Server running at http://localhost:${PORT}/`);
     console.log(`Press Ctrl+C to stop the server`);

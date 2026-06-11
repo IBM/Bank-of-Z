@@ -80,8 +80,6 @@ graph LR
     style BANKQ2 fill:#ffebee
 ```
 
-
-
 ### Customer Routing
 
 - Customers with ID pattern **Cnnnn** → Routed to CICS
@@ -117,8 +115,6 @@ Bank-of-Z/
 - **IBM DBB Integration** - Modern build automation for z/OS applications
 - **Pipeline Simulation** - Automated build and deployment workflows
 
-
-
 ## Quick Start
 
 ### Prerequisites
@@ -131,19 +127,21 @@ Bank-of-Z/
     - `npm -v`
   - node: ">=22.22.1 < 23"
     - `node -v`
-- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli): 
+- [Zowe CLI](https://docs.zowe.org/stable/user-guide/cli-installcli):
   - `npm install -g @zowe/cli@zowe-v3-lts`
-- Zowe RSE API Plugin: 
+- Zowe RSE API Plugin:
   - `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - Configured Zowe profile with z/OS connection details
 
 Here is a sample configuration for the Zowe profile. Change:
--  the 'host' line to match your z/OS host
+
+- the 'host' line to match your z/OS host
 - the 'account' line to match your TSO account on the host
 - the 'logonProcedure' line to match your logon procedure on the host
 
 and if you use non-default ports, you may have to change other lines as well.
 Save the file in: `~/.zowe/zowe.config.json`
+
 ```json
 {
   "$schema": "./zowe.schema.json",
@@ -209,6 +207,7 @@ Save the file in: `~/.zowe/zowe.config.json`
 ```
 
 You can then test each connection. Example:
+
 - `zowe zosmf check status`
 - `zowe rse check status`
 - ...
@@ -222,34 +221,83 @@ Bank of Z requires a mainframe runtime environment.
 - [zconfig](https://ibm.biz/zconfig-join) for provisioning the middleware configuration
   - CICS region for application deployment
 - Db2 for z/OS
-- IMS 
-- IBM DBB 3.0.4.1 installed (typically at `/usr/lpp/IBM/dbb`)
+- IMS
+- IBM DBB 3.0.5 installed (typically at `/usr/lpp/IBM/dbb`)
 - ZOAU 1.4.1.0 installed (typically at `/usr/lpp/IBM/zoautil`)
-- Wazi Deploy 3.0.7.2 installed (typically at `/global/opt/pyenv/gdp`)
-- [CICS TS Resource Builde](https://www.ibm.com/docs/en/cics-resource-builder/1.0.x?topic=installing-planning-installation-cics-ts-resource-builder)r 
-
+- Wazi Deploy 3.0.7.3 installed (typically at `/global/opt/pyenv/gdp`)
+- ZCodeScan 1.0.2 installed (typically at `/global/opt/pyenv/akf`)
+- [CICS TS Resource Builder](https://www.ibm.com/docs/en/cics-resource-builder/1.0.x?topic=installing-planning-installation-cics-ts-resource-builder)
 
 ### Setup IDE
 
+If a `VS Code` or `Open VSX` link available, the extension can be installed via the marketplace, with Bob IDE using the Open VSX marketplace.  If setting up the Bob IDE environment and the extension is not avaialble in the Open VSX Marketplace use the `Download VSIX` link to download the extensions .vsix from the VS Code Marketplace and [manually install it in the IDE](#manual-installation-of-vsix).
+
 Install Bob IDE and/or VS Code IDE and required extensions:
 
-- [IDzEE Extension Pack](https://marketplace.visualstudio.com/items?itemName=IBM.application-delivery-foundation-for-zos-vscode-extension-pack)
-  - IBM Z Open Editor
-  - IBM Z Open Debug
-  - IBM Compiled Code Coverage
-  - Zowe Explorer
-  - Zowe Explorer for IBM CICS Transaction Server
-- [CICS Interdependency Analyzer Extension for Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe)
-- [IBM IMS Explorer for VS Code](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode)
-- [IBM Db2 Developer Extension](https://marketplace.visualstudio.com/items?itemName=IBM.db2-for-luw)
-- MQ (no IBM extension in VS Code marketplace) - IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in teh github.com/ibm-messaging group.
+| Extension Name | VS Code Marketplace | Open VSX Marketplace | Download VSIX |
+|----------------|---------------------|----------------------|---------------|
+| IDzEE Extension Pack<br/>• IBM Z Open Editor<br/>• IBM Z Open Debug<br/>• IBM Compiled Code Coverage<br/>• Zowe Explorer<br/>• Zowe Explorer for IBM CICS Transaction Server | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack) | [Link](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage) |
+| CICS Interdependency Analyzer Extension for Zowe Explorer | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/cics-ia-extension-for-zowe/latest/vspackage) |
+| IBM IMS Explorer for VS Code | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ims-explorer-for-vscode/latest/vspackage) |
+| IBM Db2 for z/OS Developer Extension | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension) | [Link](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/db2forzosdeveloperextension/latest/vspackage) |
+| IBM z/OS Connect development tools | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.ibm-zosconnect) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ibm-zosconnect/latest/vspackage) |
+| IBM TAZ Early Development Testing | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.taz-edt-extension) | [Link](https://open-vsx.org/extension/IBM/taz-edt-extension) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/taz-edt-extension/latest/vspackage) |
+
+**Note:** For MQ, there is no IBM extension in the VS Code marketplace. See IBM docs for [IBM MQ Console within Visual Studio Code's built-in browser](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) that links to an extension in the github.com/ibm-messaging group.
+
+**Note:** Automated scripts require Node.js (version 22.22.1 or higher recommended)
+
+#### Automated Download of all VSIX packages
+
+Run the following command in the root of the repository:
+
+```bash
+node scripts/download-vsix.js [output-directory]
+```
+
+Default output directory is `./vsix-extensions`
+
+#### Automated Installation of VSIX into Bob IDE
+
+The following command will require the `bobide` command line tool installed and on the PATH. To do this from the Bob IDE GUI:
+
+- Open the command palette by selecting `View` -> `Command Palette`, then type `Shell Command: Install 'bobide' command in PATH`
+
+Run the following command in the root of the repository, no need to pass an output directory if default was used for download:
+
+```bash
+node scripts/install-bobide-vsix.js [output-directory]
+```
+
+#### Automated Installation of VSIX into VS Code
+
+The following command will require the `code` command line tool installed and on the PATH. To do this from the VS Code GUI:
+
+- Open the command palette by selecting `View` -> `Command Palette`, then type `Shell Command: Install 'code' command in PATH`
+
+Run the following command in the root of the repository, no need to pass an output directory if default was used for download:
+
+```bash
+node scripts/install-vscode-vsix.js [output-directory]
+```
+
+For more information regarding the download and install scripts see [scripts/README.md](scripts/README.md).
+
+
+#### Manual Installation of VSIX
+
+To manually install the extension into the Bob IDE or VS Code:
+
+- Select the extensions icon located in the Activity Bar on the left side of the IDE.  
+- Select the `...` icon for `Views and More Actions...`
+- Select `Install from VSIX...` choosing the download location of the extension from VS Code Marketplace in the file picker.
 
 ### Build and Install Bank of Z
 
 ### Setup Bank of Z
 
-* Take a fork this repository, or move it into your own git provider
-* Follow the initial setup instuctions in [docs/README.md](docs/README.md) to install and configure Bank of Z to your own runtime environment.
+- Take a fork this repository, or move it into your own git provider
+- Follow the initial setup instuctions in [docs/README.md](docs/README.md) to install and configure Bank of Z to your own runtime environment.
 
 ## Tutorials
 

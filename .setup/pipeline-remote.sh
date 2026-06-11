@@ -26,6 +26,7 @@ stage_execute_pipeline() {
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
         print_info "  - Refresh git repository (pull latest)"
     fi
+    print_info "  - Run static scan"
     print_info "  - Run DBB build"
     print_info "  - Deploy build"
     print_info "  - Run unit test"
@@ -41,7 +42,7 @@ stage_execute_pipeline() {
     set -o pipefail
     
     chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
-    bash ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy&
+    bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
@@ -76,6 +77,12 @@ main() {
     print_info "It uses Zowe CLI to coordinate pipeline execution on remote z/OS USS"
     echo ""
 
+    # Detect Execution Mode
+    detect_bank_of_z_location
+    
+    # Load configuration
+    load_config
+    
     # Detect Execution Mode
     detect_bank_of_z_location
     

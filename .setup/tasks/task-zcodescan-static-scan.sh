@@ -30,6 +30,8 @@ export SCAN_OUTPUT_FOLDER=${SCAN_OUTPUT_FOLDER:-$(get_section_value 'zcodescan' 
 export SCAN_RULE_FILE=${SCAN_RULE_FILE:-$(get_section_value 'zcodescan' 'rule_file')}
 export SCAN_ENCODING=${SCAN_ENCODING:-$(get_section_value 'zcodescan' 'src_encoding')}
 export SCAN_CONFIG_FILE=${SCAN_CONFIG_FILE:-$(get_section_value 'zcodescan' 'config_file')}
+export SCAN_MAX_RC=${SCAN_MAX_RC:-$(get_section_value 'zcodescan' 'max_rc')}
+
 export PATH="${JAVA_HOME}/bin:${REMOTE_EXTRA_PATH:-}:$PATH"
 
 if [ ! -f $SCAN_CONFIG_FILE ]; then
@@ -173,8 +175,8 @@ if [ "$rc" -eq 255 ] || [ "$rc" -lt 0 ] 2>/dev/null; then
     exit 1
 fi
 
-if [ "$rc" -gt 4 ]; then
-    print_error "${RED}[ZCODESCAN]${NC} RC=$rc"
+if [ "$rc" -gt $SCAN_MAX_RC ]; then
+    print_error "${RED}[ZCODESCAN]${NC} RC=$rc - Max RC=$SCAN_MAX_RC"
     exit 1
 fi
 

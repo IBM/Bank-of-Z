@@ -65,7 +65,7 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
         // Check if the path contains the frontend directory
         if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
             isFrontendChanged = true
-            println("> Frontend file detected: ${file}")
+            log.info("> Frontend file detected: ${file}")
         }
     }
     

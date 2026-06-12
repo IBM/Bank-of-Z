@@ -94,6 +94,72 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /ims/accounts/{accountId}:
+    get:
+      tags:
+        - Accounts
+      summary: Get account details
+      description: Retrieve detailed information about a specific account
+      operationId: getIMSAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321" #pragma: allowlist secret
+      responses:
+        '200':
+          description: Account details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /ims/accounts/{accountId}/balances:
+    get:
+      tags:
+        - Balances
+      summary: Get account balances
+      description: Retrieve current balance information for a specific account
+      operationId: getIMSAccountBalances
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321" #pragma: allowlist secret
+      responses:
+        '200':
+          description: Balance information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /customers/{customerId}:
     get:
       tags:
@@ -259,6 +325,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  
 
   /accounts/{accountId}/transactions:
     get:

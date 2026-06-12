@@ -319,14 +319,50 @@
             try {
                 const response = await api.customers.getCustomerAccounts(customerId);
                 const accounts = response.accounts || [];
-                displayAccountsTable(accounts);
+                
+                // Check if these are IMS accounts (have customerId field)
+                const isImsCustomer = accounts.length > 0 && accounts[0].customerId !== undefined;
+                
+                if (isImsCustomer) {
+                    // For IMS, load all balances in one call
+                    await loadImsBalancesAndDisplay(accounts, customerId);
+                } else {
+                    // For CICS, display table and load balances individually
+                    displayAccountsTable(accounts, null);
+                }
             } catch (error) {
                 console.error('Error loading accounts:', error);
                 document.getElementById('accounts-table').innerHTML = '<p>No accounts found or error loading accounts</p>';
             }
         }
         
-        function displayAccountsTable(accounts) {
+        async function loadImsBalancesAndDisplay(accounts, customerId) {
+            try {
+                // Call IMS balance endpoint once for all accounts
+                const response = await fetch(`/ims/accounts/${customerId}/balances`);
+                const balanceData = await response.json();
+                
+                // balanceData.amount is an array of balances matching the account order
+                const balances = balanceData.amount || [];
+                
+                // Attach balance to each account
+                accounts.forEach((account, index) => {
+                    if (index < balances.length) {
+                        account.availableBalance = balances[index];
+                        account.currentBalance = balances[index];
+                    }
+                });
+                
+                // Now display the table with balance data
+                displayAccountsTable(accounts, null);
+            } catch (error) {
+                console.error('Error loading IMS balances:', error);
+                // Display table anyway, balances will show as loading
+                displayAccountsTable(accounts, null);
+            }
+        }
+        
+        function displayAccountsTable(accounts, customerId) {
             if (!accounts || accounts.length === 0) {
                 document.getElementById('accounts-table').innerHTML = '<p>No accounts found for this customer</p>';
                 return;
@@ -351,18 +387,32 @@
             `;
             
             accounts.forEach((account, index) => {
+                // Check if balance data is already present (IMS accounts include balances)
+                const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
+                
+                // Format balance display
+                const availBalance = hasBalanceData && account.availableBalance !== undefined
+                    ? formatCurrency(account.availableBalance, account.currency)
+                    : '<cds-loading size="sm"></cds-loading>';
+                const currentBalance = hasBalanceData && account.currentBalance !== undefined
+                    ? formatCurrency(account.currentBalance, account.currency)
+                    : '<cds-loading size="sm"></cds-loading>';
+                
+                // For IMS accounts (with customerId), use accountId as accountNumber if not present
+                const accountNumber = account.accountNumber || (account.customerId ? account.accountId : 'N/A');
+                
                 tableHTML += `
                     <tr>
                         <td>${account.accountId || 'N/A'}</td>
-                        <td>${account.accountNumber || 'N/A'}</td>
+                        <td>${accountNumber}</td>
                         <td>${account.sortCode || 'N/A'}</td>
                         <td>${account.accountType || 'N/A'}</td>
                         <td>${account.currency || 'N/A'}</td>
                         <td id="avail-bal-${index}">
-                            <cds-loading size="sm"></cds-loading>
+                            ${availBalance}
                         </td>
                         <td id="current-bal-${index}">
-                            <cds-loading size="sm"></cds-loading>
+                            ${currentBalance}
                         </td>
                         <td>${account.status || 'N/A'}</td>
                         <td>
@@ -379,9 +429,11 @@
             
             document.getElementById('accounts-table').innerHTML = tableHTML;
             
-            // Lazy load balances for each account
+            // Load balances for CICS accounts that don't already have balance data
+            // IMS accounts already have balance data loaded
             accounts.forEach((account, index) => {
-                if (account.accountId) {
+                const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
+                if (account.accountId && !hasBalanceData) {
                     loadAccountBalances(account.accountId, index);
                 }
             });
@@ -396,6 +448,7 @@
             currentBalCell.innerHTML = '<cds-loading size="sm"></cds-loading>';
             
             try {
+                // CICS accounts use /accounts/{accountId}/balances
                 const balance = await api.accounts.getAccountBalances(accountId);
 
                 const formattedBalance = balance?.amount !== undefined

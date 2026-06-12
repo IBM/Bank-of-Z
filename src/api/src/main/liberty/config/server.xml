@@ -2,31 +2,4 @@
   <featureManager>
     <feature>zosconnect:zosConnect-3.0</feature>
   </featureManager>
-  
-  <applicationManager autoExpand="true"/>
-  <applicationMonitor updateTrigger="mbean" dropinsEnabled="false"/>
-  
-  <!-- HTTP Endpoint Configuration -->
-  <httpEndpoint id="defaultHttpEndpoint"
-                host="*"
-                httpPort="${env.HTTP_PORT}"/>
-  
-  <!-- CORS Configuration for all API endpoints -->
-  <cors domain="/"
-        allowedOrigins="*"
-        allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
-        allowedHeaders="Content-Type, Authorization, Accept, Origin, X-Requested-With"
-        allowCredentials="false"
-        maxAge="3600" />
-  
-  <!-- API Application -->
-  <webApplication id="api" location="api.war" name="api" contextRoot="/"/>
-  
-  <!-- Include CICS connection configuration -->
-  <include optional="false" location="cics.xml"/>
-  
-  <!-- Include IMS connection configuration -->
-  <include optional="false" location="ims.xml"/>
 </server>
-
-<!-- Made with Bob -->

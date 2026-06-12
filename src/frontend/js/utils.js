@@ -32,10 +32,11 @@ export function parseDate(dateString) {
 /**
  * Format currency
  */
-export function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-GB', {
+export function formatCurrency(amount, currency = 'USD') {
+    const locale = currency === 'USD' ? 'en-US' : 'en-GB';
+    return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: 'GBP'
+        currency: currency
     }).format(amount);
 }
 

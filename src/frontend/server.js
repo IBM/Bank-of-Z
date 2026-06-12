@@ -33,8 +33,8 @@ const mimeTypes = {
 const server = http.createServer((req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 
-    // Check if this is an API request
-    if (req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
+    // Check if this is an API request (IMS, customers, accounts endpoints)
+    if (req.url.startsWith('/ims/') || req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
         // Proxy API requests to backend
         proxyApiRequest(req, res);
         return;
@@ -73,18 +73,25 @@ const server = http.createServer((req, res) => {
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
-    const apiUrl = `${API_BASE_URL}${req.url}`;
-    console.log(`Proxying API request to: ${apiUrl}`);
+    const apiUrl = new URL(`${API_BASE_URL}${req.url}`);
+    console.log(`Proxying API request to: ${apiUrl.href}`);
 
     const options = {
+        hostname: apiUrl.hostname,
+        port: apiUrl.port || 80,
+        path: apiUrl.pathname + apiUrl.search,
         method: req.method,
         headers: {
             'Content-Type': 'application/json',
+            'Host': apiUrl.host,
             ...req.headers
         }
     };
 
-    const proxyReq = http.request(apiUrl, options, (proxyRes) => {
+    // Remove host header from original request to avoid conflicts
+    delete options.headers.host;
+
+    const proxyReq = http.request(options, (proxyRes) => {
         // Forward status code and headers
         res.writeHead(proxyRes.statusCode, proxyRes.headers);
 
@@ -94,6 +101,8 @@ function proxyApiRequest(req, res) {
 
     proxyReq.on('error', (error) => {
         console.error('Proxy request failed:', error);
+        console.error('Target URL:', apiUrl.href);
+        console.error('Options:', options);
         res.writeHead(502, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Bad Gateway', message: error.message }));
     });

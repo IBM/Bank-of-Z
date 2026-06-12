@@ -16,7 +16,8 @@ mappings:
           - accountType:
               required: true
               nullable: false
-              template: "{{$item.\"ACCTYPE-AS\"}}"
+              template: "{{ $item.\"ACCTYPE-AS\"  = 's' ? 'SAVINGS' : $item.\"ACCTYPE-AS\"\
+                \ = 'c' ? 'CHECKING' : 'CURRENT'}}"
           - currency:
               required: true
               nullable: false

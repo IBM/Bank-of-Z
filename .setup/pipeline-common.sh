@@ -19,6 +19,31 @@ set -e  # Exit on error
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
+#########################################################
+# STAGE: Static scan Bank of Z
+#########################################################
+stage_static_scan_bank_of_z() {
+    print_stage "STAGE: Static scan Bank of Z"
+    
+    # Verify installation script exists
+    if [ ! -f "$BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
+        exit 1
+    fi
+    
+    # Run zcode scan task
+    print_info "Running Bank of Z static scan script..."
+    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if ${BANK_DIR}/.setup/tasks/task-zcodescan-static-scan.sh; then
+        print_success "Bank of Z application static scan completed successfully"
+    else
+        print_error "Failed to static scan Bank of Z"
+        exit 1
+    fi
+}
 
 #########################################################
 # STAGE: Build Bank of Z
@@ -118,6 +143,9 @@ print_phase_next_step() {
     echo ""
     case "$completed_phase" in
         validation)
+            print_info "Next step: Execute ZCodeScan for Bank of Z."
+            ;;
+        static-scan)
             print_info "Next step: build Bank of Z."
             ;;
         build)
@@ -139,6 +167,20 @@ main_validation() {
     print_stage "VALIDATION COMPLETE"
     print_success "Environment validation completed successfully!"
     print_phase_next_step "validation"
+}
+
+main_static_scan() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_static_scan_bank_of_z
+
+    # Summary
+    print_stage "STATIC SCAN COMPLETE"
+    print_success "STATIC SCAN  setup completed successfully!"
+    print_phase_next_step "static-scan"
 }
 
 main_build() {
@@ -182,6 +224,10 @@ main() {
         validate-prereqs)
             main_validation
             ;;
+        scan)
+            shift
+            main_static_scan
+            ;;
         build)
             shift  # Remove 'build' from parameters
             main_build "$@"
@@ -191,6 +237,12 @@ main() {
             ;;
         build-and-deploy)
             shift  # Remove 'build-and-deploy' from parameters
+            main_build "$@"
+            main_deploy
+            ;;
+        scan-build-and-deploy)
+            shift  # Remove 'scan-build-and-deploy' from parameters
+            main_static_scan
             main_build "$@"
             main_deploy
             ;;

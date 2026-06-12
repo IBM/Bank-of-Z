@@ -16,3 +16,4 @@ zowe.config.user.json
 # VSIX extension downloads
 vsix-extensions/
 *.vsix
+/.taz-unit-test

@@ -94,17 +94,18 @@ class CustomersApi extends BaseApi {
     /**
      * Get customer accounts
      * GET /customers/{customerId}/accounts
-     * Automatically routes to IMS endpoint for 9-digit customer IDs
+     * Routes to /ims/ endpoint for 9-digit customer IDs, /api/ for others
      * @param {string} customerId - Unique identifier for the customer
      * @returns {Promise<AccountList>} List of customer accounts
      */
     async getCustomerAccounts(customerId) {
-        // Check if customer ID is 9 digits (IMS customer)
+        // Check if customer ID is exactly 9 digits (IMS customer)
         const isImsCustomer = /^\d{9}$/.test(customerId);
         
         if (isImsCustomer) {
             // Route to IMS endpoint
-            return this.request(`${this.configuration.baseUrl.replace('/api', '/ims')}/customers/${customerId}/accounts`);
+            const imsBaseUrl = this.configuration.baseUrl.replace('/api', '/ims');
+            return this.request(`${imsBaseUrl}/customers/${customerId}/accounts`);
         } else {
             // Route to CICS endpoint (default)
             return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);

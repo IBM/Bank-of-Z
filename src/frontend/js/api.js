@@ -103,11 +103,10 @@ class CustomersApi extends BaseApi {
         const isImsCustomer = /^\d{9}$/.test(customerId);
         
         if (isImsCustomer) {
-            // Route to IMS endpoint
-            const imsBaseUrl = this.configuration.baseUrl.replace('/api', '/ims');
-            return this.request(`${imsBaseUrl}/customers/${customerId}/accounts`);
+            // Route to IMS endpoint at /api/ims/customers/... (under same context root)
+            return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}/accounts`);
         } else {
-            // Route to CICS endpoint (default)
+            // Route to CICS endpoint at /api/customers/... (default)
             return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
         }
     }

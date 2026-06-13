@@ -29,6 +29,13 @@ export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 
+# IMS environment variables
+export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
+export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
+export IMS_USER=${IMS_USER:-$(get_section_value 'ims' 'user')}
+export IMS_PASSWORD=${IMS_PASSWORD:-$(get_section_value 'ims' 'password')} #pragma: allowlist secret
+export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
+
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -126,12 +133,6 @@ EOF
 # =========================
 # Generate IMS connection config
 # =========================
-export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
-export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
-export IMS_USER=${IMS_USER:-$(get_section_value 'ims' 'user')}
-export IMS_PASSWORD=${IMS_PASSWORD:-$(get_section_value 'ims' 'password')} #pragma: allowlist secret
-export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
-
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Connection to IMS">
@@ -145,7 +146,7 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
         <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
     </connectionFactory>
 
-    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+    <zosconnect_authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
 

@@ -338,12 +338,11 @@
         
         async function loadImsBalancesAndDisplay(accounts, customerId) {
             try {
-                // Call IMS balance endpoint once for all accounts
-                const response = await fetch(`/ims/accounts/${customerId}/balances`);
-                const balanceData = await response.json();
+                // Call IMS balance endpoint once for all accounts using API client
+                const balanceData = await api.accounts.getAccountBalances(null, customerId);
                 
                 // balanceData.amount is an array of balances matching the account order
-                const balances = balanceData.amount || [];
+                const balances = Array.isArray(balanceData.amount) ? balanceData.amount : [balanceData.amount];
                 
                 // Attach balance to each account
                 accounts.forEach((account, index) => {

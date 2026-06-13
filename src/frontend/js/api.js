@@ -93,10 +93,10 @@ class CustomersApi extends BaseApi {
         const isImsCustomer = /^\d{9}$/.test(customerId);
         
         if (isImsCustomer) {
-            // Route to IMS endpoint at /api/ims/customers/... (under same context root)
+            // Route to IMS endpoint
             return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}`);
         } else {
-            // Route to CICS endpoint at /api/customers/... (default)
+            // Route to CICS endpoint
             return this.request(`${this.configuration.baseUrl}/customers/${customerId}`);
         }
     }
@@ -104,7 +104,7 @@ class CustomersApi extends BaseApi {
     /**
      * Get customer accounts
      * GET /customers/{customerId}/accounts
-     * Routes to /ims/ endpoint for 9-digit customer IDs, /api/ for others
+     * Routes to /ims/ endpoint for 9-digit customer IDs, /customers/ for others
      * @param {string} customerId - Unique identifier for the customer
      * @returns {Promise<AccountList>} List of customer accounts
      */
@@ -113,10 +113,10 @@ class CustomersApi extends BaseApi {
         const isImsCustomer = /^\d{9}$/.test(customerId);
         
         if (isImsCustomer) {
-            // Route to IMS endpoint at /api/ims/customers/... (under same context root)
+            // Route to IMS endpoint
             return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}/accounts`);
         } else {
-            // Route to CICS endpoint at /api/customers/... (default)
+            // Route to CICS endpoint
             return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
         }
     }
@@ -180,7 +180,7 @@ class AccountsApi extends BaseApi {
         if (filters.status) params.append('status', filters.status);
         
         const queryString = params.toString();
-        const url = queryString 
+        const url = queryString
             ? `${this.configuration.baseUrl}/accounts?${queryString}`
             : `${this.configuration.baseUrl}/accounts`;
         

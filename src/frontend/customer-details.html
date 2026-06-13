@@ -434,12 +434,12 @@
             accounts.forEach((account, index) => {
                 const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
                 if (account.accountId && !hasBalanceData) {
-                    loadAccountBalances(account.accountId, index);
+                    loadAccountBalances(account.accountId, index, account.customerId);
                 }
             });
         }
         
-        async function loadAccountBalances(accountId, rowIndex) {
+        async function loadAccountBalances(accountId, rowIndex, customerId = null) {
             const availBalCell = document.getElementById(`avail-bal-${rowIndex}`);
             const currentBalCell = document.getElementById(`current-bal-${rowIndex}`);
             
@@ -448,8 +448,8 @@
             currentBalCell.innerHTML = '<cds-loading size="sm"></cds-loading>';
             
             try {
-                // CICS accounts use /accounts/{accountId}/balances
-                const balance = await api.accounts.getAccountBalances(accountId);
+                // Route to IMS or CICS based on customerId
+                const balance = await api.accounts.getAccountBalances(accountId, customerId);
 
                 const formattedBalance = balance?.amount !== undefined
                     ? formatCurrency(balance.amount, balance.currency)

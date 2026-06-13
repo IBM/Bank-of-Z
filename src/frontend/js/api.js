@@ -189,22 +189,38 @@ class AccountsApi extends BaseApi {
 
     /**
      * Get account details
-     * GET /accounts/{accountId}
+     * GET /accounts/{accountId} or /ims/accounts/{accountId}
      * @param {string} accountId - Unique identifier for the account
+     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS)
      * @returns {Promise<Account>} Account details
      */
-    async getAccount(accountId) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
+    async getAccount(accountId, customerId = null) {
+        if (customerId) {
+            // IMS account - pad account ID to 9 digits
+            const paddedAccountId = accountId.padStart(9, '0');
+            return this.request(`${this.configuration.baseUrl}/ims/accounts/${paddedAccountId}`);
+        } else {
+            // CICS account
+            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
+        }
     }
 
     /**
      * Get account balances
-     * GET /accounts/{accountId}/balances
+     * GET /accounts/{accountId}/balances or /ims/accounts/{accountId}/balances
      * @param {string} accountId - Unique identifier for the account
+     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS)
      * @returns {Promise<BalanceList>} Balance information
      */
-    async getAccountBalances(accountId) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
+    async getAccountBalances(accountId, customerId = null) {
+        if (customerId) {
+            // IMS account - pad account ID to 9 digits
+            const paddedAccountId = accountId.padStart(9, '0');
+            return this.request(`${this.configuration.baseUrl}/ims/accounts/${paddedAccountId}/balances`);
+        } else {
+            // CICS account
+            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
+        }
     }
 
     /**

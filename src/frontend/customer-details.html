@@ -429,17 +429,63 @@
             
             document.getElementById('accounts-table').innerHTML = tableHTML;
             
-            // Load balances for CICS accounts that don't already have balance data
-            // IMS accounts already have balance data loaded
-            accounts.forEach((account, index) => {
-                const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
-                if (account.accountId && !hasBalanceData) {
-                    loadAccountBalances(account.accountId, index, account.customerId);
-                }
-            });
+            // Check if this is an IMS customer (accounts have customerId field)
+            const isImsCustomer = accounts.length > 0 && accounts[0].customerId;
+            
+            if (isImsCustomer) {
+                // For IMS: Load all balances in one call
+                loadImsBalances(accounts[0].customerId, accounts);
+            } else {
+                // For CICS: Load balances individually for accounts that don't have balance data
+                accounts.forEach((account, index) => {
+                    const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
+                    if (account.accountId && !hasBalanceData) {
+                        loadAccountBalances(account.accountId, index);
+                    }
+                });
+            }
         }
         
-        async function loadAccountBalances(accountId, rowIndex, customerId = null) {
+        async function loadImsBalances(customerId, accounts) {
+            try {
+                // IMS returns all account balances in one call with arrays
+                const balanceData = await api.accounts.getAccountBalances(null, customerId);
+                
+                // balanceData.amount is an array with one balance per account
+                const balances = Array.isArray(balanceData.amount) ? balanceData.amount : [balanceData.amount];
+                
+                // Update each account row with its corresponding balance
+                accounts.forEach((account, index) => {
+                    const availBalCell = document.getElementById(`avail-bal-${index}`);
+                    const currentBalCell = document.getElementById(`current-bal-${index}`);
+                    
+                    if (availBalCell && currentBalCell && index < balances.length) {
+                        const balance = balances[index];
+                        const formattedBalance = formatCurrency(balance, balanceData.currency || 'USD');
+                        
+                        availBalCell.textContent = balanceData.balanceType === 'AVAILABLE' ? formattedBalance : 'N/A';
+                        currentBalCell.textContent = balanceData.balanceType === 'CURRENT' ? formattedBalance : 'N/A';
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading IMS balances:', error);
+                // Show error in all balance cells
+                accounts.forEach((account, index) => {
+                    const availBalCell = document.getElementById(`avail-bal-${index}`);
+                    const currentBalCell = document.getElementById(`current-bal-${index}`);
+                    if (availBalCell) {
+                        availBalCell.textContent = 'Error';
+                        availBalCell.title = error.message || 'Failed to load balances';
+                    }
+                    if (currentBalCell) {
+                        currentBalCell.textContent = 'Error';
+                        currentBalCell.title = error.message || 'Failed to load balances';
+                    }
+                });
+            }
+        }
+        
+        async function loadAccountBalances(accountId, rowIndex) {
             const availBalCell = document.getElementById(`avail-bal-${rowIndex}`);
             const currentBalCell = document.getElementById(`current-bal-${rowIndex}`);
             
@@ -448,8 +494,8 @@
             currentBalCell.innerHTML = '<cds-loading size="sm"></cds-loading>';
             
             try {
-                // Route to IMS or CICS based on customerId
-                const balance = await api.accounts.getAccountBalances(accountId, customerId);
+                // CICS balance call (IMS uses loadImsBalances instead)
+                const balance = await api.accounts.getAccountBalances(accountId);
 
                 const formattedBalance = balance?.amount !== undefined
                     ? formatCurrency(balance.amount, balance.currency)

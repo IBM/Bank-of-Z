@@ -10,5 +10,5 @@
         <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
     </connectionFactory>
 
-    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+    <zosconnect_authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>

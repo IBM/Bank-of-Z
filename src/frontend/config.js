@@ -9,8 +9,8 @@
  */
 export const config = {
     api: {
-        // Empty baseUrl - endpoints are at root level (e.g., /ims/customers/...)
-        baseUrl: ''
+        // Base URL for API endpoints
+        baseUrl: '/api'
     },
     defaults: {
         sortCode: '987654'

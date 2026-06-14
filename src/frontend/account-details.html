@@ -109,16 +109,18 @@
             // Inject header
             document.getElementById('header-container').innerHTML = createAdminHeader();
 
-            // Check for account ID in URL
+            // Check for account ID and customer ID in URL
             const urlParams = new URLSearchParams(window.location.search);
-            const accountId = urlParams.get('id');
+            const accountId = urlParams.get('id') || urlParams.get('accountId');
+            const customerId = urlParams.get('customerId');
+            
             if (accountId) {
                 document.getElementById('accountId').value = accountId;
-                searchAccount();
+                searchAccount(customerId);
             }
 
             // Handle search
-            document.getElementById('search-btn').addEventListener('click', searchAccount);
+            document.getElementById('search-btn').addEventListener('click', () => searchAccount());
             document.getElementById('accountId').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchAccount();
             });
@@ -127,7 +129,7 @@
             document.getElementById('update-btn').addEventListener('click', updateAccount);
         });
 
-        async function searchAccount() {
+        async function searchAccount(customerId = null) {
             const accountId = document.getElementById('accountId').value.trim();
 
             if (!accountId) {
@@ -138,17 +140,19 @@
             showLoadingModal('Searching for account...');
 
             try {
-                const account = await api.accounts.getAccount(accountId);
+                // Pass customerId if available (for IMS accounts)
+                const account = await api.accounts.getAccount(accountId, customerId);
                 currentAccount = account;
+                currentAccount._customerId = customerId; // Store for later use
                 hideLoadingModal();
-                await displayAccountDetails(account);
+                await displayAccountDetails(account, customerId);
             } catch (error) {
                 hideLoadingModal();
                 showErrorModal('Error', 'Account not found or error loading data');
             }
         }
 
-        async function displayAccountDetails(account) {
+        async function displayAccountDetails(account, customerId = null) {
             document.getElementById('accountNumber').value = account.accountId || '';
             document.getElementById('customerNumber').value = account.customerId || '';
             document.getElementById('accountType').value = account.accountType || '';
@@ -164,10 +168,18 @@
             document.getElementById('details-section').style.display = 'block';
 
             try {
-                const balance = await api.accounts.getAccountBalances(account.accountId);
+                // For IMS accounts, use customerId; for CICS, use accountId
+                const balance = await api.accounts.getAccountBalances(
+                    customerId ? null : account.accountId,
+                    customerId
+                );
+                
+                // Handle IMS array response
+                const balanceAmount = Array.isArray(balance?.amount) ? balance.amount[0] : balance?.amount;
+                
                 document.getElementById('availableBalance').value =
-                    balance?.amount !== undefined
-                        ? formatCurrency(balance.amount, balance.currency)
+                    balanceAmount !== undefined
+                        ? formatCurrency(balanceAmount, balance.currency)
                         : 'N/A';
             } catch (error) {
                 console.error(`Error loading balance for account ${account.accountId}:`, error);

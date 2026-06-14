@@ -48,7 +48,8 @@
                     <cds-text-input
                         id="searchCustomerId"
                         label="Customer ID"
-                        helper-text="Enter the Customer ID to view details">
+                        placeholder="C1234567 or I000000015"
+                        helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234567 or I000000015)">
                     </cds-text-input>
                     <br />
                     <cds-text-input
@@ -102,7 +103,7 @@
     <script type="module">
         import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, formatCurrency, parseDate } from './js/utils.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, formatCurrency, parseDate, parseCustomerId, formatCustomerId, validateCustomerId } from './js/utils.js';
         
         let currentCustomer = null;
         
@@ -137,25 +138,34 @@
         });
         
         async function searchCustomer() {
-            const customerId = document.getElementById('searchCustomerId').value.trim();
+            const customerIdInput = document.getElementById('searchCustomerId').value.trim();
             const customerName = document.getElementById('searchCustomerName').value.trim();
             
             // Clear any previous notifications
             clearNotification();
             
-            if (!customerId && !customerName) {
+            if (!customerIdInput && !customerName) {
                 displayNotification('error', 'Validation Error', 'Please enter either a customer ID or name');
                 return;
             }
             
-            if (customerId && customerName) {
+            if (customerIdInput && customerName) {
                 displayNotification('error', 'Validation Error', 'Please enter either customer ID or name, not both');
                 return;
             }
             
             // If customer ID is provided, search by ID
-            if (customerId) {
-                await searchByCustomerId(customerId);
+            if (customerIdInput) {
+                // Validate and parse customer ID with prefix
+                const validation = validateCustomerId(customerIdInput);
+                if (!validation.valid) {
+                    displayNotification('error', 'Validation Error', validation.error);
+                    return;
+                }
+                
+                // Parse to get numeric ID and system
+                const parsed = parseCustomerId(customerIdInput);
+                await searchByCustomerId(parsed.customerId, parsed.system);
             } else {
                 // Search by name
                 await searchByCustomerName(customerName);
@@ -177,12 +187,13 @@
             container.innerHTML = '';
         }
         
-        async function searchByCustomerId(customerId) {
-            displayLoading('Searching for customer...');
+        async function searchByCustomerId(customerId, system) {
+            displayLoading(`Searching for ${system} customer...`);
             
             try {
                 const customer = await api.customers.getCustomer(customerId);
                 currentCustomer = customer;
+                currentCustomer._system = system; // Store system type
                 displayCustomerDetails(customer);
                 
                 // Load customer accounts
@@ -281,13 +292,17 @@
             const detailsSection = document.getElementById('details-section');
             detailsSection.style.display = 'block';
             
+            // Format customer ID with system prefix
+            const system = customer._system || (customer.customerId && customer.customerId.length === 9 ? 'IMS' : 'CICS');
+            const displayCustomerId = formatCustomerId(customer.customerId, system);
+            
             // Restore the proper HTML structure
             detailsSection.innerHTML = `
-                <h3>Customer Information</h3>
+                <h3>Customer Information (${system})</h3>
 
                 <div class="form-constrained">
                     <cds-form id="customer-form">
-                        <cds-text-input id="customerId" label="Customer ID" readonly value="${customer.customerId || ''}"></cds-text-input>
+                        <cds-text-input id="customerId" label="Customer ID" readonly value="${displayCustomerId}"></cds-text-input>
                         <cds-text-input id="title" label="Title" value="${customer.title || ''}"></cds-text-input>
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
                         <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>

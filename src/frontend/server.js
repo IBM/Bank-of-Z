@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 
     // Check if this is an API request (IMS, customers, accounts endpoints)
-    if (req.url.startsWith('/ims/') || req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
+    if (req.url.startsWith('/api/') || req.url.startsWith('/ims/') || req.url.startsWith('/customers') || req.url.startsWith('/accounts')) {
         // Proxy API requests to backend
         proxyApiRequest(req, res);
         return;
@@ -73,7 +73,9 @@ const server = http.createServer((req, res) => {
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
-    const apiUrl = new URL(`${API_BASE_URL}${req.url}`);
+    // Strip /api prefix for local Docker z/OS Connect
+    const urlPath = req.url.startsWith('/api/') ? req.url.substring(4) : req.url;
+    const apiUrl = new URL(`${API_BASE_URL}${urlPath}`);
     console.log(`Proxying API request to: ${apiUrl.href}`);
 
     const options = {

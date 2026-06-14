@@ -400,6 +400,11 @@
                 // For IMS accounts (with customerId), use accountId as accountNumber if not present
                 const accountNumber = account.accountNumber || (account.customerId ? account.accountId : 'N/A');
                 
+                // For IMS accounts, pass customerId in the URL; for CICS, pass accountId
+                const viewLink = account.customerId
+                    ? `account-details.html?customerId=${account.customerId}&accountId=${account.accountId}`
+                    : `account-details.html?id=${account.accountId}`;
+                
                 tableHTML += `
                     <tr>
                         <td>${account.accountId || 'N/A'}</td>
@@ -415,7 +420,7 @@
                         </td>
                         <td>${account.status || 'N/A'}</td>
                         <td>
-                            <a href="account-details.html?id=${account.accountId}">View</a>
+                            <a href="${viewLink}">View</a>
                         </td>
                     </tr>
                 `;

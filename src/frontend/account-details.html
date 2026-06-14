@@ -141,7 +141,33 @@
 
             try {
                 // Pass customerId if available (for IMS accounts)
-                const account = await api.accounts.getAccount(accountId, customerId);
+                const response = await api.accounts.getAccount(accountId, customerId);
+                
+                // Handle IMS response which may return multiple accounts
+                let account = response;
+                if (response.accountId && Array.isArray(response.accountId)) {
+                    // IMS returns arrays - find the matching account
+                    const accountIndex = response.accountId.findIndex(id => id.toString() === accountId);
+                    if (accountIndex === -1) {
+                        throw new Error('Account not found in response');
+                    }
+                    
+                    // Extract single account data from arrays
+                    account = {
+                        accountId: response.accountId[accountIndex],
+                        customerId: Array.isArray(response.customerId) ? response.customerId[accountIndex] : response.customerId,
+                        accountType: Array.isArray(response.accountType) ? response.accountType[accountIndex] : response.accountType,
+                        currency: Array.isArray(response.currency) ? response.currency[accountIndex] : response.currency,
+                        status: Array.isArray(response.status) ? response.status[accountIndex] : response.status,
+                        sortCode: Array.isArray(response.sortCode) ? response.sortCode[accountIndex] : response.sortCode,
+                        accountNumber: Array.isArray(response.accountNumber) ? response.accountNumber[accountIndex] : response.accountNumber,
+                        iban: Array.isArray(response.iban) ? response.iban[accountIndex] : response.iban,
+                        openingDate: Array.isArray(response.openingDate) ? response.openingDate[accountIndex] : response.openingDate,
+                        nickname: Array.isArray(response.nickname) ? response.nickname[accountIndex] : response.nickname
+                    };
+                    account._accountIndex = accountIndex; // Store index for balance lookup
+                }
+                
                 currentAccount = account;
                 currentAccount._customerId = customerId; // Store for later use
                 hideLoadingModal();
@@ -174,8 +200,14 @@
                     customerId
                 );
                 
-                // Handle IMS array response
-                const balanceAmount = Array.isArray(balance?.amount) ? balance.amount[0] : balance?.amount;
+                // Handle IMS array response - use the account index if available
+                let balanceAmount;
+                if (Array.isArray(balance?.amount)) {
+                    const index = account._accountIndex !== undefined ? account._accountIndex : 0;
+                    balanceAmount = balance.amount[index];
+                } else {
+                    balanceAmount = balance?.amount;
+                }
                 
                 document.getElementById('availableBalance').value =
                     balanceAmount !== undefined

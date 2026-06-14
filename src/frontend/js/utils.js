@@ -38,6 +38,7 @@ export function formatCurrency(amount, currency = 'USD') {
         style: 'currency',
         currency: currency
     }).format(amount);
+}
 
 /**
  * Parse customer ID with system prefix (C for CICS, I for IMS)
@@ -121,12 +122,11 @@ export function validateCustomerId(input) {
         };
     }
     
-    return { 
-        valid: true, 
-        error: null, 
-        system: prefix === 'I' ? 'IMS' : 'CICS' 
+    return {
+        valid: true,
+        error: null,
+        system: prefix === 'I' ? 'IMS' : 'CICS'
     };
-}
 }
 
 /**

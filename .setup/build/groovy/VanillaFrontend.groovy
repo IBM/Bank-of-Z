@@ -59,8 +59,12 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
     def allFiles = changedFiles + deletedFiles + renamedFiles
     
+    log.info("> Checking for frontend changes in ${allFiles.size()} files")
+    log.info("> Looking for files containing: '/${vanillaFrontendRelativePath}/'")
+    
     def isFrontendChanged = false
     allFiles.each { file ->
+        log.info("> Checking file: ${file}")
         // Files contain paths like "Bank-of-Z/src/frontend/admin.html"
         // Check if the path contains the frontend directory
         if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
@@ -70,7 +74,7 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     }
     
     if (!isFrontendChanged) {
-        println("> No frontend changes detected - skipping frontend build")
+        log.info("> No frontend changes detected - skipping frontend build")
         return 0
     }
     

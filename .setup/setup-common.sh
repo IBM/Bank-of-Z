@@ -244,7 +244,7 @@ stage_setup_cics_region() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    ./setup/setup/stage_setup_cics_region.sh &
+    .setup/setup/setup-cics-region.sh &
     PID=$!
     # Wait for cics setup to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then

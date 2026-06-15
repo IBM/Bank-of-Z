@@ -227,7 +227,7 @@ stage_setup_zosconnect_server() {
 
 
 #########################################################
-# STAGE: Setup Bank of Z databse
+# STAGE: Setup CICS region
 #########################################################
 stage_setup_cics_region() {
     print_stage "STAGE: Create CICS region with zconfig"
@@ -239,15 +239,41 @@ stage_setup_cics_region() {
     fi
     
     # Run script
-    print_info "Running Bank of Z database setup script..."
+    print_info "Running CICS region setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-cics-region.sh"
     cd "$BANK_DIR"
     
     set -o pipefail
     if  .setup/setup/setup-cics-region.sh; then
-        print_success "Bank of Z application setup completed successfully"
+        print_success "CICS region setup completed successfully"
     else
-        print_error "Failed to install Bank of Z"
+        print_error "Failed to setup CICS region"
+        exit 1
+    fi
+}
+
+#########################################################
+# STAGE: Setup IMS region
+#########################################################
+stage_setup_ims_region() {
+    print_stage "STAGE: Create IMS region with zconfig"
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-ims-region.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-region.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running IMS region setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-region.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if  .setup/setup/setup-ims-region.sh; then
+        print_success "IMS region setup completed successfully"
+    else
+        print_error "Failed to setup IMS region"
         exit 1
     fi
 }
@@ -303,6 +329,8 @@ main_setup() {
     stage_setup_database
     
     stage_setup_cics_region
+    
+    stage_setup_ims_region
     
     stage_setup_zosconnect_server
     

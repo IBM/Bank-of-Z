@@ -157,4 +157,15 @@ ims:
   user: ${IMS_USER} # env var
   password: ${IMS_PASSWORD} # env var #pragma: allowlist secret
   datastore: IMS2
+  # IMS system HLQ
+  ims_sys_hlq: IMSV15
+  # IMS region HLQ
+  ims_hlq: ${app.base_name}.IMS2
+  # IMS installation directory
+  ims_home: /usr/lpp/ims/ims15
+  # IMS Connect configuration
+  ims_connect:
+    hostname: localhost
+    port: 9977
+    ssl_port: 9966
 

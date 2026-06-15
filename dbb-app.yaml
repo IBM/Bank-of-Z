@@ -20,6 +20,14 @@ application:
   name: BANKZ
 
   tasks:
+
+    - task: ScannerInit
+      variables:
+        - name: scanners
+          value: 
+            - scanner: Dummy # Direct yaml files for z/OS Connect files to the Dummy scanner instead of the default DBB DependencyScanner
+              extensions: yaml
+
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
       variables:

@@ -445,12 +445,6 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
    [INFO] [DBB-BUILD] Location: '/usr/local/sandboxes'
    [INFO] [DBB-BUILD] Group: BANKZ-main
    [INFO] [DBB-BUILD] Task: FullAnalysis
-   [INFO] [DBB-BUILD] [main] WARN com.ibm.dbb.task.framework.FullAnalysis - BGZZB0021E Scanning failed for build file "Bank-of-Z/src/api/src/main/webapp/META-INF/openapi.yaml" with error:
-   [INFO] [DBB-BUILD] BGZTK0128E No dependency scanner was located for Bank-of-Z/src/api/src/main/webapp/META-INF/openapi.yaml
-   [INFO] [DBB-BUILD] [main] WARN com.ibm.dbb.task.framework.FullAnalysis - BGZZB0021E Scanning failed for build file "Bank-of-Z/src/api/src/main/api/openapi.yaml" with error:
-   [INFO] [DBB-BUILD] BGZTK0128E No dependency scanner was located for Bank-of-Z/src/api/src/main/api/openapi.yaml
-   [INFO] [DBB-BUILD] [main] WARN com.ibm.dbb.task.framework.FullAnalysis - BGZZB0021E Scanning failed for build file "Bank-of-Z/zcodescan/zcodescan-rules.yaml" with error:
-   [INFO] [DBB-BUILD] BGZTK0128E No dependency scanner was located for Bank-of-Z/zcodescan/zcodescan-rules.yaml
    [INFO] [DBB-BUILD] Stage: Languages
    [INFO] [DBB-BUILD] Language: BMS
    [INFO] [DBB-BUILD] Building 'Bank-of-Z/src/base/cics/bms/BNK1ACC.bms'

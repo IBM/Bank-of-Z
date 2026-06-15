@@ -114,6 +114,9 @@ set -e
 dbb build "$BUILD_TYPE" --debug --hlq "${APP_BASE_NAME}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line
 do
     case "$line" in
+        *"BGZZB0021E Scanning failed"*|*"BGZTK0128E No dependency scanner"*)
+            continue
+            ;;
         ">"*)
             print_info "${CYAN}[DBB-BUILD]${NC} ${line#> }"
             ;;

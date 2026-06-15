@@ -60,14 +60,17 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def allFiles = changedFiles + deletedFiles + renamedFiles
     
     log.info("> Checking for frontend changes in ${allFiles.size()} files")
-    log.info("> Looking for files containing: '/${vanillaFrontendRelativePath}/'")
+    log.info("> Looking for files containing: '${vanillaFrontendRelativePath}/'")
     
     def isFrontendChanged = false
     allFiles.each { file ->
         log.info("> Checking file: ${file}")
         // Files contain paths like "Bank-of-Z/src/frontend/admin.html"
-        // Check if the path contains the frontend directory
-        if (file.contains("/${vanillaFrontendRelativePath}/") || file.endsWith("/${vanillaFrontendRelativePath}")) {
+        // Check if the path contains the frontend directory (with or without leading slash)
+        if (file.contains("/${vanillaFrontendRelativePath}/") ||
+            file.contains("${vanillaFrontendRelativePath}/") ||
+            file.endsWith("/${vanillaFrontendRelativePath}") ||
+            file.endsWith("${vanillaFrontendRelativePath}")) {
             isFrontendChanged = true
             log.info("> Frontend file detected: ${file}")
         }

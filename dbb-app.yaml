@@ -309,7 +309,19 @@ application:
       variables:
         - name: configSources
           value:
-            - "**/src/main/api/openapi.yaml"
+            - "**/cics/src/main/api/openapi.yaml"
+        - name: gradleDebug
+          value: true
+        - name: gradlePath
+          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
+    
+    - task: zOSConnectIMS
+      variables:
+        - name: configSources
+          value:
+            - "**/ims/src/main/api/openapi.yaml"
         - name: gradleDebug
           value: true
         - name: gradlePath

@@ -83,16 +83,14 @@ class BaseApi {
 class CustomersApi extends BaseApi {
     /**
      * Get customer information
-     * GET /customers/{customerId}
-     * Routes to /ims/ endpoint for 9-digit customer IDs, /api/ for others
-     * @param {string} customerId - Unique identifier for the customer
+     * GET /customers/{customerId} or /ims/customers/{customerId}
+     * Routes based on explicit system parameter (from C/I prefix)
+     * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
+     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<Customer>} Customer details
      */
-    async getCustomer(customerId) {
-        // Check if customer ID is exactly 9 digits (IMS customer)
-        const isImsCustomer = /^\d{9}$/.test(customerId);
-        
-        if (isImsCustomer) {
+    async getCustomer(customerId, system = 'CICS') {
+        if (system === 'IMS') {
             // Route to IMS endpoint
             return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}`);
         } else {
@@ -103,16 +101,14 @@ class CustomersApi extends BaseApi {
 
     /**
      * Get customer accounts
-     * GET /customers/{customerId}/accounts
-     * Routes to /ims/ endpoint for 9-digit customer IDs, /customers/ for others
-     * @param {string} customerId - Unique identifier for the customer
+     * GET /customers/{customerId}/accounts or /ims/customers/{customerId}/accounts
+     * Routes based on explicit system parameter (from C/I prefix)
+     * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
+     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<AccountList>} List of customer accounts
      */
-    async getCustomerAccounts(customerId) {
-        // Check if customer ID is exactly 9 digits (IMS customer)
-        const isImsCustomer = /^\d{9}$/.test(customerId);
-        
-        if (isImsCustomer) {
+    async getCustomerAccounts(customerId, system = 'CICS') {
+        if (system === 'IMS') {
             // Route to IMS endpoint
             return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}/accounts`);
         } else {

@@ -19,7 +19,6 @@ services:
       - "9080:9080"
     volumes:
       - ./src/api:/workspace/project
-      - ./src/api:/api/project
       - ./logs/:/logs/
       # - ./certs:/config/resources/security/:ro
     networks:

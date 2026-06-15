@@ -11,6 +11,9 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
+  
+servers:
+  - url: /cics
 
 tags:
   - name: Customers
@@ -21,11 +24,6 @@ tags:
     description: Account balance endpoints
   - name: Transactions
     description: Transaction history endpoints
-
-security:
-  - OAuth2:
-      - accounts
-      - customers
 
 paths:
   /ims/customers/{customerId}:

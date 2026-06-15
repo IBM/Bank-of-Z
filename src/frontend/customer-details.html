@@ -562,7 +562,14 @@
                 showSuccessModal('Success', 'Customer updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Not Supported', error.message || 'Customer updates are not available in the OpenBanking API');
+                
+                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
+                    showErrorModal('Feature Not Implemented', error.message);
+                } else if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', error.message || 'Failed to update customer');
+                }
             }
         }
     </script>

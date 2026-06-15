@@ -40,12 +40,12 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # Ignore errors if already cancelled
 # =========================
 set +e
-jcan P "CICS${APP_SHORT_NAME}" & 2>/dev/null
-opercmd "C CICS${APP_SHORT_NAME}" & 2>/dev/null
+jcan P "CICS${APP_SHORT_NAME}"  2>/dev/null
+opercmd "C CICS${APP_SHORT_NAME}"  2>/dev/null
 sleep 10
-drm "${APP_BASE_NAME}.${APP_VERSION}.*" & 2>/dev/null
-drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*" & 2>/dev/null
-drm "${APP_BASE_NAME}.DBB.*" & 2>/dev/null
+drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
+drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*"  2>/dev/null
+drm "${APP_BASE_NAME}.DBB.*"  2>/dev/null
 sleep 5
 tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)"
 # =========================
@@ -158,7 +158,7 @@ deactivate
 # =========================
 print_stage "STAGE 4: Start CICS region"
 
-jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" &
+jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" 
 sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10

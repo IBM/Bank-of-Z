@@ -145,8 +145,16 @@ zowe:
 cics:
   host: localhost
   user: ${CICS_USER} # env var
-  password: ${CICS_PASSWORD} # env var
+  password: ${CICS_PASSWORD} # env var #pragma: allowlist secret
   cmci_port: 27100
   ipic_port: 4320
   debug_port: 27103
+
+# IMS attributes
+ims:
+  host: localhost
+  port: 9977
+  user: ${IMS_USER} # env var
+  password: ${IMS_PASSWORD} # env var #pragma: allowlist secret
+  datastore: IMS2
 

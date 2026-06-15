@@ -32,11 +32,101 @@ export function parseDate(dateString) {
 /**
  * Format currency
  */
-export function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-GB', {
+export function formatCurrency(amount, currency = 'USD') {
+    const locale = currency === 'USD' ? 'en-US' : 'en-GB';
+    return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: 'GBP'
+        currency: currency
     }).format(amount);
+}
+
+/**
+ * Parse customer ID with system prefix (C for CICS, I for IMS)
+ * Returns { system: 'CICS'|'IMS', customerId: 'digits' }
+ */
+export function parseCustomerId(input) {
+    if (!input) return null;
+    
+    const trimmed = input.trim().toUpperCase();
+    
+    // Check for C prefix (CICS)
+    if (trimmed.startsWith('C')) {
+        const digits = trimmed.substring(1);
+        if (/^\d+$/.test(digits)) {
+            return { system: 'CICS', customerId: digits };
+        }
+    }
+    
+    // Check for I prefix (IMS)
+    if (trimmed.startsWith('I')) {
+        const digits = trimmed.substring(1);
+        if (/^\d{9}$/.test(digits)) { // IMS requires exactly 9 digits
+            return { system: 'IMS', customerId: digits };
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Format customer ID with system prefix
+ * @param {string} customerId - The numeric customer ID
+ * @param {string} system - 'CICS' or 'IMS'
+ * @returns {string} Formatted customer ID with prefix (e.g., 'C1234567' or 'I000000015')
+ */
+export function formatCustomerId(customerId, system) {
+    if (!customerId) return '';
+    const prefix = system === 'IMS' ? 'I' : 'C';
+    return `${prefix}${customerId}`;
+}
+
+/**
+ * Validate customer ID format
+ * @param {string} input - Customer ID with prefix
+ * @returns {Object} { valid: boolean, error: string|null, system: string|null }
+ */
+export function validateCustomerId(input) {
+    if (!input || !input.trim()) {
+        return { valid: false, error: 'Customer ID is required', system: null };
+    }
+    
+    const trimmed = input.trim().toUpperCase();
+    
+    // Must start with C or I
+    if (!trimmed.startsWith('C') && !trimmed.startsWith('I')) {
+        return { 
+            valid: false, 
+            error: 'Customer ID must start with C (CICS) or I (IMS)', 
+            system: null 
+        };
+    }
+    
+    const prefix = trimmed[0];
+    const digits = trimmed.substring(1);
+    
+    // Check if rest is numeric
+    if (!/^\d+$/.test(digits)) {
+        return { 
+            valid: false, 
+            error: 'Customer ID must contain only digits after the prefix', 
+            system: null 
+        };
+    }
+    
+    // IMS requires exactly 9 digits
+    if (prefix === 'I' && digits.length !== 9) {
+        return { 
+            valid: false, 
+            error: 'IMS customer ID must have exactly 9 digits after I prefix (e.g., I000000015)', 
+            system: null 
+        };
+    }
+    
+    return {
+        valid: true,
+        error: null,
+        system: prefix === 'I' ? 'IMS' : 'CICS'
+    };
 }
 
 /**

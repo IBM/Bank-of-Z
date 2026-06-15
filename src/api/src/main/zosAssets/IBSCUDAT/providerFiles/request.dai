@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1" name="INPUT-IBSCUDAT" originalName="INPUT-IBSCUDAT">
+            <field name="INPUT-AREA" originalName="INPUT-AREA" included="Y" path="INPUT-AREA" fileName="IBSCUDAT.cbl" structureIndex="0" structSrcFileName="INPUT-AREA_request_0.cpy" srcLine="01 INPUT-AREA.">
+                <startPos>1</startPos>
+                <bytes>250</bytes>
+                <maxBytes>250</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL-IN" originalName="LL-IN" included="Y" path="INPUT-AREA.LL-IN" srcLine="05 LL-IN PIC 9(4) USAGE COMP.">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ-IN" originalName="ZZ-IN" included="Y" path="INPUT-AREA.ZZ-IN" srcLine="05 ZZ-IN PIC 9(4) USAGE COMP.">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="TRAN-CODE" originalName="TRAN-CODE" included="Y" path="INPUT-AREA.TRAN-CODE" srcLine="05 TRAN-CODE PIC X(8) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="CUSTOMER-IN" originalName="CUSTOMER-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN" srcLine="05 CUSTOMER-IN.">
+                    <startPos>13</startPos>
+                    <bytes>238</bytes>
+                    <maxBytes>238</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="CUSTID-IN" originalName="CUSTID-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.CUSTID-IN" srcLine="10 CUSTID-IN PIC S9(9) USAGE COMP-5.">
+                        <startPos>13</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isNativeInteger="Y" alignment="NATURAL"/>
+                        <applicationDatatype datatype="INT"/>
+                    </field>
+                    <field name="LASTNAME-IN" originalName="LASTNAME-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.LASTNAME-IN" srcLine="10 LASTNAME-IN PIC X(50) USAGE DISPLAY.">
+                        <startPos>17</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="FIRSTNAME-IN" originalName="FIRSTNAME-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.FIRSTNAME-IN" srcLine="10 FIRSTNAME-IN PIC X(50) USAGE DISPLAY.">
+                        <startPos>67</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="ADDRESS-IN" originalName="ADDRESS-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.ADDRESS-IN" srcLine="10 ADDRESS-IN PIC X(80) USAGE DISPLAY.">
+                        <startPos>117</startPos>
+                        <bytes>80</bytes>
+                        <maxBytes>80</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="CITY-IN" originalName="CITY-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.CITY-IN" srcLine="10 CITY-IN PIC X(25) USAGE DISPLAY.">
+                        <startPos>197</startPos>
+                        <bytes>25</bytes>
+                        <maxBytes>25</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="STATE-IN" originalName="STATE-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.STATE-IN" srcLine="10 STATE-IN PIC X(2) USAGE DISPLAY.">
+                        <startPos>222</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="ZIPCODE-IN" originalName="ZIPCODE-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.ZIPCODE-IN" srcLine="10 ZIPCODE-IN PIC X(15) USAGE DISPLAY.">
+                        <startPos>224</startPos>
+                        <bytes>15</bytes>
+                        <maxBytes>15</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="PHONE-IN" originalName="PHONE-IN" included="Y" path="INPUT-AREA.CUSTOMER-IN.PHONE-IN" srcLine="10 PHONE-IN PIC X(12) USAGE DISPLAY.">
+                        <startPos>239</startPos>
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

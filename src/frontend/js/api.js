@@ -83,22 +83,38 @@ class BaseApi {
 class CustomersApi extends BaseApi {
     /**
      * Get customer information
-     * GET /customers/{customerId}
-     * @param {string} customerId - Unique identifier for the customer
+     * GET /customers/{customerId} or /ims/customers/{customerId}
+     * Routes based on explicit system parameter (from C/I prefix)
+     * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
+     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<Customer>} Customer details
      */
-    async getCustomer(customerId) {
-        return this.request(`${this.configuration.baseUrl}/customers/${customerId}`);
+    async getCustomer(customerId, system = 'CICS') {
+        if (system === 'IMS') {
+            // Route to IMS endpoint
+            return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}`);
+        } else {
+            // Route to CICS endpoint
+            return this.request(`${this.configuration.baseUrl}/customers/${customerId}`);
+        }
     }
 
     /**
      * Get customer accounts
-     * GET /customers/{customerId}/accounts
-     * @param {string} customerId - Unique identifier for the customer
+     * GET /customers/{customerId}/accounts or /ims/customers/{customerId}/accounts
+     * Routes based on explicit system parameter (from C/I prefix)
+     * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
+     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<AccountList>} List of customer accounts
      */
-    async getCustomerAccounts(customerId) {
-        return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
+    async getCustomerAccounts(customerId, system = 'CICS') {
+        if (system === 'IMS') {
+            // Route to IMS endpoint
+            return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}/accounts`);
+        } else {
+            // Route to CICS endpoint
+            return this.request(`${this.configuration.baseUrl}/customers/${customerId}/accounts`);
+        }
     }
 
     // Stub methods for legacy endpoints not in OpenAPI spec
@@ -160,7 +176,7 @@ class AccountsApi extends BaseApi {
         if (filters.status) params.append('status', filters.status);
         
         const queryString = params.toString();
-        const url = queryString 
+        const url = queryString
             ? `${this.configuration.baseUrl}/accounts?${queryString}`
             : `${this.configuration.baseUrl}/accounts`;
         
@@ -169,22 +185,36 @@ class AccountsApi extends BaseApi {
 
     /**
      * Get account details
-     * GET /accounts/{accountId}
+     * GET /accounts/{accountId} or /ims/accounts/{customerId}
      * @param {string} accountId - Unique identifier for the account
+     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS using customerId)
      * @returns {Promise<Account>} Account details
      */
-    async getAccount(accountId) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
+    async getAccount(accountId, customerId = null) {
+        if (customerId) {
+            // IMS account - use customer ID in path
+            return this.request(`${this.configuration.baseUrl}/ims/accounts/${customerId}`);
+        } else {
+            // CICS account
+            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
+        }
     }
 
     /**
      * Get account balances
-     * GET /accounts/{accountId}/balances
+     * GET /accounts/{accountId}/balances or /ims/accounts/{customerId}/balances
      * @param {string} accountId - Unique identifier for the account
+     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS using customerId)
      * @returns {Promise<BalanceList>} Balance information
      */
-    async getAccountBalances(accountId) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
+    async getAccountBalances(accountId, customerId = null) {
+        if (customerId) {
+            // IMS account - use customer ID in path, not account ID
+            return this.request(`${this.configuration.baseUrl}/ims/accounts/${customerId}/balances`);
+        } else {
+            // CICS account
+            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
+        }
     }
 
     /**

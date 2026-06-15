@@ -11,6 +11,7 @@ services:
       - IMS_PASSWORD=
       - IMS_HOST=
       - IMS_PORT=
+      - IMS_DATASTORE=
       - HTTP_PORT=9080
       - zosconnect_remote_download_allowlist=BLOCK_ALL
     ports:

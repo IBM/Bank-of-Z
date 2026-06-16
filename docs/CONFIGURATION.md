@@ -226,8 +226,8 @@ zconfig:
 zcodescan:
   zcodescan_home: /global/opt/pyenv/akf
   java_home: /usr/lpp/java/java21/current_64
-  src_folder: ${sandbox.path}/Bank-of-Z/src/base
-  output_folder: ${sandbox.path}/Bank-of-Z/zcodescan
+  src_dir: ${sandbox.path}/Bank-of-Z/src/base
+  output_dir: ${sandbox.path}/Bank-of-Z/zcodescan
   src_encoding: IBM-1047
 ```
 
@@ -253,9 +253,10 @@ wazideploy:
 ```yaml
 taz:
   taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
-  test_folder: ${sandbox.path}/Bank-of-Z/tests
+  test_dir: ${sandbox.path}/Bank-of-Z/taz-unit-test
   proclib: SYS1.PROCLIB
   library: ${app.base_name}.${app.zos_version}.LOAD
+  steplib: EQAW.SEQAMOD
 ```
 
 **Description**: Unit testing framework configuration.

@@ -29,6 +29,7 @@ stage_execute_pipeline() {
     print_info "  - Run static scan"
     print_info "  - Run DBB build"
     print_info "  - Deploy build"
+    print_info "  - Run unit test"
     echo ""
     
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
@@ -42,6 +43,16 @@ stage_execute_pipeline() {
     
     chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
     bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
+        print_success "Remote pipeline completed successfully"
+    else
+        print_error "Failed to execute pipeline on remote system"
+        exit 1
+    fi
+
+    bash ${SCRIPTS_DIR}/pipeline-common.sh unit-test&
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
@@ -65,6 +76,9 @@ main() {
     print_info "This script runs on your LOCAL machine"
     print_info "It uses Zowe CLI to coordinate pipeline execution on remote z/OS USS"
     echo ""
+
+    # Detect Execution Mode
+    detect_bank_of_z_location
     
     # Load configuration
     load_config

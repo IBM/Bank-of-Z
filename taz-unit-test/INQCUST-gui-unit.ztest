@@ -1,0 +1,43 @@
+name: INQCUST-gui-unit
+description: Unit test for INQCUST
+version: 1.0.1
+program: INQCUST
+sourcePath: src/base/cics/cobol/INQCUST.cbl
+dataFilePath: taz-unit-test/INQCUST-gui-unit.zdata
+unitTests:
+- name: INQCUST-gui-unit-1
+  programIndex: 1
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"
+- name: INQCUST-gui-unit-2
+  programIndex: 2
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"
+- name: INQCUST-gui-unit-3
+  programIndex: 3
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"
+- name: INQCUST-gui-unit-4
+  programIndex: 4
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"
+- name: INQCUST-gui-unit-5
+  programIndex: 5
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"
+- name: INQCUST-gui-unit-6
+  programIndex: 6
+  description: Default assertions to unit test program inputs and outputs
+  # PROGRAM validation asserts arguments passed to/from the program under test
+  validate:
+    - "PROGRAM"

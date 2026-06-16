@@ -287,7 +287,6 @@ print_usage() {
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
-    echo "  bash setup-common.sh update-bank-of-z"
 }
 
 #########################################################

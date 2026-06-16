@@ -109,16 +109,18 @@
             // Inject header
             document.getElementById('header-container').innerHTML = createAdminHeader();
 
-            // Check for account ID in URL
+            // Check for account ID and customer ID in URL
             const urlParams = new URLSearchParams(window.location.search);
-            const accountId = urlParams.get('id');
+            const accountId = urlParams.get('id') || urlParams.get('accountId');
+            const customerId = urlParams.get('customerId');
+            
             if (accountId) {
                 document.getElementById('accountId').value = accountId;
-                searchAccount();
+                searchAccount(customerId);
             }
 
             // Handle search
-            document.getElementById('search-btn').addEventListener('click', searchAccount);
+            document.getElementById('search-btn').addEventListener('click', () => searchAccount());
             document.getElementById('accountId').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchAccount();
             });
@@ -127,7 +129,7 @@
             document.getElementById('update-btn').addEventListener('click', updateAccount);
         });
 
-        async function searchAccount() {
+        async function searchAccount(customerId = null) {
             const accountId = document.getElementById('accountId').value.trim();
 
             if (!accountId) {
@@ -138,17 +140,67 @@
             showLoadingModal('Searching for account...');
 
             try {
-                const account = await api.accounts.getAccount(accountId);
+                // Pass customerId if available (for IMS accounts)
+                const response = await api.accounts.getAccount(accountId, customerId);
+                
+                // Handle IMS response which may return multiple accounts
+                let account = response;
+                
+                // Helper function to parse array-like strings or return actual arrays
+                const parseArrayField = (field) => {
+                    if (Array.isArray(field)) return field;
+                    if (typeof field === 'string' && field.startsWith('[')) {
+                        try {
+                            return JSON.parse(field);
+                        } catch (e) {
+                            console.warn('Failed to parse array field:', field);
+                            return [field];
+                        }
+                    }
+                    return field;
+                };
+                
+                // Check if accountId is an array (or array-like string)
+                const accountIds = parseArrayField(response.accountId);
+                if (Array.isArray(accountIds)) {
+                    // IMS returns arrays - find the matching account
+                    const accountIndex = accountIds.findIndex(id => id.toString() === accountId);
+                    if (accountIndex === -1) {
+                        throw new Error('Account not found in response');
+                    }
+                    
+                    // Extract single account data from arrays
+                    const extractValue = (field) => {
+                        const parsed = parseArrayField(field);
+                        return Array.isArray(parsed) ? parsed[accountIndex] : parsed;
+                    };
+                    
+                    account = {
+                        accountId: accountIds[accountIndex],
+                        customerId: extractValue(response.customerId),
+                        accountType: extractValue(response.accountType),
+                        currency: extractValue(response.currency),
+                        status: extractValue(response.status),
+                        sortCode: extractValue(response.sortCode),
+                        accountNumber: extractValue(response.accountNumber),
+                        iban: extractValue(response.iban),
+                        openingDate: extractValue(response.openingDate),
+                        nickname: extractValue(response.nickname)
+                    };
+                    account._accountIndex = accountIndex; // Store index for balance lookup
+                }
+                
                 currentAccount = account;
+                currentAccount._customerId = customerId; // Store for later use
                 hideLoadingModal();
-                await displayAccountDetails(account);
+                await displayAccountDetails(account, customerId);
             } catch (error) {
                 hideLoadingModal();
                 showErrorModal('Error', 'Account not found or error loading data');
             }
         }
 
-        async function displayAccountDetails(account) {
+        async function displayAccountDetails(account, customerId = null) {
             document.getElementById('accountNumber').value = account.accountId || '';
             document.getElementById('customerNumber').value = account.customerId || '';
             document.getElementById('accountType').value = account.accountType || '';
@@ -164,10 +216,24 @@
             document.getElementById('details-section').style.display = 'block';
 
             try {
-                const balance = await api.accounts.getAccountBalances(account.accountId);
+                // For IMS accounts, use customerId; for CICS, use accountId
+                const balance = await api.accounts.getAccountBalances(
+                    customerId ? null : account.accountId,
+                    customerId
+                );
+                
+                // Handle IMS array response - use the account index if available
+                let balanceAmount;
+                if (Array.isArray(balance?.amount)) {
+                    const index = account._accountIndex !== undefined ? account._accountIndex : 0;
+                    balanceAmount = balance.amount[index];
+                } else {
+                    balanceAmount = balance?.amount;
+                }
+                
                 document.getElementById('availableBalance').value =
-                    balance?.amount !== undefined
-                        ? formatCurrency(balance.amount, balance.currency)
+                    balanceAmount !== undefined
+                        ? formatCurrency(balanceAmount, balance.currency)
                         : 'N/A';
             } catch (error) {
                 console.error(`Error loading balance for account ${account.accountId}:`, error);
@@ -190,7 +256,14 @@
                 showSuccessModal('Success', 'Account updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Error', error.message || 'Failed to update account');
+                
+                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
+                    showErrorModal('Feature Not Implemented', error.message);
+                } else if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', error.message || 'Failed to update account');
+                }
             }
         }
     </script>

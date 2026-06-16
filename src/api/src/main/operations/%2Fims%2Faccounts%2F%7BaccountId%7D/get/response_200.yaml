@@ -1,0 +1,23 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\"\
+          .\"ACCID-AS\"}}"
+    - accountType:
+        required: true
+        nullable: false
+        template: "{{ $item.\"ACCTYPE-AS\"  = 's' ? 'SAVINGS' : $item.\"ACCTYPE-AS\"\
+          \ = 'c' ? 'CHECKING' : 'CURRENT'}}"
+    - currency:
+        required: true
+        nullable: false
+        template: "USD"
+    - status:
+        required: true
+        nullable: false
+        template: "ACTIVE"

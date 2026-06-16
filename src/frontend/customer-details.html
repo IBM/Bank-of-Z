@@ -48,7 +48,8 @@
                     <cds-text-input
                         id="searchCustomerId"
                         label="Customer ID"
-                        helper-text="Enter the Customer ID to view details">
+                        placeholder="C1234567 or I000000015"
+                        helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234567 or I000000015)">
                     </cds-text-input>
                     <br />
                     <cds-text-input
@@ -102,7 +103,7 @@
     <script type="module">
         import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, formatCurrency, parseDate } from './js/utils.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, formatCurrency, parseDate, parseCustomerId, formatCustomerId, validateCustomerId } from './js/utils.js';
         
         let currentCustomer = null;
         
@@ -137,25 +138,34 @@
         });
         
         async function searchCustomer() {
-            const customerId = document.getElementById('searchCustomerId').value.trim();
+            const customerIdInput = document.getElementById('searchCustomerId').value.trim();
             const customerName = document.getElementById('searchCustomerName').value.trim();
             
             // Clear any previous notifications
             clearNotification();
             
-            if (!customerId && !customerName) {
+            if (!customerIdInput && !customerName) {
                 displayNotification('error', 'Validation Error', 'Please enter either a customer ID or name');
                 return;
             }
             
-            if (customerId && customerName) {
+            if (customerIdInput && customerName) {
                 displayNotification('error', 'Validation Error', 'Please enter either customer ID or name, not both');
                 return;
             }
             
             // If customer ID is provided, search by ID
-            if (customerId) {
-                await searchByCustomerId(customerId);
+            if (customerIdInput) {
+                // Validate and parse customer ID with prefix
+                const validation = validateCustomerId(customerIdInput);
+                if (!validation.valid) {
+                    displayNotification('error', 'Validation Error', validation.error);
+                    return;
+                }
+                
+                // Parse to get numeric ID and system
+                const parsed = parseCustomerId(customerIdInput);
+                await searchByCustomerId(parsed.customerId, parsed.system);
             } else {
                 // Search by name
                 await searchByCustomerName(customerName);
@@ -177,16 +187,17 @@
             container.innerHTML = '';
         }
         
-        async function searchByCustomerId(customerId) {
-            displayLoading('Searching for customer...');
+        async function searchByCustomerId(customerId, system) {
+            displayLoading(`Searching for ${system} customer...`);
             
             try {
-                const customer = await api.customers.getCustomer(customerId);
+                const customer = await api.customers.getCustomer(customerId, system);
                 currentCustomer = customer;
+                currentCustomer._system = system; // Store system type
                 displayCustomerDetails(customer);
                 
                 // Load customer accounts
-                loadCustomerAccounts(customerId);
+                loadCustomerAccounts(customerId, system);
             } catch (error) {
                 displayNotification('error', 'Error', 'Customer not found or error loading data');
             }
@@ -281,13 +292,17 @@
             const detailsSection = document.getElementById('details-section');
             detailsSection.style.display = 'block';
             
+            // Format customer ID with system prefix
+            const system = customer._system || (customer.customerId && customer.customerId.length === 9 ? 'IMS' : 'CICS');
+            const displayCustomerId = formatCustomerId(customer.customerId, system);
+            
             // Restore the proper HTML structure
             detailsSection.innerHTML = `
-                <h3>Customer Information</h3>
+                <h3>Customer Information (${system})</h3>
 
                 <div class="form-constrained">
                     <cds-form id="customer-form">
-                        <cds-text-input id="customerId" label="Customer ID" readonly value="${customer.customerId || ''}"></cds-text-input>
+                        <cds-text-input id="customerId" label="Customer ID" readonly value="${displayCustomerId}"></cds-text-input>
                         <cds-text-input id="title" label="Title" value="${customer.title || ''}"></cds-text-input>
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
                         <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
@@ -315,18 +330,53 @@
             document.getElementById('update-btn').addEventListener('click', updateCustomer);
         }
         
-        async function loadCustomerAccounts(customerId) {
+        async function loadCustomerAccounts(customerId, system = 'CICS') {
             try {
-                const response = await api.customers.getCustomerAccounts(customerId);
+                const response = await api.customers.getCustomerAccounts(customerId, system);
                 const accounts = response.accounts || [];
-                displayAccountsTable(accounts);
+                
+                // Use the explicit system parameter instead of checking account fields
+                const isImsCustomer = system === 'IMS';
+                
+                if (isImsCustomer) {
+                    // For IMS, load all balances in one call
+                    await loadImsBalancesAndDisplay(accounts, customerId);
+                } else {
+                    // For CICS, display table and load balances individually
+                    displayAccountsTable(accounts, null);
+                }
             } catch (error) {
                 console.error('Error loading accounts:', error);
                 document.getElementById('accounts-table').innerHTML = '<p>No accounts found or error loading accounts</p>';
             }
         }
         
-        function displayAccountsTable(accounts) {
+        async function loadImsBalancesAndDisplay(accounts, customerId) {
+            try {
+                // Call IMS balance endpoint once for all accounts using API client
+                const balanceData = await api.accounts.getAccountBalances(null, customerId);
+                
+                // balanceData.amount is an array of balances matching the account order
+                const balances = Array.isArray(balanceData.amount) ? balanceData.amount : [balanceData.amount];
+                
+                // Attach balance to each account
+                accounts.forEach((account, index) => {
+                    if (index < balances.length) {
+                        account.availableBalance = balances[index];
+                        account.currentBalance = balances[index];
+                    }
+                });
+                
+                // Now display the table with balance data
+                displayAccountsTable(accounts, null);
+            } catch (error) {
+                console.error('Error loading IMS balances:', error);
+                // Display table anyway, balances will show as loading
+                displayAccountsTable(accounts, null);
+            }
+        }
+        
+        function displayAccountsTable(accounts, customerId) {
             if (!accounts || accounts.length === 0) {
                 document.getElementById('accounts-table').innerHTML = '<p>No accounts found for this customer</p>';
                 return;
@@ -351,22 +401,41 @@
             `;
             
             accounts.forEach((account, index) => {
+                // Check if balance data is already present (IMS accounts include balances)
+                const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
+                
+                // Format balance display
+                const availBalance = hasBalanceData && account.availableBalance !== undefined
+                    ? formatCurrency(account.availableBalance, account.currency)
+                    : '<cds-loading size="sm"></cds-loading>';
+                const currentBalance = hasBalanceData && account.currentBalance !== undefined
+                    ? formatCurrency(account.currentBalance, account.currency)
+                    : '<cds-loading size="sm"></cds-loading>';
+                
+                // For IMS accounts (with customerId), use accountId as accountNumber if not present
+                const accountNumber = account.accountNumber || (account.customerId ? account.accountId : 'N/A');
+                
+                // For IMS accounts, pass customerId in the URL; for CICS, pass accountId
+                const viewLink = account.customerId
+                    ? `account-details.html?customerId=${account.customerId}&accountId=${account.accountId}`
+                    : `account-details.html?id=${account.accountId}`;
+                
                 tableHTML += `
                     <tr>
                         <td>${account.accountId || 'N/A'}</td>
-                        <td>${account.accountNumber || 'N/A'}</td>
+                        <td>${accountNumber}</td>
                         <td>${account.sortCode || 'N/A'}</td>
                         <td>${account.accountType || 'N/A'}</td>
                         <td>${account.currency || 'N/A'}</td>
                         <td id="avail-bal-${index}">
-                            <cds-loading size="sm"></cds-loading>
+                            ${availBalance}
                         </td>
                         <td id="current-bal-${index}">
-                            <cds-loading size="sm"></cds-loading>
+                            ${currentBalance}
                         </td>
                         <td>${account.status || 'N/A'}</td>
                         <td>
-                            <a href="account-details.html?id=${account.accountId}">View</a>
+                            <a href="${viewLink}">View</a>
                         </td>
                     </tr>
                 `;
@@ -379,12 +448,60 @@
             
             document.getElementById('accounts-table').innerHTML = tableHTML;
             
-            // Lazy load balances for each account
-            accounts.forEach((account, index) => {
-                if (account.accountId) {
-                    loadAccountBalances(account.accountId, index);
-                }
-            });
+            // Check if this is an IMS customer (accounts have customerId field)
+            const isImsCustomer = accounts.length > 0 && accounts[0].customerId;
+            
+            if (isImsCustomer) {
+                // For IMS: Load all balances in one call
+                loadImsBalances(accounts[0].customerId, accounts);
+            } else {
+                // For CICS: Load balances individually for accounts that don't have balance data
+                accounts.forEach((account, index) => {
+                    const hasBalanceData = account.availableBalance !== undefined || account.currentBalance !== undefined;
+                    if (account.accountId && !hasBalanceData) {
+                        loadAccountBalances(account.accountId, index);
+                    }
+                });
+            }
+        }
+        
+        async function loadImsBalances(customerId, accounts) {
+            try {
+                // IMS returns all account balances in one call with arrays
+                const balanceData = await api.accounts.getAccountBalances(null, customerId);
+                
+                // balanceData.amount is an array with one balance per account
+                const balances = Array.isArray(balanceData.amount) ? balanceData.amount : [balanceData.amount];
+                
+                // Update each account row with its corresponding balance
+                accounts.forEach((account, index) => {
+                    const availBalCell = document.getElementById(`avail-bal-${index}`);
+                    const currentBalCell = document.getElementById(`current-bal-${index}`);
+                    
+                    if (availBalCell && currentBalCell && index < balances.length) {
+                        const balance = balances[index];
+                        const formattedBalance = formatCurrency(balance, balanceData.currency || 'USD');
+                        
+                        availBalCell.textContent = balanceData.balanceType === 'AVAILABLE' ? formattedBalance : 'N/A';
+                        currentBalCell.textContent = balanceData.balanceType === 'CURRENT' ? formattedBalance : 'N/A';
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading IMS balances:', error);
+                // Show error in all balance cells
+                accounts.forEach((account, index) => {
+                    const availBalCell = document.getElementById(`avail-bal-${index}`);
+                    const currentBalCell = document.getElementById(`current-bal-${index}`);
+                    if (availBalCell) {
+                        availBalCell.textContent = 'Error';
+                        availBalCell.title = error.message || 'Failed to load balances';
+                    }
+                    if (currentBalCell) {
+                        currentBalCell.textContent = 'Error';
+                        currentBalCell.title = error.message || 'Failed to load balances';
+                    }
+                });
+            }
         }
         
         async function loadAccountBalances(accountId, rowIndex) {
@@ -396,6 +513,7 @@
             currentBalCell.innerHTML = '<cds-loading size="sm"></cds-loading>';
             
             try {
+                // CICS balance call (IMS uses loadImsBalances instead)
                 const balance = await api.accounts.getAccountBalances(accountId);
 
                 const formattedBalance = balance?.amount !== undefined
@@ -444,7 +562,14 @@
                 showSuccessModal('Success', 'Customer updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                showErrorModal('Not Supported', error.message || 'Customer updates are not available in the OpenBanking API');
+                
+                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
+                    showErrorModal('Feature Not Implemented', error.message);
+                } else if (error.message.includes('Failed to fetch')) {
+                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                } else {
+                    showErrorModal('Error', error.message || 'Failed to update customer');
+                }
             }
         }
     </script>

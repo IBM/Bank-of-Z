@@ -81,6 +81,13 @@ zcodescan:
   src_encoding: IBM-1047
   # ZCodeScan RESAPI connection info to check for IDZ EE license.
   config_file: ${HOME}/zcs_config_file.yml
+  # ZCodeScan maximum return code when issue(s) in the scan
+  #  - 1 - The highest issue severity found is INFO.
+  #  - 2 - The highest issue severity found is LOW.
+  #  - 3 - The highest issue severity found is MEDIUM.
+  #  - 4 - The highest issue severity found is HIGH.
+  #  - 5 - The highest issue severity found is BLOCKER.
+  max_rc: 4
 
 # Wazi Deploy (deployment automation)
 wazideploy:
@@ -138,8 +145,16 @@ zowe:
 cics:
   host: localhost
   user: ${CICS_USER} # env var
-  password: ${CICS_PASSWORD} # env var
+  password: ${CICS_PASSWORD} # env var #pragma: allowlist secret
   cmci_port: 27100
   ipic_port: 4320
   debug_port: 27103
+
+# IMS attributes
+ims:
+  host: localhost
+  port: 9977
+  user: ${IMS_USER} # env var
+  password: ${IMS_PASSWORD} # env var #pragma: allowlist secret
+  datastore: IMS2
 

@@ -35,3 +35,52 @@ When you are done stop Open Liberty with:
 mvn liberty:stop-server
 ```
 
+## API Endpoints Summary
+
+### CICS Endpoints
+
+#### Customer Management
+- [x] GET /customers/{customerId} - Get customer information (maps to INQCUST.cbl)
+- [x] GET /customers/{customerId}/accounts - Get customer accounts (maps to INQACCCU.cbl)
+- [ ] POST /customers - Create customer (maps to CRECUST.cbl)
+- [ ] PUT /customers/{customerId} - Update customer (maps to UPDCUST.cbl)
+- [x] DELETE /customers/{customerId} - Delete customer (maps to DELCUS.cbl)
+
+#### Account Management
+- [x] GET /accounts/{accountId} - Get account details (maps to INQACC.cbl)
+- [ ] GET /accounts - Get all accounts with filtering
+- [ ] POST /accounts - Create account (maps to CREACC.cbl)
+- [ ] PUT /accounts/{accountId} - Update account (maps to UPDACC.cbl)
+- [ ] DELETE /accounts/{accountId} - Delete account (maps to DELACC.cbl)
+
+#### Balance Management
+- [x] GET /accounts/{accountId}/balances - Get account balances
+
+#### Transaction Management
+- [ ] GET /accounts/{accountId}/transactions - Get transaction history
+- [ ] GET /accounts/{accountId}/transactions/{transactionId} - Get transaction details
+
+---
+
+### IMS Endpoints
+
+#### Customer Management
+- [x] GET /ims/customers/{customerId} - Get customer information (maps to IBGCUDAT)
+- [x] GET /ims/customers/{customerId}/accounts - Get customer accounts
+- [ ] POST /ims/customers - Create customer
+- [ ] PUT /ims/customers/{customerId} - Update customer
+- [ ] DELETE /ims/customers/{customerId} - Delete customer
+
+#### Account Management
+- [ ] GET /ims/accounts/{accountId} - Get account details
+- [ ] GET /ims/accounts - Get all accounts with filtering
+- [ ] POST /ims/accounts - Create account
+- [ ] PUT /ims/accounts/{accountId} - Update account
+- [ ] DELETE /ims/accounts/{accountId} - Delete account
+
+#### Balance Management
+- [ ] GET /ims/accounts/{accountId}/balances - Get account balances
+
+#### Transaction Management
+- [ ] GET /ims/accounts/{accountId}/transactions - Get transaction history
+- [ ] GET /ims/accounts/{accountId}/transactions/{transactionId} - Get transaction details

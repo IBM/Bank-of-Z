@@ -99,7 +99,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << 'EOF'
 //STDENV   DD   *
 _BPX_SHAREAS=YES
 JAVA_HOME=/usr/lpp/java/java21/current_64
-WLP_USER_DIR=/usr/local/sandboxes/bank-of-z/zosconnect-server
+WLP_USER_DIR=${SANDBOX_DIR}/zosconnect-server
 JVM_OPTIONS=-Xmx2048M
 //*
 // PEND

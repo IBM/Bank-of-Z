@@ -17,3 +17,4 @@ zowe.config.user.json
 vsix-extensions/
 *.vsix
 /.taz-unit-test
+tools/

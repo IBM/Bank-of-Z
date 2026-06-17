@@ -71,14 +71,25 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
-zconfig apply ims-region.yaml -v
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Applying IMS region configuration..."
+zconfig apply ims-region.yaml -v 2>&1 | tee /tmp/zconfig_ims_output.log
 
 RC=$?
-if [ "$RC" -eq 0 ]; then
+
+# Check if zconfig actually processed the file or ignored it
+if grep -q "Type ims is not supported" /tmp/zconfig_ims_output.log; then
+    print_warning "zconfig does not support IMS type - IMS regions must be provisioned manually"
+    print_info "IMS region configuration is available in: $SCRIPTS_DIR/../zconfig/ims-region.yaml"
+    print_info "Please provision IMS regions using traditional IMS setup procedures"
+    rm -f /tmp/zconfig_ims_output.log
+    # Don't exit - continue to verification to check if IMS is already running
+elif [ "$RC" -eq 0 ]; then
     print_success "ZConfig IMS region creation completed successfully!"
+    rm -f /tmp/zconfig_ims_output.log
 else
     print_error "ZConfig failed with return code: $RC"
     print_error "Check logs in: $SCRIPTS_DIR/logs"
+    rm -f /tmp/zconfig_ims_output.log
     exit 1
 fi
 

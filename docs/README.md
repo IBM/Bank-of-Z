@@ -1063,7 +1063,7 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 1. Make changes locally
 2. Run GRUB to sync and setup
 
-GRUB automatically syncs your changes to USS and runs [`setup-common.sh`](../.setup/setup-common.sh) natively.
+GRUB automatically syncs your changes to USS and executes [`setup-remote.sh`](../.setup/setup-remote.sh) there.
 
 📖 [Detailed GRUB Guide →](WORKFLOW-GRUB.md)
 

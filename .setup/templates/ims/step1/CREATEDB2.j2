@@ -1,0 +1,33 @@
+{{ JOB_CARD }}                
+//*********************************************************************  
+//*                                                                   *  
+//* CREATE DB2 DATABASE - {{DB2_DATABASE}} AND {{DB2_TABLE}} TABLE   *  
+//*                                                                   *  
+//*                                                                   *  
+//********************************************************************* 
+//DB EXEC PGM=IKJEFT01,DYNAMNBR=20                                 
+//STEPLIB  DD  DISP=SHR,DSN={{ DSNEXIT }}                       
+//         DD  DISP=SHR,DSN={{ DSNLOD2 }}                       
+//         DD  DISP=SHR,DSN={{ DSNLOAD }}                         
+//SYSTSPRT DD  SYSOUT=*                                                  
+//SYSPRINT DD  SYSOUT=*                                                  
+//SYSUDUMP DD  SYSOUT=*                                                  
+//SYSTSIN  DD  *                                                         
+  DSN SYSTEM({{ DB2SSID }})                                                       
+  RUN PROGRAM({{ DB2_PROGRAM }})  PLAN({{ DB2_PLAN }}) -
+       LIB('{{ DB2_RUNLIB_LOAD }}')                                  
+  END 
+//SYSIN    DD  *
+  CREATE DATABASE {{ DB2_DATABASE }}
+  CCSID EBCDIC;
+  CREATE TABLE {{ DB2_DATABASE }}.{{ DB2_TABLE }}
+  (
+	TXID           BIGINT UNIQUE   NOT NULL,
+	TIMESTMP       TIMESTAMP       NOT NULL,
+	TRANSTYP       CHAR(1)         NOT NULL,
+	AMOUNT         DECIMAL(15,2)   NOT NULL,
+	REFTXID        BIGINT          NOT NULL,
+	ACCID          BIGINT          NOT NULL
+  ) IN DATABASE {{ DB2_DATABASE }} AUDIT NONE DATA CAPTURE NONE CCSID EBCDIC;
+  GRANT ALL ON {{ DB2_DATABASE }}.{{ DB2_TABLE }} TO PUBLIC;
+/*

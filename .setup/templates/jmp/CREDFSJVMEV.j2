@@ -1,0 +1,28 @@
+{{ JOB_CARD }}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC2    EXEC PGM=IEBUPDTE,PARM=MOD                        
+//SYSPRINT DD   SYSOUT=*                                       
+//SYSUT1   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSUT2   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSIN    DD   DATA                                           
+./        {{ 'ADD' if not REPLACE_MEMBERS else 'REPL' }}    NAME=DFSJVMEV,LEVEL=00,SOURCE=0,LIST=ALL 
+**********************************************************************
+* Specify the location of Java Virtual Machine (JVM) installation and
+* IMS Java native code (libT2DLI.so)
+**********************************************************************
+LIBPATH=>
+{{ DFS_jvmpath }}/lib:>
+{{ DFS_jvmpath }}/lib/j9vm:>
+{{ DFS_jvmpath }}/lib/default:>
+{{ DFS_jvmpath }}/bin/j9vm:>
+{{ DFS_jvmpath }}/bin/:>
+{{ DFS_imslibpath }}/lib:>
+{{DFS_db2libpath}}/lib
+*
+./      ENDUP
+/*

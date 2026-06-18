@@ -1,0 +1,21 @@
+{{ JOB_CARD }}
+//*
+//* FUNCTION: COPY DFSJMP PROC TO IMS PROCLIB DATA SET
+//*********************************************************************
+//COPYJOBS PROC MBR=TEMPNAME
+//*
+//CM       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*********************************************************************
+//*
+//*-----------------------------------------------
+//* COPY DFSJMP PROC TO PROCLIB
+//*-----------------------------------------------
+//DFSJMP   EXEC PROC=COPYJOBS,MBR=DFSJMP
+//CM.SYSUT1 DD DATA,DLM=ZZ
+{{ lookup('template', '{0}/templates/DFSJMP.j2'.format(eager_role_path)) -}}
+ZZ

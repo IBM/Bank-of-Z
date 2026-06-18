@@ -1,0 +1,61 @@
+{##!/bin/sh
+{% for item in datasets %}
+{{ uss_utilities_path }}/drm {{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name }} 2>/dev/null
+{{ uss_utilities_path }}/dtouch -t{{ item.type }} -s{{ item.size }} -r{{ item.record_format }} -l{{ item.logical_record_length }} {{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name }}
+{% endfor %}#}
+{{ JOB_CARD }}
+//*
+{# //SCRTCH1  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+{% for item in datasets %}
+  DELETE {{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name | upper }} -
+         NONVSAM SCRATCH
+{% endfor %}
+{% for item in loads %}
+  DELETE {{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name | upper }}.INPUT -
+         NONVSAM SCRATCH
+{% endfor %}
+  SET MAXCC=0
+//*
+//* #}
+//* ALLOCATE NEW DATA SETS
+//*
+//ALLOCATE EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+{% for item in datasets %}
+  ALLOCATE -
+      DSNAME('{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name | upper }}')  -
+      FILE({{item.name | upper}})               -
+	  RECFM(F,B)                  -
+      LRECL({{item.logical_record_length}})                   -
+      BLKSIZE({{item.block_size}})               -
+      DSORG(PO)                   -
+      DSNTYPE({{ item.type | upper}})                -
+      NEW CATALOG                 -
+      SPACE({{item.primary_size}},{{item.secondary_size}}) TRACKS              -
+      DIR({{item.dir_blocks}})                     -
+{% if not DFS_SMS_ENVIRONMENT %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+{% endfor %}
+{% for item in loads %}
+  ALLOCATE -
+      DSNAME('{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ item.name | upper }}.INPUT')  -
+      FILE({{item.name | upper}})               -
+	  RECFM(F,B)                  -
+      LRECL({{item.logical_record_length}})                   -
+      BLKSIZE({{item.block_size}})               -
+      DSORG(PS)                   -
+      DSNTYPE({{ item.type | upper}})                -
+      NEW CATALOG                 -
+      SPACE({{item.primary_size}},{{item.secondary_size}}) TRACKS              -
+{% if not DFS_SMS_ENVIRONMENT %}
+      VOL({{ DFS_DS_VOLUME1 }})          -
+{% endif %}
+      UNIT({{ DFS_IMS_UNIT }})
+{% endfor %}

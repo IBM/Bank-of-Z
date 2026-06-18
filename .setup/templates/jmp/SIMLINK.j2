@@ -1,0 +1,13 @@
+{{ JOB_CARD }}
+{% if DFS_IMS_SYSAFF %}
+/*JOBPARM SYSAFF={{ DFS_IMS_SYSAFF }}
+{% endif %}
+//SIMLINK  EXEC PGM=BPXBATCH,REGION=0M
+//STEPLIB  DD  DSN={{ ZOS_LERUNLIB }},DISP=SHR
+//STDERR   DD  PATH='{{ DFS_workingdir }}/mystd.err',
+//             PATHDISP=(KEEP,KEEP),
+//             PATHOPTS=(OWRONLY,OCREAT,OTRUNC),
+//             PATHMODE=(SIRWXU,SIRWXG,SIRWXO)
+//STDPARM  DD   *
+SH su; cd /u/ims/usr/lpp/ims/ims13/imsjava; ln -e DFSCLIBU libT2DLI.so;
+/*

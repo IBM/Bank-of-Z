@@ -1,0 +1,43 @@
+{{ JOB_CARD }}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC    EXEC PGM=IEBUPDTE,PARM=MOD
+//SYSPRINT DD   SYSOUT=*
+//SYSUT1   DD   DSNAME={{DFS_AUTH_LIB_HLQ1}}.{{DFS_AUTH_LIB_HLQ2}}.IMSJAVA.JOBS,
+//         DISP=SHR
+//SYSUT2   DD   DSNAME={{DFS_AUTH_LIB_HLQ1}}.{{DFS_AUTH_LIB_HLQ2}}.IMSJAVA.JOBS,
+//         DISP=SHR
+//SYSIN    DD   DATA
+./        {{ 'ADD' if not member_exists else 'REPL' }}   NAME={{ DFS_IMS_SSID }}JMP{{ REGION_NUM|string }},LEVEL=00,SOURCE=0,LIST=ALL
+//{{ DFS_IMS_SSID }}JMP{{ REGION_NUM|string }}  JOB ,
+// CLASS=A,MSGCLASS=H,MSGLEVEL=(1,1),NOTIFY={{ TSO_USERID }},REGION=0M
+//       JCLLIB ORDER={{ DFS_PROCLIB }}
+//*******************************************************
+//*
+//* JCL FOR THE IMS JAVA REGION (JMP) USED TO EXECUTE YOUR JAVA
+//* PROGRAM
+//*
+//* AUTHOR            LAST CHANGED        PROJECT
+//* ---------------   --------------      -------------------
+//* {{ TSO_USERID }}         01/22/16          {{ DFS_appname }}
+//*******************************************************
+//JMP1 EXEC PROC=DFSJMP,
+//         TIME=(1440),
+//         RGN=0M,                       REGION SIZE FOR EXECUTION
+//         OPT=W,                        WAIT FOR CNTRL PRGRM TO START
+//         PCB=040,                      DEP RGN INTERREGN COM AREA SIZE
+//         CL1={{ DFS_tranclass1 }},     TRANSACTION CLASS 1
+//         CL2={{ DFS_tranclass2 }},     TRANSACTION CLASS 2
+//         CL3={{ DFS_tranclass3 }},     TRANSACTION CLASS 3
+//         CL4={{ DFS_tranclass4 }},     TRANSACTION CLASS 4
+//         NBA=5,                        FP DB BUFFER NUMBER
+//         OBA=5,                        FP PAGE-FIXED BUFFER NUMBER
+//         IMSID={{ DFS_IMS_SSID }},     IMSID OF IMS CONTROL REGION
+//         SSM={{ DB2_SSM }},            DB2 SSM
+//         ENVIRON=DFSJVMEV,             JVM ENVIRONMENT SETTINGS
+//         JVMOPMAS=DFSJVMMS,            MASTER/STANDALONE JVM OPTIONS
+//         SOUT=*

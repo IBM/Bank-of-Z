@@ -1,0 +1,23 @@
+{{ JOB_CARD }}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC    EXEC PGM=IEBUPDTE,PARM=MOD                        
+//SYSPRINT DD   SYSOUT=*                                       
+//SYSUT1   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSUT2   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSIN    DD   DATA                                           
+./        {{ 'ADD' if not REPLACE_MEMBERS else 'REPL' }}    NAME=DFSJVMMS,LEVEL=00,SOURCE=0,LIST=ALL
+-Xoptionsfile={{ DFS_optionsfilepath }}/dfsjvmpr.props
+-Xmx{{ DFS_max_heapsize }}M
+-Xmn{{ DFS_min_heapsize }}M
+-XX:+Enable3164Interoperability
+*Xdebug
+*Xnoagent
+*Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=7777
+*
+./      ENDUP
+/*

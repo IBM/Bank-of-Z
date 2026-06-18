@@ -1,0 +1,36 @@
+#!/bin/sh
+
+#set -e
+
+{% for file in uss_datasets %}
+for entry in `ls {{ SAMPLE_FILE_DIR }}/{{ file.name }}`; do
+name=$(echo "$entry" | cut -f 1 -d '.')
+
+{% if file.name == "COBOL" %}
+cp {{ SAMPLE_FILE_DIR }}/{{ file.name }}/$entry "//'{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.PGMSRC($name)'"
+
+{% elif file.name == "PLI" %}
+cp {{ SAMPLE_FILE_DIR }}/{{ file.name }}/$entry "//'{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.PLISRC($name)'"
+
+{% elif file.name == "LoadData" %}
+file_extension="${entry##*.}"
+if [[ "$file_extension" = "data" ]]; then
+cp {{ SAMPLE_FILE_DIR }}/{{ file.name }}/$entry "//'{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.$name.INPUT'"
+fi
+{# file_exists=`tsocmd "LISTCAT ENTRIES('{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.$name.INPUT')"`
+
+case "$file_exists" in
+    *"IN-CAT"*)
+        if [ "$file_extension" = "data" ]; then
+            cp {{ SAMPLE_FILE_DIR }}/{{ file.name }}/$entry "//'{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.$name.INPUT'"
+        fi
+esac #}
+
+{% elif file.name == "DBD" or file.name == "PSB" %}
+cp {{ SAMPLE_FILE_DIR }}/{{ file.name }}/$entry "//'{{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.{{ file.name }}($name)'"
+
+{% endif %}
+
+done
+
+{% endfor %}

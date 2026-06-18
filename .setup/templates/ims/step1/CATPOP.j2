@@ -1,0 +1,58 @@
+{{ JOB_CARD }}
+//*******************************************************************
+//*  CATALOG POPULATE - DFS3UACB Utility
+//*
+//*  Purpose: Populate IMS catalog staging directory with DBDs/PSBs
+//*           for managed ACBs (ACBMGMT=CATALOG)
+//*
+//*  Reference: IBM IMS 15.5.0 Utilities Reference
+//*******************************************************************
+//CATPOP   EXEC PGM=DFS3UACB,REGION=0M
+//STEPLIB  DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.SDFSRESL,DISP=SHR
+//PROCLIB  DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.PROCLIB,DISP=SHR
+//DFSRESLB DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.SDFSRESL,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSOUT   DD SYSOUT=*
+//SYSABEND DD SYSOUT=*
+//IMS      DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.PSBLIB,DISP=SHR
+//         DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.DBDLIB,DISP=SHR
+//ACBCATWK DD SPACE=(CYL,(1,1)),UNIT=SYSDA
+//*
+//*******************************************************************
+//* ACBGEN DATASETS
+//*******************************************************************
+//IMSACB   DD DSN={{ IMSBANK_HLQ1 }}.{{ IMSBANK_HLQ2 }}.ACBLIB,DISP=OLD
+//SYSUT3   DD UNIT=SYSDA,SPACE=(80,(100,100))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(256,(100,100)),DCB=KEYLEN=30
+//*******************************************************************
+//* ACBGEN INPUT PARMS TO UPDATE ACBLIB
+//*******************************************************************
+//SYSIN    DD *
+     BUILD   PSB=(IB,IBACSUM,IBGCUDAT,IBLOAD,IBLOGIN,                  C
+               IBLOGOUT,IBSCUDAT,IBTRAN)
+     BUILD   DBD=(ACCOUNT,ACCTYPE,CUSTACCS,CUSTOMER,                   C
+               CUSTTYPE,HISTORY,TSTAT,TSTATTYP,TTYPE)
+/*
+//*******************************************************************
+//* POPULATE UTILITY DATASETS
+//*******************************************************************
+//IMSACB01 DD DSN=*.IMSACB,DISP=OLD
+//SYSINP   DD *
+MANAGEDACBS=STAGE
+/*
+//DFSVSAMP DD *
+IOBF=(2048,20000,Y,Y,OA2K)
+IOBF=(2048,20000,Y,Y,OB2K)
+IOBF=(2048,20000,Y,Y,OC2K)
+IOBF=(2048,20000,Y,Y,OD2K)
+IOBF=(4096,4000,Y,Y,O04K)
+IOBF=(8192,20000,Y,Y,O08K)
+IOBF=(12288,20000,Y,Y,O12K)
+//IEFRDER  DD DUMMY
+//IEFRDER2 DD DUMMY
+//*******************************************************************
+//* UPDATE INPUT PARMS FOR IMS CATALOG POPULATE UTILITY
+//*******************************************************************
+//DFS3PPRM DD *
+BMP,DFS3UACB,DFSCP001,,,,,,,,,,,{{ DFS_IMS_SSID }}
+/*

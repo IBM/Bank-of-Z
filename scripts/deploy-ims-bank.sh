@@ -129,6 +129,12 @@ load_ims_config() {
     export DB2_SSID=${DB2_SSID:-DBG1}
     export DB2_DATABASE=${DB2_DATABASE:-IMSBANK}
     export DB2_TABLE=${DB2_TABLE:-HISTORY}
+    export DB2_SDSNEXIT=${DB2_SDSNEXIT:-"DSNC10.SDSNEXIT"}
+    export DB2_SDSNLOAD=${DB2_SDSNLOAD:-"DSNC10.SDSNLOAD"}
+    export DB2_RUNLIB=${DB2_RUNLIB:-"DSNC10.RUNLIB.LOAD"}
+    export DB2_SQLID=${DB2_SQLID:-"IBMUSER"}
+    export AUTHID=${AUTHID:-"IBMUSER"}
+    export CLASS=${CLASS:-"A"}
     
     # Dataset Names
     export PGMLIB="${IMS_HLQ}.PGMLIB"
@@ -138,8 +144,11 @@ load_ims_config() {
     
     # USS Paths
     export USS_WORK_DIR="/tmp/ims-bank-deploy-$$"
-    export ANSIBLE_DIR="${REPO_ROOT}/imsbank_provisioning"
-    export TEMPLATE_DIR="${ANSIBLE_DIR}/roles/configure-ims-bank/templates"
+    export TEMPLATE_DIR="${REPO_ROOT}/.setup/templates"
+    export DB2_TEMPLATE_DIR="${TEMPLATE_DIR}/db2"
+    export IMS_TEMPLATE_DIR="${TEMPLATE_DIR}/ims"
+    export MPP_TEMPLATE_DIR="${TEMPLATE_DIR}/mpp"
+    export JMP_TEMPLATE_DIR="${TEMPLATE_DIR}/jmp"
     
     # JCL Job Card
     export JOB_CARD="//IMSBANKJ JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
@@ -432,8 +441,15 @@ substitute_variables() {
         -e "s|{{ IMS_HLQ }}|${IMS_HLQ}|g" \
         -e "s|{{ IMS_PLEX }}|${IMS_PLEX}|g" \
         -e "s|{{ DB2SSID }}|${DB2_SSID}|g" \
+        -e "s|{{ DB2_SSID }}|${DB2_SSID}|g" \
         -e "s|{{ DB2_DATABASE }}|${DB2_DATABASE}|g" \
         -e "s|{{ DB2_TABLE }}|${DB2_TABLE}|g" \
+        -e "s|{{ DB2_SDSNEXIT }}|${DB2_SDSNEXIT}|g" \
+        -e "s|{{ DB2_SDSNLOAD }}|${DB2_SDSNLOAD}|g" \
+        -e "s|{{ DB2_RUNLIB }}|${DB2_RUNLIB}|g" \
+        -e "s|{{ DB2_SQLID }}|${DB2_SQLID}|g" \
+        -e "s|{{ AUTHID }}|${AUTHID}|g" \
+        -e "s|{{ CLASS }}|${CLASS}|g" \
         -e "s|{{ JOB_CARD }}|${JOB_CARD}|g" \
         -e "s|{{ PGMLIB }}|${PGMLIB}|g" \
         -e "s|{{ PSBLIB }}|${PSBLIB}|g" \
@@ -469,7 +485,7 @@ deploy_db2() {
     
     # Configure RACF for DB2
     log "Configuring RACF authorization for DB2..."
-    local racf_template="${ANSIBLE_DIR}/roles/provision-db2/templates/DB2-RACF.j2"
+    local racf_template="${DB2_TEMPLATE_DIR}/DB2-RACF.j2"
     if [ -f "$racf_template" ]; then
         substitute_variables "$racf_template" "${USS_WORK_DIR}/DB2-RACF.jcl"
         submit_jcl "${USS_WORK_DIR}/DB2-RACF.jcl" 4
@@ -479,7 +495,7 @@ deploy_db2() {
     
     # Drop existing database (ignore errors)
     log "Dropping existing DB2 database (if exists)..."
-    local drop_template="${ANSIBLE_DIR}/roles/provision-db2/templates/Db2-drop.j2"
+    local drop_template="${DB2_TEMPLATE_DIR}/Db2-drop.j2"
     if [ -f "$drop_template" ]; then
         substitute_variables "$drop_template" "${USS_WORK_DIR}/Db2-drop.jcl"
         submit_jcl "${USS_WORK_DIR}/Db2-drop.jcl" 8 || true
@@ -487,7 +503,7 @@ deploy_db2() {
     
     # Create database and tables
     log "Creating DB2 database and HISTORY table..."
-    local create_template="${ANSIBLE_DIR}/roles/provision-db2/templates/Db2-create.j2"
+    local create_template="${DB2_TEMPLATE_DIR}/Db2-create.j2"
     if [ ! -f "$create_template" ]; then
         log_error "Create template not found: $create_template"
         return 1
@@ -497,7 +513,7 @@ deploy_db2() {
     
     # Bind DB2 plans
     log "Binding DB2 plans..."
-    local bind_template="${ANSIBLE_DIR}/roles/provision-db2/templates/Db2-bind.j2"
+    local bind_template="${DB2_TEMPLATE_DIR}/Db2-bind.j2"
     if [ ! -f "$bind_template" ]; then
         log_error "Bind template not found: $bind_template"
         return 1
@@ -507,7 +523,7 @@ deploy_db2() {
     
     # Load transaction history data
     log "Loading transaction history data..."
-    local load_template="${ANSIBLE_DIR}/roles/provision-db2/templates/LOADDB2.j2"
+    local load_template="${DB2_TEMPLATE_DIR}/LOADDB2.j2"
     if [ ! -f "$load_template" ]; then
         log_error "Load template not found: $load_template"
         return 1
@@ -562,7 +578,7 @@ deploy_ims_datasets() {
     
     # Create IMS datasets
     log "Creating IMS datasets..."
-    local create_template="${TEMPLATE_DIR}/step1/CREATEDATA.j2"
+    local create_template="${IMS_TEMPLATE_DIR}/step1/CREATEDATA.j2"
     if [ ! -f "$create_template" ]; then
         log_error "Create datasets template not found: $create_template"
         return 1
@@ -586,7 +602,7 @@ deploy_ims_datasets() {
     copy_ims_members "$DBB_LOAD" "$PSBLIB" "$psbs"
     
     # Copy USS files to MVS (if template exists)
-    local cptomvs_template="${TEMPLATE_DIR}/step1/CPTOMVS.j2"
+    local cptomvs_template="${IMS_TEMPLATE_DIR}/step1/CPTOMVS.j2"
     if [ -f "$cptomvs_template" ]; then
         log "Copying USS files to MVS datasets..."
         substitute_variables "$cptomvs_template" "${USS_WORK_DIR}/CPTOMVS.sh"
@@ -597,7 +613,7 @@ deploy_ims_datasets() {
     fi
     
     # Create dynamic allocation datasets
-    local dynalloc_template="${TEMPLATE_DIR}/step1/DYNALLOC.j2"
+    local dynalloc_template="${IMS_TEMPLATE_DIR}/step1/DYNALLOC.j2"
     if [ -f "$dynalloc_template" ]; then
         log "Creating dynamic allocation datasets..."
         substitute_variables "$dynalloc_template" "${USS_WORK_DIR}/DYNALLOC.jcl"
@@ -619,7 +635,7 @@ activate_ims_control_blocks() {
     
     # Generate ACBs from DBDs and PSBs
     log "Generating ACBs..."
-    local acbgen_template="${TEMPLATE_DIR}/step1/ACBGEN.j2"
+    local acbgen_template="${IMS_TEMPLATE_DIR}/step1/ACBGEN.j2"
     if [ ! -f "$acbgen_template" ]; then
         log_error "ACBGEN template not found: $acbgen_template"
         return 1
@@ -629,7 +645,7 @@ activate_ims_control_blocks() {
     
     # Populate IMS catalog with ACBs
     log "Populating IMS catalog..."
-    local catpop_template="${TEMPLATE_DIR}/step1/CATPOP.j2"
+    local catpop_template="${IMS_TEMPLATE_DIR}/step1/CATPOP.j2"
     if [ ! -f "$catpop_template" ]; then
         log_error "CATPOP template not found: $catpop_template"
         return 1
@@ -639,7 +655,7 @@ activate_ims_control_blocks() {
     
     # Import and create IMS resources (managed ACBs)
     log "Importing managed ACBs..."
-    local update_macb_template="${TEMPLATE_DIR}/step2/UPDATE_MACB.j2"
+    local update_macb_template="${IMS_TEMPLATE_DIR}/step2/UPDATE_MACB.j2"
     if [ -f "$update_macb_template" ]; then
         substitute_variables "$update_macb_template" "${USS_WORK_DIR}/UPDATE_MACB.jcl"
         submit_jcl "${USS_WORK_DIR}/UPDATE_MACB.jcl" 8
@@ -647,7 +663,7 @@ activate_ims_control_blocks() {
     
     # Define IMS resources (CREATE DB/PGM commands)
     log "Defining IMS resources via SPOC..."
-    local spoc_template="${TEMPLATE_DIR}/step1/SPOCJOB.j2"
+    local spoc_template="${IMS_TEMPLATE_DIR}/step1/SPOCJOB.j2"
     if [ ! -f "$spoc_template" ]; then
         log_error "SPOCJOB template not found: $spoc_template"
         return 1
@@ -673,7 +689,7 @@ load_ims_databases() {
     
     for job in "${load_jobs[@]}"; do
         log "Loading database: $job..."
-        local load_template="${TEMPLATE_DIR}/step1/${job}.j2"
+        local load_template="${IMS_TEMPLATE_DIR}/step1/${job}.j2"
         
         if [ ! -f "$load_template" ]; then
             log_warning "Load template not found: $load_template (skipping)"
@@ -686,7 +702,7 @@ load_ims_databases() {
     
     # Remove old RECON registrations
     log "Removing old database registrations..."
-    local delrecon_template="${TEMPLATE_DIR}/step1/DELOLDRECON.j2"
+    local delrecon_template="${IMS_TEMPLATE_DIR}/step1/DELOLDRECON.j2"
     if [ -f "$delrecon_template" ]; then
         substitute_variables "$delrecon_template" "${USS_WORK_DIR}/DELOLDRECON.jcl"
         submit_jcl "${USS_WORK_DIR}/DELOLDRECON.jcl" 12 || true
@@ -694,7 +710,7 @@ load_ims_databases() {
     
     # Register databases to RECON
     log "Registering databases to RECON..."
-    local recon_template="${TEMPLATE_DIR}/step1/RECON.j2"
+    local recon_template="${IMS_TEMPLATE_DIR}/step1/RECON.j2"
     if [ ! -f "$recon_template" ]; then
         log_error "RECON template not found: $recon_template"
         return 1
@@ -818,7 +834,7 @@ provision_mpp_regions() {
     
     # MPP2 Region
     log "Creating MPP2 region..."
-    local mpp2_template="${ANSIBLE_DIR}/roles/provision-mpp/templates/CRE_DFSMPR.j2"
+    local mpp2_template="${MPP_TEMPLATE_DIR}/CRE_DFSMPR.j2"
     if [ ! -f "$mpp2_template" ]; then
         log_error "MPP template not found: $mpp2_template"
         return 1
@@ -833,7 +849,7 @@ provision_mpp_regions() {
     
     # Start MPP2
     log "Starting MPP2 region..."
-    local start_mpp2_template="${ANSIBLE_DIR}/roles/provision-mpp/templates/STARTMPP.j2"
+    local start_mpp2_template="${MPP_TEMPLATE_DIR}/STARTMPP.j2"
     if [ -f "$start_mpp2_template" ]; then
         substitute_variables "$start_mpp2_template" "${USS_WORK_DIR}/STARTMPP2.jcl"
         submit_jcl "${USS_WORK_DIR}/STARTMPP2.jcl" 0
@@ -863,7 +879,7 @@ provision_mpp_regions() {
 
 create_jvm_properties_file() {
     local props_file="${JAVA_CONF_PATH}/dfsjvmpr.props"
-    local jar_file="${ANSIBLE_DIR}/nazare-ims-jmp-1.0.0-SNAPSHOT.jar"
+    local jar_file="${REPO_ROOT}/src/base/ims/java/target/nazare-ims-jmp-1.0.0-SNAPSHOT.jar"
     
     log "Creating JVM properties file: $props_file"
     
@@ -907,7 +923,7 @@ provision_jmp_region() {
     
     # Create JCL work datasets
     log "Creating JMP work datasets..."
-    local crework_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/CREWORKDS.j2"
+    local crework_template="${JMP_TEMPLATE_DIR}/CREWORKDS.j2"
     if [ -f "$crework_template" ]; then
         substitute_variables "$crework_template" "${USS_WORK_DIR}/CREWORKDS.jcl"
         submit_jcl "${USS_WORK_DIR}/CREWORKDS.jcl" 4
@@ -915,7 +931,7 @@ provision_jmp_region() {
     
     # Copy DFSJMP proc to PROCLIB
     log "Creating DFSJMP proc..."
-    local jmp_proc_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/CRE_DFSJMP.j2"
+    local jmp_proc_template="${JMP_TEMPLATE_DIR}/CRE_DFSJMP.j2"
     if [ ! -f "$jmp_proc_template" ]; then
         log_error "JMP proc template not found: $jmp_proc_template"
         return 1
@@ -925,7 +941,7 @@ provision_jmp_region() {
     
     # Create JMP region
     log "Creating JMP region..."
-    local imdojmp_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/IMDOJMP.j2"
+    local imdojmp_template="${JMP_TEMPLATE_DIR}/IMDOJMP.j2"
     if [ -f "$imdojmp_template" ]; then
         substitute_variables "$imdojmp_template" "${USS_WORK_DIR}/IMDOJMP.jcl"
         submit_jcl "${USS_WORK_DIR}/IMDOJMP.jcl" 4
@@ -933,7 +949,7 @@ provision_jmp_region() {
     
     # Configure JVM environment
     log "Configuring JVM environment..."
-    local jvmenv_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/CREDFSJVMEV.j2"
+    local jvmenv_template="${JMP_TEMPLATE_DIR}/CREDFSJVMEV.j2"
     if [ -f "$jvmenv_template" ]; then
         substitute_variables "$jvmenv_template" "${USS_WORK_DIR}/CREDFSJVMEV.jcl"
         submit_jcl "${USS_WORK_DIR}/CREDFSJVMEV.jcl" 4
@@ -941,7 +957,7 @@ provision_jmp_region() {
     
     # Set Java classpath
     log "Setting Java classpath..."
-    local jvmms_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/CREDFSJVMMS.j2"
+    local jvmms_template="${JMP_TEMPLATE_DIR}/CREDFSJVMMS.j2"
     if [ -f "$jvmms_template" ]; then
         substitute_variables "$jvmms_template" "${USS_WORK_DIR}/CREDFSJVMMS.jcl"
         submit_jcl "${USS_WORK_DIR}/CREDFSJVMMS.jcl" 4
@@ -949,7 +965,7 @@ provision_jmp_region() {
     
     # Map PSB to Java application
     log "Mapping PSB to Java application..."
-    local jvmap_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/CREDFSJVMAP.j2"
+    local jvmap_template="${JMP_TEMPLATE_DIR}/CREDFSJVMAP.j2"
     if [ -f "$jvmap_template" ]; then
         substitute_variables "$jvmap_template" "${USS_WORK_DIR}/CREDFSJVMAP.jcl"
         submit_jcl "${USS_WORK_DIR}/CREDFSJVMAP.jcl" 4
@@ -957,7 +973,7 @@ provision_jmp_region() {
     
     # Start JMP region
     log "Starting JMP region..."
-    local start_jmp_template="${ANSIBLE_DIR}/roles/provision-jmp/templates/STARTJMP.j2"
+    local start_jmp_template="${JMP_TEMPLATE_DIR}/STARTJMP.j2"
     if [ -f "$start_jmp_template" ]; then
         substitute_variables "$start_jmp_template" "${USS_WORK_DIR}/STARTJMP.jcl"
         submit_jcl "${USS_WORK_DIR}/STARTJMP.jcl" 0

@@ -1,0 +1,34 @@
+{{ JOB_CARD }}
+//*
+//* ********************************************************
+//*       JCL for Java For IMS z/OSMF workflow V1.0
+//*       -----------------------------------------
+//* TASK: This Job is designed to modify DFSJVAMP member in
+//*       the designated proclib and prepare your application
+//*       to be executed in an IMS environment
+//* NOTE: RC=4 is intended and expected
+//*       If this member does not exist it will be created.
+//*       
+//* *********************************************************
+//UPDTPRC0    EXEC PGM=IEBUPDTE,PARM=MOD                        
+//SYSPRINT DD   SYSOUT=*                                       
+//SYSUT1   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSUT2   DD   DSNAME={{ DFS_PROCLIB }},DISP=SHR                 
+//SYSIN    DD   DATA                                           
+./        {{ 'ADD' if not REPLACE_MEMBERS else 'REPL' }}    NAME=DFSJVMAP,LEVEL=00,SOURCE=0,LIST=ALL 
+**********************************************************************
+
+DFSIVP37=samples/ivp/ims/IMSIVP
+IBGHIST=nazare/jmp/controller/QueryTransaction
+*
+**********************************************************************
+* The exec parms in the JBP region proc are set as:
+* MBR=DFSJBP and PSB=DFSIVP67
+**********************************************************************
+DFSJBP=samples/ivp/ims/IMSIVPJBP
+*
+DFSCATS2=samples/ivp/opendb/OpenDBCatalogSQLType2
+DFSCATD2=samples/ivp/opendb/OpenDBCatalogDLIType2
+*
+./      ENDUP
+/*

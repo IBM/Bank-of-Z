@@ -1,0 +1,40 @@
+{{ JOB_CARD }}
+//*********************************************************************
+//*                                                                   *
+//* CREATE DB2 DATABASE - {{ DB2_DATABASE }}                          *
+//*                                                                   *
+//*********************************************************************
+//CREATEDB EXEC PGM=IKJEFT01,DYNAMNBR=20
+//STEPLIB  DD  DISP=SHR,DSN={{ DB2_SDSNEXIT }}
+//         DD  DISP=SHR,DSN={{ DB2_SDSNLOAD }}
+//SYSTSPRT DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//SYSTSIN  DD  *
+  DSN SYSTEM({{ DB2_SSID }})
+  RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
+       LIB('{{ DB2_RUNLIB }}')
+  END
+/*
+//SYSIN    DD  *
+SET CURRENT SQLID = '{{ DB2_SQLID }}';
+
+CREATE DATABASE {{ DB2_DATABASE }}
+CCSID EBCDIC;
+
+CREATE TABLE "{{ DB2_DATABASE }}"."{{ DB2_TABLE }}"
+(
+	"TXID" BIGINT UNIQUE NOT NULL,
+	"TIMESTMP" TIMESTAMP NOT NULL,
+	"TRANSTYP" CHAR(1) NOT NULL,
+	"AMOUNT" DECIMAL(15,2) NOT NULL,
+	"REFTXID" BIGINT NOT NULL,
+	"ACCID" BIGINT NOT NULL,
+	"BALANCE" DECIMAL(15,2) NOT NULL
+)
+	AUDIT NONE
+	DATA CAPTURE NONE;
+
+GRANT ALL ON {{ DB2_DATABASE }}.{{ DB2_TABLE }} TO PUBLIC;
+COMMIT;
+/*

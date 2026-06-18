@@ -1,0 +1,38 @@
+{{ JOB_CARD }}
+//*********************************************************************
+//*                                                                   *
+//* BIND DB2 PLANS FOR IMS BANK APPLICATION                           *
+//*                                                                   *
+//*********************************************************************
+//BIND    EXEC PGM=IKJEFT01
+//STEPLIB  DD  DISP=SHR,DSN={{ DB2_SDSNEXIT }}
+//         DD  DISP=SHR,DSN={{ DB2_SDSNLOAD }}
+//SYSPRINT DD  SYSOUT=*
+//SYSTSPRT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//SYSTSIN DD *
+  DSN SYSTEM({{ DB2_SSID }})
+    BIND PLAN ({{ DB2_PLAN_IBTRAN }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+    BIND PLAN ({{ DB2_PLAN_IBGHIST }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+    BIND PLAN ({{ DB2_PLAN_IBSHIST }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+  END
+/*
+//GRANT EXEC PGM=IKJEFT01,REGION=0M
+//STEPLIB  DD  DISP=SHR,DSN={{ DB2_SDSNEXIT }}
+//         DD  DISP=SHR,DSN={{ DB2_SDSNLOAD }}
+//SYSUDUMP DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN DD *
+DSN SYSTEM({{ DB2_SSID }})
+RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
+LIB('{{ DB2_RUNLIB }}')
+//SYSIN DD *
+  GRANT EXECUTE ON PLAN {{ DB2_PLAN_IBTRAN }} TO PUBLIC;
+  GRANT EXECUTE ON PLAN {{ DB2_PLAN_IBGHIST }} TO PUBLIC;
+  GRANT EXECUTE ON PLAN {{ DB2_PLAN_IBSHIST }} TO PUBLIC;
+  COMMIT;
+/*

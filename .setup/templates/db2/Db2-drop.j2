@@ -1,0 +1,23 @@
+{{ JOB_CARD }}
+//*********************************************************************
+//*                                                                   *
+//* DROP DB2 DATABASE - {{ DB2_DATABASE }}                            *
+//*                                                                   *
+//*********************************************************************
+//DROPDB2 EXEC PGM=IKJEFT01,DYNAMNBR=20
+//STEPLIB  DD  DISP=SHR,DSN={{ DB2_SDSNEXIT }}
+//         DD  DISP=SHR,DSN={{ DB2_SDSNLOAD }}
+//SYSTSPRT DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//SYSTSIN  DD  *
+  DSN SYSTEM({{ DB2_SSID }})
+  RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
+       LIB('{{ DB2_RUNLIB }}')
+  END
+//SYSIN    DD  *
+SET CURRENT SQLID = '{{ DB2_SQLID }}';
+
+DROP DATABASE {{ DB2_DATABASE }};
+COMMIT;
+/*

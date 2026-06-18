@@ -14,15 +14,15 @@ mappings:
             - COMM-TITLE:
                 required: false
                 nullable: false
-                expression: "$body.title"
+                template: "{{$body.title}}"
             - COMM-FIRST-NAME:
                 required: false
                 nullable: false
-                expression: "$exists(body.firstName) ? $body.firstName : \"\""
+                template: "{{$exists(body.firstName) ? $body.firstName : \"\"}}"
             - COMM-LAST-NAME:
                 required: false
                 nullable: false
-                expression: "$exists(body.lastName) ? $body.firstName : \"\""
+                template: "{{$exists(body.lastName) ? $body.firstName : \"\"}}"
         - COMM-DOB:
             required: false
             nullable: false
@@ -42,7 +42,7 @@ mappings:
         - COMM-PHONE:
             required: false
             nullable: false
-            expression: "$body.phoneNumber"
+            template: "{{$body.phoneNumber}}"
         - COMM-ADDR:
             required: false
             nullable: false
@@ -50,24 +50,24 @@ mappings:
             - COMM-ADDR-LINE1:
                 required: false
                 nullable: false
-                expression: "$body.address.addressLine1"
+                template: "{{$body.address.addressLine1}}"
             - COMM-ADDR-LINE2:
                 required: false
                 nullable: false
-                expression: "$body.address.addressLine2"
+                template: "{{$body.address.addressLine2}}"
             - COMM-CITY:
                 required: false
                 nullable: false
-                expression: "$body.address.city"
+                template: "{{$body.address.city}}"
             - COMM-POSTCODE:
                 required: false
                 nullable: false
-                expression: "$body.address.postalCode"
+                template: "{{$body.address.postalCode}}"
             - COMM-COUNTRY:
                 required: false
                 nullable: false
-                expression: "$body.address.country"
+                template: "{{$body.address.country}}"
         - COMM-STATUS:
             required: false
             nullable: false
-            expression: "$body.customerStatus"
+            template: "{{$body.customerStatus}}"

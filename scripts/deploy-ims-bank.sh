@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # =============================================================================
 # Script  : deploy-ims-bank.sh
 # Summary : Deploy IMS Bank application using shell scripts

@@ -274,7 +274,7 @@ wait_for_job() {
 # Verify dataset exists
 verify_dataset() {
     local dsn=$1
-    dls "$dsn" >/dev/null 2>&1
+    dls "'${dsn}'" >/dev/null 2>&1
     return $?
 }
 
@@ -282,7 +282,7 @@ verify_dataset() {
 verify_member() {
     local dsn=$1
     local member=$2
-    dls "${dsn}(${member})" >/dev/null 2>&1
+    dls -a "$dsn" 2>/dev/null | grep -q "^${member}$"
     return $?
 }
 

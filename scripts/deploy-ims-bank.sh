@@ -439,35 +439,53 @@ substitute_variables() {
     local template=$1
     local output=$2
     
-    # Create temporary file for ASCII output
-    local temp_output="${output}.tmp"
+    # Verify template exists and is readable
+    if [[ ! -f "$template" ]]; then
+        log_error "Template not found: $template"
+        return 1
+    fi
     
-    # Use sed to substitute variables, processing line by line
-    sed "s|{{ IMS_REGION }}|${IMS_REGION}|g; \
-         s|{{ IMS_HLQ }}|${IMS_HLQ}|g; \
-         s|{{ IMS_PLEX }}|${IMS_PLEX}|g; \
-         s|{{ DB2SSID }}|${DB2_SSID}|g; \
-         s|{{ DB2_SSID }}|${DB2_SSID}|g; \
-         s|{{ DB2_DATABASE }}|${DB2_DATABASE}|g; \
-         s|{{ DB2_TABLE }}|${DB2_TABLE}|g; \
-         s|{{ DB2_SDSNEXIT }}|${DB2_SDSNEXIT}|g; \
-         s|{{ DB2_SDSNLOAD }}|${DB2_SDSNLOAD}|g; \
-         s|{{ DB2_RUNLIB }}|${DB2_RUNLIB}|g; \
-         s|{{ DB2_SQLID }}|${DB2_SQLID}|g; \
-         s|{{ AUTHID }}|${AUTHID}|g; \
-         s|{{ CLASS }}|${CLASS}|g; \
-         s|{{ JOB_CARD }}|${JOB_CARD}|g; \
-         s|{{ PGMLIB }}|${PGMLIB}|g; \
-         s|{{ PSBLIB }}|${PSBLIB}|g; \
-         s|{{ DBDLIB }}|${DBDLIB}|g; \
-         s|{{ ACBLIB }}|${ACBLIB}|g; \
-         s|{{ DBB_LOAD }}|${DBB_LOAD}|g; \
-         s|{{ IMS_SYS_HLQ }}|${IMS_SYS_HLQ}|g" "$template" > "$temp_output"
+    # Use sed to substitute variables, keep output in ASCII
+    # jsub -f will handle the encoding when submitting USS files
+    sed -e "s|{{ IMS_REGION }}|${IMS_REGION}|g" \
+        -e "s|{{ IMS_HLQ }}|${IMS_HLQ}|g" \
+        -e "s|{{ IMS_PLEX }}|${IMS_PLEX}|g" \
+        -e "s|{{ DB2SSID }}|${DB2_SSID}|g" \
+        -e "s|{{ DB2_SSID }}|${DB2_SSID}|g" \
+        -e "s|{{ DB2_DATABASE }}|${DB2_DATABASE}|g" \
+        -e "s|{{ DB2_TABLE }}|${DB2_TABLE}|g" \
+        -e "s|{{ DB2_SDSNEXIT }}|${DB2_SDSNEXIT}|g" \
+        -e "s|{{ DB2_SDSNLOAD }}|${DB2_SDSNLOAD}|g" \
+        -e "s|{{ DB2_RUNLIB }}|${DB2_RUNLIB}|g" \
+        -e "s|{{ DB2_SQLID }}|${DB2_SQLID}|g" \
+        -e "s|{{ AUTHID }}|${AUTHID}|g" \
+        -e "s|{{ CLASS }}|${CLASS}|g" \
+        -e "s|{{ JOB_CARD }}|${JOB_CARD}|g" \
+        -e "s|{{ PGMLIB }}|${PGMLIB}|g" \
+        -e "s|{{ PSBLIB }}|${PSBLIB}|g" \
+        -e "s|{{ DBDLIB }}|${DBDLIB}|g" \
+        -e "s|{{ ACBLIB }}|${ACBLIB}|g" \
+        -e "s|{{ DBB_LOAD }}|${DBB_LOAD}|g" \
+        -e "s|{{ IMS_SYS_HLQ }}|${IMS_SYS_HLQ}|g" \
+        "$template" > "$output"
     
-    # Convert from ASCII to EBCDIC and tag the file
-    iconv -f ISO8859-1 -t IBM-1047 "$temp_output" > "$output"
-    chtag -tc IBM-1047 "$output"
-    rm -f "$temp_output"
+    local sed_rc=$?
+    if [[ $sed_rc -ne 0 ]]; then
+        log_error "Failed to substitute variables in template: $template"
+        return 1
+    fi
+    
+    # Tag the output file as ASCII (ISO8859-1) to match the template
+    # jsub -f expects USS files in their native encoding
+    chtag -tc ISO8859-1 "$output"
+    
+    if [[ ! -f "$output" ]]; then
+        log_error "Failed to create JCL file: $output"
+        return 1
+    fi
+    
+    log_debug "Generated JCL: $output ($(wc -l < "$output") lines)"
+    return 0
 }
 
 # =========================

@@ -1529,7 +1529,7 @@ resourceDefinitions:
       group: SOCKETS
       description: Used for sockets allocation
       type: INTRA
-      attfacility: FILE
+      atifacility: FILE
       triggerlevel: 1
       transid: TRAA
 

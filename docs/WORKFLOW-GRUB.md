@@ -60,7 +60,7 @@ GRUB analyzes changes
 Creates patch files
     ↓
     ├──────────────────────────→ Applies patches to USS
-                                  Runs setup-common.sh natively
+                                  Runs setup-remote.sh natively
                                   ├─ Stage 1: Initialize workspace
                                   ├─ Stage 2: Clone DBB accelerators
                                   ├─ Stage 3: Deploy zBuilder
@@ -73,10 +73,10 @@ Creates patch files
 
 ### Stage Detection
 
-The [`setup-common.sh`](../setup-common.sh:1) script intelligently detects it's running from within the Bank-of-Z repository (GRUB workflow):
+The [`setup-remote.sh`](../.setup/setup-remote.sh) script intelligently detects it's running from within the Bank-of-Z repository (GRUB workflow):
 
 ```bash
-# From setup-common.sh Stage 4
+# From setup-remote.sh Stage 4
 if git rev-parse --git-dir > /dev/null 2>&1; then
     local repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" == "Bank-of-Z" ]]; then

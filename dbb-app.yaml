@@ -17,45 +17,35 @@
 version: 1.0.0
 
 application:
-  name: BANKZ
+  name: Bank-of-Z
 
   tasks:
+
+    - task: Start
+      variables:
+      # Configure the source directory for building
+      - name: sourceDirs
+        value:
+            - "${APPLICATION}/src/base"
+            - "${APPLICATION}/src/api/src/main/api"
+            - "${APPLICATION}/src/frontend"
 
     - task: ScannerInit
       variables:
         - name: scanners
-          value: 
-            - scanner: Dummy # Direct yaml files for z/OS Connect files to the Dummy scanner instead of the default DBB DependencyScanner
+          value:
+            - scanner: Dummy
               extensions: yaml
+        - name: excludeFileList
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]  
 
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
       variables:
-        - name: sourceDirs
-          value:
-            - "src/base"
-            - "src/api/src/main/api"
-            - "src/frontend"
         - name: continueOnScanFailure
           value: true
         - name: excludeFileList
-          value:
-            - ".**"
-            - "**/.**"
-            - "**.properties"
-            - "**.groovy"
-            - "**.json"
-            - "**.md"
-            - "**.sh"
-            - "**.jcl"
-            - "**.tar"
-            - "**.war"
-            - "**.log"
-            - "**/operations/**"
-            - "**/zosAssets/**"
-            - "**/dbb-app.yaml"
-            - "**/zapp.yaml"
-            - "**/docker-compose.yaml"
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -65,33 +55,12 @@ application:
     # ----------------------------------------------------------
     - task: ImpactAnalysis
       variables:
-        - name: sourceDirs
-          value:
-            - "src/base"
-            - "src/api/src/main/api"
-            - "src/frontend"
-        
         - name: continueOnScanFailure
           value: true
-        
+
         - name: excludeFileList
-          value:
-            - ".**"
-            - "**/.**"
-            - "**.properties"
-            - "**.groovy"
-            - "**.json"
-            - "**.md"
-            - "**.sh"
-            - "**.jcl"
-            - "**.tar"
-            - "**.war"
-            - "**.log"
-            - "**/operations/**"
-            - "**/zosAssets/**"
-            - "**/dbb-app.yaml"
-            - "**/zapp.yaml"
-            - "**/docker-compose.yaml"
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+
         
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems
@@ -314,10 +283,9 @@ application:
           value: "src/api/src/main/liberty/config/cics.xml"
     
     - task: zOSConnect
+      sources:
+        - "**/src/main/api/openapi.yaml"
       variables:
-        - name: configSources
-          value:
-            - "**/src/main/api/openapi.yaml"
         - name: gradleDebug
           value: true
         - name: gradlePath

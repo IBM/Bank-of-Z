@@ -17,7 +17,7 @@
 version: 1.0.0
 
 application:
-  name: Bank-of-Z
+  name: BANKZ
 
   tasks:
 
@@ -26,9 +26,9 @@ application:
       # Configure the source directory for building
       - name: sourceDirs
         value:
-            - "${APPLICATION}/src/base"
-            - "${APPLICATION}/src/api/src/main/api"
-            - "${APPLICATION}/src/frontend"
+            - "Bank-of-Z/src/base"
+            - "Bank-of-Z/src/api/src/main/api"
+            - "Bank-of-Z/src/frontend"
 
     - task: ScannerInit
       variables:

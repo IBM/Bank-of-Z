@@ -283,9 +283,12 @@ application:
           value: "src/api/src/main/liberty/config/cics.xml"
     
     - task: zOSConnect
-      sources:
-        - "**/src/main/api/openapi.yaml"
       variables:
+        - name: configSources
+          value:
+            - "**/src/main/api/openapi.yaml"
+        - name: gradleDebug
+          value: true
         - name: gradleDebug
           value: true
         - name: gradlePath

@@ -289,8 +289,6 @@ application:
             - "**/src/main/api/openapi.yaml"
         - name: gradleDebug
           value: true
-        - name: gradleDebug
-          value: true
         - name: gradlePath
           value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
         - name: shellEnvironment

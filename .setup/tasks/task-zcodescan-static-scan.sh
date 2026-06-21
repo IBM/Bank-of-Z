@@ -31,7 +31,7 @@ export SCAN_RULE_FILE=${SCAN_RULE_FILE:-$(get_section_value 'zcodescan' 'rule_fi
 export SCAN_ENCODING=${SCAN_ENCODING:-$(get_section_value 'zcodescan' 'src_encoding')}
 export SCAN_CONFIG_FILE=${SCAN_CONFIG_FILE:-$(get_section_value 'zcodescan' 'config_file')}
 export SCAN_MAX_RC=${SCAN_MAX_RC:-$(get_section_value 'zcodescan' 'max_rc')}
-
+export PYTHONUNBUFFERED=1 
 export PATH="${JAVA_HOME}/bin:${REMOTE_EXTRA_PATH:-}:$PATH"
 
 if [ ! -f $SCAN_CONFIG_FILE ]; then

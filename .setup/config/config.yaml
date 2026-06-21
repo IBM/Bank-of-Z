@@ -2,159 +2,191 @@
 #########################################################
 # Setup Configuration for Pipeline Simulation
 #########################################################
-version: 1.0.0
+version: "1.0.0"
 
 # Git repositories to clone
 repositories:
-  - name: dbb
-    url: https://github.com/IBM/dbb.git
-    target_dir: dbb
+  dbb_url: "https://github.com/IBM/dbb.git"
 
 # Java Home
 java:
-  java_home: /usr/local/sandboxes/tools/J21.0_64
+  java_home: "/usr/local/sandboxes/tools/J21.0_64"
 
 # Application metadata
 app:
-  # Application name
-  base_name: BANKZ
-  # Application short name (max 4 chars)
-  short_name: BOZ
-  # z/OS version used for dataset naming
-  zos_version: V0R1M0
+  base_name: "BANKZ"
+  short_name: "BOZ"
+  zos_version: "V0R1M0"
 
 # Sandbox root directory (USS)
 sandbox:
-  # Root path of the project on the remote server
-  path: /usr/local/sandboxes/bank-of-z
+  path: "/usr/local/sandboxes/bank-of-z"
 
 # Z configuration tools
 zconfig:
-  # Z Config installation directory
-  zconfig_home: /usr/local/sandboxes/tools/zconfig
-  # CICS Resource Builder installation
-  zcb_home: /usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6
-  # Java runtime for Z tools
-  java_home: ${java.java_home}
+  zconfig_home: "/usr/local/sandboxes/tools/zconfig"
+  zcb_home: "/usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6"
+  java_home: "{{java.java_home}}"
 
 # DBB (Dependency Based Build)
 dbb:
-  # DBB installation directory
-  dbb_home: /usr/local/sandboxes/tools/dbb
-  # Java runtime for DBB
-  java_home: ${java.java_home}
-  # DBB build output directory
-  dbb_build: ${sandbox.path}/${REPO_NAME}/.setup/build
-  # DBB application configuration file
-  dbb_app_conf: ${sandbox.path}/${REPO_NAME}/dbb-app.yaml
-  # DBB working directory (source root)
-  dbb_cwd: ${sandbox.path}/${REPO_NAME}/
-  # DBB log directory
-  dbb_log_dir: ${sandbox.path}/logs/dbb
-  # API build output directory
-  api_base: ${sandbox.path}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build
+  dbb_home: "/usr/local/sandboxes/tools/dbb"
+  java_home: "{{java.java_home}}"
+  dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
+  dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
+  dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
+  dbb_log_dir: "{{sandbox.path}}/logs/dbb"
+
+# API build output directory
+api_base: "{{sandbox.path}}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build"
 
 # zBuilder framework configuration
 zbuilder:
-  # Local source directory
-  source_dir: ${sandbox.path}/${REPO_NAME}/.setup/build
-  # Target USS directory for upload
-  target_dir: ${sandbox.path}/zBuilder
-  # Java home (min version 17)
-  java_home: ${java.java_home}
+  source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
+  target_dir: "{{sandbox.path}}/zBuilder"
+  java_home: "{{java.java_home}}"
 
 # ZCodeScan (static analysis)
 zcodescan:
-  # ZCodeScan installation (Python environment)
-  zcodescan_home: /global/opt/pyenv/akf
-  # Java runtime for scanning tools
-  java_home: ${java.java_home}
-  # Working directory
-  cwd_dir: ${sandbox.path}
-  # Source directory to scan
-  src_dir: ${sandbox.path}/${REPO_NAME}/src/base
-  # Output directory for scan reports
-  output_dir: ${sandbox.path}/zcodescan
-  # Rules file to apply
-  rule_file: ${sandbox.path}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml
-  # Source encoding (z/OS default encoding)
-  src_encoding: IBM-1047
-  # ZCodeScan RESAPI connection info to check for IDZ EE license.
-  config_file: ${HOME}/zcs_config_file.yml
-  # ZCodeScan maximum return code when issue(s) in the scan
-  #  - 1 - The highest issue severity found is INFO.
-  #  - 2 - The highest issue severity found is LOW.
-  #  - 3 - The highest issue severity found is MEDIUM.
-  #  - 4 - The highest issue severity found is HIGH.
-  #  - 5 - The highest issue severity found is BLOCKER.
+  zcodescan_home: "/global/opt/pyenv/akf"
+  java_home: "{{java.java_home}}"
+  cwd_dir: "{{sandbox.path}}"
+  src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
+  output_dir: "{{sandbox.path}}/zcodescan"
+  rule_file: "{{sandbox.path}}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml"
+  src_encoding: "IBM-1047"
+  config_file: "${HOME}/zcs_config_file.yml"
   max_rc: 4
 
 # Wazi Deploy (deployment automation)
 wazideploy:
-  # Wazi Deploy installation
-  wazideploy_home: /global/opt/pyenv/gdp
-  # CICS/DB2 deployment method (from DBB repo)
-  deployment_method_cics: ${sandbox.path}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml
-  # z/OS Connect deployment method
-  deployment_method: ${sandbox.path}/${REPO_NAME}/.setup/deploy/deployment-method.yml
-  # Environment-specific deployment configuration
-  deployment_envfile: ${sandbox.path}/${REPO_NAME}/.setup/deploy/Development.yml
-  # Deploy types mapping file
-  types_pattern_mapping: ${sandbox.path}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml
-  # zDeploy root directory
-  zdeploy_dir: ${sandbox.path}/dbb/WaziDeploy/zDeploy
-  # Deploy log directory
-  deploy_log_dir: ${sandbox.path}/logs/deploy
+  wazideploy_home: "/global/opt/pyenv/gdp"
+  deployment_method_cics: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml"
+  deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
+  deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
+  types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
+  zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
+  deploy_log_dir: "{{sandbox.path}}/logs/deploy"
 
 # TAZ Unit Test configuration
 taz:
-  # TAZ CLI installation directory
-  taz_home: /usr/local/sandboxes/tools/taz-280/test-cli
-  # Root directory containing test suites
-  test_dir: ${sandbox.path}/${REPO_NAME}
-  # JES procedure library
-  proclib: SYS1.PROCLIB
-  # Load library used during execution
-  library: ${app.base_name}.${app.zos_version}.LOADLIB
-  # STEPLIB for runtime/debug
-  steplib: EQAW.VHR0M0.PTF.SEQAMOD
+  taz_home: "/usr/local/sandboxes/tools/taz-280/test-cli"
+  test_dir: "{{sandbox.path}}/${REPO_NAME}"
+  proclib: "SYS1.PROCLIB"
+  library: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
+  hlq: "EQAW"
+  steplib: "{{taz.hlq}}.SEQAMOD"
 
 # z/OS Connect (API exposure)
 zosconnect:
-  # z/OS Connect installation
-  zosconnect_home: /usr/lpp/IBM/zosconnect/bin/
-  # z/OS Connect server directory
-  server_dir: ${sandbox.path}/zosconnect-server
-  # z/OS Connect server name
-  server_name: bankOfZServer
-  # HTTP/HTTPS ports
+  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin/"
+  server_dir: "{{sandbox.path}}/zosconnect-server"
+  server_name: "bankOfZServer"
   http_port: 9080
   https_port: 9443
 
-# ZOAU installtion directory
+# ZOAU installation directory
 zoau:
-  zoau_home: /usr/lpp/IBM/zoautil
+  zoau_home: "/usr/lpp/IBM/zoautil"
 
 # Zowe CLI configuration
 zowe:
-  # RSE profile name to use (optional, defaults to 'rse')
-  # Set via environment variable: export ZOWE_RSE_PROFILE=bankz
-  rse_profile: bankz
+  rse_profile: "bankz"
 
 # CICS attributes
 cics:
-  host: localhost
-  user: ${CICS_USER} # env var
-  password: ${CICS_PASSWORD} # env var #pragma: allowlist secret
+  host: "localhost"
+  user: "${CICS_USER}"
+  password: "${CICS_PASSWORD}"
   cmci_port: 27100
   ipic_port: 4320
   debug_port: 27103
 
 # IMS attributes
 ims:
-  host: localhost
+  host: "localhost"
   port: 9977
-  user: ${IMS_USER} # env var
-  password: ${IMS_PASSWORD} # env var #pragma: allowlist secret
-  datastore: IMS2
+  user: "${IMS_USER}"
+  password: "${IMS_PASSWORD}"
+  datastore: "IMS2"
+  ims_sys_hlq: "IMSV15"
+  ims_hlq: "{{app.base_name}}.IMS2"
+  ims_home: "/usr/lpp/ims/ims15"
+  dfs_ds_volume_1: "IMSV15"
+  ims_connect:
+    hostname: "localhost"
+    port: 9977
+    ssl_port: 9966
+  db2_database: "IMSBANK"
+  db2_table: "HISTORY"
+  db2_plan_ibtran: "IBTRAN" 
+  db2_plan_ibghist: "IBGHIST"
+  db2_plan_ibshist: "IBSHIST"
+  jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  asm_lib_hlq: "ASM.SASMMOD1"
+  dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
+  dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
+  dfs_recon3: "{{ ims.ims_hlq }}.RECON3"
+  dfs_ims_ssid: "{{ ims.datastore }}"
+  use_pseudo_wfi: no
+  dfs_auth_lib_hlq1: "{{ app.base_name }}"
+  dfs_auth_lib_hlq2: "{{ ims.dfs_ims_ssid }}"
+  dfs_auth_lib_syshlq1: "IMSV15"
+  dsnexit: "{{ db2.sdsnexit }}"
+  dsnlod2: "{{ db2.sdsnlod2 }}"
+  dsnload: "{{ db2.sdsnload }}"
+  dfs_proclib: "{{ ims.ims_hlq }}.PROCLIB"
+  dfs_joblib: "{{ ims.ims_hlq }}.JOBS"
+  java_conf_path: "${HOME}/dfsjvmpr.props"
+  ims_java_home: "/usr/lpp/ims/imsjava"
+  db2_java_home: "/usr/lpp/db2d10"
+  dfs_ims_userid: "${ZOS_USER}"
+  dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
+  dfs_imsplex: "PLEX2"
+  regions:
+  - with_db2: yes
+    use_pseudo_wfi: no
+    region_num: 1
+    dfsmpr_name: "DFSMPR1"
+    dfs_tranclass1: '007'
+    dfs_tranclass2: '000'
+    dfs_tranclass3: '000'
+    dfs_tranclass4: '000'
+    dfs_ims_syaff: ''
+  - with_db2: no
+    use_pseudo_wfi: no
+    region_num: 2
+    dfsmpr_name: "DFSMPR2"
+    dfs_tranclass1: '005'
+    dfs_tranclass2: '000'
+    dfs_tranclass3: '000'
+    dfs_tranclass4: '000'
+    dfs_ims_syaff: ''
+  - zcloud_leruntime: "CEE.SCEERUN"
+    zcloud_csslib: "SYS1.CSSLIB"
+    dfs_ims_syaff: ''
+    dfs_workingdir:  "${HOME}"
+    dfs_tranclass: '006'
+    dfs_tranclass1: '006'
+    dfs_tranclass2: '000'
+    dfs_tranclass3: '000'
+    dfs_tranclass4: '000'
+    dfs_appname: "IMS1BANK"
+    replace_member: yes
+    dfs_max_heapsize: 128
+    dfs_min_heapsize: 64
+    dfs_optionsfilepath: "${HOME}"
 
+# DB2 configuration
+db2:
+  hostname: "localhost"
+  sqlid: "${ZOS_USER}"
+  ssid: "DBD1"
+  port: 8102
+  password: "${ZOS_USER_PASSWORD}"
+  localtion: "DBD1LOC"
+  sdsnexit: "DB2V13.SDSNEXIT"
+  sdsnload: "DB2V13.SDSNLOAD"
+  sdsnlod2: "DB2V13.SDSNLOD2"
+  jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  runlib: "DBD1.RUNLIB.LOAD"

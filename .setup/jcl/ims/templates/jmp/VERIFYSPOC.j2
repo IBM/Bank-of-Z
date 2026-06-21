@@ -1,0 +1,12 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{%- if reg.dfs_ims_syaff %}
+/*JOBPARM SYSAFF={{ reg.dfs_ims_syaff }}
+{%- endif %}
+//SPOC      EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims.dfs_imsplex }},ROUTE={{ ims.dfs_ims_ssid }},WAIT=30,F=WRAP')
+//STEPLIB   DD DISP=SHR,DSN={{ ims.dfs_reslib }}
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+     QRY IMS TYPE(ALL) SHOW(ALL)
+/*

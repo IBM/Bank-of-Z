@@ -1,0 +1,45 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{%- set region_num = 1 %}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC    EXEC PGM=IEBUPDTE,PARM=MOD
+//SYSPRINT DD   SYSOUT=*
+//SYSUT1   DD   DSNAME={{ ims.ims_hlq }}.IMSJAVA.JOBS,
+//         DISP=SHR
+//SYSUT2   DD   DSNAME={{ ims.ims_hlq }}.IMSJAVA.JOBS,
+//         DISP=SHR
+//SYSIN    DD   DATA
+./        {{ 'ADD' if member_exists == 'False' else 'REPL' }}   NAME={{ ims.dfs_ims_ssid }}JMP{{ region_num|string }},LEVEL=00,SOURCE=0,LIST=ALL
+//{{ ims.dfs_ims_ssid }}JMP{{ region_num|string }}  JOB ,
+// CLASS=A,MSGCLASS=H,MSGLEVEL=(1,1),NOTIFY={{ ims.dfs_ims_userid }},REGION=0M
+//       JCLLIB ORDER={{ ims.dfs_proclib }}
+//*******************************************************
+//*
+//* JCL FOR THE IMS JAVA REGION (JMP) USED TO EXECUTE YOUR JAVA
+//* PROGRAM
+//*
+//* AUTHOR            LAST CHANGED        PROJECT
+//* ---------------   --------------      -------------------
+//* {{ ims.dfs_ims_userid }}         01/22/16          {{ reg.dfs_appname }}
+//*******************************************************
+//JMP1 EXEC PROC=DFSJMP,
+//         TIME=(1440),
+//         RGN=0M,                     REGION SIZE FOR EXECUTION
+//         OPT=W,                      WAIT FOR CNTRL PRGRM TO START
+//         PCB=040,                    DEP RGN INTERREGN COM AREA SIZE
+//         CL1={{ reg.dfs_tranclass1 }},     TRANSACTION CLASS 1
+//         CL2={{ reg.dfs_tranclass2 }},     TRANSACTION CLASS 2
+//         CL3={{ reg.dfs_tranclass3 }},     TRANSACTION CLASS 3
+//         CL4={{ reg.dfs_tranclass4 }},     TRANSACTION CLASS 4
+//         NBA=5,                        FP DB BUFFER NUMBER
+//         OBA=5,                        FP PAGE-FIXED BUFFER NUMBER
+//         IMSID={{ ims.dfs_ims_ssid }},     IMSID OF IMS CONTROL REGION
+//         SSM={{ db2.ssid }},            DB2 SSM
+//         ENVIRON=DFSJVMEV,             JVM ENVIRONMENT SETTINGS
+//         JVMOPMAS=DFSJVMMS,            MASTER/STANDALONE JVM OPTIONS
+//         SOUT=*

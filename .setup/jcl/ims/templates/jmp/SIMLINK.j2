@@ -1,0 +1,14 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{% if reg.dfs_ims_syaff %}
+/*JOBPARM SYSAFF={{ reg.dfs_ims_syaff }}
+{% endif %}
+//SIMLINK  EXEC PGM=BPXBATCH,REGION=0M
+//STEPLIB  DD  DSN={{ reg.zcloud_leruntime }},DISP=SHR
+//STDERR   DD  PATH='{{ reg.dfs_workingdir }}/mystd.err',
+//             PATHDISP=(KEEP,KEEP),
+//             PATHOPTS=(OWRONLY,OCREAT,OTRUNC),
+//             PATHMODE=(SIRWXU,SIRWXG,SIRWXO)
+//STDPARM  DD   *
+SH su; cd /u/ims/usr/lpp/ims/ims13/imsjava; ln -e DFSCLIBU libT2DLI.so;
+/*

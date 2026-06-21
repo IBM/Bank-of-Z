@@ -352,3 +352,11 @@ application:
         - name: deployType
           forFiles: "**/src/base/ims/DBD/*.asm"
           value: DBDLOAD
+
+        # Assembler parms
+        - name: assemblerParms
+          value: OBJECT,NODECK
+
+        # Link edit parms
+        - name: linkEditParms
+          value: XREF,LIST

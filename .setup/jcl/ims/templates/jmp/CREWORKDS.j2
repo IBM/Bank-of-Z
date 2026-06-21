@@ -1,0 +1,20 @@
+{{ ims.jobcard -}}
+{%- if 'REG=' not in ims.jobcard and 'REGION=' not in ims.jobcard %},
+//  REGION=0M
+{%- endif %}
+//* CHECK FOR WORKLIB EXISTANCE
+//*
+//LSTDS1  EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=A
+//SYSIN    DD *
+     LISTCAT ENT('{{ ims.ims_hlq }}.IMSJAVA.JOBS')
+//*
+//* ALLOCATE JOBS DATA SET IF NOT THERE
+//*
+//ALLCWRK EXEC PGM=IEFBR14,COND=(0,EQ,LSTDS1)   
+//SYSUT2   DD  DISP=(NEW,CATLG),SPACE=(CYL,(10,10,5)),
+//         DSN={{ ims.ims_hlq }}.IMSJAVA.JOBS,
+//*         STORCLAS=MFI,
+//         DCB=(LRECL=80,RECFM=FB,BLKSIZE=27920,DSORG=PO)
+//*
+/*

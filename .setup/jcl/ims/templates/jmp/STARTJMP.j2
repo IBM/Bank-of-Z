@@ -1,0 +1,10 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{%- set region_num = 1 %}
+//*
+//JMPSTRT         EXEC  PGM=IEBGENER
+//SYSPRINT  DD    SYSOUT=*
+//SYSUT2    DD    SYSOUT=(A,INTRDR)
+//SYSIN     DD    DUMMY
+//SYSUT1    DD    DSN={{ims.ims_hlq}}.IMSJAVA.JOBS({{ ims.dfs_ims_ssid }}JMP{{ region_num|string }}),DISP=SHR
+/*

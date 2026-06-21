@@ -1,0 +1,29 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC    EXEC PGM=IEBUPDTE,PARM=MOD                        
+//SYSPRINT DD   SYSOUT=*                                       
+//SYSUT1   DD   DSNAME={{ ims.dfs_proclib }},DISP=SHR                 
+//SYSUT2   DD   DSNAME={{ ims.dfs_proclib }},DISP=SHR                 
+//SYSIN    DD   DATA                                           
+./        {{ 'ADD' if not reg.replace_member else 'REPL' }}    NAME=DFSJVMMS,LEVEL=00,SOURCE=0,LIST=ALL
+-Ddb2Hostname={{ db2.hostname }}
+-Ddb2Port={{ db2.port }}
+-Ddb2Location={{ db2.localtion }}
+-Ddb2Username={{ db2.sqlid }}
+-Ddb2Password={{ db2.password }}
+-Xoptionsfile={{ reg.dfs_optionsfilepath }}/dfsjvmpr.props
+-Xmx{{ reg.dfs_max_heapsize }}M
+-Xmn{{ reg.dfs_min_heapsize }}M
+-XX:+Enable3164Interoperability
+*Xdebug
+*Xnoagent
+*Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=7777
+*
+./      ENDUP
+/*

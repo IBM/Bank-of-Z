@@ -1,0 +1,79 @@
+//******************************************************************
+//*  DFSMPR Procedure
+//*
+//*  This procedure is an online execution procedure that
+//*  initiates an IMS message processing address space.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//************************************************************
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//*************************************************************
+//*
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{%- set syshlq2 = ims.get('dfs_auth_lib_syshlq2', '') %}
+{%- set syshlq = ims.dfs_auth_lib_syshlq1 ~ ('.' ~ syshlq2 if syshlq2 else '') %}
+//DFSMPR PROC SOUT=A,RGN=52K,SYS2=,
+//            CL1=007,CL2=000,CL3=000,CL4=000,
+//            OPT=N,OVLA=0,SPIE=0,VALCK=0,TLIM=00,
+//            PCB=000,PRLD=,STIMER=,SOD=,DBLDL=,
+//            NBA=,OBA=,IMSID={{ ims.dfs_ims_ssid }},AGN=,VSFX=,VFREE=,
+//            SSM=,PREINIT=,ALTID=,PWFI={{ 'Y' if ims.use_pseudo_wfi else 'N' }},
+//            APARM=,LOCKMAX=,APPLFE=,
+//            ENVIRON=,JVMOPMAS=,PARDLI=
+//*
+//*
+//REGION EXEC PGM=DFSRRC00,REGION=&RGN,
+//            TIME=1440,DPRTY=(12,0),
+//            PARM=(MSG,&CL1&CL2&CL3&CL4,
+//            &OPT&OVLA&SPIE&VALCK&TLIM&PCB,
+//            &PRLD,&STIMER,&SOD,&DBLDL,&NBA,
+//            &OBA,&IMSID,&AGN,&VSFX,&VFREE,
+//            &SSM,&PREINIT,&ALTID,&PWFI,
+//            '&APARM',&LOCKMAX,&APPLFE,
+//            &ENVIRON,&JVMOPMAS,&PARDLI)
+//*
+//STEPLIB  DD DSN={{ ims.dfs_auth_lib_hlq1 }}.{{ ims.dfs_auth_lib_hlq2 }}.&SYS2.PGMLIB,DISP=SHR
+//         DD DSN={{ syshlq }}.SDFSJLIB,DISP=SHR
+//         DD DSN={{ syshlq }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ syshlq }}.SDFSRESL,DISP=SHR
+//         DD DSN={{ ims.dsnexit }},DISP=SHR
+//         DD DSN={{ ims.dsnlod2 }},DISP=SHR
+//         DD DSN={{ ims.dsnload }},DISP=SHR
+//PROCLIB  DD DSN={{ ims.dfs_auth_lib_hlq1 }}.{{ ims.dfs_auth_lib_hlq2 }}.&SYS2.PROCLIB,DISP=SHR
+//SYSUDUMP DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,BLKSIZE=3129,RECFM=VBA),
+//         SPACE=(125,(2500,100),RLSE,,ROUND)
+//CEEOPTS  DD  *
+  CEEDUMP(60,SYSOUT=*,FREE=END,SPIN=UNALLOC),
+  HEAPCHK(OFF,1,0,0,0,1024,0,1024,0),
+  HEAPPOOLS(ON,8,10,32,10,128,10,256,10,1024,10,2048,10,0,10,0,10,0,
+  10,0,10,0,10,0,10),
+  STORAGE(00,NONE,NONE,8192),
+  THREADSTACK(OFF,65536,16384,ANYWHERE,KEEP,131072,131072),
+  TRAP(ON,SPIE)
+/*
+//DFSOPT   DD *
+  JVM=3164
+/*
+//DFSESL   DD DSN={{ syshlq }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ ims.dsnexit }},DISP=SHR
+//         DD DSN={{ ims.dsnlod2 }},DISP=SHR
+//         DD DSN={{ ims.dsnload }},DISP=SHR
+//STDOUT   DD SYSOUT=*
+//STDERR   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=&SOUT
+//*

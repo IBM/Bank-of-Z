@@ -26,7 +26,22 @@ export DFS_IMS_SSID=${DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
-rm -f "/tmp/IMS-bankz-*"
+rm -f /tmp/IMS-*
+rm -f /tmp/Ims-*
+
+# =========================
+# Stop IBM BOZ regions
+# =========================
+set +e
+jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+sleep 5
+jcan P "IMS2JMP1" 2>/dev/null
+jcan P "IMS2MPP1" 2>/dev/null
+jcan P "IMS2MPP2" 2>/dev/null
+sleep 5
+set -e
 
 # JMP
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
@@ -167,11 +182,12 @@ EOF
 run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
 
 echo "IEFBR14" > "/tmp/IMS-bankz-dfsintdc.txt"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/IMS-bankz-dfsintdc.txt"
 cat > "/tmp/IMS-bankz-dfsintdc.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-dfsintdc.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.JOBS(DFSINTDC),DISP=SHR
+//OUT  DD DSN=${BOZ_IMS_HLQ}.PROCLIB(DFSINTDC),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -189,5 +205,7 @@ sleep 5
 jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STARTJMP)"  2>/dev/null
 sleep 5
 
+rm -f /tmp/IMS-*
+rm -f /tmp/Ims-*
 
-exit $?
+exit 0

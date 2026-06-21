@@ -447,11 +447,11 @@ main_setup() {
     # infrastructure
     stage_stop_tasks
     
-    stage_setup_ims_region
-    
     stage_setup_database
     
     stage_setup_cics_region
+    
+    stage_setup_ims_region
     
     stage_setup_ims_database
     

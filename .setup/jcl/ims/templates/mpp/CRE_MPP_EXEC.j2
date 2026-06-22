@@ -1,0 +1,92 @@
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+{{ ims.jobcard }}
+//*
+//* FUNCTION: COPY IMSRDR JOBS TO IMS JOBS DATA SET(S)
+//*********************************************************************
+//COPYJOBS PROC MBR=TEMPNAME
+//*
+//CM       EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSUT2   DD DISP=SHR,
+//            DSN={{ ims.dfs_auth_lib_hlq1 }}.{{ ims.dfs_auth_lib_hlq2 }}.&SYS2.JOBS(&MBR)
+//SYSIN    DD DUMMY
+//        PEND
+//*********************************************************************
+//*
+//*-----------------------------------------------
+//* COPY EXECUTION JOB FOR MPP
+//*-----------------------------------------------
+//MPP{{ region_num | string }}  EXEC PROC=COPYJOBS,SYS2=,MBR={{ ims.dfs_ims_ssid }}MPP{{ region_num | string }}
+//CM.SYSUT1 DD DATA,DLM=ZZ
+//{{ ims.dfs_ims_ssid }}MPP{{ region_num | string }} JOB {{ app.base_name }},
+// 'PGMRNAME',
+// CLASS=A,
+// MSGCLASS=X,MSGLEVEL=(1,1),
+// NOTIFY=${ZOS_USER},
+// REGION=0M
+//*
+//*JOBPARM PROCLIB=PROC99
+//*
+//* SKELETON: DFSIXS19
+//*
+//* FUNCTION: IMBED - EXECUTION JOB FOR MPP # - {{ ims.dfs_ims_ssid }}
+//*********************************************************************
+//*
+//************************************************************@SCPYRT**
+//*                                                                   *
+//*  LICENSED MATERIALS - PROPERTY OF IBM                             *
+//*                                                                   *
+//*  5635-A04                                                         *
+//*                                                                   *
+//*      COPYRIGHT IBM CORP. 1989,2015 ALL RIGHTS RESERVED            *
+//*                                                                   *
+//*  US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION OR      *
+//*  DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE CONTRACT WITH          *
+//*  IBM CORP.                                                        *
+//*                                                                   *
+//************************************************************@ECPYRT**
+//JOBLIBS JCLLIB ORDER=({{ ims.dfs_proclib }})
+//MPP{{ region_num | string }}     EXEC PROC={{ reg.dfsmpr_name }},TIME=(1440),
+//         NBA=6,
+//         OBA=5,
+//         SOUT='*',              SYSOUT CLASS
+//         CL1={{ reg.dfs_tranclass1 }},               TRANSACTION CLASS 1
+//         CL2={{ reg.dfs_tranclass2 }},               TRANSACTION CLASS 2
+//         CL3={{ reg.dfs_tranclass3 }},               TRANSACTION CLASS 3
+//         CL4={{ reg.dfs_tranclass4 }},               TRANSACTION CLASS 4
+//         TLIM=10,               MPR TERMINATION LIMIT
+//         SOD=,                  SPIN-OFF DUMP CLASS
+//         IMSID={{ ims.dfs_ims_ssid }},       IMSID OF IMS CONTROL REGION
+//         PREINIT=DC,            PROCLIB DFSINTXX MEMBER
+//         PWFI={{ 'Y' if reg.use_pseudo_wfi else 'N' }}{{ ',' if reg.with_db2 else '' }}
+{%- if reg.with_db2 %}
+//         SSM={{ db2.ssid }},
+//         ENVIRON=DFSJVMEV,
+//         JVMOPMAS=DFSJVMMS
+{%- endif %}
+//*
+//* OVERRIDE PROC DD STATEMENTS
+//*
+//* --NONE--
+//*
+//* ADDITIONAL DD STATEMENTS
+//*
+//DFSCTL   DD DISP=SHR,
+//            DSN={{ ims.dfs_auth_lib_syshlq1 }}.PROCLIB(DFSSBPRM)
+//DFSSTAT  DD SYSOUT=*
+//* REXX EXEC SOURCE LOCATION
+//SYSEXEC  DD DISP=SHR,
+//            DSN={{ ims.dfs_auth_lib_syshlq1 }}.INSTALIB
+//         DD DISP=SHR,
+//            DSN={{ ims.dfs_auth_lib_syshlq1 }}.SDFSEXEC
+//* REXX INPUT LOCATION WHEN STACK IS EMPTY
+//SYSTSIN  DD *
+/*
+//* REXX OUTPUT LOCATION
+//SYSTSPRT DD SYSOUT=*
+//* COBOL OUTPUT LOCATION
+//SYSOUT   DD SYSOUT=*
+//* COBOL ABEND OUTPUT LOCATION
+//SYSABOUT DD SYSOUT=*
+//*
+ZZ

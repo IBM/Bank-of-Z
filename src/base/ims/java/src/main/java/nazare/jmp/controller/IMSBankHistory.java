@@ -4,7 +4,7 @@
  *                                                                *
  * "Object Code Only (OCO)"                                       *
  *                                                                *
- * (C) COPYRIGHT IBM CORP. 2026 ALL RIGHTS RESERVED               *
+ * (C) COPYRIGHT IBM CORP. 2020 ALL RIGHTS RESERVED               *
  *                                                                *
  * US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION,      *
  * OR DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE                   *
@@ -61,11 +61,11 @@ public class IMSBankHistory {
 			System.out.println("**** SSL certificate validation and hostname verification disabled");
 			
 			// DB2 connection parameters from DSNL004I output
-			String db2Domain = ""; // Replace with actual domain
-			String db2Port = "8102";
-			String db2Location = "DBD1LOC";
-			String db2Username = "ibmuser";
-			String db2Password = ""; // Replace with actual password
+			String db2Domain   = System.getProperty("db2Hostname");
+			String db2Port     = System.getProperty("db2Port");
+			String db2Location = System.getProperty("db2Location");
+			String db2Username = System.getProperty("db2Username");
+			String db2Password = System.getProperty("db2Password");
 			
 			// Build JDBC URL with SSL enabled
 			// sslServerCertificate=false disables hostname verification in DB2 JCC driver

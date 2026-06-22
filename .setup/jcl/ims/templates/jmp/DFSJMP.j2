@@ -1,0 +1,90 @@
+//******************************************************************
+//*  DFSJMP Procedure
+//*
+//*  This procedure starts a Java message-driven dependent
+//*  region that resembles an MPP region.
+//*
+//*  The high-level qualifier of the IMS data sets is IMS.
+//*  If your installation does not use this default value,
+//*  then set the NODEx parameters, which correspond
+//*  to the names specified in the IMSGEN macro.
+//*
+//*  The default name of the callable services library data set
+//*  is SYS1.CSSLIB.
+//*  If your installation overrides this default value
+//*  in the CSSLIB parameter of the sysgen IMSGEN macro,
+//*  then you should set the CSSLIB parameter of this procedure.
+//*
+//*  The default name of the System C Runtime library data set
+//*  is CEE.SCEERUN.
+//*  If your installation overrides this default value
+//*  in the SCEERUN parameter of the sysgen IMSGEN macro,
+//*  then you should set the SCEERUN parameter of this procedure.
+//*
+//***********************************************************@SCPYRT**
+//*
+//*  Licensed Materials - Property of IBM
+//*
+//*  5635-A06
+//*
+//*      Copyright IBM Corp. 2016      All Rights Reserved
+//*
+//*  US Government Users Restricted Rights - Use, duplication or
+//*  disclosure restricted by GSA ADP Schedule contract with
+//*  IBM Corp.
+//*
+//***********************************************************@ECPYRT**
+//*
+{%- set syshlq2 = ims.get('dfs_auth_lib_syshlq2', '') %}
+{%- set syshlq = ims.dfs_auth_lib_syshlq1 ~ ('.' ~ syshlq2 if syshlq2 else '') %}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+//       PROC SOUT=A,RGN=52K,SYS2=,
+//            CL1=006,CL2=000,CL3=000,CL4=000,
+//            OPT=N,OVLA=0,SPIE=0,VALCK=0,TLIM=00,
+//            PCB=000,STIMER=,SOD=,
+//            NBA=,OBA=,IMSID={{ ims.dfs_ims_ssid  }},AGN=,
+//            PREINIT=,ALTID=,PWFI=N,APARM=,
+//            LOCKMAX=,ENVIRON=,
+//            JVMOPMAS=,PRLD=,SSM=,PARDLI=,
+//            MINTHRD=000,MAXTHRD=256,
+//            CSSLIB='{{ reg.zcloud_csslib }}',
+//            SCEERUN='{{ reg.zcloud_leruntime }}',
+//            SCEERUN2='{{ reg.zcloud_leruntime }}2'
+//*
+//JMPRGN EXEC PGM=DFSRRC00,REGION=&RGN,
+//            TIME=1440,DPRTY=(12,0),
+//            PARM=(JMP,&CL1&CL2&CL3&CL4,
+//            &OPT&OVLA&SPIE&VALCK&TLIM&PCB,
+//            &STIMER,&SOD,&NBA,
+//            &OBA,&IMSID,&AGN,&PREINIT,
+//            &ALTID,&PWFI,'&APARM',&LOCKMAX,
+//            &ENVIRON,,&JVMOPMAS,&PRLD,
+//            &SSM,&PARDLI,
+//            &MINTHRD,&MAXTHRD)
+//*
+//*
+//STEPLIB  DD DSN={{ ims.dfs_auth_lib_hlq1 }}.{{ ims.dfs_auth_lib_hlq2 }}.&SYS2.PGMLIB,DISP=SHR
+//         DD DSN={{ syshlq }}.SDFSJLIB,DISP=SHR
+//         DD DSN={{ syshlq }}.&SYS2.SDFSRESL,DISP=SHR
+//         DD DSN={{ syshlq }}.SDFSRESL,DISP=SHR
+//         DD DSN={{ ims.dsnexit }},DISP=SHR
+//         DD DSN={{ ims.dsnlod2 }},DISP=SHR
+//         DD DSN={{ ims.dsnload }},DISP=SHR
+//         DD DSN=&SCEERUN,DISP=SHR
+//         DD DSN=&SCEERUN2,DISP=SHR
+//         DD DSN=&CSSLIB,DISP=SHR
+//PROCLIB  DD DSN={{ ims.dfs_auth_lib_hlq1 }}.{{ ims.dfs_auth_lib_hlq2 }}.&SYS2.PROCLIB,DISP=SHR
+//DFSESL   DD DSN={{ syshlq }}.SDFSRESL,DISP=SHR
+//         DD DSN={{ ims.dsnexit }},DISP=SHR
+//         DD DSN={{ ims.dsnlod2 }},DISP=SHR
+//         DD DSN={{ ims.dsnload }},DISP=SHR
+//SYSUDUMP DD SYSOUT=&SOUT,
+//         DCB=(LRECL=121,BLKSIZE=3129,RECFM=VBA),
+//         SPACE=(125,(2500,100),RLSE,,ROUND)
+//STDERR   DD SYSOUT=&SOUT  
+//STDOUT   DD SYSOUT=&SOUT  
+//SYSPRINT DD SYSOUT=&SOUT  
+//DFSOPT   DD *
+  JVM=3164
+/*
+//*

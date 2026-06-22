@@ -34,9 +34,9 @@ export DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 
 export TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
 export ZOS_CONNECT_SERVER_FOLDER="${ZOS_CONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
 export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)"
-export INSTALL_APP="${1:-""}"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
+export PYTHONUNBUFFERED=1 
 # =========================
 # Output directories
 # =========================
@@ -153,12 +153,6 @@ done
 
 print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for BankZ"
 
-if [ "$INSTALL_APP" = "true" ]; then
-    TAGS="-pt deploy"
-else
-    TAGS=""
-fi
-
 CICS_CREDS=""
 if [ -n "${CICS_USER:-}" ]; then
     CICS_CREDS="$CICS_CREDS -e default_cics_user=$CICS_USER"
@@ -173,13 +167,14 @@ CMD="wazideploy-deploy \
  --workingFolder ${DEPLOY_LOG_FOLDER}/work-bankz \
  --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
  --envFile $DEPLOY_ENV_FILE \
+ -e script_dir=$SCRIPTS_DIR \
  -e application=$APP_BASE_NAME \
  -e hlq=$TARGET_HLQ \
  -e deploy_cfg_home=$ZDEPLOY_FOLDER \
  -e zos_connect_root=$ZOS_CONNECT_SERVER_FOLDER \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
- --evidencesFileName ${evidenceDir}/evidence-bankz.yaml $TAGS"
+ --evidencesFileName ${evidenceDir}/evidence-bankz.yaml $@"
 
 rm -f message.log
 

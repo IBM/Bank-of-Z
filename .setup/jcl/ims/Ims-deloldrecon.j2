@@ -1,0 +1,37 @@
+{{ ims.jobcard -}}
+{%- if 'REG=' not in ims.jobcard and 'REGION=' not in ims.jobcard %},
+//  REGION=0M
+{%- endif %}
+//***************************************************************
+//INIT      EXEC PGM=DSPURX00
+//STEPLIB  DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.SDFSRESL
+//         DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.SDFSRESL
+//SYSPRINT DD SYSOUT=*
+//IMS       DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.DBDLIB
+//*        DD DISP=SHR,
+//*     DSN=IMSPERF.IDBCTK01.RESLIB(DFSCD000)
+//*        DD DISP=SHR,
+//*     DSN=IMSPERF.IDBCTK01.RESLIB(DFSCX000)
+//RECON1  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon1 }}
+//RECON2  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon2 }}
+{%- if ims.dfs_recon3 is defined and ims.dfs_recon3 != '' %}
+//RECON3  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon3 }}
+{%- endif %}
+//SYSIN    DD *
+ DELETE.DBDS  DBD(CUSTOMER) DDN(CUSTOMER)
+ DELETE.DB    DBD(CUSTOMER)
+ DELETE.DBDS  DBD(ACCOUNT) DDN(ACCOUNT)
+ DELETE.DB    DBD(ACCOUNT)
+ DELETE.DBDS  DBD(CUSTACCS) DDN(CUSTACCS)
+ DELETE.DB    DBD(CUSTACCS)
+ DELETE.DBDS DBD(HISTORY) DDN(HISTORY)
+ DELETE.DB DBD(HISTORY)
+ DELETE.DBDS DBD(TSTAT) DDN(TSTAT) 
+ DELETE.DB DBD(TSTAT)
+

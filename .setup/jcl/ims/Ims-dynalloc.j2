@@ -1,0 +1,175 @@
+{{ ims.jobcard -}}
+{%- if 'REG=' not in ims.jobcard and 'REGION=' not in ims.jobcard %},
+//  REGION=0M
+{%- endif %}
+//*******************************************************************
+//*  SCRATCH ACCOUNT DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ ims.ims_hlq }}.ACCOUNT.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+/*
+//*******************************************************************
+//*  SCRATCH HISTORY DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ ims.ims_hlq }}.HISTORY.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+/*
+//*******************************************************************
+//*  SCRATCH TSTAT DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ ims.ims_hlq }}.TSTAT.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+/*
+//*******************************************************************
+//*  SCRATCH CUSTACCS DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ ims.ims_hlq }}.CUSTACCS.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+/*
+//*******************************************************************
+//*  SCRATCH CUSTOMER DB DATASET
+//*******************************************************************
+//SCRATCH  EXEC PGM=IDCAMS,DYNAMNBR=200
+//AMSDUMP  DD DUMMY
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DELETE {{ ims.ims_hlq }}.CUSTOMER.DB -
+         NONVSAM SCRATCH
+  SET MAXCC=0
+/*
+//*******************************************************************
+//*  ALLOCATE ACCOUNT DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ ims.ims_hlq }}.ACCOUNT.DB,
+//             VOL=SER={{ ims.dfs_ds_volume_1 }},
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//*******************************************************************
+//*  ALLOCATE HISTORY DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ ims.ims_hlq }}.HISTORY.DB,
+//             VOL=SER={{ ims.dfs_ds_volume_1 }},
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//*******************************************************************
+//*  ALLOCATE TSTAT DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ ims.ims_hlq }}.TSTAT.DB,
+//            VOL=SER={{ ims.dfs_ds_volume_1 }},
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//*******************************************************************
+//*  ALLOCATE CUSTACCS DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ ims.ims_hlq }}.CUSTACCS.DB,
+//            VOL=SER={{ ims.dfs_ds_volume_1 }},
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//*******************************************************************
+//*  ALLOCATE CUSTOMER DB DATASET
+//*******************************************************************
+//ALLOC   EXEC PGM=IEFBR14
+//SYSPRINT  DD SYSOUT=*
+//A1        DD DSN={{ ims.ims_hlq }}.CUSTOMER.DB,
+//             VOL=SER={{ ims.dfs_ds_volume_1 }},
+//             SPACE=(CYL,(5,1)),UNIT=SYSDA,DISP=(,CATLG),
+//             DCB=(RECFM=F,LRECL=8192,BLKSIZE=8192)
+/*
+//***************************************************************
+//*   THIS JOB HAS BEEN RUN ONCE FOR EACH REPLICATE SUFFIX.
+//*   IT NEED NOT BE RUN AGAIN UNLESS THE DFSMDA DATASET IS LOST.
+//*  DFSMDA DATASET: '{{ ims.ims_hlq }}.DYNALL'
+//*  USING : 'IMSPERF.IMS13R.MACLIB'
+//****************************************************************
+//IMSDALOC  PROC  SOUT=*
+//ASSEM  EXEC PGM=ASMA90,PARM='ALIGN,DECK,NOOBJECT'
+//STEPLIB  DD DSN={{ ims.asm_lib_hlq }},DISP=SHR
+//SYSLIB   DD DISP=SHR,DSN={{ ims.ims_hlq }}.SDFSMAC
+//         DD DISP=SHR,DSN=SYS1.MACLIB
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(10,5))
+//SYSPUNCH DD DSN=&OBJMOD,DCB=(RECFM=FB,LRECL=80,BLKSIZE=400),
+//            SPACE=(CYL,(50,10)),UNIT=SYSDA,DISP=(NEW,PASS)
+//SYSPRINT DD SYSOUT=&SOUT
+//BLDMBR EXEC PGM=IEBUPDTE,PARM='NEW',COND=(7,LT,ASSEM)
+//SYSPRINT DD DUMMY
+//SYSUT2   DD DSN=&TEMPPDS,UNIT=SYSDA,DISP=(NEW,PASS,DELETE),
+//            SPACE=(CYL,(50,10,100)),DCB=(RECFM=F,BLKSIZE=80)
+//SYSIN    DD DSN=*.ASSEM.SYSPUNCH,DISP=(OLD,DELETE,DELETE)
+//LNKEDT EXEC PGM=IEWL,PARM='LIST,XREF,LET',
+//            COND=((7,LT,ASSEM),(3,LT,BLDMBR))
+//SYSUT1   DD UNIT=SYSDA,SPACE=(1024,(100,50))
+//SYSLIB   DD DUMMY
+//SYSPRINT DD SYSOUT=&SOUT
+//SYSLMOD  DD DISP=SHR,DSN={{ ims.ims_hlq }}.SDFSRESL
+//OBJMOD   DD DSN=&TEMPPDS,DISP=(OLD,DELETE,DELETE)
+//SYSLIN   DD DSN=&TEMPPDS(LNKCTL),DISP=(OLD,DELETE,DELETE),
+//            VOL=REF=*.OBJMOD
+// PEND
+//*
+//STEP01A  EXEC PROC=IMSDALOC
+//ASSEM.SYSIN DD *
+         DFSMDA TYPE=INITIAL
+******************************************************
+         DFSMDA TYPE=DATABASE,DBNAME=HISTORY
+         DFSMDA TYPE=DATASET,DDNAME=HISTORY,                           X
+               DSNAME={{ ims.ims_hlq }}.HISTORY.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=CUSTACCS
+         DFSMDA TYPE=DATASET,DDNAME=CUSTACCS,                          X
+               DSNAME={{ ims.ims_hlq }}.CUSTACCS.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=CUSTOMER
+         DFSMDA TYPE=DATASET,DDNAME=CUSTOMER,                          X
+               DSNAME={{ ims.ims_hlq }}.CUSTOMER.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=TSTAT
+         DFSMDA TYPE=DATASET,DDNAME=TSTAT,                             X
+               DSNAME={{ ims.ims_hlq }}.TSTAT.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=TTYPE
+         DFSMDA TYPE=DATASET,DDNAME=TTYPE,                             X
+               DSNAME={{ ims.ims_hlq }}.TTYPE.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=ACCTYPE
+         DFSMDA TYPE=DATASET,DDNAME=ACCTYPE,                           X
+               DSNAME={{ ims.ims_hlq }}.ACCTYPE.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=ACCOUNT
+         DFSMDA TYPE=DATASET,DDNAME=ACCOUNT,                           X
+               DSNAME={{ ims.ims_hlq }}.ACCOUNT.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=TSTATTYP
+         DFSMDA TYPE=DATASET,DDNAME=TSTATTYP,                          X
+               DSNAME={{ ims.ims_hlq }}.TSTATTYP.DB,DISP=SHR
+         DFSMDA TYPE=DATABASE,DBNAME=CUSTTYPE
+         DFSMDA TYPE=DATASET,DDNAME=CUSTTYPE,                          X
+               DSNAME={{ ims.ims_hlq }}.CUSTTYPE.DB,DISP=SHR
+******************************************************
+         DFSMDA TYPE=FINAL
+         END
+/*

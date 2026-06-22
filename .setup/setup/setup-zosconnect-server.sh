@@ -146,7 +146,7 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
         <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
     </connectionFactory>
 
-    <zosconnect_authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
 

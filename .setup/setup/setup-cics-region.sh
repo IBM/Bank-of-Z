@@ -31,6 +31,7 @@ export ZCS_HOME=$(get_section_value 'zconfig' 'zcb_home')
 export ZCS_HOME=$(echo "$ZCS_HOME" | sed "s|~|$HOME|g")
 export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export DBB_BUILD_PATH=$(get_section_value 'dbb' 'dbb_build')
+export EQAW_HLQ=$(get_section_value 'taz' 'hlq')
 
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
@@ -140,6 +141,7 @@ zconfig apply \
   -e region_uss_dir="$SANDBOX_DIR" \
   -e java_home="/usr/lpp/java/java21/current_64" \
   -e cmci_port="$CMCI_PORT" \
+  -e eqaw_hlq="$EQAW_HLQ" \
   cics-region.yaml
 
 RC=$?

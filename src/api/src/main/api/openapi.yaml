@@ -7,7 +7,7 @@ info:
   version: 1.0.0
   contact:
     name: Bank of Z API Support
-    email: api-support@bankofz.com
+    email: api-support@bankofz.example.com
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -466,8 +466,8 @@ components:
       description: OAuth2 authentication for secure API access
       flows:
         authorizationCode:
-          authorizationUrl: https://auth.bankofz.com/oauth/authorize
-          tokenUrl: https://auth.bankofz.com/oauth/token
+          authorizationUrl: https://auth.bankofz.example.com/oauth/authorize
+          tokenUrl: https://auth.bankofz.example.com/oauth/token
           scopes:
             accounts: Access to account information
             customers: Access to customer information

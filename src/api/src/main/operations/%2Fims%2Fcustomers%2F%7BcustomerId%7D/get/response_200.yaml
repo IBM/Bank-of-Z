@@ -18,7 +18,7 @@ mappings:
     - email:
         required: true
         nullable: false
-        template: "customer@bankofz.com"
+        template: "customer@bankofz.example.com"
     - phoneNumber:
         required: false
         nullable: false

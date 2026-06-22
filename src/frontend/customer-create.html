@@ -51,25 +51,62 @@
                         <cds-select-item value="Lady">Lady</cds-select-item>
                         <cds-select-item value="Lord">Lord</cds-select-item>
                     </cds-select>
-                    <cds-text-input 
-                        id="fullName" 
-                        label="Full name" 
-                        placeholder="Enter full name"
+                    <cds-text-input
+                        id="firstName"
+                        label="First name"
+                        placeholder="Enter first name"
+                        maxlength="50"
                         required>
                     </cds-text-input>
-                    <cds-text-input 
-                        id="addressLine1" 
-                        label="Address line 1" 
-                        placeholder="Enter address"
+                    <cds-text-input
+                        id="lastName"
+                        label="Last name"
+                        placeholder="Enter last name"
+                        maxlength="50"
                         required>
                     </cds-text-input>
-                    <cds-text-input 
-                        id="city" 
-                        label="City" 
+                    <cds-text-input
+                        id="phoneNumber"
+                        label="Phone number"
+                        placeholder="Enter phone number"
+                        maxlength="20"
+                        required>
+                    </cds-text-input>
+                    <cds-text-input
+                        id="addressLine1"
+                        label="Address line 1"
+                        placeholder="Enter address line 1"
+                        maxlength="50"
+                        required>
+                    </cds-text-input>
+                    <cds-text-input
+                        id="addressLine2"
+                        label="Address line 2"
+                        placeholder="Enter address line 2"
+                        maxlength="50">
+                    </cds-text-input>
+                    <cds-text-input
+                        id="city"
+                        label="City"
                         placeholder="Enter city"
+                        maxlength="50"
                         required>
                     </cds-text-input>
-                    <cds-date-picker>
+                    <cds-text-input
+                        id="postalCode"
+                        label="Postcode"
+                        placeholder="Enter postcode"
+                        maxlength="10"
+                        required>
+                    </cds-text-input>
+                    <cds-text-input
+                        id="country"
+                        label="Country"
+                        placeholder="Enter country"
+                        maxlength="50"
+                        required>
+                    </cds-text-input>
+                    <cds-date-picker date-format="d/m/Y">
                         <cds-date-picker-input 
                             id="dateOfBirth"
                             kind="single" 
@@ -121,53 +158,106 @@
             });
         });
         
+        // Mirrors the OpenAPI constraints in src/api/src/main/api/openapi.yaml#CreateCustomerRequest.
+        // The backend (CRECUST COBOL) silently truncates over-length names instead of
+        // rejecting them, so this is the only place that actually stops it.
+        function validateCustomerData({ firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country }) {
+            const requiredFields = {
+                'First name': firstName,
+                'Last name': lastName,
+                'Phone number': phoneNumber,
+                'Date of birth': dateOfBirth,
+                'Address line 1': addressLine1,
+                'City': city,
+                'Postal code': postalCode,
+                'Country': country
+            };
+            const missing = Object.entries(requiredFields)
+                .filter(([label, value]) => !value)
+                .map(([label]) => label);
+            if (missing.length > 0) {
+                return `Please fill in: ${missing.join(', ')}`;
+            }
+            const maxLengths = {
+                'First name': [firstName, 50],
+                'Last name': [lastName, 50],
+                'Phone number': [phoneNumber, 15],
+                'Address line 1': [addressLine1, 100],
+                'Address line 2': [addressLine2, 100],
+                'City': [city, 50],
+                'Postal code': [postalCode, 10],
+                'Country': [country, 50]
+            };
+            for (const [label, [value, max]] of Object.entries(maxLengths)) {
+                if (value && value.length > max) {
+                    return `${label} must be ${max} characters or fewer (currently ${value.length})`;
+                }
+            }
+            if (dateOfBirth) {
+                const parsed = parseDate(dateOfBirth);
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(parsed)) {
+                    return 'Date of birth must be a valid date';
+                }
+            }
+            return null;
+        }
+
         async function createCustomer() {
-            // Get form values
             const title = document.getElementById('title').value;
-            const fullName = document.getElementById('fullName').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
             const dateOfBirth = document.getElementById('dateOfBirth').value;
             const addressLine1 = document.getElementById('addressLine1').value;
+            const addressLine2 = document.getElementById('addressLine2').value;
             const city = document.getElementById('city').value;
-            
-            // Validate required fields
-            if (!title || !fullName || !addressLine1 || !city) {
-                showErrorModal('Validation Error', 'Please fill in all required fields');
+            const postalCode = document.getElementById('postalCode').value;
+            const country = document.getElementById('country').value;
+
+            const validationError = validateCustomerData({
+                firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
+            });
+            if (validationError) {
+                showErrorModal('Validation Error', validationError);
                 return;
             }
-            
-            // Prepare data
-            const customerAddress = `${addressLine1}, ${city}`;
-            const customerName = `${title} ${fullName}`;
-            const formattedDOB = dateOfBirth ? parseDate(dateOfBirth) : '';
-            
+
             const customerData = {
-                customerName: customerName,
-                customerAddress: customerAddress,
-                dateOfBirth: formattedDOB,
-                sortCode: config.defaults.sortCode
+                title: title || undefined,
+                firstName,
+                lastName,
+                dateOfBirth: dateOfBirth ? parseDate(dateOfBirth) : undefined,
+                phoneNumber: phoneNumber || undefined,
+                address: {
+                    addressLine1,
+                    addressLine2: addressLine2 || undefined,
+                    city,
+                    postalCode: postalCode || undefined,
+                    country: country || undefined
+                },
+                customerStatus: 'ACTIVE'
             };
-            
-            // Show loading
+
             showLoadingModal('Creating customer...');
-            
+
             try {
                 const response = await api.customers.createCustomer(customerData);
                 hideLoadingModal();
-                
+
                 showSuccessModal(
                     'Customer created successfully',
-                    `A customer profile for ${fullName} has been created. Customer ID: ${response.id}`,
+                    `A customer profile for ${firstName} ${lastName} has been created. Customer ID: ${response.customerId}`,
                     () => {
                         window.location.href = 'customer-details.html';
                     }
                 );
             } catch (error) {
                 hideLoadingModal();
-                
-                if (error.message.includes('Failed to fetch')) {
+
+                if (error.message && error.message.includes('Failed to fetch')) {
                     showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
                 } else {
-                    showErrorModal('Error', 'Failed to create customer. Please try again.');
+                    showErrorModal('Error', error.message || 'Failed to create customer. Please try again.');
                 }
             }
         }

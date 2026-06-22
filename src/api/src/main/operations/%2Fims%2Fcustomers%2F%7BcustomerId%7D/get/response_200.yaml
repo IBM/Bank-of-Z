@@ -30,7 +30,8 @@ mappings:
         - addressLine1:
             required: false
             nullable: false
-            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ADDRESS-OUT\"}}"
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ADDRESS-OUT\"\
+              }}"
         - city:
             required: false
             nullable: false
@@ -38,7 +39,8 @@ mappings:
         - postalCode:
             required: false
             nullable: false
-            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ZIPCODE-OUT\"}}"
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ZIPCODE-OUT\"\
+              }}"
     - customerStatus:
         required: false
         nullable: false

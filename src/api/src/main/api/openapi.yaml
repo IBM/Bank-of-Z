@@ -160,6 +160,35 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /customers:
+    post:
+      tags:
+        - Customers
+      summary: Create a new customer
+      description: Create a new customer record via the CICS CRECUST program
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedCustomer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /customers/{customerId}:
     get:
       tags:
@@ -445,6 +474,62 @@ components:
             transactions: Access to transaction history
 
   schemas:
+    CreateCustomerRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+      properties:
+        title:
+          type: string
+          description: Customer title (must be one of the valid values accepted by CRECUST)
+          enum: [Professor, Mr, Mrs, Miss, Ms, Dr, Drs, Lord, Sir, Lady]
+          example: "Mr"
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Customer first name
+          example: "John"
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Customer last name
+          example: "Smith"
+        dateOfBirth:
+          type: string
+          format: date
+          description: Customer date of birth (YYYY-MM-DD)
+          example: "1985-06-15"
+        phoneNumber:
+          type: string
+          maxLength: 20
+          description: Customer phone number
+          example: "+44 20 7946 0958"
+        address:
+          $ref: '#/components/schemas/Address'
+        customerStatus:
+          type: string
+          maxLength: 10
+          description: Customer status
+          example: "ACTIVE"
+
+    CreatedCustomer:
+      type: object
+      required:
+        - customerId
+        - sortCode
+      properties:
+        customerId:
+          type: string
+          description: The newly assigned customer ID
+          example: "0000000042"
+        sortCode:
+          type: string
+          description: The bank sort code for this customer
+          example: "987654"
+
     Customer:
       type: object
       required:

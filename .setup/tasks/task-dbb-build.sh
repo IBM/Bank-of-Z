@@ -33,8 +33,9 @@ export DBB_LOG_FOLDER=$(get_section_value 'dbb' 'dbb_log_dir')
 export JAVA_HOME=$(get_section_value 'dbb' 'java_home')
 export API_BASE=$(get_section_value 'dbb' 'api_base')
 export PATH="$JAVA_HOME/bin:$DBB_HOME/bin:$PATH"
-export GRADLE_USER_HOME="$(get_section_value 'sandbox' 'path')/../.gradle"
+export GRADLE_USER_HOME="$SANDBOX_DIR/../.gradle"
 export GRADLE_OPTS="-Dfile.encoding=UTF-8"
+export MAVEN_OPTS="-Dmaven.repo.local=$SANDBOX_DIR/../.m2/repository"
 
 # =========================
 # Temporary log
@@ -151,6 +152,13 @@ if [ $? -eq 0 ]; then
     exit 0
 fi
 set -e
+
+# =========================
+# Build IMS java code
+# =========================
+cd src/base/ims/java
+$SANDBOX_DIR/../tools/apache-maven-3.6.3/bin/mvn  clean install -DoutputDir=$SANDBOX_DIR/jars
+cd -
 
 # =========================
 # Collect tar file

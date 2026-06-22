@@ -1,8 +1,8 @@
 #!/bin/env bash
 set -e
 # =============================================================================
-# Script  : setup-db2-tables.sh
-# Summary : DB2 table creation
+# Script  : setup-ims-tables.sh
+# Summary : IMS table creation
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
 # - Drops existing tables
@@ -24,16 +24,25 @@ export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
 # =========================
-# Create DB2 tables
+# Delele IMS tables
 # =========================
-rm -f "/tmp/IMS-Db2-*"
-rm -f "/tmp/Db2-*"
-run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/Db2-drop.jcl" "8"
-run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/Db2-create.jcl"
+set +e
+drm "BANKZ.IMS2.ACCOUNT.DB" 2>/dev/null
+drm "BANKZ.IMS2.ACCTYPE.DB" 2>/dev/null
+drm "BANKZ.IMS2.CUSTACCS.DB" 2>/dev/null
+drm "BANKZ.IMS2.CUSTOMER.DB" 2>/dev/null
+drm "BANKZ.IMS2.CUSTTYPE.DB" 2>/dev/null
+drm "BANKZ.IMS2.HISTORY.DB" 2>/dev/null
+drm "BANKZ.IMS2.TSTAT.DB" 2>/dev/null
+drm "BANKZ.IMS2.TSTATTYP.DB" 2>/dev/null
+drm "BANKZ.IMS2.TTYPE.DB" 2>/dev/null
+set -e
+
+# =========================
+# IMS dynalloc
+# =========================
+rm -f "/tmp/IMS-table-*"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "jobname=DB2DROP" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-drop.j2"  --outputFile "/tmp/IMS-Db2-drop-$$.jcl"
-run_job_and_wait "/tmp/IMS-Db2-drop-$$.jcl" "8"
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "jobname=DB2CRE" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-create.j2"  --outputFile "/tmp/IMS-Db2-create-$$.jcl"
-run_job_and_wait "/tmp/IMS-Db2-create-$$.jcl" 
+    --extraVar "jobname=DYNALLOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-dynalloc.j2"  --outputFile "/tmp/IMS-table-$$.jcl"
+run_job_and_wait "/tmp/IMS-table-$$.jcl" 
 exit $?

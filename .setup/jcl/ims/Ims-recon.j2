@@ -1,0 +1,41 @@
+{{ ims.jobcard -}}
+{%- if 'REG=' not in ims.jobcard and 'REGION=' not in ims.jobcard %},
+//  REGION=0M
+{%- endif %}
+//***************************************************************
+//INIT      EXEC PGM=DSPURX00
+//STEPLIB  DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.SDFSRESL
+//         DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.SDFSRESL
+//SYSPRINT DD SYSOUT=*
+//IMS       DD DISP=SHR,
+//      DSN={{ ims.ims_hlq }}.DBDLIB
+//*        DD DISP=SHR,
+//*     DSN=IMSPERF.IDBCTK01.RESLIB(DFSCD000)
+//*        DD DISP=SHR,
+//*     DSN=IMSPERF.IDBCTK01.RESLIB(DFSCX000)
+//RECON1  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon1 }}
+//RECON2  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon2 }}
+{%- if ims.dfs_recon3 is defined and ims.dfs_recon3 != '' %}
+//RECON3  DD DISP=SHR,
+//      DSN={{ ims.dfs_recon3 }}
+{%- endif %}
+//SYSIN    DD *
+ INIT.DB   DBD(CUSTOMER) SHARELVL(0)
+ INIT.DBDS  DBD(CUSTOMER) DDN(CUSTOMER) -
+   DSN({{ ims.ims_hlq }}.CUSTOMER.DB) GENMAX(2)
+ INIT.DB   DBD(ACCOUNT) SHARELVL(0)
+ INIT.DBDS  DBD(ACCOUNT) DDN(ACCOUNT) -
+   DSN({{ ims.ims_hlq }}.ACCOUNT.DB) GENMAX(2)
+ INIT.DB   DBD(CUSTACCS) SHARELVL(0)
+ INIT.DBDS  DBD(CUSTACCS) DDN(CUSTACCS) -
+   DSN({{ ims.ims_hlq }}.CUSTACCS.DB) GENMAX(2)
+ INIT.DB   DBD(HISTORY) SHARELVL(0)
+ INIT.DBDS  DBD(HISTORY) DDN(HISTORY) -
+   DSN({{ ims.ims_hlq }}.HISTORY.DB) GENMAX(2)
+ INIT.DB   DBD(TSTAT) SHARELVL(0)
+ INIT.DBDS  DBD(TSTAT) DDN(TSTAT) -
+   DSN({{ ims.ims_hlq }}.TSTAT.DB) GENMAX(2)

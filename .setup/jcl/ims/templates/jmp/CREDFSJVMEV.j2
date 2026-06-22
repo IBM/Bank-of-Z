@@ -1,0 +1,29 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+//*
+//* NOTE: IF THIS MEMBER EXISTS IT WILL NOT BE
+//*       REPLACED. IF YOU WISH TO USE THE SUGGESTED 
+//*       SETTINGS FOR THE JVM OPTIONS CHANGE
+//*       THE SYSIN CONTROL STATEMENT FROM ADD TO REPL
+//*
+//UPDTPRC2    EXEC PGM=IEBUPDTE,PARM=MOD                        
+//SYSPRINT DD   SYSOUT=*                                       
+//SYSUT1   DD   DSNAME={{ ims.dfs_proclib }},DISP=SHR                 
+//SYSUT2   DD   DSNAME={{ ims.dfs_proclib }},DISP=SHR                 
+//SYSIN    DD   DATA                                           
+./        {{ 'ADD' if not reg.replace_member else 'REPL' }}    NAME=DFSJVMEV,LEVEL=00,SOURCE=0,LIST=ALL 
+**********************************************************************
+* Specify the location of Java Virtual Machine (JVM) installation and
+* IMS Java native code (libT2DLI.so)
+**********************************************************************
+LIBPATH=>
+{{ java.java_home }}/lib:>
+{{ java.java_home }}/lib/j9vm:>
+{{ java.java_home }}/lib/default:>
+{{ java.java_home }}/bin/j9vm:>
+{{ java.java_home }}/bin/:>
+{{ ims.ims_java_home }}/lib:>
+{{ ims.db2_java_home }}/lib
+*
+./      ENDUP
+/*

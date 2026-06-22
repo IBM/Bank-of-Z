@@ -1,0 +1,10 @@
+{{ ims.jobcard }}
+{%- set reg = ims.get('regions', [])[region_num | int - 1] %}
+/*JOBPARM SYSAFF={{ reg.dfs_ims_syaff }}
+//JOBLIBS JCLLIB ORDER=({{ ims.dfs_proclib }},{{ ims.dfs_joblib }})
+//STARTCTL       EXEC PGM=ISFAFD
+//ISFOUT DD SYSOUT=*
+//ISFIN  DD *
+LOG
+/{{ ims.dfs_ims_ssid }}STOP REGION JOBNAME {{ ims.dfs_ims_ssid }}MPP{{ region_num | string }} 
+/*   

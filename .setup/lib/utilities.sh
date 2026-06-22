@@ -23,119 +23,14 @@
 #   - The CONFIG_FILE variable must contain the path
 #     to the YAML configuration file.
 #   - Only simple YAML structures are supported.
-_get_section_value_() {
-    section=$1
-    key=$2
-
-    awk -v section="$section" -v key="$key" '
-        # Detect top-level YAML sections.
-        # A section is expected to start without indentation.
-        /^[^ #]/ {
-            current_section = ($0 ~ "^" section ":") ? section : ""
-        }
-
-        # Search for indented keys inside the current section.
-        current_section == section && /^[[:space:]]+/ {
-
-            # Remove leading indentation.
-            sub(/^[[:space:]]+/, "")
-
-            # Check if the current line matches the requested key.
-            if ($0 ~ "^" key ":") {
-
-                # Extract everything after "key:"
-                sub(/^[^:]+:[[:space:]]*/, "")
-
-                # Remove inline comments.
-                sub(/#.*$/, "")
-
-                # Remove trailing spaces.
-                sub(/[[:space:]]+$/, "")
-
-                # Print the value and stop processing.
-                print
-                exit
-            }
-        }
-    ' "$CONFIG_FILE"
-}
-
-# Public wrapper around _get_section_value_.
-#
-# This function additionally expands variable references
-# found in the configuration value.
-#
-# Supported formats:
-#   ${section.key} -> YAML reference
-#   ${ENV_VAR}     -> shell environment variable
-#
-# Example:
-#   base:
-#     dir: /opt/app
-#
-#   logs:
-#     path: ${base.dir}/logs
-#
-# Result:
-#   /opt/app/logs
 get_section_value() {
-    section=$1
-    key=$2
+    local script_dir
 
-    expand_vars "$(_get_section_value_ "$1" "$2")"
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    python3 "${script_dir}/config.py" "$1" "$2"
 }
 
-# Expands variables found in configuration values.
-#
-# Supported substitutions:
-#
-# 1. YAML references:
-#      ${section.key}
-#
-#    Example:
-#      ${sandbox.path}
-#
-# 2. Environment variables:
-#      ${HOME}
-#
-# The function resolves values recursively.
-expand_vars() {
-    value=$1
-
-    # Resolve YAML references (${section.key})
-    while [[ "$value" =~ \$\{([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)\} ]]; do
-
-        section="${BASH_REMATCH[1]}"
-        key="${BASH_REMATCH[2]}"
-        ref="${BASH_REMATCH[0]}"
-
-        # Read referenced value from YAML config
-        resolved="$(get_section_value "$section" "$key")"
-
-        # Stop if reference cannot be resolved
-        [[ -z "$resolved" ]] && break
-
-        # Resolve nested variables recursively
-        resolved="$(expand_vars "$resolved")"
-
-        # Replace reference with resolved value
-        value="${value//$ref/$resolved}"
-    done
-
-    # Resolve shell environment variables (${VAR})
-    while [[ "$value" =~ \$\{([a-zA-Z_][a-zA-Z0-9_]*)\} ]]; do
-    
-        varname="${BASH_REMATCH[1]}"
-        ref="${BASH_REMATCH[0]}"
-    
-        # Undefined env vars become empty strings
-        resolved="${!varname:-}"
-    
-        value="${value//$ref/$resolved}"
-    done
-
-    echo "$value"
-}
 
 # Resolves a path to its canonical absolute path.
 #
@@ -249,10 +144,9 @@ run_job_and_wait() {
   local TMPJCL="/tmp/$(basename "$JCLFILE").$$"
 
   sed "s/IBMUSER/${ZOS_USER}/g" "$JCLFILE" > "$TMPJCL"
-  echo "==> Submitting $TMPJCL via jsub..."
+  echo "==> Submitting $JCLFILE via jsub ..."
 
   OUT=$(jsub -f "$TMPJCL")
-  echo "$OUT"
   rm -f "$TMPJCL"
 
   JOBID=$(echo "$OUT" | awk '{
@@ -263,39 +157,38 @@ run_job_and_wait() {
 
   [ -z "$JOBID" ] && { echo "ERROR: no JOBID returned by jsub"; return 8; }
 
-  echo "Waiting for job $JOBID..."
+  echo "==> Waiting for job $JOBID..."
 
   while :; do
     LINE=$(jls "$JOBID" 2>/dev/null | grep "$JOBID" | tail -1 || true)
     [ -n "$LINE" ] && echo "$LINE"
 
-    echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break
+    echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break 
 
     sleep 3
   done
 
-  jls "$JOBID" || true
+  FINAL=$(jls "$JOBID" | grep "$JOBID" | tail -1)
 
+  STATUS=$(echo "$FINAL" | awk '{print $4}')
+  RC=$(echo "$FINAL" | awk '{print $5}')
+
+  if [ "$STATUS" = "CC" ]; then
+    case "$RC" in
+      0000|0004)
+        return 0
+        ;;
+      0008)
+        [ "$MAXRC" = "8" ] && return 0
+        ;;
+      0012)
+        [ "$MAXRC" = "12" ] && return 0
+        ;;
+    esac
+  fi
+  echo "ERROR: Job failed: $JOBID"
   echo "===== JESYSMSG ====="
   pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
-
-FINAL=$(jls "$JOBID" | grep "$JOBID" | tail -1)
-
-STATUS=$(echo "$FINAL" | awk '{print $4}')
-RC=$(echo "$FINAL" | awk '{print $5}')
-
-if [ "$STATUS" = "CC" ]; then
-  case "$RC" in
-    0000|0004)
-      return 0
-      ;;
-    0008)
-      [ "$MAXRC" = "8" ] && return 0
-      ;;
-  esac
-fi
-
-echo "ERROR: Job failed: $JOBID"
 return 8
 }
 

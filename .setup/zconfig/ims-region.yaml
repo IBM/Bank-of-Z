@@ -1,0 +1,522 @@
+# IMS Region Configuration for Bank of Z
+# This configuration file is used by zconfig to provision an IMS region
+vars:
+  imsid: IMS2
+  ims_hlq: BANKZ.IMS2
+  ims_user: ibmuser
+  ims_password: SYS1SYS1
+ims:
+  ims_id: "{{ vars.imsid }}"
+  ims_sys_hlq: IMSV15
+  ims_hlq: "{{ vars.ims_hlq }}"
+  db2_hlq: DB2V13
+  ims_type: DB/DC
+  ims_unit: SYSALLDA
+  ims_target_user: "{{ vars.ims_user }}"
+  ims_lgmsg:
+    primary_space: 84
+    secondary_space: 63
+    unit: MB
+  ims_proclib:
+    #$hg remove list of DSN
+    members:
+    - member_name: DFSPBIMS
+      config:
+        dynamic_terminal_auto_logoff_time: 60
+        aoi_buffer_pool_upper_limit: 2047M
+        aoi_type2_security_settings: false
+        aoi_type1_security_mode: R
+        appc_enablement: false
+        appc_security_setting: F
+        ims_vtam_appl_id: IMS2
+        automatic_restart_manager_registration: false
+        dynamic_terminal_auto_signoff_time: 60
+        automatic_restart: false
+        dedb_maximum_buffer_size: 4096
+        coordinator_controller_convert_abend_on_cancel: false
+        communication_input_output_pool_maximum_size: 2048M
+        extended_mcs_console_security_setting: true
+        maximum_number_log_records_per_checkpoint_interval: 500000
+        command_recognition_character: '@'
+        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 12288
+        maximum_number_dedb_buffers: 100
+        dedb_buffer_pool_page_free_option: 0
+        dedb_additional_buffers: 10
+        recovery_control_server_name: IMS2DRC
+        database_workarea_pool_size: 24576
+        dfsdc_file_suffix: 0
+        console_message_descriptor_overide: 7
+        component_subset_configuration_file_suffix: '000' #$hg pratap has fixed it, need to merge the fix
+        database_server_name: IMS2DLI
+        database_server_private_size_for_program_scheduling_definition_files: 716800
+        undeliverable_message_purge_time: 60
+        database_scheduling_pool_size: 49152 #$hg204800
+        dynamic_terminal_descriptor_file_suffix: I
+        transaction_manager_module_storage_pool_maximum_size: 2047M
+        fast_path_message_buffer_pool_maximum_size: 2047M
+        fast_path_default_message_buffer_size: 256
+        fast_path_maximum_pcb_pool_size: 12288
+        dynamic_terminal_enablement_option: true
+        long_term_page_fixing_queue_buffer: 1
+        message_format_buffer_pool_maximum_size: 49152
+        front_end_switch_enablement: false
+        front_end_switch_timeout_value: 0
+        long_term_storage_page_fixing_options_file_suffix: DC
+        control_region_dump_formatting_option: D
+        fast_path_enablement: true
+        dedb_area_auto_open_option: false
+        dedb_auto_restart_option_after_lock_manager_reconnect: false
+        fast_path_workpool_maximum_pool_size: 2047M
+        number_of_format_fetch_request_elements: 30
+        otma_xcf_group_name: IMSXCFGN
+        high_communication_io_pool_upper_limit_expansion: 2047M
+        dependent_region_scheduling_connection_id: IMS2
+        ims_identifier: IMS2
+        time_to_calculate_iovf_free_space_for_each_open_area: 7200
+        irlm_enablement: false
+        database_lock_manager_server_name: XRLM
+        resource_access_security_checking_option: A
+        long_message_record_size: 0
+        number_of_distinct_updates_to_dedb_ci_before_combining_into_single_logrecord_of_entire_ci: 10
+        logical_terminal_hash_table_slot_count: 256
+        subordinate_database_server_enablement: S
+        static_input_terminal_option: true
+        common_buffer_pool_upper_limit_expansion_for_lu62_device_manager: 2047M
+        private_buffer_pool_upper_limit_expansion_for_lu62_device_manager: 2047M
+        maximum_number_of_application_and_system_tasks: 255
+        multiple_console_support_route_and_descriptor_codes:
+        - '2'
+        - '7'
+        highest_numbered_mfs_field_edit_exit_routine_to_be_loaded: 0
+        lowest_numbered_mfs_segment_edit_exit_routine_to_be_loaded: 127
+        multiple_systems_coupling_enablement: false
+        main_storage_database_load_option_file_name_suffix: C
+        terminal_hash_table_slot_count: 256
+        msc_parallel_session_count_for_initilization: 0
+        allocate_psb_security_enablement_for_open_database_allocation: false
+        maximum_number_of_output_threads_for_fast_path: 5
+        open_transaction_server_restart_behavior_option: true
+        otma_non_response_mode_transaction_scheduling_program_to_program_switch: false
+        allow_member_name_overide_by_otma_prerouting_exit: false
+        open_transaction_server_security_option: false
+        open_transaction_server_synchronous_output_tpipe: false
+        program_isolation_getmain_size_increment: 65536
+        program_isolation_maximum_table_size: 1048576
+        ims_proclib_reader_procedure_name: IMS2RDR
+        suffix_of_the_program_preload_list_file: DC
+        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12288
+        work_area_pool_size_for_program_scheduling_definition_files: 24576 #$hg974848
+        inital_number_of_application_and_system_tasks: 5
+        security_mixed_case_password_option: R
+        number_of_message_queue_buffers: 5
+        queue_buffer_pool_expansion_threshold: 0
+        queue_buffer_pool_compression_threshold: 0
+        queue_buffer_pool_maximum_number_of_buffers: 0
+        queue_buffer_size: 0
+        message_queue_utilization_low_threshold_notification: 50
+        message_queue_utilization_high_threshold_notification: 75
+        transaction_command_and_signon_security_option: A
+        number_of_security_tasks_for_signon: 1
+        security_class_suffix: IMS
+        restart_file_buffer_size: 4096
+        number_of_vtam_receive_any_buffers: 50
+        receive_any_buffer_size: 4096
+        load_resident_blocks_at_initialization: true
+        resource_recovery_services_enablement: false
+        password_reverification_enablement: false
+        number_of_dynamic_saveareas: 5
+        terminal_signon_security_option: Z
+        short_message_record_size: 0
+        shared_printer_router_message_exit: false
+        sysout_class_for_spin_off_dumps: 0
+        directed_load_standard_search_order: 0
+        external_subsystem_configuration_file_name: DBD1
+        ims_nucleus_file_suffix: I
+        ims_type_2_svc_number: 203
+        shared_vso_remote_site_emergency_restart_option: NONE
+        time_controlled_operation_security_enablement: false
+        transaction_security_option: true
+        io_pcb_timestamp_format: L
+        number_of_user_hash_table_slots: 256
+        user_messaage_table_enablement: false
+        vtam_authorized_path_facility_enablement: 1
+        dfsvsm_file_suffix: DC
+        work_area_pool_maximum_size: 49152
+        four_digit_year_timestamp: false
+    - member_name: DFSDF000
+      config:
+        common_service_layer:
+          cmdsec: false
+          imsplex: PLEX2
+          modblks: DYN
+        dynamic_resources:
+          autoexport: AUTO
+          autoimport: AUTO
+          rddsdsn:
+          - "{{ vars.ims_hlq }}.RDDS1"
+          - "{{ vars.ims_hlq }}.RDDS2"
+          - "{{ vars.ims_hlq }}.RDDS3"
+        logger:
+          oldsdef:
+            olds:
+            - '00'
+            - '01'
+            - '02'
+            - '03'
+            - '04'
+            - '05'
+            - '99'
+            bufno: 5
+            mode: DUAL
+          wadsdef:
+            wads:
+            - '0'
+            - '1'
+            - '8'
+            - '9'
+          arc: 3
+        catalog:
+          catalog: true
+          alias: DFSC
+          retention:
+            days: 40
+            versions: 55
+          acbmgmt: CATALOG
+          access: UPDATE
+          ixvolser: IMSV15
+    - member_name: DFSFIXDC
+      config:
+        nuc: 33
+    - member_name: DFSDRFDC
+      config: {}
+    - member_name: DBFMSDBC
+      config:
+        msdb:
+        - dbd: DBFSAMD1
+          nbrsegs: '2'
+          page_fixed: true
+        - dbd: DBFSAMD2
+          nbrsegs: '2'
+          page_fixed: true
+        - dbd: IVPDB4
+          nbrsegs: '6'
+          page_fixed: true
+    - member_name: DFSMPLDC
+      config:
+        modules:
+        - CSQACLST
+        - CSQAMLST
+        - CSQAPRH
+        - CSQAVICM
+        - CSQFSALM
+        - CSQQDEFV
+        - CSQQCONN
+        - CSQQDISC
+        - CSQQTERM
+        - CSQQINIT
+        - CSQQBACK
+        - CSQQCMMT
+        - CSQQESMT
+        - CSQQPREP
+        - CSQQTTHD
+        - CSQQWAIT
+        - CSQQNORM
+        - CSQQSSOF
+        - CSQQSSON
+        - CSQFSTAB
+        - CSQQRESV
+        - CSQQSNOP
+        - CSQQCMND
+        - CSQQCVER
+        - CSQQTMID
+        - CSQQTRGI
+        - CSQQCON2
+    - member_name: DFSYDTI
+      config:
+        descriptors:
+        - descriptor_type: D
+          descriptor_name: IMSDTOR1
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: TPIPE1
+        - descriptor_type: D
+          descriptor_name: IMSDTOR2
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: TPIPE2
+        - descriptor_type: D
+          descriptor_name: IMSDTOR3
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: TPIPE3
+        - descriptor_type: D
+          descriptor_name: IMSDTOR4
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: TPIPE4
+        - descriptor_type: D
+          descriptor_name: IMSDTOR5
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: TPIPE5
+        - descriptor_type: D
+          descriptor_name: IMSDTOR6
+          descriptor_parameters:
+          - type: IMSCON
+          - tmember: IMS2HWS
+          - tpipe: IVPPIPE6
+    - member_name: DFSDSCMI
+      config:
+        descriptors:
+        - descriptor_type: L
+          descriptor_name: DFSFIN
+          descriptor_parameters:
+            unitype: FINANCE
+        - descriptor_type: L
+          descriptor_name: DFS3270
+          descriptor_parameters:
+            unitype: '3270'
+        - descriptor_type: L
+          descriptor_name: DFSSLU1
+          descriptor_parameters:
+            unitype: SLUTYPE1
+        - descriptor_type: L
+          descriptor_name: DFSSLU2
+          descriptor_parameters:
+            unitype: SLUTYPE2
+        - descriptor_type: L
+          descriptor_name: DFSSLUP
+          descriptor_parameters:
+            unitype: SLUTYPEP
+        - descriptor_type: L
+          descriptor_name: DFSLU61
+          descriptor_parameters:
+            unitype: LUTYPE6
+        - descriptor_type: L
+          descriptor_name: DFSSLU4
+          descriptor_parameters:
+            unitype: SLUTYPE4
+        - descriptor_type: L
+          descriptor_name: DFSNTO
+          descriptor_parameters:
+            unitype: NTO
+        - descriptor_type: L
+          descriptor_name: DFS327P
+          descriptor_parameters:
+            unitype: '3270'
+            unit: '3284'
+        - descriptor_type: L
+          descriptor_name: DFSTCP
+          descriptor_parameters:
+            unitype: ISCTCPIP
+            lclicon: HWS1
+        - descriptor_type: U
+          descriptor_name: DFSUSER
+          descriptor_parameters:
+            lterm:
+            - DFSUSER
+            - ULC
+            options:
+            - SYSINFO
+            - TRANRESP
+    - member_name: DFSVSMDC
+      config:
+        vsam_subpool_definition:
+        - buffer_size: '20480'
+          number_of_buffers: '4'
+        - buffer_size: '8192'
+          number_of_buffers: '4'
+        - buffer_size: '2048'
+          number_of_buffers: '4'
+        - buffer_size: '1024'
+          number_of_buffers: '8'
+        osam_subpool_definition:
+        - buffer_size: '8192'
+          number_of_buffers: '4'
+          keep_buffer_in_memory: N
+          keep_buffer_prefix_in_memory: N
+        - buffer_size: '6144'
+          number_of_buffers: '4'
+          keep_buffer_in_memory: N
+          keep_buffer_prefix_in_memory: N
+        - buffer_size: '2048'
+          number_of_buffers: '4'
+          keep_buffer_in_memory: N
+          keep_buffer_prefix_in_memory: N
+        serviceability_and_trace_options:
+          disp: 'ON'
+          dl/i: 'ON'
+          dlog: 'ON'
+          latc: 'ON'
+          lock: 'ON'
+          qmgr: 'ON'
+          schd: 'ON'
+          sqtt: 'ON'
+          strg: 'ON'
+    - member_name: CSLSI000
+      config:
+        armrst: N
+        sciname: 2SCI1
+        imsplex:
+          name: PLEX2
+    - member_name: CSLOI000
+      config:
+        armrst: N
+        cmdlang: ENU
+        cmdsec: N
+        omname: 2OM1
+        imsplex:
+          name: PLEX2
+          auditlog: SYSLOG.OM2Q01.LOG
+        cmdtextdsn: IMSV15.SDFSDATA
+    - member_name: CSLRI000
+      config:
+        armrst: N
+        rmname: 2RM1
+        imsplex:
+          name: PLEX2
+    - member_name: HWSCFODB
+      config:
+        hws:
+          id: IMS2HWS
+          xibarea: 100
+          racf: false
+          rrs: false
+        tcpip:
+          hostname: TCPIP
+          portid:
+          - '9977'
+          - LOCAL
+          racfid: SYS1
+          timeout: 5000
+          ipv6: true
+          sslport: 9966
+          sslenvar: HWSDPSSL
+          maxsoc: 600
+          exit:
+          - HWSIMSO0
+          - HWSIMSO1
+          - HWSSMPL0
+          - HWSSMPL1
+          - HWSCSLO0
+          - HWSCSLO1
+          - HWSSOAP1
+          - HWSDPWR1
+        datastore:
+          id: IMS2
+          group: IMSXCFGN
+          member: IMS2HWS
+          tmember: IMS2
+          dru: HWSYDRU0
+          appl: APPLID1
+        imsplex:
+          member: IMS2HWS
+          tmember: PLEX2
+        adapter:
+          xml: true
+        odaccess:
+          odbmautoconn: false
+          imsplex:
+            member: HWS1
+            tmember: PLEX2
+          drdaport:
+            id: 9978
+            porttmot: 6000
+          odbmtmot: 6000
+    - member_name: BPECONFG
+      config:
+        lang: ENU
+        trace_levels:
+        - ims_component: RM
+          type: '*'
+          level: LOW
+    - member_name: BPECFGIV
+      config:
+        lang: ENU
+        trace_levels:
+        - ims_component: BPE
+          type: '*'
+          level: HIGH
+          pages: '20'
+        - ims_component: BPE
+          type: STG
+          level: MEDIUM
+        - ims_component: BPE
+          type: CBS
+          level: MEDIUM
+        - ims_component: BPE
+          type: DISP
+          level: HIGH
+        - ims_component: BPE
+          type: AWE
+          level: HIGH
+        - ims_component: BPE
+          type: SSRV
+          level: HIGH
+        - ims_component: HWS
+          type: '*'
+          level: HIGH
+          pages: '20'
+        - ims_component: HWS
+          type: HWSI
+          level: HIGH
+          pages: '100'
+        - ims_component: HWS
+          type: HWSN
+          level: HIGH
+          pages: '100'
+        - ims_component: HWS
+          type: HWSW
+          level: HIGH
+          pages: '100'
+        - ims_component: HWS
+          type: OTMA
+          level: HIGH
+          pages: '100'
+        - ims_component: HWS
+          type: TCPI
+          level: HIGH
+          pages: '100'
+        exitmbr:
+        - HWSEXIT0
+        - HWS
+    - member_name: DFSJVMEV
+      config:
+        libpath:
+        - /usr/lpp/java/java21/J21.0_64/lib
+        - /usr/lpp/java/java21/J21.0_64/lib/j9vm
+        - /usr/lpp/java/java21/J21.0_64/lib/default
+        - /usr/lpp/java/java21/J21.0_64/bin/j9vm
+        - /usr/lpp/java/java21/J21.0_64/bin/
+        - /usr/lpp/ims/imsjava/lib
+        - /usr/lpp/db2d10/jdbc/lib
+    - member_name: DFSJVMMS
+      config:
+        jvm_options:
+        - option: -Ddb2Hostname
+          value: localhost
+        - option: -Ddb2Port
+          value: 8102
+        - option: -Ddb2Location
+          value: DBD1LOC
+        - option: -Ddb2Username
+          value: "{{ vars.ims_user }}"
+        - option: -Ddb2Username
+          value: "{{ vars.ims_password }}"
+        - option: -Xoptionsfile
+          value: "/u/{{ vars.ims_user }}/dfsjvmpr.props"
+        - option: -Xmx128M
+        - option: -Xmn64M
+        - option: -XX:+Enable3164Interoperability
+    - member_name: DFSJVMAP
+      config:
+        dfsivp37: samples/ivp/ims/IMSIVP
+        ibghist: nazare/jmp/controller/QueryTransaction
+        dfsjbp: samples/ivp/ims/IMSIVPJBP
+        dfscats2: samples/ivp/opendb/OpenDBCatalogSQLType2
+        dfscatd2: samples/ivp/opendb/OpenDBCatalogDLIType2

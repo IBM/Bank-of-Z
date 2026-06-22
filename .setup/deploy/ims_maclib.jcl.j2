@@ -1,0 +1,117 @@
+{% set dbds = wd_step.artifacts | selectattr('type', 'equalto', 'DBDLOAD') | list %}
+{% set psbs = wd_step.artifacts | selectattr('type', 'equalto', 'PSBLOAD') | list %}
+//MACLIB JOB 'WD-UPTMACL',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID
+//*******************************************************************
+//*  UPDATE MANAGED ACBs - CATALOG-BASED ACB MANAGEMENT
+//*
+//*  This job imports and creates ACB definitions from the IMS Catalog
+//*  using managed ACBs (mACBs). IMS automatically manages ACBs
+//*  through the catalog when ACBMGMT=CATALOG is configured.
+//*
+//*  PREREQUISITE: DFS3UACB utility must have populated the catalog
+//*                with DBD/PSB definitions (CATPOP step)
+//*
+//*  WORKFLOW FOR NEW RESOURCES (COPY=Y):
+//*  1. IMPORT DEFN SOURCE(CATALOG) - Imports ALL staged definitions
+//*     in one step (avoids "empty staging directory" errors)
+//*  2. CREATE DB - Initializes runtime control blocks for new DBDs
+//*  3. CREATE PGM - Initializes runtime control blocks for new PSBs
+//*  4. UPDATE DB START(ACCESS) - Makes databases available for access
+//*  5. UPDATE PGM START(SCHD) - Makes programs available for scheduling
+//*
+//*  Reference: IBM IMS 15.x Documentation
+//*  - IMPORT returns COPY=Y for brand-new resources
+//*  - CREATE DB/PGM required before UPDATE when COPY=Y
+//*  - Single IMPORT without NAME() imports all staged resources
+//*******************************************************************
+//*
+//*  STEP 1: IMPORT ALL DEFINITIONS FROM CATALOG (SINGLE STEP)
+//*******************************************************************
+//IMPALL   EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    IMPORT DEFN SOURCE(CATALOG)
+/*
+//*
+//*******************************************************************
+//*  STEP 2: CREATE DATABASE RUNTIME CONTROL BLOCKS
+//*******************************************************************
+{% for item in dbds %}
+//CRE{{ loop.index }}DB  EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    CREATE DB NAME({{ item.name }})
+/*
+//*
+{% endfor %}
+//*******************************************************************
+//*  STEP 3: CREATE PROGRAM RUNTIME CONTROL BLOCKS
+//*******************************************************************
+{% for item in psbs %}
+//CRE{{ loop.index }}PG  EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    CREATE PGM NAME({{ item.name }})
+/*
+//*
+{% endfor %}
+//*******************************************************************
+//*  STEP 4: START DATABASE RESOURCES (MAKE AVAILABLE FOR ACCESS)
+//*******************************************************************
+{% for item in dbds %}
+//UPD{{ loop.index }}DB  EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    UPDATE DB NAME({{ item.name }}) START(ACCESS)
+/*
+//*
+{% endfor %}
+//*******************************************************************
+//*  STEP 5: START PROGRAM RESOURCES (MAKE AVAILABLE FOR SCHEDULING)
+//*******************************************************************
+{% for item in psbs %}
+//UPD{{ loop.index }}PG  EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    UPDATE PGM NAME({{ item.name }}) START(SCHD)
+/*
+//*
+{% endfor %}
+//*******************************************************************
+//*  STEP 6: QUERY RESOURCE STATUS (VERIFICATION)
+//*******************************************************************
+//QRYDB    EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    QUERY DB SHOW(ALL)
+/*
+//*
+//QRYPGM   EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX={{ ims_plex }},ROUTE={{ ims_route }},WAIT=30')
+//STEPLIB   DD DISP=SHR,DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//SYSPRINT  DD SYSOUT=*
+//SYSIN     DD *
+    QUERY PGM SHOW(ALL)
+/*
+//*******************************************************************
+//*  END OF MANAGED ACBs UPDATE JOB
+//*
+//*  NOTES:
+//*  - INITIATE OLC commands are NOT used with ACBMGMT=CATALOG
+//*  - IMPORT DEFN SOURCE(CATALOG) replaces /MODIFY PREPARE/COMMIT
+//*  - Resources must be registered in catalog via DFS3UACB utility
+//*  - COPY=Y requires CREATE DB/PGM before UPDATE commands
+//*  - Single IMPORT without NAME() imports all staged resources
+//*******************************************************************

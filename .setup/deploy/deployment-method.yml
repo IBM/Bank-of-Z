@@ -203,6 +203,9 @@ activities:
       - name: "CICSLOAD"
       - name: "MAPLOAD"
       - name: "JCL"
+      - name: "PSBLOAD"
+      - name: "DBDLOAD"
+      - name: "IMSLOAD"
     is_artifact: True
     plan_tags:
       - deploy
@@ -235,14 +238,14 @@ activities:
               This step performs the DB2 Bind package operations for restored DBRM members
             properties:
               - key: template
-                value: db2_bind_package    
+                value: db2_bind_package
           - name: BIND_PLAN
             short_name: BIND_PLAN
             description: |
               This step performs the DB2 Bind plan operations for restored DBRM members
             properties:
               - key: template
-                value: db2_bind_plan    
+                value: db2_bind_plan
     types:
       - name: "LOAD"
       - name: "DBRM"
@@ -315,6 +318,95 @@ activities:
               - key: "template"
                 value: "cics_cmci_prog_update"
     is_artifact: True
+
+  - name: IMS_ACB_MANAGEMENT
+    description: |
+      This activity is dedicated to the deployment of IMS with Management ACBs
+    actions:
+        - name: IMS_ACBGEN
+          description: |
+            This action is applicable when we add or modify artifacts.
+          steps:
+          - name: ACBGEN
+            description: |
+              This step build the ACBs
+            properties:
+            - key: "template"
+              value: "ims_acb_gen"
+            retry:
+              max_attempt: 2
+              interval: 1
+    types:
+      - name: 'PSBLOAD'
+      - name: 'DBDLOAD'
+    is_artifact: True
+    tags:
+    - ims_acb_management
+
+  - name: IMS_CATALOG_MANAGEMENT
+    description: |
+      This activity is dedicated to the deployment of IMS with Catalog Management ACBs
+    actions:
+        - name: IMS_CATALOG
+          description: |
+            This action is applicable when we add or modify artifacts.
+          steps:
+          - name: IMS_CATALOG
+            description: |
+              This step activates all new IMS artifacts
+            properties:
+            - key: "template"
+              value: "ims_catalog_populate"
+    is_artifact: False
+    tags:
+    - ims_catalog_management
+
+  - name: IMS_MACLIB_MANAGEMENT
+    description: |
+      This activity is dedicated to the update of MacLib
+    actions:
+        - name: IMS_MACLIB
+          description: |
+            This action is applicable when we add or modify artifacts.
+          steps:
+          - name: IMS_MACLIB
+            description: |
+              This step activates all new IMS artifacts
+            properties:
+              - key: template
+                value: job_submit
+              - key: var_job_submit
+                value: jcl_ims_maclib
+    types:
+      - name: 'PSBLOAD'
+      - name: 'DBDLOAD'
+    is_artifact: True
+    tags:
+    - ims_maclib_management
+
+  - name: IMS_SPOC_MANAGEMENT
+    description: |
+      This activity is dedicated to the update of MacLib
+    actions:
+        - name: IMS_SPOC
+          description: |
+            This action is applicable when we add or modify artifacts.
+          steps:
+          - name: IMS_SPOC
+            description: |
+              This step activates all new IMS artifacts
+            properties:
+              - key: template
+                value: job_submit
+              - key: var_job_submit
+                value: jcl_ims_spoc
+    types:
+      - name: 'PSBLOAD'
+      - name: 'DBDLOAD'
+      - name: 'IMSLOAD'
+    is_artifact: True
+    tags:
+    - ims_spoc_management
 
   - name: 'Deploy WAR files'
     description: 'Copy the z/OS Connect WAR files into the destination folder'

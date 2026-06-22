@@ -88,7 +88,33 @@ types:
        mode: 0755
     mode: 0777
     is_binary: True
-
+  - pattern: .*\.IMSLOAD$
+    pds:
+      name: "{{ ims_hlq }}.{{ ims_datastore }}.PGMLIB"
+      backup: "{{ hlq }}.BACK.PGMLIB"
+      spec: "{{ common_pds_load_spec }}"
+    is_load: True
+    aliases: True
+    force_lock: True
+    use_native_copy: true
+  - pattern: .*\.PSBLOAD$
+    pds:
+      name: "{{ ims_hlq }}.{{ ims_datastore }}.PSBLIB"
+      backup: "{{ hlq }}.BACK.PSBLIB"
+      spec: "{{ common_pds_load_spec }}"
+    is_load: True
+    is_ims_psb: True
+    force_lock: True
+    use_native_copy: true
+  - pattern: .*\.DBDLOAD$
+    pds:
+      name: "{{ ims_hlq }}.{{ ims_datastore }}.DBDLIB"
+      backup: "{{ hlq }}.BACK.DBDLIB"
+      spec: "{{ common_pds_load_spec }}"
+    force_lock: True
+    is_load: True
+    is_ims_dbd: True
+    use_native_copy: true
 type_dbrm_temp:
   - type: "DBRM"
     pattern: .*.DBRM$

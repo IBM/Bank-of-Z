@@ -1,0 +1,46 @@
+{{ ims.jobcard -}}
+{%- if 'REG=' not in ims.jobcard and 'REGION=' not in ims.jobcard %},
+//  REGION=0M
+{%- endif %}
+//*******************************************************************
+//*  PREREORG (HISTORY)
+//*******************************************************************
+//PREREORG EXEC PGM=DFSRRC00,
+//        PARM='ULU,DFSURPR0,,,,,,,,,,,,N,N',REGION=1M
+//STEPLIB  DD DSN={{ ims.ims_hlq }}.SDFSRESL,DISP=SHR
+//DFSRESLB DD DSN={{ ims.ims_hlq }}.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ ims.ims_hlq }}.DBDLIB,DISP=SHR
+//DFSURCDS DD DSN=&&CDS,UNIT=SYSDA,DISP=(,PASS),
+//            SPACE=(TRK,1),DCB=BLKSIZE=1600
+//SYSPRINT DD SYSOUT=A
+//SYSUDUMP DD SYSOUT=A
+//SYSIN    DD *
+DBIL=HISTORY
+/*
+//*******************************************************************
+//*  LOAD DB (HISTORY)
+//*******************************************************************
+//LOADSTEP EXEC PGM=DFSRRC00,
+//        PARM='DLI,LOADHIST,IBLOAD,,,,,,,,,,,N,N',REGION=0M
+//STEPLIB  DD DSN={{ ims.ims_hlq }}.PGMLIB,DISP=SHR
+//         DD DSN={{ ims.ims_hlq }}.SDFSRESL,DISP=SHR
+//DFSRESLB DD DSN={{ ims.ims_hlq }}.SDFSRESL,DISP=SHR
+//IMS      DD DSN={{ ims.ims_hlq }}.PSBLIB,DISP=SHR
+//         DD DSN={{ ims.ims_hlq }}.DBDLIB,DISP=SHR
+//PRINTDD  DD SYSOUT=A,DCB=BLKSIZE=1200
+//HISTIN   DD DISP=SHR,DSN={{ ims.ims_hlq }}.HISTORY.INPUT
+//SYSABEND DD SYSOUT=A
+//SYSPRINT DD SYSOUT=A
+//DFSURCDS DD DSN=&&CDS,DISP=(OLD,PASS)
+//DFSVSAMP DD *
+IOBF=(2048,20000,Y,Y,OA2K)
+IOBF=(2048,20000,Y,Y,OB2K)
+IOBF=(2048,20000,Y,Y,OC2K)
+IOBF=(2048,20000,Y,Y,OD2K)
+IOBF=(4096,4000,Y,Y,O04K)
+IOBF=(8192,20000,Y,Y,O08K)
+IOBF=(12288,20000,Y,Y,O12K)
+//IEFRDER  DD DUMMY
+//HISTORY  DD DISP=SHR,DSN={{ ims.ims_hlq }}.HISTORY.DB
+//PUNCHDD  DD SYSOUT=B
+//*

@@ -9,6 +9,7 @@ vars:
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
+  eqaw_hlq: "EQAW.SEQAMOD"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -39,7 +40,7 @@ cics_region:
       region: 0M
     dfhrpl:
       top_data_sets:
-        - EQAW.SEQAMOD
+        - "{{ vars.eqaw_hlq }}.SEQAMOD"
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB

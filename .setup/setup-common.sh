@@ -20,6 +20,35 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
 
 #########################################################
+# STAGE: Stop running tasks (if any)
+#########################################################
+stage_stop_tasks() {
+    set +e
+    # =========================
+    # Stop IBM IMS regions
+    # =========================
+    jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+    jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+    jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+    sleep 5
+    jcan P "IMS2JMP1" 2>/dev/null
+    jcan P "IMS2MPP1" 2>/dev/null
+    jcan P "IMS2MPP2" 2>/dev/null
+    
+    # =========================
+    # Stop IBM CICS regions
+    # =========================
+    jcan P "CICS${APP_SHORT_NAME}"  2>/dev/null
+    opercmd "C CICS${APP_SHORT_NAME}"  2>/dev/null
+    
+    # =========================
+    # Stop IBM zconn servers
+    # =========================
+    jcan P "BAQ${APP_NAME}"  2>/dev/null
+    set -e
+}
+
+#########################################################
 # STAGE: Clone Required Accelerators
 #########################################################
 stage_clone_accelerators() {
@@ -148,7 +177,7 @@ stage_copy_framework() {
 
 
 #########################################################
-# STAGE: Setup Bank of Z databse
+# STAGE: Setup Bank of Z database
 #########################################################
 stage_setup_database() {
     print_stage "STAGE: Create DB2 database"
@@ -172,6 +201,61 @@ stage_setup_database() {
     fi
 
 }
+
+#########################################################
+# STAGE: Create Bank of Z IMS database
+#########################################################
+stage_setup_ims_database() {
+    print_stage "STAGE: Create Bank of Z IMS database"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-ims-tables.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-tables.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z IMS database setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-tables.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    chmod +x .setup/setup/setup-ims-tables.sh
+    if .setup/setup/setup-ims-tables.sh; then
+        print_success "Bank of Z application setup completed successfully"
+    else
+        print_error "Failed to install Bank of Z"
+        exit 1
+    fi
+
+}
+
+#########################################################
+# STAGE: Setup and start Bank of Z IMS regions
+#########################################################
+stage_setup_ims_bankz_regions() {
+    print_stage "STAGE: Setup and start Bank of Z IMS regions"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-ims-bankz-regions.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-bankz-regions.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z Setup and start IMS regions script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-bankz-regions.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    chmod +x .setup/setup/setup-ims-bankz-regions.sh
+    if .setup/setup/setup-ims-bankz-regions.sh; then
+        print_success "Bank of Z application setup completed successfully"
+    else
+        print_error "Failed to install Bank of Z"
+        exit 1
+    fi
+
+}
+
 
 #########################################################
 # STAGE: Populate DB2 database
@@ -198,6 +282,34 @@ stage_populate_database() {
     fi
 
 }
+
+#########################################################
+# STAGE: Populate IMS database
+#########################################################
+stage_populate_ims_database() {
+    print_stage "STAGE: Populate IMS database"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/populate-ims-tables.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/populate-ims-tables.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z database populate script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/populate-ims-tables.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    chmod +x .setup/setup/populate-ims-tables.sh
+    if .setup/setup/populate-ims-tables.sh; then
+        print_success "Bank of Z application populate completed successfully"
+    else
+        print_error "Failed to populate Bank of Z database"
+        exit 1
+    fi
+
+}
+
 
 #########################################################
 # STAGE: Setup zOS Connect server
@@ -227,7 +339,7 @@ stage_setup_zosconnect_server() {
 
 
 #########################################################
-# STAGE: Setup Bank of Z databse
+# STAGE: Setup CICS region
 #########################################################
 stage_setup_cics_region() {
     print_stage "STAGE: Create CICS region with zconfig"
@@ -239,7 +351,7 @@ stage_setup_cics_region() {
     fi
     
     # Run script
-    print_info "Running Bank of Z database setup script..."
+    print_info "Running CICS region setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-cics-region.sh"
     cd "$BANK_DIR"
     
@@ -248,9 +360,40 @@ stage_setup_cics_region() {
     PID=$!
     # Wait for cics setup to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
-        print_success "Bank of Z application setup completed successfully"
+        print_success "CICS region setup completed successfully"
     else
-        print_error "Failed to install Bank of Z"
+        print_error "Failed to setup CICS region"
+        exit 1
+    fi
+}
+
+#########################################################
+# STAGE: Setup IMS region
+#########################################################
+stage_setup_ims_region() {
+    print_stage "STAGE: Create IMS region with zconfig"
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-ims-region.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-region.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running IMS region setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-region.sh"
+    cd "$BANK_DIR"
+    
+    
+    set -o pipefail
+    chmod +x .setup/setup/setup-ims-region.sh
+    .setup/setup/setup-ims-region.sh&
+    PID=$!
+    # Wait for cics setup to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
+        print_success "IMS region setup completed successfully"
+    else
+        print_error "Failed to setup IMS region"
         exit 1
     fi
 }
@@ -302,9 +445,17 @@ main_setup() {
     stage_copy_framework
 
     # infrastructure
+    stage_stop_tasks
+    
     stage_setup_database
     
     stage_setup_cics_region
+    
+    stage_setup_ims_region
+    
+    stage_setup_ims_database
+    
+    stage_setup_ims_bankz_regions
     
     stage_setup_zosconnect_server
     
@@ -379,6 +530,7 @@ main() {
                 exit 1
             fi
             stage_populate_database
+            stage_populate_ims_database
             ;;
         -h|--help|help|"")
             print_usage

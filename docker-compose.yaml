@@ -2,6 +2,7 @@ version: "3.2"
 services:
   zosConnect:
     image: icr.io/zosconnect/ibm-zcon-designer:3.0.103
+    platform: linux/amd64
     environment:
       - CICS_USER=
       - CICS_PASSWORD=

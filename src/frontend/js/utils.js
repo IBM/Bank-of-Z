@@ -29,6 +29,17 @@ export function parseDate(dateString) {
     return dateString;
 }
 
+
+/**
+* Escape HTML special chaarcters so user supplied text can't break out
+* of the innerHTML templates used by modal helpers
+*/
+export function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = value;
+    return div.innerHTML;
+}
+
 /**
  * Format currency
  */

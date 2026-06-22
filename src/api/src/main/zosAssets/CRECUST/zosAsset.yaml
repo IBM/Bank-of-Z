@@ -1,0 +1,11 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: "Create Customer CICS Program"
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "OMEN"
+  language: "COBOL"
+  program: "CRECUST"
+  connectionRef: "bankzCicsConnection"
+  ccsid: "037"

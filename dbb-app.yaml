@@ -20,34 +20,32 @@ application:
   name: BANKZ
 
   tasks:
+
+    - task: Start
+      variables:
+      # Configure the source directory for building
+      - name: sourceDirs
+        value:
+            - "Bank-of-Z/src/base"
+            - "Bank-of-Z/src/api/src/main/api"
+            - "Bank-of-Z/src/frontend"
+
+    - task: ScannerInit
+      variables:
+        - name: scanners
+          value:
+            - scanner: Dummy
+              extensions: yaml
+        - name: excludeFileList
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]  
+
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
       variables:
-        - name: sourceDirs
-          value:
-            - "src/base"
-            - "src/api/src/main/api"
-            - "src/frontend"
         - name: continueOnScanFailure
           value: true
         - name: excludeFileList
-          value:
-            - ".**"
-            - "**/.**"
-            - "**.properties"
-            - "**.groovy"
-            - "**.json"
-            - "**.md"
-            - "**.sh"
-            - "**.jcl"
-            - "**.tar"
-            - "**.war"
-            - "**.log"
-            - "**/operations/**"
-            - "**/zosAssets/**"
-            - "**/dbb-app.yaml"
-            - "**/zapp.yaml"
-            - "**/docker-compose.yaml"
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -57,33 +55,12 @@ application:
     # ----------------------------------------------------------
     - task: ImpactAnalysis
       variables:
-        - name: sourceDirs
-          value:
-            - "src/base"
-            - "src/api/src/main/api"
-            - "src/frontend"
-        
         - name: continueOnScanFailure
           value: true
-        
+
         - name: excludeFileList
-          value:
-            - ".**"
-            - "**/.**"
-            - "**.properties"
-            - "**.groovy"
-            - "**.json"
-            - "**.md"
-            - "**.sh"
-            - "**.jcl"
-            - "**.tar"
-            - "**.war"
-            - "**.log"
-            - "**/operations/**"
-            - "**/zosAssets/**"
-            - "**/dbb-app.yaml"
-            - "**/zapp.yaml"
-            - "**/docker-compose.yaml"
+          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+
         
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems

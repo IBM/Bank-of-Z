@@ -136,6 +136,7 @@ ims:
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   asm_lib_hlq: "ASM.SASMMOD1"
+  ims_macro_lib: "IMSV15.SDFSMAC"
   dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
   dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
   dfs_recon3: "{{ ims.ims_hlq }}.RECON3"

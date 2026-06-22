@@ -296,6 +296,20 @@
             const system = customer._system || (customer.customerId && customer.customerId.length === 9 ? 'IMS' : 'CICS');
             const displayCustomerId = formatCustomerId(customer.customerId, system);
             
+            // Format date of birth to ensure YYYY-MM-DD format with zero-padding
+            let formattedDOB = '';
+            if (customer.dateOfBirth) {
+                const dobParts = customer.dateOfBirth.split('-');
+                if (dobParts.length === 3) {
+                    const year = dobParts[0].padStart(4, '0');
+                    const month = dobParts[1].padStart(2, '0');
+                    const day = dobParts[2].padStart(2, '0');
+                    formattedDOB = `${year}-${month}-${day}`;
+                } else {
+                    formattedDOB = customer.dateOfBirth;
+                }
+            }
+            
             // Restore the proper HTML structure
             detailsSection.innerHTML = `
                 <h3>Customer Information (${system})</h3>
@@ -306,9 +320,8 @@
                         <cds-text-input id="title" label="Title" value="${customer.title || ''}"></cds-text-input>
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
                         <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
-                        <cds-text-input id="email" label="Email" value="${customer.email || ''}"></cds-text-input>
                         <cds-text-input id="phoneNumber" label="Phone Number" value="${customer.phoneNumber || ''}"></cds-text-input>
-                        <cds-text-input id="dateOfBirth" label="Date of Birth" value="${customer.dateOfBirth || ''}"></cds-text-input>
+                        <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formattedDOB}"></cds-text-input>
                         <cds-text-input id="addressLine1" label="Address Line 1" value="${customer.address?.addressLine1 || ''}"></cds-text-input>
                         <cds-text-input id="addressLine2" label="Address Line 2" value="${customer.address?.addressLine2 || ''}"></cds-text-input>
                         <cds-text-input id="city" label="City" value="${customer.address?.city || ''}"></cds-text-input>
@@ -538,37 +551,100 @@
         async function updateCustomer() {
             if (!currentCustomer) return;
             
-            const updatedData = {
-                title: document.getElementById('title').value,
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                dateOfBirth: document.getElementById('dateOfBirth').value,
-                address: {
-                    addressLine1: document.getElementById('addressLine1').value,
-                    addressLine2: document.getElementById('addressLine2').value,
-                    city: document.getElementById('city').value,
-                    postalCode: document.getElementById('postalCode').value,
-                    country: document.getElementById('country').value
-                }
-            };
+            // Clear any previous notifications
+            clearNotification();
+            
+            // Collect form data
+            const title = document.getElementById('title').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const dateOfBirth = document.getElementById('dateOfBirth').value.trim();
+            const addressLine1 = document.getElementById('addressLine1').value.trim();
+            const addressLine2 = document.getElementById('addressLine2').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const postalCode = document.getElementById('postalCode').value.trim();
+            const country = document.getElementById('country').value.trim();
+            
+            // Validation: Valid titles
+            const VALID_TITLES = ['Professor', 'Mr', 'Mrs', 'Miss', 'Ms', 'Dr', 'Drs', 'Lord', 'Sir', 'Lady', ''];
+            if (title && !VALID_TITLES.includes(title)) {
+                displayNotification('error', 'Validation Error',
+                    'Invalid title. Must be one of: Professor, Mr, Mrs, Miss, Ms, Dr, Drs, Lord, Sir, Lady');
+                return;
+            }
+            
+            // Validation: At least one of firstName, lastName, or addressLine1 must be provided
+            if (!firstName && !lastName && !addressLine1) {
+                displayNotification('error', 'Validation Error',
+                    'At least one of First Name, Last Name, or Address Line 1 must be provided');
+                return;
+            }
+            
+            // Validation: Date format (if provided)
+            if (dateOfBirth && !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+                displayNotification('error', 'Validation Error',
+                    'Date of Birth must be in format YYYY-MM-DD');
+                return;
+            }
+            
+            // Build update data object (only include non-empty fields)
+            const updatedData = {};
+            
+            if (title) updatedData.title = title;
+            if (firstName) updatedData.firstName = firstName;
+            if (lastName) updatedData.lastName = lastName;
+            if (phoneNumber) updatedData.phoneNumber = phoneNumber;
+            if (dateOfBirth) updatedData.dateOfBirth = dateOfBirth;
+            
+            // Address object (only include if at least one field is provided)
+            if (addressLine1 || addressLine2 || city || postalCode || country) {
+                updatedData.address = {};
+                if (addressLine1) updatedData.address.addressLine1 = addressLine1;
+                if (addressLine2) updatedData.address.addressLine2 = addressLine2;
+                if (city) updatedData.address.city = city;
+                if (postalCode) updatedData.address.postalCode = postalCode;
+                if (country) updatedData.address.country = country;
+            }
+            
+            // Note: customerStatus is read-only in the form, so we don't include it
             
             showLoadingModal('Updating customer...');
             
             try {
-                await api.customers.updateCustomer(currentCustomer.customerId, updatedData);
-                hideLoadingModal();
-                showSuccessModal('Success', 'Customer updated successfully');
-            } catch (error) {
+                const updatedCustomer = await api.customers.updateCustomer(currentCustomer.customerId, updatedData);
                 hideLoadingModal();
                 
-                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
-                    showErrorModal('Feature Not Implemented', error.message);
+                // Update current customer with the response
+                currentCustomer = updatedCustomer;
+                
+                // Show success notification
+                displayNotification('success', 'Success', 'Customer updated successfully');
+                
+                // Refresh the display with updated data
+                displayCustomerDetails(updatedCustomer);
+            } catch (error) {
+                hideLoadingModal();
+                console.error('Update error:', error);
+                
+                // Parse error details if available
+                let errorMessage = error.message || 'Failed to update customer';
+                
+                if (error.details && Array.isArray(error.details)) {
+                    const detailMessages = error.details.map(d => `${d.field}: ${d.issue}`).join('; ');
+                    errorMessage = `${errorMessage}. ${detailMessages}`;
+                }
+                
+                if (error.status === 400) {
+                    displayNotification('error', 'Validation Error', errorMessage);
+                } else if (error.status === 404) {
+                    displayNotification('error', 'Not Found', 'Customer not found');
+                } else if (error.status === 500) {
+                    displayNotification('error', 'Server Error', errorMessage);
                 } else if (error.message.includes('Failed to fetch')) {
-                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
+                    displayNotification('error', 'Network Error', 'Failed to connect to the server. Please check your connection.');
                 } else {
-                    showErrorModal('Error', error.message || 'Failed to update customer');
+                    displayNotification('error', 'Error', errorMessage);
                 }
             }
         }

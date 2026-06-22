@@ -140,13 +140,17 @@ class CustomersApi extends BaseApi {
     // Stub methods for legacy endpoints not in OpenAPI spec
 
     /**
-     * Update customer (stub - not in OpenAPI spec)
-     * @param {string} customerNumber - Unique customer identifier
+     * Update customer information
+     * PUT /customers/{customerId}
+     * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
      * @param {Object} customerData - Updated customer data
-     * @returns {Promise<Object>} Rejected promise
+     * @returns {Promise<Customer>} Updated customer details
      */
-    async updateCustomer(customerNumber, customerData) {
-        throw new Error('Customer updates are not supported in the OpenBanking API specification');
+    async updateCustomer(customerId, customerData) {
+        return this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
+            method: 'PUT',
+            body: JSON.stringify(customerData)
+        });
     }
 
     /**
@@ -356,7 +360,6 @@ export { ApiClient, CustomersApi, AccountsApi, ApiConfiguration };
  * @property {string} firstName - Customer first name
  * @property {string} lastName - Customer last name
  * @property {string} [dateOfBirth] - Customer date of birth (YYYY-MM-DD)
- * @property {string} email - Customer email address
  * @property {string} [phoneNumber] - Customer phone number
  * @property {Address} [address] - Customer address
  * @property {string} [customerStatus] - Current status (ACTIVE, INACTIVE, SUSPENDED)

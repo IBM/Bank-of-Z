@@ -266,6 +266,23 @@ class AccountsApi extends BaseApi {
         return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/transactions/${transactionId}`);
     }
 
+    /**
+     * Deposit funds to an account
+     * POST /accounts/{accountId}/deposit
+     * @param {string} accountId - Unique identifier for the account
+     * @param {Object} depositData - Deposit data
+     * @param {number} depositData.amount - Deposit amount (must be positive, minimum 0.01)
+     * @param {string} depositData.sortCode - 6-digit bank sort code
+     * @param {string} [depositData.description] - Description of the deposit (max 40 characters)
+     * @returns {Promise<Object>} Deposit result with updated balances
+     */
+    async depositToAccount(accountId, depositData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/deposit`, {
+            method: 'POST',
+            body: JSON.stringify(depositData)
+        });
+    }
+
     // Stub methods for legacy endpoints not in OpenAPI spec
     /**
      * Create a new account (stub - not in OpenAPI spec)

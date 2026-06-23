@@ -355,7 +355,44 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  
+  /accounts/{accountId}/deposit:
+    post:
+      tags:
+        - Accounts
+      summary: Deposit funds to account
+      description: Deposit funds into a specific account
+      operationId: depositToAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "ACC987654321" #pragma: allowlist secret
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+      responses:
+        '201':
+          description: Deposit successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /accounts/{accountId}/transactions:
     get:
@@ -803,6 +840,55 @@ components:
           type: string
           description: Merchant category code
           example: "5411"
+
+    DepositRequest:
+      type: object
+      required:
+        - amount
+        - sortCode
+      properties:
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Deposit amount (must be positive)
+          example: 100.00
+        sortCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit bank sort code
+          example: "987654"
+        description:
+          type: string
+          maxLength: 40
+          description: Optional description of the deposit
+          example: "Cash deposit"
+
+    DepositResponse:
+      type: object
+      required:
+        - accountId
+        - availableBalance
+        - actualBalance
+      properties:
+        accountId:
+          type: string
+          description: Account identifier
+          example: "ACC987654321" #pragma: allowlist secret
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance after deposit
+          example: 1334.56
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance after deposit
+          example: 1334.56
+        transactionReference:
+          type: string
+          description: Transaction reference number
+          example: "DEP20260619001"
 
     Error:
       type: object

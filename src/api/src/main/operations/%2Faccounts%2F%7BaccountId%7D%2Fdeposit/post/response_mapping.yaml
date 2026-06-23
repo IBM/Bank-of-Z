@@ -1,0 +1,12 @@
+---
+version: "1.0"
+response_201.yaml:
+  condition: "$exists($zosAssetResponse.commarea.PAYDBCRZ)"
+  httpStatusCode: 201
+response_401.yaml:
+  httpStatusCode: 401
+response_403.yaml:
+  httpStatusCode: 403
+response_500.yaml:
+  condition: true
+  httpStatusCode: 500

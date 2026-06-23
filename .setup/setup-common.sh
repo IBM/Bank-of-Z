@@ -45,13 +45,12 @@ stage_stop_tasks() {
     # Stop IBM zconn servers
     # =========================
     jcan P "BAQ${APP_NAME}"  2>/dev/null
-    set -e
     
     # =========================
     # Stop IMS1
     # =========================
     jcan P "IMS1*" 2>/dev/null
-    
+    set -e    
 }
 
 #########################################################

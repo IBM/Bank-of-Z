@@ -30,7 +30,7 @@ rm -f "/tmp/IMS-Db2-*"
 rm -f "/tmp/Db2-*"
 run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/Db2-drop.jcl" "8"
 run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/Db2-create.jcl"
-# Use jsub directly for IMS to preserve IBMUSER in SQL statements
+# IMS DB2 setup
 jsub -f "$SCRIPTS_DIR/../jcl/ims/Db2-drop.jcl"
 jsub -f "$SCRIPTS_DIR/../jcl/ims/Db2-create.jcl"
 exit $?

@@ -1,17 +1,24 @@
-//BNKSTMT JOB (@TS3,FF12),'STMT X47636',MSGCLASS=Q,MSGLEVEL=(1,1),
-//         NOTIFY=&SYSUID,CLASS=O,REGION=0M
+/BNKSTMT JOB 'Report',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
+//          MSGLEVEL=(1,1),REGION=4M
 //STEP1    EXEC PGM=IKJEFT01
-//STEPLIB  DD DSN=SYS1.DSNDB2T.SDSNLOAD,DISP=SHR
+//STEPLIB  DD  DISP=SHR,DSN=DB2V13.SDSNEXIT
+//         DD  DISP=SHR,DSN=DB2V13.SDSNLOAD
+//********************************************
+//*MONTH FOR WHICH REPORT IS RUN
+//********************************************
 //DATECARD DD *
 202606
+//********************************************
+//*ACCOUNT IDENTIFIER FOR WHICH REPORT IS RUN
+//********************************************
 //SORTCODE DD *
 123456
 //SYSPRINT DD   SYSOUT=*
 //SYSOUT   DD   SYSOUT=*
 //SYSTSPRT DD   SYSOUT=*
 //SYSTSIN  DD *
- DSN SYSTEM(DB2T)
- RUN  PROGRAM(BNKSTMT) PLAN(BNKSTMT) -
-      LIB('P2DEV01.TEST.LINKLIB')
+ DSN SYSTEM(DBD1)
+ RUN  PROGRAM(BNKSTMT) PLAN(BANKZPLN) -
+      LIB('BANKZ.V0R1M0.LOADLIB')
  END                                                                     
 /*

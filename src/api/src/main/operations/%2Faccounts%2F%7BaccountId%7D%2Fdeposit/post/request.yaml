@@ -10,15 +10,19 @@ mappings:
         - COMM-ACCNO:
             required: false
             nullable: false
-            expression: "$substring('00000000', 0, 8 - $length($string($number($pathParameters.accountId)))) & $string($number($pathParameters.accountId))"
+            expression: "$boolean($match($string($pathParameters.accountId), /^\\d{1,8}$/))
+              ? $substring('00000000', 0, 8 - $length($string($pathParameters.accountId)))
+              & $string($pathParameters.accountId) : $number('INVALID_ACCOUNT_ID')"
         - COMM-AMT:
             required: false
             nullable: false
-            expression: "$body.amount"
+            expression: "$exists($body.amount) and $body.amount > 0 ? $body.amount :
+              $number('INVALID_AMOUNT')"
         - COMM-SORTC:
             required: false
             nullable: false
-            expression: "$number($body.sortCode)"
+            expression: "$exists($body.sortCode) and $boolean($match($string($body.sortCode),
+              /^\\d{6}$/)) ? $number($body.sortCode) : $number('INVALID_SORT_CODE')"
         - COMM-ORIGIN:
             required: false
             nullable: false
@@ -26,7 +30,8 @@ mappings:
             - COMM-APPLID:
                 required: false
                 nullable: false
-                template: ""
+                expression: "$exists($body.description) and $length($body.description)
+                  > 40 ? $number('INVALID_DESCRIPTION') : ''"
             - COMM-USERID:
                 required: false
                 nullable: false

@@ -85,6 +85,10 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
+# Update ims_user in ims-region.yaml to use current user instead of ibmuser
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${ZOS_USER}"
+sed -i "s/ims_user: ibmuser/ims_user: ${ZOS_USER}/" ims-region.yaml
+
 zconfig apply ims-region.yaml -v
 
 RC=$?

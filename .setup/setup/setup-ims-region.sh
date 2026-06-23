@@ -85,7 +85,19 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
-zconfig apply ims-region.yaml -v
+# Get current user and update ims-region.yaml
+CURRENT_USER=$(whoami | tr '[:lower:]' '[:upper:]')
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Current user: $CURRENT_USER"
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Updating ims-region.yaml with current user..."
+
+# Create a temporary modified version of ims-region.yaml
+sed "s/ims_user: ibmuser/ims_user: ${CURRENT_USER,,}/g" ims-region.yaml > ims-region-temp.yaml
+
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Applying IMS configuration..."
+zconfig apply ims-region-temp.yaml -v
+
+# Clean up temporary file
+rm -f ims-region-temp.yaml
 
 RC=$?
 if [ "$RC" -eq 0 ]; then

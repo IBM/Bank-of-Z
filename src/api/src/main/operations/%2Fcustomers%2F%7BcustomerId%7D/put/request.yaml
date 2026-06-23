@@ -1,0 +1,77 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - UPDCUST:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            template: "{{$pathParameters.customerId}}"
+        - COMM-NAME:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-TITLE:
+                required: false
+                nullable: false
+                template: "{{$body.title}}"
+            - COMM-FIRST-NAME:
+                required: false
+                nullable: false
+                template: "{{$body.firstName}}"
+            - COMM-LAST-NAME:
+                required: false
+                nullable: false
+                template: "{{$body.lastName}}"
+        - COMM-DOB:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-DOB-DAY:
+                required: false
+                nullable: false
+                expression: "$number($substring($requestBody.dateOfBirth, 8, 2))"
+            - COMM-DOB-MONTH:
+                required: false
+                nullable: false
+                expression: "$number($substring($requestBody.dateOfBirth, 5, 2))"
+            - COMM-DOB-YEAR:
+                required: false
+                nullable: false
+                expression: "$number($substring($requestBody.dateOfBirth, 0, 4))"
+        - COMM-PHONE:
+            required: false
+            nullable: false
+            template: "{{$body.phoneNumber}}"
+        - COMM-ADDR:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-ADDR-LINE1:
+                required: false
+                nullable: false
+                template: "{{$body.address.addressLine1}}"
+            - COMM-ADDR-LINE2:
+                required: false
+                nullable: false
+                template: "{{$body.address.addressLine2}}"
+            - COMM-CITY:
+                required: false
+                nullable: false
+                template: "{{$body.address.city}}"
+            - COMM-POSTCODE:
+                required: false
+                nullable: false
+                template: "{{$body.address.postalCode}}"
+            - COMM-COUNTRY:
+                required: false
+                nullable: false
+                template: "{{$body.address.country}}"
+        - COMM-STATUS:
+            required: false
+            nullable: false
+            template: "{{$body.customerStatus}}"

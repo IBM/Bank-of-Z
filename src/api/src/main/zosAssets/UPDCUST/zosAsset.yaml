@@ -1,0 +1,9 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: ""
+providerProperties:
+  language: "COBOL"
+  program: "UPDCUST"
+  connectionRef: "bankzCicsConnection"
+  ccsid: "37"

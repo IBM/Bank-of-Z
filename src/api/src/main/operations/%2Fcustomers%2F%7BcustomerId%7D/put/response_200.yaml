@@ -1,0 +1,74 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - customerId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-CUSTNO\"}}"
+    - title:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-NAME\".\"COMM-TITLE\"\
+          }}"
+    - firstName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-NAME\".\"COMM-FIRST-NAME\"\
+          }}"
+    - lastName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-NAME\".\"COMM-LAST-NAME\"\
+          }}"
+    - dateOfBirth:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-DOB\".\"COMM-DOB-YEAR\"\
+          }}-{{$zosAssetResponse.commarea.UPDCUST.\"COMM-DOB\".\"COMM-DOB-MONTH\"\
+          }}-{{$zosAssetResponse.commarea.UPDCUST.\"COMM-DOB\".\"COMM-DOB-DAY\"}}"
+    - phoneNumber:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-PHONE\"}}"
+    - address:
+        required: false
+        nullable: false
+        mappings:
+        - addressLine1:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\".\"COMM-ADDR-LINE1\"\
+              }}"
+        - addressLine2:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\".\"COMM-ADDR-LINE2\"\
+              }}"
+        - city:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\".\"COMM-CITY\"\
+              }}"
+        - postalCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\".\"COMM-POSTCODE\"\
+              }}"
+        - country:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-ADDR\".\"COMM-COUNTRY\"\
+              }}"
+    - customerStatus:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-STATUS\"}}"
+    - createdDate:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-CREATED-DATE\".\"COMM-CREATED-YEAR\"\
+          }}-{{$zosAssetResponse.commarea.UPDCUST.\"COMM-CREATED-DATE\".\"COMM-CREATED-MONTH\"\
+          }}-{{$zosAssetResponse.commarea.UPDCUST.\"COMM-CREATED-DATE\".\"COMM-CREATED-DAY\"\
+          }}T00:00:00Z"

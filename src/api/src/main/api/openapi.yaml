@@ -221,6 +221,44 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Customers
+      summary: Update customer information
+      description: Update detailed information for a specific customer
+      operationId: updateCustomer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "0000010000000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 
   /customers/{customerId}/accounts:
     get:
@@ -536,7 +574,6 @@ components:
         - customerId
         - firstName
         - lastName
-        - email
       properties:
         customerId:
           type: string
@@ -559,11 +596,6 @@ components:
           format: date
           description: Customer date of birth
           example: "1985-06-15"
-        email:
-          type: string
-          format: email
-          description: Customer email address
-          example: "john.smith@example.com"
         phoneNumber:
           type: string
           description: Customer phone number
@@ -599,6 +631,63 @@ components:
         country:
           type: string
           example: "United Kingdom"
+    CustomerUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Customer title
+          example: "Mr"
+          enum: [Professor, Mr, Mrs, Miss, Ms, Dr, Drs, Lord, Sir, Lady]
+        firstName:
+          type: string
+          description: Customer first name
+          example: "John"
+          maxLength: 50
+        lastName:
+          type: string
+          description: Customer last name
+          example: "Smith"
+          maxLength: 50
+        dateOfBirth:
+          type: string
+          format: date
+          description: Customer date of birth
+          example: "1985-06-15"
+        phoneNumber:
+          type: string
+          description: Customer phone number
+          example: "+44 20 7946 0958"
+          maxLength: 20
+        address:
+          type: object
+          properties:
+            addressLine1:
+              type: string
+              example: "123 High Street"
+              maxLength: 50
+            addressLine2:
+              type: string
+              example: "Apartment 4B"
+              maxLength: 50
+            city:
+              type: string
+              example: "London"
+              maxLength: 50
+            postalCode:
+              type: string
+              example: "SW1A 1AA"
+              maxLength: 10
+            country:
+              type: string
+              example: "United Kingdom"
+              maxLength: 50
+        customerStatus:
+          type: string
+          enum: [ACTIVE, INACTIVE, SUSPENDED]
+          description: Current status of the customer
+          example: "ACTIVE"
+
 
     AccountList:
       type: object

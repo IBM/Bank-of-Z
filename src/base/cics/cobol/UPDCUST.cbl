@@ -243,8 +243,24 @@
       *
       *    First, read the current customer record
       *
-           MOVE DESIRED-SORT-CODE TO HV-CUSTOMER-SORTCODE.
-           MOVE DESIRED-CUSTNO TO HV-CUSTOMER-NUMBER.
+      *    Use COMM-SCODE directly to preserve leading zeros, or use
+      *    default SORTCODE if not provided
+      *
+            IF COMM-SCODE = SPACES OR COMM-SCODE = LOW-VALUES
+               MOVE SORTCODE TO HV-CUSTOMER-SORTCODE
+            ELSE
+               MOVE COMM-SCODE TO HV-CUSTOMER-SORTCODE
+            END-IF.
+      *
+      *    Format customer number with leading zeros
+      *    (e.g., '1234      ' -> '0000001234')
+      *    Initialize to zero, then extract numeric part
+      *
+            MOVE ZERO TO DESIRED-CUSTNO.
+            UNSTRING COMM-CUSTNO DELIMITED BY ' '
+               INTO DESIRED-CUSTNO
+            END-UNSTRING.
+            MOVE DESIRED-CUSTNO TO HV-CUSTOMER-NUMBER.
 
            EXEC SQL
               SELECT CUSTOMER_EYECATCHER,

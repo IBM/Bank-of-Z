@@ -1,10 +1,12 @@
 #!/bin/env bash
 
-set -e
-
 # =========================
 # Source library scripts
 # =========================
+set +e
+# For Grub and or ZOWE CLI
+source /etc/profile 2>/dev/null
+set -e
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     export REPO_NAME="$(basename "$(git rev-parse --show-toplevel)")"
@@ -15,6 +17,8 @@ export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
+
+
 
 check_python_deps() {
     missing=""

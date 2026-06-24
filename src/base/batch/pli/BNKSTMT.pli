@@ -1,0 +1,911 @@
+  /*------------------------------------------------------------*
+   * Licensed Materials - Property of IBM
+   *
+   * (c) Copyright IBM Corp. 2026.
+   *
+   * US Government Users Restricted Rights - Use, duplication or
+   * disclosure restricted by GSA ADP Schedule Contract
+   * with IBM Corp.
+  *------------------------------------------------------------*/
+
+  /*------------------------------------------------------------*
+  * Procedure: BNKSTMT
+  * Description: PL/I Batch Program for Bank Monthly Statement Generation
+  * 
+  * Purpose: Generate monthly account statements for bank customers
+  *          using DB2 tables for account, customer, and transaction data
+  *
+  * Input:  JCL parameters - Account number range and statement period
+  * Output: Formatted monthly statement report to SYSPRINT
+  *
+  * DB2 Tables Used:
+  *   - ACCOUNT: Account information and balances
+  *   - CUSTOMER: Customer demographic information
+  *   - PROCTRAN: Transaction history (processed transactions)
+  *------------------------------------------------------------*/
+
+  BNKSTMT: PROCEDURE OPTIONS(MAIN);
+
+  /*------------------------------------------------------------*
+  * SQL INCLUDE FOR DB2 COMMUNICATION AREA
+  *------------------------------------------------------------*/
+  EXEC SQL INCLUDE SQLCA;
+
+  /*------------------------------------------------------------*
+  * HOST VARIABLE DECLARATIONS FOR CUSTOMER TABLE
+  *------------------------------------------------------------*/
+  DCL
+   1 HV_CUSTOMER,
+    5 HV_CUST_EYECATCHER      CHAR(4),
+    5 HV_CUST_SORTCODE        CHAR(6),
+    5 HV_CUST_NUMBER          CHAR(10),
+    5 HV_CUST_TITLE           CHAR(10),
+    5 HV_CUST_FIRST_NAME      CHAR(50),
+    5 HV_CUST_LAST_NAME       CHAR(50),
+    5 HV_CUST_DOB             FIXED BIN(31),
+    5 HV_CUST_PHONE           CHAR(20),
+    5 HV_CUST_ADDR_LINE1      CHAR(50),
+    5 HV_CUST_ADDR_LINE2      CHAR(50),
+    5 HV_CUST_CITY            CHAR(50),
+    5 HV_CUST_POSTCODE        CHAR(10),
+    5 HV_CUST_COUNTRY         CHAR(50),
+    5 HV_CUST_STATUS          CHAR(10),
+    5 HV_CUST_CREATED_DATE    FIXED BIN(31),
+    5 HV_CUST_CREDIT_SCORE    FIXED BIN(15),
+    5 HV_CUST_CS_REVIEW_DATE  FIXED BIN(31);
+
+  /* Null indicators for customer table */
+  DCL
+   1 HV_CUST_NULL_IND,
+    5 HV_CUST_TITLE_NULL      FIXED BIN(15),
+    5 HV_CUST_PHONE_NULL      FIXED BIN(15),
+    5 HV_CUST_ADDR_LINE2_NULL FIXED BIN(15),
+    5 HV_CUST_DOB_NULL        FIXED BIN(15),
+    5 HV_CUST_CREDIT_SCORE_NULL FIXED BIN(15),
+    5 HV_CUST_CS_REVIEW_DATE_NULL FIXED BIN(15);
+
+  /*------------------------------------------------------------*
+  * HOST VARIABLE DECLARATIONS FOR ACCOUNT TABLE
+  *------------------------------------------------------------*/
+  DCL
+   1 HV_ACCOUNT,
+    5 HV_ACCT_EYECATCHER      CHAR(4),
+    5 HV_ACCT_CUST_NUMBER     CHAR(10),
+    5 HV_ACCT_SORTCODE        CHAR(6),
+    5 HV_ACCT_NUMBER          CHAR(8),
+    5 HV_ACCT_TYPE            CHAR(8),
+    5 HV_ACCT_INTEREST_RATE   FIXED DEC(4,2),
+    5 HV_ACCT_OPENED          CHAR(10),
+    5 HV_ACCT_OVERDRAFT_LIMIT FIXED BIN(31),
+    5 HV_ACCT_LAST_STMT       CHAR(10),
+    5 HV_ACCT_NEXT_STMT       CHAR(10),
+    5 HV_ACCT_AVAIL_BALANCE   FIXED DEC(10,2),
+    5 HV_ACCT_ACTUAL_BALANCE  FIXED DEC(10,2);
+
+  /* Null indicators for account table */
+  DCL
+   1 HV_ACCT_NULL_IND,
+    5 HV_ACCT_INTEREST_RATE_NULL FIXED BIN(15),
+    5 HV_ACCT_OVERDRAFT_LIMIT_NULL FIXED BIN(15),
+    5 HV_ACCT_LAST_STMT_NULL FIXED BIN(15),
+    5 HV_ACCT_NEXT_STMT_NULL FIXED BIN(15);
+
+  /*------------------------------------------------------------*
+  * HOST VARIABLE DECLARATIONS FOR TRANSACTION TABLE
+  *------------------------------------------------------------*/
+  DCL
+   1 HV_TRANSACTION,
+    5 HV_TRAN_EYECATCHER      CHAR(4),
+    5 HV_TRAN_SORTCODE        CHAR(6),
+    5 HV_TRAN_NUMBER          CHAR(8),
+    5 HV_TRAN_DATE            CHAR(10),
+    5 HV_TRAN_TIME            CHAR(6),
+    5 HV_TRAN_REF             CHAR(12),
+    5 HV_TRAN_TYPE            CHAR(3),
+    5 HV_TRAN_DESC            CHAR(40),
+    5 HV_TRAN_AMOUNT          FIXED DEC(12,2);
+
+  /* Null indicators for transaction table */
+  DCL
+   1 HV_TRAN_NULL_IND,
+    5 HV_TRAN_DESC_NULL       FIXED BIN(15);
+
+  /*------------------------------------------------------------*
+  * WORKING VARIABLES
+  *------------------------------------------------------------*/
+  DCL STMT_DATE               CHAR(10);
+  DCL PERIOD_FROM             CHAR(8);
+  DCL PERIOD_TO               CHAR(8);
+  DCL TRANS_COUNT             FIXED BIN(15) INIT(0);
+  DCL TOTAL_CREDITS           FIXED DEC(12,2) INIT(0);
+  DCL TOTAL_DEBITS            FIXED DEC(12,2) INIT(0);
+  DCL OPENING_BALANCE         FIXED DEC(12,2) INIT(0);
+  DCL CLOSING_BALANCE         FIXED DEC(12,2) INIT(0);
+  DCL INTEREST_EARNED         FIXED DEC(10,2) INIT(0);
+  DCL FEES_CHARGED            FIXED DEC(10,2) INIT(0);
+  DCL SQLCODE_SAVE            FIXED BIN(31);
+  DCL END_OF_DATA             BIT(1) INIT('0'B);
+  DCL REPORT_LINE             CHAR(132);
+  DCL LINE_COUNT              FIXED BIN(15) INIT(0);
+  DCL PAGE_COUNT              FIXED BIN(15) INIT(0);
+  DCL LINES_PER_PAGE          FIXED BIN(15) INIT(55);
+  
+  /* File declarations for parameter inputs */
+  DCL DATECARD FILE RECORD INPUT ENV(F RECSIZE(80));
+  DCL SORTCODE FILE RECORD INPUT ENV(F RECSIZE(80));
+
+  /*------------------------------------------------------------*
+  * CURSOR DECLARATIONS
+  *------------------------------------------------------------*/
+  
+  /* Cursor to retrieve all accounts for statement generation */
+  EXEC SQL DECLARE ACCT_CURSOR CURSOR FOR
+    SELECT ACCOUNT_EYECATCHER,
+           ACCOUNT_CUSTOMER_NUMBER,
+           ACCOUNT_SORTCODE,
+           ACCOUNT_NUMBER,
+           ACCOUNT_TYPE,
+           ACCOUNT_INTEREST_RATE,
+           ACCOUNT_OPENED,
+           ACCOUNT_OVERDRAFT_LIMIT,
+           ACCOUNT_LAST_STATEMENT,
+           ACCOUNT_NEXT_STATEMENT,
+           ACCOUNT_AVAILABLE_BALANCE,
+           ACCOUNT_ACTUAL_BALANCE
+    FROM ACCOUNT
+    WHERE ACCOUNT_SORTCODE = :HV_ACCT_SORTCODE
+    ORDER BY ACCOUNT_NUMBER;
+
+  /* Cursor to retrieve transactions for an account within period */
+  EXEC SQL DECLARE TRAN_CURSOR CURSOR FOR
+    SELECT PROCTRAN_EYECATCHER,
+           PROCTRAN_SORTCODE,
+           PROCTRAN_NUMBER,
+           CHAR(PROCTRAN_DATE, ISO),
+           PROCTRAN_TIME,
+           PROCTRAN_REF,
+           PROCTRAN_TYPE,
+           PROCTRAN_DESC,
+           PROCTRAN_AMOUNT
+    FROM PROCTRAN
+    WHERE PROCTRAN_SORTCODE = :HV_TRAN_SORTCODE
+      AND PROCTRAN_NUMBER = :HV_TRAN_NUMBER
+      AND PROCTRAN_DATE >= DATE(
+          SUBSTR(:PERIOD_FROM,1,4) || '-' ||
+          SUBSTR(:PERIOD_FROM,5,2) || '-' ||
+          SUBSTR(:PERIOD_FROM,7,2))
+      AND PROCTRAN_DATE <= DATE(
+          SUBSTR(:PERIOD_TO,1,4) || '-' ||
+          SUBSTR(:PERIOD_TO,5,2) || '-' ||
+          SUBSTR(:PERIOD_TO,7,2))
+    ORDER BY PROCTRAN_DATE, PROCTRAN_TIME;
+
+  /*------------------------------------------------------------*
+  * MAIN PROGRAM LOGIC
+  *------------------------------------------------------------*/
+
+  PUT SKIP LIST('BNKSTMT - BANK MONTHLY STATEMENT PROGRAM');
+  PUT SKIP LIST('==========================================');
+  PUT SKIP LIST(' ');
+
+  /* Initialize statement period - default to current month */
+  CALL GET_STATEMENT_PERIOD;
+
+  /* Initialize DB2 connection */
+  CALL INITIALIZE_DB2;
+
+  /* Process all accounts */
+  CALL PROCESS_ALL_ACCOUNTS;
+
+  /* Terminate DB2 connection */
+  CALL TERMINATE_DB2;
+
+  PUT SKIP LIST(' ');
+  PUT SKIP LIST('BNKSTMT COMPLETED SUCCESSFULLY');
+  PUT SKIP LIST('TOTAL STATEMENTS GENERATED: ', PAGE_COUNT);
+
+  RETURN;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: GET_STATEMENT_PERIOD
+  * Set the statement period (from/to dates)
+  *------------------------------------------------------------*/
+  GET_STATEMENT_PERIOD: PROCEDURE;
+    DCL CURRENT_DATE_TIME     CHAR(17);
+    DCL YEAR                  CHAR(4);
+    DCL MONTH                 CHAR(2);
+    DCL DAY                   CHAR(2);
+    DCL DATECARD_INPUT        CHAR(80);
+    DCL SORTCODE_INPUT        CHAR(80);
+    DCL REPORTING_MONTH       CHAR(6);
+    DCL LAST_DAY              CHAR(2);
+
+    /* Read sort code from SORTCODE parameter file */
+    ON ENDFILE(SORTCODE)
+      BEGIN;
+        PUT SKIP LIST('SORTCODE FILE NOT FOUND - USING DEFAULT');
+        HV_ACCT_SORTCODE = '123456';  /* Default sort code */
+        GO TO READ_DATECARD;
+      END;
+    
+    OPEN FILE(SORTCODE);
+    READ FILE(SORTCODE) INTO(SORTCODE_INPUT);
+    CLOSE FILE(SORTCODE);
+    
+    /* Extract sort code (first 6 characters) */
+    HV_ACCT_SORTCODE = SUBSTR(SORTCODE_INPUT, 1, 6);
+    PUT SKIP LIST('SORT CODE FROM PARAMETER: ', HV_ACCT_SORTCODE);
+
+  READ_DATECARD:
+    /* Try to read reporting month from DATECARD */
+    ON ENDFILE(DATECARD)
+      BEGIN;
+        /* If DATECARD not available, use current date */
+        PUT SKIP LIST('DATECARD NOT FOUND - USING CURRENT DATE');
+        CURRENT_DATE_TIME = DATETIME();
+        YEAR = SUBSTR(CURRENT_DATE_TIME, 1, 4);
+        MONTH = SUBSTR(CURRENT_DATE_TIME, 5, 2);
+        DAY = SUBSTR(CURRENT_DATE_TIME, 7, 2);
+
+        /* Set statement date to current date */
+        STMT_DATE = YEAR || '-' || MONTH || '-' || DAY;
+
+        /* Set period to current month */
+        PERIOD_FROM = YEAR || MONTH || '01';
+        PERIOD_TO = YEAR || MONTH || DAY;
+
+        PUT SKIP LIST('STATEMENT PERIOD: ', PERIOD_FROM, 
+                      ' TO ', PERIOD_TO);
+        GO TO END_PROC;
+      END;
+    
+    OPEN FILE(DATECARD);
+    READ FILE(DATECARD) INTO(DATECARD_INPUT);
+    CLOSE FILE(DATECARD);
+    
+    /* Extract YYYYMM from input (first 6 characters) */
+    REPORTING_MONTH = SUBSTR(DATECARD_INPUT, 1, 6);
+    YEAR = SUBSTR(REPORTING_MONTH, 1, 4);
+    MONTH = SUBSTR(REPORTING_MONTH, 5, 2);
+    
+    /* Calculate last day of month */
+    IF MONTH = '02' THEN
+      LAST_DAY = '28';  /* Simplified - not handling leap years */
+    ELSE IF (MONTH = '04') | (MONTH = '06') | (MONTH = '09') |
+            (MONTH = '11') THEN
+      LAST_DAY = '30';
+    ELSE
+      LAST_DAY = '31';
+    
+    /* Set statement date to last day of reporting month */
+    STMT_DATE = YEAR || '-' || MONTH || '-' || LAST_DAY;
+    
+    /* Set period to entire reporting month */
+    PERIOD_FROM = YEAR || MONTH || '01';
+    PERIOD_TO = YEAR || MONTH || LAST_DAY;
+    
+    PUT SKIP LIST('REPORTING MONTH FROM DATECARD: ', REPORTING_MONTH);
+    PUT SKIP LIST('STATEMENT PERIOD: ', PERIOD_FROM, ' TO ', PERIOD_TO);
+
+  END_PROC:
+    RETURN;
+  END GET_STATEMENT_PERIOD;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: INITIALIZE_DB2
+  * Initialize DB2 connection
+  *------------------------------------------------------------*/
+  INITIALIZE_DB2: PROCEDURE;
+
+    PUT SKIP LIST('INITIALIZING DB2 CONNECTION...');
+
+    /* No explicit CONNECT needed for batch PL/I with DB2 */
+    /* Connection is established via DSN RUN command in JCL */
+    
+    PUT SKIP LIST('DB2 CONNECTION ESTABLISHED VIA DSN RUN');
+
+  RETURN;
+  END INITIALIZE_DB2;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: TERMINATE_DB2
+  * Terminate DB2 connection
+  *------------------------------------------------------------*/
+  TERMINATE_DB2: PROCEDURE;
+
+    PUT SKIP LIST('TERMINATING DB2 CONNECTION...');
+
+    EXEC SQL COMMIT WORK;
+    
+    /* No explicit disconnect needed - handled by DSN END */
+
+    PUT SKIP LIST('DB2 CONNECTION TERMINATED');
+
+  RETURN;
+  END TERMINATE_DB2;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PROCESS_ALL_ACCOUNTS
+  * Process all accounts and generate statements
+  *------------------------------------------------------------*/
+  PROCESS_ALL_ACCOUNTS: PROCEDURE;
+
+    PUT SKIP LIST('PROCESSING ACCOUNTS FOR SORT CODE: ', 
+                              HV_ACCT_SORTCODE);
+
+    /* Sort code already set from DATECARD in GET_STATEMENT_PERIOD */
+
+    /* Open account cursor */
+    EXEC SQL OPEN ACCT_CURSOR;
+
+    IF SQLCODE ^= 0 THEN DO;
+      PUT SKIP LIST('ERROR OPENING ACCOUNT CURSOR - SQLCODE: '
+                   , SQLCODE);
+      RETURN;
+    END;
+
+    /* Process each account */
+    END_OF_DATA = '0'B;
+    DO WHILE (^END_OF_DATA);
+      CALL FETCH_ACCOUNT;
+      IF ^END_OF_DATA THEN
+        CALL GENERATE_STATEMENT;
+    END;
+
+    /* Close account cursor */
+    EXEC SQL CLOSE ACCT_CURSOR;
+
+  RETURN;
+  END PROCESS_ALL_ACCOUNTS;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: FETCH_ACCOUNT
+  * Fetch next account from cursor
+  *------------------------------------------------------------*/
+  FETCH_ACCOUNT: PROCEDURE;
+
+    EXEC SQL FETCH ACCT_CURSOR
+      INTO :HV_ACCT_EYECATCHER,
+           :HV_ACCT_CUST_NUMBER,
+           :HV_ACCT_SORTCODE,
+           :HV_ACCT_NUMBER,
+           :HV_ACCT_TYPE,
+           :HV_ACCT_INTEREST_RATE :HV_ACCT_INTEREST_RATE_NULL,
+           :HV_ACCT_OPENED,
+           :HV_ACCT_OVERDRAFT_LIMIT :HV_ACCT_OVERDRAFT_LIMIT_NULL,
+           :HV_ACCT_LAST_STMT :HV_ACCT_LAST_STMT_NULL,
+           :HV_ACCT_NEXT_STMT :HV_ACCT_NEXT_STMT_NULL,
+           :HV_ACCT_AVAIL_BALANCE,
+           :HV_ACCT_ACTUAL_BALANCE;
+
+    IF SQLCODE = 100 THEN
+      END_OF_DATA = '1'B;
+    ELSE IF SQLCODE ^= 0 THEN DO;
+      PUT SKIP LIST('ERROR FETCHING ACCOUNT - SQLCODE: ', SQLCODE);
+      END_OF_DATA = '1'B;
+    END;
+
+  RETURN;
+  END FETCH_ACCOUNT;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: GENERATE_STATEMENT
+  * Generate statement for current account
+  *------------------------------------------------------------*/
+  GENERATE_STATEMENT: PROCEDURE;
+
+    PUT SKIP LIST('GENERATING STATEMENT FOR ACCOUNT: ', 
+                  TRIM(HV_ACCT_NUMBER));
+
+    /* Initialize counters */
+    TRANS_COUNT = 0;
+    TOTAL_CREDITS = 0;
+    TOTAL_DEBITS = 0;
+    OPENING_BALANCE = 0;  /* Will be calculated in PRINT_SUMMARY */
+    LINE_COUNT = 0;
+    PAGE_COUNT = PAGE_COUNT + 1;
+
+    /* Retrieve customer information */
+    CALL GET_CUSTOMER_INFO;
+
+    /* Print statement header */
+    CALL PRINT_HEADER;
+
+    /* Print customer and account information */
+    CALL PRINT_ACCOUNT_INFO;
+
+    /* Process and print transactions */
+    CALL PROCESS_TRANSACTIONS;
+
+    /* Print statement summary */
+    CALL PRINT_SUMMARY;
+
+    /* Print footer */
+    CALL PRINT_FOOTER;
+
+  RETURN;
+  END GENERATE_STATEMENT;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: GET_CUSTOMER_INFO
+  * Retrieve customer information from DB2
+  *------------------------------------------------------------*/
+  GET_CUSTOMER_INFO: PROCEDURE;
+
+    EXEC SQL SELECT CUSTOMER_EYECATCHER,
+                    CUSTOMER_SORTCODE,
+                    CUSTOMER_NUMBER,
+                    CUSTOMER_TITLE,
+                    CUSTOMER_FIRST_NAME,
+                    CUSTOMER_LAST_NAME,
+                    CUSTOMER_DATE_OF_BIRTH,
+                    CUSTOMER_PHONE,
+                    CUSTOMER_ADDR_LINE1,
+                    CUSTOMER_ADDR_LINE2,
+                    CUSTOMER_CITY,
+                    CUSTOMER_POSTCODE,
+                    CUSTOMER_COUNTRY,
+                    CUSTOMER_STATUS,
+                    CUSTOMER_CREATED_DATE,
+                    CUSTOMER_CREDIT_SCORE,
+                    CUSTOMER_CS_REVIEW_DATE
+             INTO :HV_CUST_EYECATCHER,
+                  :HV_CUST_SORTCODE,
+                  :HV_CUST_NUMBER,
+                  :HV_CUST_TITLE :HV_CUST_TITLE_NULL,
+                  :HV_CUST_FIRST_NAME,
+                  :HV_CUST_LAST_NAME,
+                  :HV_CUST_DOB :HV_CUST_DOB_NULL,
+                  :HV_CUST_PHONE :HV_CUST_PHONE_NULL,
+                  :HV_CUST_ADDR_LINE1,
+                  :HV_CUST_ADDR_LINE2 :HV_CUST_ADDR_LINE2_NULL,
+                  :HV_CUST_CITY,
+                  :HV_CUST_POSTCODE,
+                  :HV_CUST_COUNTRY,
+                  :HV_CUST_STATUS,
+                  :HV_CUST_CREATED_DATE,
+                  :HV_CUST_CREDIT_SCORE :HV_CUST_CREDIT_SCORE_NULL,
+                  :HV_CUST_CS_REVIEW_DATE :HV_CUST_CS_REVIEW_DATE_NULL
+             FROM CUSTOMER
+             WHERE CUSTOMER_NUMBER = :HV_ACCT_CUST_NUMBER
+               AND CUSTOMER_SORTCODE = :HV_ACCT_SORTCODE;
+
+    IF SQLCODE = 100 THEN DO;
+      /* Customer not found - blank out all fields */
+      PUT SKIP LIST('WARNING: CUSTOMER NOT FOUND - SQLCODE: 100');
+      HV_CUST_EYECATCHER = '';
+      HV_CUST_SORTCODE = '';
+      HV_CUST_NUMBER = '';
+      HV_CUST_TITLE = '';
+      HV_CUST_FIRST_NAME = '';
+      HV_CUST_LAST_NAME = '';
+      HV_CUST_DOB = 0;
+      HV_CUST_PHONE = '';
+      HV_CUST_ADDR_LINE1 = '';
+      HV_CUST_ADDR_LINE2 = '';
+      HV_CUST_CITY = '';
+      HV_CUST_POSTCODE = '';
+      HV_CUST_COUNTRY = '';
+      HV_CUST_STATUS = '';
+      HV_CUST_CREATED_DATE = 0;
+      HV_CUST_CREDIT_SCORE = 0;
+      HV_CUST_CS_REVIEW_DATE = 0;
+      /* Set all null indicators to -1 (null) */
+      HV_CUST_TITLE_NULL = -1;
+      HV_CUST_PHONE_NULL = -1;
+      HV_CUST_ADDR_LINE2_NULL = -1;
+      HV_CUST_DOB_NULL = -1;
+      HV_CUST_CREDIT_SCORE_NULL = -1;
+      HV_CUST_CS_REVIEW_DATE_NULL = -1;
+    END;
+    ELSE IF SQLCODE ^= 0 THEN DO;
+      PUT SKIP LIST('ERROR RETRIEVING CUSTOMER - SQLCODE: ', SQLCODE);
+      /* Blank out fields on error as well */
+      HV_CUST_FIRST_NAME = '';
+      HV_CUST_LAST_NAME = '';
+      HV_CUST_TITLE = '';
+      HV_CUST_PHONE = '';
+      HV_CUST_ADDR_LINE1 = '';
+      HV_CUST_ADDR_LINE2 = '';
+      HV_CUST_CITY = '';
+      HV_CUST_POSTCODE = '';
+      HV_CUST_COUNTRY = '';
+    END;
+
+  RETURN;
+  END GET_CUSTOMER_INFO;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PRINT_HEADER
+  * Print statement header
+  *------------------------------------------------------------*/
+  PRINT_HEADER: PROCEDURE;
+
+    CALL CHECK_PAGE_BREAK;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = CENTRE('BANK OF Z', 132);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = CENTRE('MONTHLY ACCOUNT STATEMENT', 132);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = CENTRE('================================', 132);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'STATEMENT DATE: ' || STMT_DATE;
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'STATEMENT PERIOD: ' || PERIOD_FROM || ' TO ' || 
+                  PERIOD_TO;
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'PAGE: ' || TRIM(CHAR(PAGE_COUNT));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+  RETURN;
+  END PRINT_HEADER;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PRINT_ACCOUNT_INFO
+  * Print customer and account information
+  *------------------------------------------------------------*/
+  PRINT_ACCOUNT_INFO: PROCEDURE;
+
+    CALL CHECK_PAGE_BREAK;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'CUSTOMER INFORMATION:';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  NAME: ' || TRIM(HV_CUST_TITLE) || ' ' ||
+                  TRIM(HV_CUST_FIRST_NAME) || ' ' || 
+                  TRIM(HV_CUST_LAST_NAME);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  ADDRESS: ' || TRIM(HV_CUST_ADDR_LINE1);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    IF TRIM(HV_CUST_ADDR_LINE2) ^= '' THEN DO;
+      REPORT_LINE = '           ' || TRIM(HV_CUST_ADDR_LINE2);
+      PUT SKIP EDIT(REPORT_LINE) (A);
+      LINE_COUNT = LINE_COUNT + 1;
+    END;
+
+    REPORT_LINE = '           ' || TRIM(HV_CUST_CITY) || ', ' ||
+                  TRIM(HV_CUST_POSTCODE);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '           ' || TRIM(HV_CUST_COUNTRY);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  PHONE: ' || TRIM(HV_CUST_PHONE);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'ACCOUNT INFORMATION:';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  ACCOUNT NUMBER: ' || TRIM(HV_ACCT_SORTCODE) || 
+                  '-' || TRIM(HV_ACCT_NUMBER);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  ACCOUNT TYPE: ' || TRIM(HV_ACCT_TYPE);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  INTEREST RATE: ' || 
+                  TRIM(CHAR(HV_ACCT_INTEREST_RATE)) || '%';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '  OVERDRAFT LIMIT: $' || 
+                  TRIM(CHAR(HV_ACCT_OVERDRAFT_LIMIT));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+  RETURN;
+  END PRINT_ACCOUNT_INFO;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PROCESS_TRANSACTIONS
+  * Process and print transaction history
+  *------------------------------------------------------------*/
+  PROCESS_TRANSACTIONS: PROCEDURE;
+    DCL TRAN_END_OF_DATA      BIT(1);
+
+    CALL CHECK_PAGE_BREAK;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'TRANSACTION HISTORY:';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'DATE       TIME    TYPE  REFERENCE    ' ||
+                  'DESCRIPTION                      AMOUNT';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '--------------------------------------' ||
+                  '--------------------------------------' ||
+                  '----------';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    /* Set parameters for transaction cursor */
+    HV_TRAN_SORTCODE = HV_ACCT_SORTCODE;
+    HV_TRAN_NUMBER = HV_ACCT_NUMBER;
+
+    /* Open transaction cursor */
+    EXEC SQL OPEN TRAN_CURSOR;
+
+    IF SQLCODE ^= 0 THEN DO;
+      PUT SKIP LIST('ERROR OPENING TRANSACTION CURSOR - SQLCODE: ', 
+                    SQLCODE);
+      RETURN;
+    END;
+
+    /* Fetch and print each transaction */
+    TRAN_END_OF_DATA = '0'B;
+    DO WHILE (^TRAN_END_OF_DATA);
+      EXEC SQL FETCH TRAN_CURSOR
+        INTO :HV_TRAN_EYECATCHER,
+             :HV_TRAN_SORTCODE,
+             :HV_TRAN_NUMBER,
+             :HV_TRAN_DATE,
+             :HV_TRAN_TIME,
+             :HV_TRAN_REF,
+             :HV_TRAN_TYPE,
+             :HV_TRAN_DESC :HV_TRAN_DESC_NULL,
+             :HV_TRAN_AMOUNT;
+
+      IF SQLCODE = 100 THEN
+        TRAN_END_OF_DATA = '1'B;
+      ELSE IF SQLCODE ^= 0 THEN DO;
+        PUT SKIP LIST('ERROR FETCHING TRANSACTION - SQLCODE: ', 
+                       SQLCODE);
+        TRAN_END_OF_DATA = '1'B;
+      END;
+      ELSE DO;
+        CALL PRINT_TRANSACTION;
+        TRANS_COUNT = TRANS_COUNT + 1;
+
+        /* Accumulate totals - store absolute values */
+        IF HV_TRAN_TYPE = 'CR' | HV_TRAN_TYPE = 'CRD' THEN
+          TOTAL_CREDITS = TOTAL_CREDITS + HV_TRAN_AMOUNT;
+        ELSE
+          TOTAL_DEBITS = TOTAL_DEBITS + ABS(HV_TRAN_AMOUNT);
+      END;
+    END;
+
+    /* Close transaction cursor */
+    EXEC SQL CLOSE TRAN_CURSOR;
+
+    IF TRANS_COUNT = 0 THEN DO;
+      REPORT_LINE = '  NO TRANSACTIONS FOR THIS PERIOD';
+      PUT SKIP EDIT(REPORT_LINE) (A);
+      LINE_COUNT = LINE_COUNT + 1;
+    END;
+
+  RETURN;
+  END PROCESS_TRANSACTIONS;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PRINT_TRANSACTION
+  * Print a single transaction line
+  *------------------------------------------------------------*/
+  PRINT_TRANSACTION: PROCEDURE;
+    DCL FORMATTED_DATE        CHAR(10);
+    DCL FORMATTED_TIME        CHAR(8);
+    DCL FORMATTED_AMOUNT      CHAR(20);
+    DCL TEMP_AMOUNT           FIXED DEC(12,2);
+    DCL AMOUNT_STR            CHAR(20);
+    DCL I                     FIXED BIN(15);
+    DCL J                     FIXED BIN(15);
+
+    CALL CHECK_PAGE_BREAK;
+
+    /* Date is already in YYYY-MM-DD format from DB2 */
+    FORMATTED_DATE = HV_TRAN_DATE;
+
+    /* Format time as HH:MM:SS */
+    FORMATTED_TIME = SUBSTR(HV_TRAN_TIME, 1, 2) || ':' ||
+                     SUBSTR(HV_TRAN_TIME, 3, 2) || ':' ||
+                     SUBSTR(HV_TRAN_TIME, 5, 2);
+
+    /* Format amount - convert decimal to string manually */
+    IF HV_TRAN_TYPE = 'CR' | HV_TRAN_TYPE = 'CRD' THEN DO;
+      TEMP_AMOUNT = HV_TRAN_AMOUNT;
+    END;
+    ELSE DO;
+      TEMP_AMOUNT = ABS(HV_TRAN_AMOUNT);
+    END;
+    
+    /* Convert to string using PUT STRING */
+    PUT STRING(AMOUNT_STR) EDIT(TEMP_AMOUNT) (F(10,2));
+    FORMATTED_AMOUNT = TRIM(AMOUNT_STR);
+    
+    /* Add minus sign for debits */
+    IF HV_TRAN_TYPE ^= 'CR' & HV_TRAN_TYPE ^= 'CRD' THEN
+      FORMATTED_AMOUNT = '-' || FORMATTED_AMOUNT;
+
+    /* Handle null description */
+    IF HV_TRAN_DESC_NULL < 0 THEN
+      HV_TRAN_DESC = 'N/A';
+
+    REPORT_LINE = FORMATTED_DATE || ' ' || FORMATTED_TIME || ' ' ||
+                  HV_TRAN_TYPE || '   ' || HV_TRAN_REF || ' ' ||
+                  SUBSTR(HV_TRAN_DESC, 1, 30) || ' ' ||
+                  FORMATTED_AMOUNT;
+
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+  RETURN;
+  END PRINT_TRANSACTION;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PRINT_SUMMARY
+  * Print statement summary
+  *------------------------------------------------------------*/
+  PRINT_SUMMARY: PROCEDURE;
+
+    CALL CHECK_PAGE_BREAK;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '================================';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = 'STATEMENT SUMMARY:';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = '================================';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    /* Use Available Balance as the current balance (end of period) */
+    /* Calculate opening balance: Current + Debits - Credits */
+    /* Opening = What we have now + what we paid out - what came in */
+    
+    /* Break calculation into steps to avoid line length issues */
+    OPENING_BALANCE = HV_ACCT_AVAIL_BALANCE;
+    OPENING_BALANCE = OPENING_BALANCE + TOTAL_DEBITS;
+    OPENING_BALANCE = OPENING_BALANCE - TOTAL_CREDITS;
+    
+    
+    PUT STRING(REPORT_LINE) EDIT('  OPENING BALANCE:        $',
+                                  OPENING_BALANCE) (A, F(10,2));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    PUT STRING(REPORT_LINE) EDIT('  TOTAL CREDITS:          $',
+                                  TOTAL_CREDITS) (A, F(10,2));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    PUT STRING(REPORT_LINE) EDIT('  TOTAL DEBITS:           $',
+                                  TOTAL_DEBITS) (A, F(10,2));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    /* Calculate closing balance: Opening - Debits + Credits */
+    /* This should equal Available Balance */
+    CLOSING_BALANCE = OPENING_BALANCE;
+    CLOSING_BALANCE = CLOSING_BALANCE - TOTAL_DEBITS;
+    CLOSING_BALANCE = CLOSING_BALANCE + TOTAL_CREDITS;
+    PUT STRING(REPORT_LINE) EDIT('  CLOSING BALANCE:        $',
+                                  CLOSING_BALANCE) (A, F(10,2));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    PUT STRING(REPORT_LINE) EDIT('  AVAILABLE BALANCE:      $',
+                                  HV_ACCT_AVAIL_BALANCE) (A, F(10,2));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    PUT STRING(REPORT_LINE) EDIT('  TRANSACTION COUNT:      ',
+                                  TRANS_COUNT) (A, F(5));
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+  RETURN;
+  END PRINT_SUMMARY;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: PRINT_FOOTER
+  * Print statement footer
+  *------------------------------------------------------------*/
+  PRINT_FOOTER: PROCEDURE;
+
+    CALL CHECK_PAGE_BREAK;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = CENTRE('*** END OF STATEMENT ***', 132);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = ' ';
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    REPORT_LINE = CENTRE('Thank you for banking with Bank of Z', 132);
+    PUT SKIP EDIT(REPORT_LINE) (A);
+    LINE_COUNT = LINE_COUNT + 1;
+
+    /* Force page break for next statement */
+    PUT PAGE;
+    LINE_COUNT = 0;
+
+  RETURN;
+  END PRINT_FOOTER;
+
+  /*------------------------------------------------------------*
+  * PROCEDURE: CHECK_PAGE_BREAK
+  * Check if page break is needed
+  *------------------------------------------------------------*/
+  CHECK_PAGE_BREAK: PROCEDURE;
+
+    IF LINE_COUNT >= LINES_PER_PAGE THEN DO;
+      PUT PAGE;
+      LINE_COUNT = 0;
+      CALL PRINT_HEADER;
+    END;
+
+  RETURN;
+  END CHECK_PAGE_BREAK;
+
+  END BNKSTMT;

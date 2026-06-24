@@ -23,6 +23,7 @@ tasks:
     # source file association
     sources:
       - "**/cobol/*.cbl"
+      - "**/pli/*.pli"
 
     # overridable variables
     variables:

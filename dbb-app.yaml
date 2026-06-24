@@ -351,15 +351,6 @@ application:
         # Assembler parms
         - name: assemblerParms
           value: OBJECT,NODECK
-          append:
-          - condition: 
-              exists: errPrefix
-            value: ADATA,EX(ADX(ELAXHASM))
-          - condition: 
-              exists: debug
-              notExits: errPrefix
-              eval: ${debug}
-            value: ADATA
 
         # Link edit parms
         - name: linkEditParms

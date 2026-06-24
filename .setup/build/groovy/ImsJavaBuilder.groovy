@@ -20,11 +20,12 @@ import com.ibm.dbb.task.TaskConstants
  * ImsJavaBuilder - DBB script to build IMS Java code and package the resulting
  * JAR into the DBB build package for deployment.
  *
- * This script:
+ * This script mirrors VanillaFrontend.groovy and zOSConnect (buildOpenAPIv3):
  * 1. Detects whether any IMS Java source files changed (pipeline/impact builds)
- * 2. Runs mvn clean install to compile the Java sources into a JAR
- * 3. Registers the output JAR in the build map with deployType=IMS-JAR so the
- *    Package task includes it in the tar
+ * 2. Runs mvn clean install, depositing the JAR into outputDirectory (the DBB
+ *    package staging area) via -DoutputDir — same pattern as the api.war
+ * 3. Registers the JAR in the build map with deployType=IMS-JAR so the Package
+ *    task pulls it into the tar, and Wazi Deploy copies it to sandbox/jars
  *
  * The Maven executable path is supplied via the 'mavenPath' config variable so
  * it is never hardcoded in this script.
@@ -33,14 +34,16 @@ import com.ibm.dbb.task.TaskConstants
 log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
 
 // -------------------------------------------------------------------------
-// Context variables
+// Context variables — same as VanillaFrontend
 // -------------------------------------------------------------------------
 def workspace       = context.getVariable(TaskConstants.WORKSPACE)
 def appDirName      = context.getVariable(TaskConstants.APP_DIR_NAME)
 def logsDirectory   = context.getVariable(TaskConstants.LOGS)
+def outputDirectory = config.getVariable(TaskConstants.OUTPUT_DIR) ?: logsDirectory
 
-log.info("Workspace:    ${workspace}")
-log.info("App Dir Name: ${appDirName}")
+log.info("Workspace:        ${workspace}")
+log.info("App Dir Name:     ${appDirName}")
+log.info("Output Directory: ${outputDirectory}")
 
 // -------------------------------------------------------------------------
 // Config variables — supplied in dbb-app.yaml task block
@@ -58,18 +61,8 @@ if (!mavenPath) {
 def imsJavaRelativePath = config.getVariable('configSources') ?: 'src/base/ims/java'
 def imsJavaPath = "${workspace}/${appDirName}/${imsJavaRelativePath}"
 
-// Directory where Maven deposits the JAR — must match dfsjvmpr.props classpath
-// Defaults to <sandbox>/jars (the original shell script location)
-def jarOutputDir = config.getVariable('jarOutputDir')
-if (!jarOutputDir) {
-    log.error("ImsJavaBuilder: 'jarOutputDir' configuration variable is required but not set.")
-    log.error("Add jarOutputDir to the ImsJavaBuilder task configuration in dbb-app.yaml.")
-    return 8
-}
-
 log.info("Maven executable: ${mavenPath}")
 log.info("IMS Java path:    ${imsJavaPath}")
-log.info("JAR output dir:   ${jarOutputDir}")
 
 // -------------------------------------------------------------------------
 // Verify Maven project directory exists
@@ -129,14 +122,17 @@ try {
     log.info("Running Maven build")
     log.info("=" * 80)
 
-    // Maven deposits the JAR into jarOutputDir via -DoutputDir
-    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${jarOutputDir}"]
+    // Maven deposits the JAR directly into outputDirectory (the DBB package staging
+    // area) via -DoutputDir. This is the same pattern as VanillaFrontend writing
+    // its WAR into outputDirectory and zOSConnect writing api.war there — the
+    // Package task then pulls everything from outputDirectory into the tar.
+    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${outputDirectory}"]
     log.info("Executing: ${mvnArgs.join(' ')}")
     log.info("Working directory: ${imsJavaPath}")
 
     def mvnProc = mvnArgs.execute(env, new File(imsJavaPath))
 
-    // Stream Maven output to logger in real time
+    // Stream Maven output to the DBB logger in real time
     mvnProc.consumeProcessOutputStream(new OutputStream() {
         private StringBuilder line = new StringBuilder()
         void write(int b) {
@@ -170,14 +166,16 @@ try {
     log.info("Maven build completed successfully")
 
     // -------------------------------------------------------------------------
-    // Find the JAR produced by Maven in outputDirectory
-    // Maven uses artifactId-version.jar — discover it rather than hardcode
+    // Find the JAR Maven produced in outputDirectory
+    // Discover it by extension rather than hardcoding the artifact name
     // -------------------------------------------------------------------------
-    def outputDir = new File(jarOutputDir)
-    def jarFiles = outputDir.listFiles({ f -> f.name.endsWith('.jar') && !f.name.endsWith('-sources.jar') } as FileFilter)
+    def outputDir = new File(outputDirectory)
+    def jarFiles = outputDir.listFiles({ f ->
+        f.name.endsWith('.jar') && !f.name.endsWith('-sources.jar')
+    } as FileFilter)
 
     if (!jarFiles || jarFiles.length == 0) {
-        log.error("No JAR found in output directory after Maven build: ${jarOutputDir}")
+        log.error("No JAR found in output directory after Maven build: ${outputDirectory}")
         return 8
     }
 
@@ -186,7 +184,7 @@ try {
     log.info("JAR produced: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
 
     // -------------------------------------------------------------------------
-    // Register JAR in build map for the Package task
+    // Register JAR in build map — same pattern as VanillaFrontend for its WAR
     // -------------------------------------------------------------------------
     log.info("=" * 80)
     log.info("Registering JAR in build map")
@@ -198,7 +196,7 @@ try {
         return 8
     }
 
-    // Use pom.xml as the marker file (stable, uniquely identifies this project)
+    // pom.xml is the stable marker for this Maven project
     String relativeMarkerPath = "${imsJavaRelativePath}/pom.xml"
 
     if (buildGroup.buildMapExists(relativeMarkerPath)) {
@@ -210,7 +208,7 @@ try {
     buildMap.addOutput(jarFile.absolutePath, "IMS-JAR", null, null)
     log.info("Output registered: ${jarFile.absolutePath} with deployType=IMS-JAR")
 
-    // Add marker to BUILD_LIST so Package task processes it
+    // Add marker to BUILD_LIST — must be the same path used in createBuildMap()
     buildList.add(relativeMarkerPath)
     log.info("Added ${relativeMarkerPath} to BUILD_LIST (total files: ${buildList.size()})")
 

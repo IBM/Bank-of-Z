@@ -94,7 +94,9 @@ stage_clone_bank_of_z() {
     fi
     
     # Clone Bank of Z repository
-    current_repo=$(git config --get remote.origin.url | sed -E 's#git@([^:]+):#https://\1/#')
+    current_repo=$(git config --get remote.origin.url \
+        | sed -E 's#git@([^:]+):#https://\1/#' \
+        | sed -E 's#https://github-[a-zA-Z0-9_-]+/#https://github.com/#')
     print_info "Cloning $current_repo on remote (branch: $current_branch)..."
     print_info "This may take a few minutes..."
     

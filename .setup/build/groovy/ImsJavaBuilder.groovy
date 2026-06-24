@@ -122,11 +122,19 @@ try {
     log.info("Running Maven build")
     log.info("=" * 80)
 
-    // Maven deposits the JAR directly into outputDirectory (the DBB package staging
-    // area) via -DoutputDir. This is the same pattern as VanillaFrontend writing
-    // its WAR into outputDirectory and zOSConnect writing api.war there — the
-    // Package task then pulls everything from outputDirectory into the tar.
-    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${outputDirectory}"]
+    // Maven's pom.xml uses <directory>${outputDir}</directory> which makes the
+    // entire Maven build dir (including mvn clean) point at that path. We must
+    // NOT pass outputDirectory directly — mvn clean would wipe everything
+    // VanillaFrontend and ServerXmlPackager already wrote there.
+    // Instead, build into a private temp dir then copy only the JAR across.
+    def mvnWorkDir = new File("${outputDirectory}/ims-java-build-temp")
+    if (mvnWorkDir.exists()) {
+        log.info("Cleaning existing Maven work dir: ${mvnWorkDir.absolutePath}")
+        mvnWorkDir.deleteDir()
+    }
+    mvnWorkDir.mkdirs()
+
+    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${mvnWorkDir.absolutePath}"]
     log.info("Executing: ${mvnArgs.join(' ')}")
     log.info("Working directory: ${imsJavaPath}")
 
@@ -166,22 +174,29 @@ try {
     log.info("Maven build completed successfully")
 
     // -------------------------------------------------------------------------
-    // Find the JAR Maven produced in outputDirectory
-    // Discover it by extension rather than hardcoding the artifact name
+    // Find the JAR Maven produced in the temp build dir, then copy it into
+    // outputDirectory so the Package task can pick it up — same as VanillaFrontend
+    // copying its WAR into outputDirectory after creating it in a temp dir.
     // -------------------------------------------------------------------------
-    def outputDir = new File(outputDirectory)
-    def jarFiles = outputDir.listFiles({ f ->
+    def jarFiles = mvnWorkDir.listFiles({ f ->
         f.name.endsWith('.jar') && !f.name.endsWith('-sources.jar')
     } as FileFilter)
 
     if (!jarFiles || jarFiles.length == 0) {
-        log.error("No JAR found in output directory after Maven build: ${outputDirectory}")
+        log.error("No JAR found in Maven work dir after build: ${mvnWorkDir.absolutePath}")
+        mvnWorkDir.deleteDir()
         return 8
     }
 
     // Pick the most recently modified jar in case there are multiple
-    def jarFile = jarFiles.sort { a, b -> b.lastModified() <=> a.lastModified() }.first()
-    log.info("JAR produced: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
+    def sourceJar = jarFiles.sort { a, b -> b.lastModified() <=> a.lastModified() }.first()
+    def jarFile = new File("${outputDirectory}/${sourceJar.name}")
+    log.info("Copying JAR: ${sourceJar.absolutePath} → ${jarFile.absolutePath}")
+    jarFile.bytes = sourceJar.bytes
+
+    // Clean up the Maven temp dir — only the JAR in outputDirectory is needed
+    mvnWorkDir.deleteDir()
+    log.info("JAR in output directory: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
 
     // -------------------------------------------------------------------------
     // Register JAR in build map — same pattern as VanillaFrontend for its WAR

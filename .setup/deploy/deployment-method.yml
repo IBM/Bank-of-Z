@@ -408,6 +408,18 @@ activities:
     tags:
     - ims_spoc_management
 
+  - name: 'Deploy IMS JAR'
+    description: 'Copy the IMS Java JMP JAR to the USS classpath directory'
+    actions:
+        - name: 'Copy to USS'
+          steps:
+          - name: USS_COPY
+    types:
+       - name: 'IMS-JAR'
+    tags:
+    - deploy
+    is_artifact: True
+
   - name: 'Deploy WAR files'
     description: 'Copy the z/OS Connect WAR files into the destination folder'
     actions:

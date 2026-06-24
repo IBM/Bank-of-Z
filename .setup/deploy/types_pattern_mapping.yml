@@ -115,6 +115,12 @@ types:
     is_load: True
     is_ims_dbd: True
     use_native_copy: true
+  - pattern: .*\.IMS-JAR$
+    uss:
+      dest: "{{ sandbox_path }}/jars"
+      backup_dest: "{{ sandbox_path }}/jars/back"
+      mode: 0755
+    is_binary: True
 type_dbrm_temp:
   - type: "DBRM"
     pattern: .*.DBRM$

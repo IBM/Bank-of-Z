@@ -1,15 +1,13 @@
 ---
 version: "1.0"
-response_201.yaml:
-  condition: "$exists($zosAssetResponse.commarea.PAYDBCRZ)"
-  httpStatusCode: 201
-response_400.yaml:
-  condition: "$not($exists($zosAssetResponse.commarea.PAYDBCRZ))"
-  httpStatusCode: 400
 response_404.yaml:
-  condition: "$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-FAIL-CODE\" = \"4\""
+  condition: "$exists($zosAssetResponse.commarea.PAYDBCRZ) and $zosAssetResponse.commarea.PAYDBCRZ.\"COMM-SUCCESS\" != \"Y\""
   httpStatusCode: 404
+response_201.yaml:
+  condition: "$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-SUCCESS\" = \"Y\""
+  httpStatusCode: 201
 response_401.yaml:
+  condition: "$not($exists($zosAssetResponse.commarea.PAYDBCRZ))"
   httpStatusCode: 401
 response_403.yaml:
   httpStatusCode: 403

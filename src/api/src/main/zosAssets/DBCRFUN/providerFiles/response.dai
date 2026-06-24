@@ -87,6 +87,12 @@
                         </marshaller>
                         <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
                     </field>
+                    <field name="FILLER" originalName="FILLER" included="N" path="PAYDBCRZ.COMM-ORIGIN.FILLER" srcLine="05 FILLER PIC X(4) USAGE DISPLAY.">
+                        <startPos>87</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
                 </field>
                 <field name="COMM-SUCCESS" originalName="COMM-SUCCESS" included="Y" path="PAYDBCRZ.COMM-SUCCESS" srcLine="03 COMM-SUCCESS PIC X USAGE DISPLAY.">
                     <startPos>91</startPos>

@@ -38,11 +38,9 @@ log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
 def workspace       = context.getVariable(TaskConstants.WORKSPACE)
 def appDirName      = context.getVariable(TaskConstants.APP_DIR_NAME)
 def logsDirectory   = context.getVariable(TaskConstants.LOGS)
-def outputDirectory = config.getVariable(TaskConstants.OUTPUT_DIR) ?: logsDirectory
 
-log.info("Workspace:        ${workspace}")
-log.info("App Dir Name:     ${appDirName}")
-log.info("Output Directory: ${outputDirectory}")
+log.info("Workspace:    ${workspace}")
+log.info("App Dir Name: ${appDirName}")
 
 // -------------------------------------------------------------------------
 // Config variables — supplied in dbb-app.yaml task block
@@ -60,8 +58,18 @@ if (!mavenPath) {
 def imsJavaRelativePath = config.getVariable('configSources') ?: 'src/base/ims/java'
 def imsJavaPath = "${workspace}/${appDirName}/${imsJavaRelativePath}"
 
+// Directory where Maven deposits the JAR — must match dfsjvmpr.props classpath
+// Defaults to <sandbox>/jars (the original shell script location)
+def jarOutputDir = config.getVariable('jarOutputDir')
+if (!jarOutputDir) {
+    log.error("ImsJavaBuilder: 'jarOutputDir' configuration variable is required but not set.")
+    log.error("Add jarOutputDir to the ImsJavaBuilder task configuration in dbb-app.yaml.")
+    return 8
+}
+
 log.info("Maven executable: ${mavenPath}")
 log.info("IMS Java path:    ${imsJavaPath}")
+log.info("JAR output dir:   ${jarOutputDir}")
 
 // -------------------------------------------------------------------------
 // Verify Maven project directory exists
@@ -121,12 +129,12 @@ try {
     log.info("Running Maven build")
     log.info("=" * 80)
 
-    // Maven deposits the JAR directly into outputDirectory via -DoutputDir
-    def mvnCmd = "${mavenPath} clean install -DoutputDir=${outputDirectory}"
-    log.info("Executing: ${mvnCmd}")
+    // Maven deposits the JAR into jarOutputDir via -DoutputDir
+    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${jarOutputDir}"]
+    log.info("Executing: ${mvnArgs.join(' ')}")
     log.info("Working directory: ${imsJavaPath}")
 
-    def mvnProc = [mvnCmd].execute(env, new File(imsJavaPath))
+    def mvnProc = mvnArgs.execute(env, new File(imsJavaPath))
 
     // Stream Maven output to logger in real time
     mvnProc.consumeProcessOutputStream(new OutputStream() {
@@ -165,11 +173,11 @@ try {
     // Find the JAR produced by Maven in outputDirectory
     // Maven uses artifactId-version.jar — discover it rather than hardcode
     // -------------------------------------------------------------------------
-    def outputDir = new File(outputDirectory)
+    def outputDir = new File(jarOutputDir)
     def jarFiles = outputDir.listFiles({ f -> f.name.endsWith('.jar') && !f.name.endsWith('-sources.jar') } as FileFilter)
 
     if (!jarFiles || jarFiles.length == 0) {
-        log.error("No JAR found in output directory after Maven build: ${outputDirectory}")
+        log.error("No JAR found in output directory after Maven build: ${jarOutputDir}")
         return 8
     }
 

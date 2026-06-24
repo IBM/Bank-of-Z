@@ -240,14 +240,17 @@ tasks:
     # Custom task for Vanilla JS frontend build
   - task: VanillaFrontend
     script: groovy/VanillaFrontend.groovy
+    failOnError: true
 
   # Custom task for server.xml packaging
   - task: ServerXmlPackager
     script: groovy/ServerXmlPackager.groovy
+    failOnError: true
 
   # Custom task for IMS Java build and JAR packaging
   - task: ImsJavaBuilder
     script: groovy/ImsJavaBuilder.groovy
+    failOnError: true
   
   # default empty Languages stage
   # to be replaced by content of Languges.yaml

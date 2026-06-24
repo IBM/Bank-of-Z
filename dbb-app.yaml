@@ -314,6 +314,9 @@ application:
         # Relative path (from repo root) to the Maven project directory
         - name: configSources
           value: "src/base/ims/java"
+        # USS directory where Maven deposits the JAR — matches dfsjvmpr.props classpath
+        - name: jarOutputDir
+          value: "/usr/local/sandboxes/bank-of-z/jars"
 
     - task: zOSConnect
       variables:

@@ -37,10 +37,7 @@ get_pipeline_parameters() {
     
     # Get git repository
     if git rev-parse --git-dir > /dev/null 2>&1; then
-        GIT_REPO=$(git remote get-url origin 2>/dev/null \
-            | sed -E 's#git@([^:]+):#https://\1/#' \
-            | sed -E 's#https://github-[a-zA-Z0-9_-]+/#https://github.com/#' \
-            || echo "https://github.com/IBM/Bank-of-Z.git")
+        GIT_REPO=$(git remote get-url origin 2>/dev/null || echo "https://github.com/IBM/Bank-of-Z.git")
     else
         GIT_REPO="https://github.com/IBM/Bank-of-Z.git"
     fi

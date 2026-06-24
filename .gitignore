@@ -19,3 +19,4 @@ vsix-extensions/
 /.taz-unit-test
 tools/
 imsbank_provisioning/
+.setup/jcl/ims/Db2-grant-sysadm.jcl

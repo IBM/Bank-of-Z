@@ -85,7 +85,12 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
-zconfig apply ims-region.yaml -v
+# Set IMS user to current user instead of ibmuser
+# Ensure ZOS_USER is set (fallback to USER if not set)
+: ${ZOS_USER:=$(printf '%s' "${USER:-${LOGNAME}}" | tr '[:lower:]' '[:upper:]')}
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${ZOS_USER}"
+
+zconfig apply -e ims_user="${ZOS_USER}" ims-region.yaml -v
 
 RC=$?
 if [ "$RC" -eq 0 ]; then

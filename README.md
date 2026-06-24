@@ -26,6 +26,7 @@ The application provides typical banking operations:
 - **Customer Management** - Manage customer information and profiles
 - **Transaction Processing** - Handle debits, credits, and fund transfers
 - **Menu Navigation** - User-friendly CICS interface for banking operations
+- **Batch Processing** - Monthly statement generation and batch reporting
 
 ## Architecture
 
@@ -90,10 +91,30 @@ graph LR
 ```text
 Bank-of-Z/
 ├── src/                          # Application source code
-│   └── base/
-│       ├── cobol/               # COBOL programs
-│       ├── bms/                 # BMS map definitions
-│       └── copy/                # Copybooks
+│   ├── base/
+│   │   ├── batch/               # Batch programs
+│   │   │   ├── pli/            # PL/I batch programs
+│   │   │   └── job/            # JCL job control
+│   │   ├── cics/               # CICS programs
+│   │   │   ├── cobol/          # COBOL programs
+│   │   │   ├── bms/            # BMS map definitions
+│   │   │   └── copy/           # Copybooks
+│   │   └── ims/                # IMS programs
+│   │       ├── cobol/          # IMS COBOL programs
+│   │       ├── pli/            # IMS PL/I programs
+│   │       ├── copy/           # IMS copybooks
+│   │       ├── DBD/            # Database Descriptors (assembler)
+│   │       ├── PSB/            # Program Specification Blocks (assembler)
+│   │       ├── java/           # IMS Java bridge components
+│   │       └── LoadData/       # IMS database load files
+│   ├── api/                     # z/OS Connect API definitions
+│   │   └── src/main/
+│   │       ├── api/            # OpenAPI specifications
+│   │       └── liberty/config/ # Liberty server configuration
+│   └── frontend/                # Browser-based UI
+│       ├── js/                 # JavaScript files
+│       ├── css/                # Stylesheets
+│       └── assets/             # Images and static resources
 ├── .setup/                       # Pipeline setup automation
 │   ├── config.yaml              # Environment configuration
 │   ├── setup.sh                 # Setup script
@@ -110,6 +131,7 @@ Bank-of-Z/
 ### Build and Deploy Tools
 
 - **COBOL Programs** - Core banking business logic for account management, customer operations, and transactions
+- **PL/I Programs** - Monthly statement generation 
 - **BMS Maps** - Screen definitions for CICS terminal interactions
 - **Copybooks** - Shared data structures and definitions
 - **IBM DBB Integration** - Modern build automation for z/OS applications

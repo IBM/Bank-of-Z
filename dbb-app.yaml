@@ -210,7 +210,7 @@ application:
     - task: PLI
       # Glob pattern selecting PL/I source files to compile
       sources:
-        - "**/src/base/**/pli/*.pli"
+        - "**/src/base/**/*.pli"
 
       variables:
 
@@ -220,7 +220,9 @@ application:
 
         # Enable IMS-specific compiler and runtime options
         # (e.g. DL/I call support, IMS PSB/DBD handling)
+        # Enable IMS ONLY for programs under ims/pli/
         - name: isIMS
+          forFiles: "**/src/base/ims/pli/*.pli"
           value: true
 
         # ----- Link-edit instream for IBLOGIN (IMS PL/I program) -----
@@ -234,12 +236,28 @@ application:
               INCLUDE  SYSLIB(${MEMBER})
               INCLUDE RESLIB(DFSLI000)
               ENTRY CEESTART
-
+              
+        # ----- Link-edit instream for batch DB2 PL/I programs -----
+        # Batch programs use CEESTART but don't need DFSLI000
+        # DB2 connection handled via DSN RUN in JCL
+        - name: linkEditStream
+          forFiles: "**/src/base/batch/pli/*.pli"
+          value: |2
+              INCLUDE  SYSLIB(${MEMBER})
+              ENTRY CEESTART
+              NAME ${MEMBER}(R)
+              
         # ----- Deployment type -----
         # Controls which target library the load module is deployed to:
         #   IMSLOAD  - IMS program library (for all programs under ims/pli/)
         - name: deployType
+          forFiles: "**/src/base/ims/pli/*.pli"
           value: IMSLOAD
+          
+        # ----- Deployment type for batch programs -----
+        - name: deployType
+          forFiles: "**/src/base/batch/pli/*.pli"
+          value: LOAD
           
     - task: MetadataInit
       variables:

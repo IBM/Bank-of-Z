@@ -6,6 +6,7 @@
 set +e
 # For Grub and or ZOWE CLI
 source /etc/profile 2>/dev/null
+source $HOME/.profile 2>/dev/null
 set -e
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if git rev-parse --show-toplevel >/dev/null 2>&1; then

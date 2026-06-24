@@ -21,8 +21,8 @@
 types:
   - pattern: .*\.LOAD$ 
     pds: 
-      name: "{{ hlq }}.LOADLIB"
-      backup: "{{ hlq }}.BACK.LOADLIB"
+      name: "{{ hlq }}.LOAD"
+      backup: "{{ hlq }}.BACK.LOAD"
       spec: "{{ common_pds_load_spec }}"
     is_load: true
     force_lock: true

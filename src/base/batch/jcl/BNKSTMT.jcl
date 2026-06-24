@@ -19,6 +19,6 @@
 //SYSTSIN  DD *
  DSN SYSTEM(DBD1)
  RUN  PROGRAM(BNKSTMT) PLAN(BANKZPLN) -
-      LIB('BANKZ.V0R1M0.LOADLIB')
- END                                                                     
+      LIB('BANKZ.V0R1M0.LOAD')
+ END
 /*

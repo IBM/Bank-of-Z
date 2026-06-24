@@ -72,7 +72,7 @@ variables:
 
   # DB2 Exit Library. Example: DBC0CFG.SDSNEXIT
   - name: SDSNEXIT
-    value: DSN.V13R1M0.SDSNEXIT
+    value: DB2V13.SDSNEXIT
 
   # IMS Macro Library. Example: DFS.V11R1M0.SDFSMAC
   - name: SDFSMAC
@@ -93,10 +93,6 @@ variables:
   # Optional IDz Load Library. Example: FEL.V14R0M0.SFELLOAD
   - name: SFELLOAD
     value: FEL.SFELLOAD
-
-  # Optional IDZ zUnit / WAZI VTP library containing necessary copybooks. Example : FEL.V14R2.SBZUSAMP
-  - name: SBZUSAMP
-    value: BZU.V1R0M0.SBZUSAMP
 
   # REXX Compiler Data Sets. Example: REXX.V1R4.SFANLMD
   #- name: SFANLMD

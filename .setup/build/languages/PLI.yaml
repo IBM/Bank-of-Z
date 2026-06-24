@@ -45,7 +45,7 @@ tasks:
 
       # default dependency search path for single repository build
       - name: dependencySearchPath
-        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/plinc/*.inc
+        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/**/*.inc
 
       # flag to perform linkedit
       - name: doLinkEdit

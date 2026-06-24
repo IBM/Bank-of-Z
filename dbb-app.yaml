@@ -210,7 +210,7 @@ application:
     - task: PLI
       # Glob pattern selecting PL/I source files to compile
       sources:
-        - "**/src/base/**/pli/*.pli"
+        - "**/src/base/**/*.pli"
 
       variables:
 

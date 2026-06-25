@@ -259,8 +259,8 @@
               DISPLAY 'IBTRAN: TPSTAT=' TPSTAT
               IF TPSTAT  = '  ' OR TPSTAT = MESSAGE-EXIST
               THEN
-                DISPLAY 'IBTRAN: ACCID=' IN-ACCID ' AMT=' IN-AMOUNT
-                  ' TYPE=' IN-TRXTYPE ' CUST=' IN-CUSTID
+                DISPLAY 'IBTRAN: ACCID=' IN-ACCID
+                DISPLAY 'IBTRAN: AMT=' IN-AMOUNT ' TYPE=' IN-TRXTYPE
 
       * DOING ACCOUNT DEPOSIT/WITHDRAWAL
                 PERFORM ACCOUNT-ACTIVITY thru ACCOUNT-ACTIVITY-END
@@ -271,7 +271,7 @@
                 THEN
                   MOVE 1 TO TERM-IO
                 ELSE
-                 DISPLAY 'GU FROM IOPCB FAILED WITH STATUS CODE: ' TPSTAT
+                 DISPLAY 'GU FROM IOPCB FAILED: ' TPSTAT
                 END-IF
               END-IF
            END-PERFORM.
@@ -309,7 +309,8 @@
                  MOVE BAD-STATUS TO MSG-OUT
                END-IF
              ELSE
-               DISPLAY 'ACCT-ACT: BAL=' BALANCE-ACC ' TXID=' LASTTXID-ACC
+               DISPLAY 'ACCT-ACT: BAL=' BALANCE-ACC
+               DISPLAY 'ACCT-ACT: TXID=' LASTTXID-ACC
       * UPDATE THE HISTORY SEG
                COMPUTE ACCID-HIST = ACCID
                COMPUTE TXID-HIST = ACCID-HIST * MULT-FACTOR

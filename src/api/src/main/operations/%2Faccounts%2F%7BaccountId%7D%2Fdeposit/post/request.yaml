@@ -1,0 +1,45 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - PAYDBCRZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-ACCNO:
+            required: false
+            nullable: false
+            expression: "$substring('00000000', 0, 8 - $length($string($number($pathParameters.accountId)))) & $string($number($pathParameters.accountId))"
+        - COMM-AMT:
+            required: false
+            nullable: false
+            expression: "$body.amount"
+        - COMM-SORTC:
+            required: false
+            nullable: false
+            expression: "$number($body.sortCode)"
+        - COMM-ORIGIN:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-APPLID:
+                required: false
+                nullable: false
+                template: ""
+            - COMM-USERID:
+                required: false
+                nullable: false
+                template: ""
+            - COMM-FACILITY-NAME:
+                required: false
+                nullable: false
+                template: ""
+            - COMM-NETWRK-ID:
+                required: false
+                nullable: false
+                template: ""
+            - COMM-FACILTYPE:
+                required: false
+                nullable: false
+                expression: 496

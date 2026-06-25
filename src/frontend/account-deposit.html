@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Deposit Funds - Bank of Z</title>
+
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page">
+        <!-- Banner -->
+        <cds-layer class="landing-page__banner landing-page__heading">
+            <cds-breadcrumb>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+                <cds-breadcrumb-item>
+                    <cds-breadcrumb-link href="account-deposit.html">Deposit Funds</cds-breadcrumb-link>
+                </cds-breadcrumb-item>
+            </cds-breadcrumb>
+            <h1>Deposit Funds to Account</h1>
+        </cds-layer>
+
+        <!-- Form Content -->
+        <cds-grid class="cds--content">
+            <cds-column lg="6" md="4" sm="2">
+                <cds-form id="deposit-form">
+                    <cds-stack gap="7">
+                        <cds-form-item>
+                            <cds-text-input id="accountId" label="Account ID"
+                                placeholder="Enter account ID (e.g., 101, 201)" required
+                                helper-text="Enter the account number to deposit funds into">
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-text-input id="amount" label="Deposit Amount"
+                                placeholder="e.g. 100.00"
+                                helper-text="Enter the amount to deposit (minimum 0.01)">
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-text-input id="sortCode" label="Sort Code"
+                                placeholder="987654" required
+                                helper-text="Bank sort code (defaults to 987654 for this system)">
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-text-input id="description" label="Description"
+                                placeholder="Optional description"
+                                helper-text="Add a note about this deposit (optional)">
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-button id="submit-btn" type="submit">Deposit Funds</cds-button>
+                    </cds-stack>
+                </cds-form>
+            </cds-column>
+            <cds-column lg="10" md="4" sm="2">
+                <img class="page-image" src="assets/images/ibm-db2-support.png" alt="deposit">
+            </cds-column>
+        </cds-grid>
+    </cds-layer>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/number-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/loading.min.js"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+        import { config } from './config.js';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+
+            // Set default sort code
+            document.getElementById('sortCode').value = config.defaults.sortCode;
+
+            // Handle form submission
+            document.getElementById('submit-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await handleDeposit();
+            });
+
+        });
+
+        async function handleDeposit() {
+            const accountId = document.getElementById('accountId').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value.trim());
+            const sortCode = document.getElementById('sortCode').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            // Validation
+            if (!accountId) {
+                showErrorModal('Validation Error', 'Please enter an account ID');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showErrorModal('Validation Error', 'Please enter a valid deposit amount greater than 0');
+                return;
+            }
+
+            if (!sortCode || !/^\d{6}$/.test(sortCode)) {
+                showErrorModal('Validation Error', 'Please enter a valid 6-digit sort code');
+                return;
+            }
+
+            // Prepare deposit data
+            const depositData = {
+                amount: amount,
+                sortCode: sortCode,
+                description: description || 'Deposit via web interface'
+            };
+
+            showLoadingModal('Processing deposit...');
+
+            try {
+                const result = await api.accounts.depositToAccount(accountId, depositData);
+                hideLoadingModal();
+                
+                showSuccessModal(
+                    'Deposit Successful',
+                    `Successfully deposited $${amount.toFixed(2)} to account ${accountId}. New balance: $${result.availableBalance?.toFixed(2) || 'N/A'}. Transaction reference: ${result.transactionReference || 'N/A'}`
+                );
+
+                // Clear form — <cds-form> is a web component, not a native <form>, so reset fields individually
+                document.getElementById('accountId').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('sortCode').value = config.defaults.sortCode;
+                document.getElementById('description').value = '';
+            } catch (error) {
+                hideLoadingModal();
+                console.error('Deposit error:', error);
+                
+                let errorMessage = 'Failed to process deposit';
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.status === 404) {
+                    errorMessage = 'Account not found';
+                } else if (error.status === 400) {
+                    errorMessage = 'Invalid deposit request. Please check your input.';
+                } else if (error.status === 500) {
+                    errorMessage = 'Server error. The backend system may not be configured properly.';
+                }
+                
+                showErrorModal('Deposit Failed', errorMessage);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -43,6 +43,7 @@ cics_region:
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
+        - TCPIP.SEZATCP
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"

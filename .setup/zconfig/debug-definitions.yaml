@@ -1400,49 +1400,49 @@ resourceDefinitions:
       group: SOCKETS
       program: EZACIC23
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV1
       group: SOCKETS
       program: EZACICSC
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV2
       group: SOCKETS
       program: EZACICSS
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV3
       group: SOCKETS
       program: EZACIC6C
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV4
       group: SOCKETS
       program: EZACIC6S
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV5
       group: SOCKETS
       program: EZACICAC
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: SRV6
       group: SOCKETS
       program: EZACICAS
       taskdataloc: ANY
-      taskdatakey: CICS
+      taskdatakey: USER
       priority: 255
   - transaction:
       name: LSN0
@@ -1523,7 +1523,7 @@ resourceDefinitions:
       recordsize: 132
       recordformat: VARIABLE
       blockformat: UNBLOCKED
-      disposition: SHARE
+      disposition: SHR
   - tdqueue:
       name: TRAA
       group: SOCKETS
@@ -1552,10 +1552,11 @@ resourceDefinitions:
       update: YES
       jnlsyncwrite: NO
   - file:
-      name: EZACONFIG
+      name: EZACONFG
+      group: SOCKETS
       description: CICS Sockets configuration file
       dsname: BANKZ.CICSBOZ.TCP.CONFIG
-      lsrpoolid: 1
+      lsrpoolnum: 1
       dsnsharing: ALLREQS
       strings: 01
       opentime: STARTUP

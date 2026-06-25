@@ -24,6 +24,7 @@ fi
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
+set -x
 set -e
 
 export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"

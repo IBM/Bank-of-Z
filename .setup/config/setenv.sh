@@ -61,5 +61,3 @@ set -a
 source "$ENV_FILE"
 set +a
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH
-echo $PATH
-

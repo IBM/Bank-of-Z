@@ -150,10 +150,20 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
 </server>
 EOF
 
-sed \
-  's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \
-   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp\
-   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml
+# =========================
+# Deploy API WAR file
+# =========================
+cp "${SANDBOX_DIR}/zDevOps/applications/${APP_BASE_NAME}/application/src/logs/package/war/${APP_BASE_NAME_LOWER}-api.war" \
+   "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/apps"
+
+echo "<server><webApplication id=\"${APP_BASE_NAME_LOWER}-api\" location=\"\${server.config.dir}/apps/${APP_BASE_NAME_LOWER}-api.war\" name=\"${APP_BASE_NAME_LOWER}-api\" contextRoot=\"/api\"/></server>" \
+    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/${APP_BASE_NAME_LOWER}-api.xml"
+
+# =========================
+# Deploy Frontend WAR file configuration
+# =========================
+echo "<server><webApplication id=\"bank-frontend-vanilla\" location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\" name=\"bank-frontend-vanilla\" contextRoot=\"/\"/></server>" \
+    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/bank-frontend-vanilla.xml"
 
 opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &
 sleep 5

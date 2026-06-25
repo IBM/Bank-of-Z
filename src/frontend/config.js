@@ -10,8 +10,8 @@
 export const config = {
     api: {
         // Base URL for API endpoints
-        // API is deployed at root context (/) per ibm-web-ext.xml
-        baseUrl: ''
+        // API is deployed at /api context per ibm-web-ext.xml
+        baseUrl: '/api'
     },
     defaults: {
         sortCode: '987654'

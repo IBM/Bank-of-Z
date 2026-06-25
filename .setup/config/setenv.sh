@@ -3,41 +3,29 @@
 # =========================
 # Source library scripts
 # =========================
-set +e
-# For Grub and or ZOWE CLI
-source /etc/profile 2>/dev/null
-source $HOME/.profile 2>/dev/null
-set -e
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
+set +e
+# Load CICS/IMS credentials
+if [[ -f $HOME/.profile.bankz ]]; then
+    source $HOME/.profile.bankz 2>/dev/null
+else
+    source $HOME/.profile 2>/dev/null
+fi
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    export REPO_NAME="$(basename "$(git rev-parse --show-toplevel)")"
+    repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
+        export REPO_NAME=${repo_name}
+    else
+        export REPO_NAME="Bank-of-Z"
+    fi
 else
     export REPO_NAME="Bank-of-Z"
 fi
-export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
-
-
-
-check_python_deps() {
-    missing=""
-
-    python3 -c "import yaml" >/dev/null 2>&1 \
-        || missing="${missing} PyYAML"
-
-    python3 -c "from jinja2 import Template" >/dev/null 2>&1 \
-        || missing="${missing} Jinja2"
-
-    if [[ -n "$missing" ]]; then
-        echo "Installing:$missing"
-        pip3 install --user $missing
-        echo "pip rc=$?"
-    fi
-}
-
-check_python_deps
+set -e
 
 export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
@@ -58,6 +46,7 @@ APP_ZOS_VERSION=$(get_section_value 'app' 'zos_version')
 APP_VERSION=$(get_section_value 'app' 'zos_version')
 SANDBOX_DIR=${SANDBOX_DIR:-$(get_section_value 'sandbox' 'path')}
 JAVA_HOME=$(get_section_value 'java' 'java_home')
+PYTHON_HOME=$(get_section_value 'python' 'python_home')
 DBB_REPO_URL=$(get_section_value 'repositories' 'dbb_url')
 ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
@@ -75,4 +64,4 @@ fi
 set -a
 source "$ENV_FILE"
 set +a
-
+export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH

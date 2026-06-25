@@ -1,0 +1,13 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: "Debit/Credit Function CICS Program"
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "OMEN"
+  language: "COBOL"
+  program: "DBCRFUN"
+  connectionRef: "bankzCicsConnection"
+  ccsid: "037"
+
+# Made with Bob

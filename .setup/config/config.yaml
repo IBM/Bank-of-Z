@@ -11,6 +11,10 @@ repositories:
 # Java Home
 java:
   java_home: "/usr/local/sandboxes/tools/J21.0_64"
+  
+# Python Home
+python:
+  python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
 
 # Application metadata
 app:

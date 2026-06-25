@@ -1,0 +1,28 @@
+//DEFCFG  JOB ,
+// CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*
+//* ------ Delete old copy of file if any.
+//*
+//DEL      EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+   DELETE -
+      BANKZ.CICSBOZ.TCP.CONFIG -
+      PURGE -
+      ERASE
+//*
+//* ------ Define the new file.
+//*
+//DEFINE   EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+  DEFINE CLUSTER (NAME(BANKZ.CICSBOZ.TCP.CONFIG) VOLUMES(USRVS1) -
+      CYL(1 1) -
+      RECORDSIZE(150 150) FREESPACE(0 15) -
+      INDEXED ) -
+      DATA ( -
+        NAME(BANKZ.CICSBOZ.TCP.CONFIG.CONFIG.DATA) -
+        KEYS (16 0) ) -
+      INDEX ( -
+        NAME(BANKZ.CICSBOZ.TCP.CONFIG.CONFIG.INDEX) )
+/*

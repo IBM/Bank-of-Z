@@ -3,12 +3,13 @@
 # =========================
 # Source library scripts
 # =========================
+
+LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 set +e
 # For Grub and or ZOWE CLI
 source /etc/profile 2>/dev/null
 source $HOME/.profile 2>/dev/null
-set -e
-LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
@@ -19,12 +20,10 @@ if git rev-parse --show-toplevel >/dev/null 2>&1; then
 else
     export REPO_NAME="Bank-of-Z"
 fi
-export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
-
-
+set -e
 
 check_python_deps() {
     missing=""

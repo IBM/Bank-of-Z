@@ -11,6 +11,7 @@ set +e
 # For Grub and or ZOWE CLI
 source /etc/profile 2>/dev/null
 source $HOME/.profile 2>/dev/null
+echo "Test"
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then

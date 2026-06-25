@@ -1,0 +1,49 @@
+---
+version: "1.2"
+mappings:
+- message:
+    mappings:
+    - INPUT-AREA:
+        required: false
+        nullable: false
+        mappings:
+        - TRAN-CODE:
+            required: false
+            nullable: false
+            template: "IBSCUDAT"
+        - CUSTOMER-IN:
+            required: false
+            nullable: false
+            mappings:
+            - CUSTID-IN:
+                required: false
+                nullable: false
+                expression: "$pathParameters.customerId"
+            - LASTNAME-IN:
+                required: false
+                nullable: false
+                template: "{{$body.lastName}}"
+            - FIRSTNAME-IN:
+                required: false
+                nullable: false
+                template: "{{$body.firstName}}"
+            - ADDRESS-IN:
+                required: false
+                nullable: false
+                template: "{{$body.address.addressLine1}}"
+            - CITY-IN:
+                required: false
+                nullable: false
+                template: "{{$body.address.city}}"
+            - STATE-IN:
+                required: false
+                nullable: false
+                template: "{{$body.address.addressLine2}}"
+            - ZIPCODE-IN:
+                required: false
+                nullable: false
+                template: "{{$body.address.postalCode}}"
+            - PHONE-IN:
+                required: false
+                nullable: false
+                template: "{{$body.phoneNumber}}"

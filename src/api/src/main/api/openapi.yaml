@@ -42,7 +42,7 @@ paths:
           description: Unique identifier for the customer
           schema:
             type: string
-            example: "CUST123456"
+            example: "000000015"
       responses:
         '200':
           description: Customer information retrieved successfully
@@ -60,7 +60,44 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
+    put:
+      tags:
+        - Customers
+      summary: Update customer information
+      description: Update detailed information for a specific customer
+      operationId: updateIMSCustomer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer
+          schema:
+            type: string
+            example: "000000015"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  
   /ims/customers/{customerId}/accounts:
     get:
       tags:
@@ -75,7 +112,7 @@ paths:
           description: Unique identifier for the customer
           schema:
             type: string
-            example: "CUST123456"
+            example: "000000015"
       responses:
         '200':
           description: Accounts retrieved successfully
@@ -108,7 +145,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321" #pragma: allowlist secret
+            example: "1504" #pragma: allowlist secret
       responses:
         '200':
           description: Account details retrieved successfully
@@ -141,7 +178,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321" #pragma: allowlist secret
+            example: "1504" #pragma: allowlist secret
       responses:
         '200':
           description: Balance information retrieved successfully

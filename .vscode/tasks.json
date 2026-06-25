@@ -2,31 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Setup Bank of Z Environment",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "./setup-local.sh"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}/.setup"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "dedicated",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "detail": "Setup Bank of Z on z/OS USS via Zowe CLI (clones branch, runs setup-common.sh remotely)"
-        },
-        {
             "label": "Run Pipeline Simulation",
             "type": "shell",
             "command": "bash",

@@ -4,7 +4,8 @@
         "bank-of-z": {
             "properties": {
                 "protocol": "https",
-                "rejectUnauthorized": false
+                "rejectUnauthorized": false,
+                "host": "163.107.86.75"
             },
             "secure": [
                 "user",
@@ -45,7 +46,8 @@
                         "authenticationType": "basic",
                         "rdsPort": 8194,
                         "rdsSecured": true,
-                        "uuid": "05a46db4-b73f-4c81-9f0a-51350d171355"
+                        "uuid": "05a46db4-b73f-4c81-9f0a-51350d171355",
+                        "ignoreCertificateErrors": true
                     }
                 }
             }

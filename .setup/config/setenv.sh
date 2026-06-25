@@ -10,7 +10,7 @@ source $HOME/.profile 2>/dev/null
 set -e
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
         export REPO_NAME=${repo_name}
     else

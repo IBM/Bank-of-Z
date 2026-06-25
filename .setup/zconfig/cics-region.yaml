@@ -66,6 +66,7 @@ cics_region:
     xppt: "NO"
     xuser: "NO"
     xfct: "NO"
+    tcpip: "YES"
 
   extensions:
     cics_cmci:

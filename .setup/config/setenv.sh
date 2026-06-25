@@ -62,4 +62,5 @@ fi
 set -a
 source "$ENV_FILE"
 set +a
+echo "Test done"
 

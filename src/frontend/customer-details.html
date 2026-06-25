@@ -612,7 +612,9 @@
             showLoadingModal('Updating customer...');
             
             try {
-                const updatedCustomer = await api.customers.updateCustomer(currentCustomer.customerId, updatedData);
+                // Determine system type from stored customer data
+                const system = currentCustomer._system || 'CICS';
+                const updatedCustomer = await api.customers.updateCustomer(currentCustomer.customerId, updatedData, system);
                 hideLoadingModal();
                 
                 // Update current customer with the response

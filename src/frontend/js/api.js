@@ -141,16 +141,27 @@ class CustomersApi extends BaseApi {
 
     /**
      * Update customer information
-     * PUT /customers/{customerId}
+     * PUT /customers/{customerId} or PUT /ims/customers/{customerId}
+     * Routes based on explicit system parameter
      * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
      * @param {Object} customerData - Updated customer data
+     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<Customer>} Updated customer details
      */
-    async updateCustomer(customerId, customerData) {
-        return this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
-            method: 'PUT',
-            body: JSON.stringify(customerData)
-        });
+    async updateCustomer(customerId, customerData, system = 'CICS') {
+        if (system === 'IMS') {
+            // Route to IMS endpoint
+            return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}`, {
+                method: 'PUT',
+                body: JSON.stringify(customerData)
+            });
+        } else {
+            // Route to CICS endpoint
+            return this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
+                method: 'PUT',
+                body: JSON.stringify(customerData)
+            });
+        }
     }
 
     /**

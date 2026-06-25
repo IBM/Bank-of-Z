@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "INTERNAL_SERVER_ERROR"
+    - message:
+        required: true
+        nullable: false
+        template: "An unexpected error occurred while processing the deposit"

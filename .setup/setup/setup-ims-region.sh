@@ -62,14 +62,16 @@ cd "$SCRIPTS_DIR/../zconfig"
 print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking for existing IMS regions..."
 if zconfig ls 2>/dev/null | grep -q "ims://${IMS_DATASTORE}"; then
     print_info "${CYAN}[ZCONFIG-IMS]${NC} Found existing IMS region ims://${IMS_DATASTORE}, removing..."
-    set +e
-    zconfig rm ims://${IMS_DATASTORE} -v
-    sleep 5
-    set -e
-    print_success "Existing IMS region removed"
 else
-    print_info "${CYAN}[ZCONFIG-IMS]${NC} No existing IMS region found, proceeding with creation"
+    print_info "${CYAN}[ZCONFIG-IMS]${NC} No existing IMS region found in zconfig, attempting cleanup anyway..."
 fi
+
+# Always attempt to remove the IMS region to clean up any leftover datasets
+set +e
+zconfig rm ims://${IMS_DATASTORE} -v
+sleep 5
+set -e
+print_success "IMS region cleanup completed"
 
 # =========================
 # Cleanup USS directories

@@ -155,8 +155,9 @@ EOF
 # =========================
 # Note: WAR file will be copied by Wazi Deploy after build completes
 # Setup script only creates the configuration file
-echo "<server><webApplication id=\"${APP_BASE_NAME_LOWER}-api\" location=\"\${server.config.dir}/apps/${APP_BASE_NAME_LOWER}-api.war\" name=\"${APP_BASE_NAME_LOWER}-api\" contextRoot=\"/api\"/></server>" \
-    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/${APP_BASE_NAME_LOWER}-api.xml"
+# Using 'api' as the ID to match the actual WAR filename (api.war)
+echo "<server><webApplication id=\"api\" location=\"\${server.config.dir}/apps/api.war\" name=\"api\" contextRoot=\"/api\"/></server>" \
+    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/api.xml"
 
 # =========================
 # Deploy Frontend WAR file configuration

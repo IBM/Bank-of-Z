@@ -1,3 +1,3 @@
 <server>
-    <webApplication id="{{ api_name }}" location="${server.config.dir}/apps/{{ api_name }}.war" name="{{ api_name }}" contextRoot="{% if api_name == 'bankz-api' %}/api{% elif api_name == 'bank-frontend-vanilla' %}/{% else %}/{{ api_name }}{% endif %}"/>
+    <webApplication id="{{ api_name }}" location="${server.config.dir}/apps/{{ api_name }}.war" name="{{ api_name }}" contextRoot="{% if api_name == 'bankz-api' %}/api{% elif api_name == 'bank-frontend-vanilla' %}/bank-frontend-vanilla{% else %}/{{ api_name }}{% endif %}"/>
 </server>

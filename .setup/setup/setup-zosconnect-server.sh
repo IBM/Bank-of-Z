@@ -162,7 +162,7 @@ echo "<server><webApplication id=\"${APP_BASE_NAME_LOWER}-api\" location=\"\${se
 # =========================
 # Deploy Frontend WAR file configuration
 # =========================
-echo "<server><webApplication id=\"bank-frontend-vanilla\" location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\" name=\"bank-frontend-vanilla\" contextRoot=\"/\"/></server>" \
+echo "<server><webApplication id=\"bank-frontend-vanilla\" location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\" name=\"bank-frontend-vanilla\" contextRoot=\"/bank-frontend-vanilla\"/></server>" \
     > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/bank-frontend-vanilla.xml"
 
 opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &

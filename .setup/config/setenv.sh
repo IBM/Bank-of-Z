@@ -7,7 +7,11 @@ LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export CONFIG_FILE="$LOCAL_SCRIPTS_DIR/config.yaml"
 set +e
 # Load CICS/IMS credentials
-source $HOME/.profile 2>/dev/null
+if [[ -f $HOME/.profile.bankz ]]; then
+    source $HOME/.profile.bankz 2>/dev/null
+else
+    source $HOME/.profile 2>/dev/null
+fi
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then

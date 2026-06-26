@@ -65,7 +65,7 @@ cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defin
 
 template_name_zosconnect_config:
   src: '../deploy/zos_connect_app_config.xml.j2'
-  dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name if api_name is defined else "bankz-api"}}.xml'
+  dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name}}.xml'
   mode: 0755
   delegate: false
 

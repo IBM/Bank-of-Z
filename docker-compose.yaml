@@ -4,12 +4,15 @@ services:
     image: icr.io/zosconnect/ibm-zcon-designer:3.0.101
     platform: linux/amd64
     environment:
+      # IMPORTANT: These environment variables must be set on the host before starting containers
+      # Format: - VAR_NAME (without =value) passes the value from host environment to container
+      # Example: export CICS_USER=myuser CICS_PASSWORD=mypass before running docker-compose up  #pragma: allowlist secret
       - CICS_USER
-      - CICS_PASSWORD
+      - CICS_PASSWORD  #pragma: allowlist secret
       - CICS_HOST
       - CICS_PORT
       - IMS_USER
-      - IMS_PASSWORD
+      - IMS_PASSWORD  #pragma: allowlist secret
       - IMS_HOST
       - IMS_PORT
       - IMS_DATASTORE

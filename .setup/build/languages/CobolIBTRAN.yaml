@@ -39,6 +39,8 @@ tasks:
       - name: linkEditStream
         value: |
           INCLUDE SYSLIB(DFSLI000)
+          INCLUDE SYSLIB(igzxjni2)
+          INCLUDE SYSLIB(libjvm31)
           ENTRY DLITCBL
 
       # build record output deploy type

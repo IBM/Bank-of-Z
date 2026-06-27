@@ -18,3 +18,5 @@ mappings:
         nullable: false
         expression: "$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\"\
           .\"BALANCE-AS\""
+
+# Made with Bob

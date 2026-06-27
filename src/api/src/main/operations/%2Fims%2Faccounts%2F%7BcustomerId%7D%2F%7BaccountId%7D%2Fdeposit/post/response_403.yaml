@@ -1,0 +1,15 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "FORBIDDEN"
+    - message:
+        required: true
+        nullable: false
+        template: "Access to this resource is forbidden"
+
+# Made with Bob

@@ -11,5 +11,3 @@ mappings:
         required: true
         nullable: false
         template: "An unexpected error occurred"
-
-# Made with Bob

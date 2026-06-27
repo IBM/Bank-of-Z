@@ -1,0 +1,140 @@
+---
+#
+# Licensed materials - Property of IBM
+# 5655-AC5 Copyright IBM Corp. 2024, 2025
+# All rights reserved
+# US Government users restricted rights  -  Use, duplication or
+# disclosure restricted by GSA ADP schedule contract with IBM Corp.
+#
+####################################
+# IBTRAN-specific Cobol configuration
+# This file provides LP(32) with JAVAIOP(JAVA64) settings for IBTRAN
+# which allows 31-bit COBOL to call 64-bit JVM via bridge
+####################################
+
+version: 1.0.0
+tasks:
+  # Cobol Language task for IBTRAN
+  - language: Cobol
+
+    # source file association patterns - only IBTRAN
+    sources:
+      - "**/cobol/IBTRAN.cbl"
+
+    # overridable variables
+    variables:
+      # IBTRAN uses LP(32) with JAVAIOP(JAVA64) for 31-bit to 64-bit Java bridge
+      - name: compileParms
+        value: LIB,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64)
+
+      # flag to perform linkedit
+      - name: doLinkEdit
+        value: true
+
+      # IBTRAN link edit with dynamic DLL loading
+      - name: linkEditParms
+        value: LIST,XREF,LET,RENT,DYNAM(DLL),CASE(MIXED)
+      
+      # Link edit stream to include IMS DLI, JNI and JVM libraries
+      - name: linkEditStream
+        value: |
+          INCLUDE SYSLIB(DFSLI000)
+          ENTRY DLITCBL
+
+      # build record output deploy type
+      - name: deployType
+        value: IMSLOAD
+
+      # flag to activate IMS options
+      - name: isIMS
+        value: true
+
+      # default dependency search path
+      - name: dependencySearchPath
+        value: search:${WORKSPACE}/?path=${APP_DIR_NAME}/copybook/*.cpy
+
+      # flag indicating to scan the load module for static link dependencies
+      - name: scanLoadModule
+        value: true
+
+    # datasets that need to be created / validated for this language configuration
+    datasets:
+      - name: ${HLQ}.COBOL
+        options: cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library)
+      - name: ${HLQ}.COPY
+        options: cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library)
+      - name: ${HLQ}.OBJ
+        options: cyl space(1,1) lrecl(80) dsorg(PO) recfm(F,B) dsntype(library)
+      - name: ${HLQ}.LOAD
+        options: cyl space(1,1) dsorg(PO) recfm(U) blksize(32760) dsntype(library)
+
+    # list of steps to execute for each program processed by this language configuration
+    steps:
+
+      # Copy build file and dependency files to data sets
+      - step: copySrc
+        type: copy
+        target: //'${HLQ}.COBOL(${MEMBER})'
+        dependencyCopy:
+          - search: ${dependencySearchPath}
+            mappings:
+              - source: "**/*"
+                dataset: ${HLQ}.COPY
+
+      # COBOL compile step with LP64
+      - step: compile
+        type: mvs
+        pgm: IGYCRCTL
+        parm: ${compileParms}
+        maxRC: 4
+        dds:
+          - { name: "SYSIN", dsn: "${HLQ}.COBOL(${MEMBER})", options: "shr", input: true }
+          - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${ENTRY})", options: "shr", output: true, deployType: "OBJ" }
+          - { name: "TASKLIB", dsn: "${SIGYCOMP}", options: "shr" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
+          - { name: "SYSMDECK", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT2", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT3", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT4", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT5", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT6", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT7", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT8", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new"}
+          - { name: "SYSUT9", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT10", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT11", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT12", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT13", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT14", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT15", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT16", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSUT17", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "SYSLIB", dsn: "${HLQ}.COPY", options: "shr" }
+          - {                 dsn: "${SCEESAMP}", options: "shr" }
+
+      # Link-Edit step with JNI and JVM libraries
+      - step: linkEdit
+        type: mvs
+        pgm: IEWBLINK
+        parm: ${linkEditParms}
+        condition: ${doLinkEdit}
+        maxRC: 0
+        dds:
+          # create a SYSREF DD to add an instream DD to a concatenation
+          - { name: "SYSREF", condition: {exists: linkEditStream}, instream: "${linkEditStream}", options: "tracks space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          # SYSLIN concatenation
+          - { name: "SYSLIN", dsn: "${HLQ}.OBJ(${MEMBER})", options: "shr" }
+          # Add a DD Ref DD statement for the instream concatenation
+          - { condition: {exists: linkEditStream}, ref: "SYSREF" }
+          - { name: "SYSLMOD", dsn: "${HLQ}.LOAD(${ENTRY})", options: "shr", output: true, deployType: "${deployType}", scan: "${scanLoadModule}" }
+          - { name: "SYSPRINT", log: "${STEP}-${FILE_NAME}.log", logEncoding: "${LOG_ENCODING}", options: "cyl space(5,5) unit(vio) blksize(133) lrecl(133) recfm(f,b) new" }
+          - { name: "SYSUT1", options: "cyl space(5,5) unit(vio) blksize(80) lrecl(80) recfm(f,b) new" }
+          - { name: "RESLIB", condition: { exists: RESLIB }, dsn: "${RESLIB}", options: "shr" }
+          - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
+          - {                 dsn: "${SCEELKED}", options: "shr" }
+          - {                 dsn: "${SCEECPP}", condition: { exists: SCEECPP }, options: "shr" }
+          - {                 dsn: "${COBOL_JAVA_HOME}/lib", condition: { exists: COBOL_JAVA_HOME }, options: "shr" }
+          - {                 dsn: "${JAVA_HOME}/lib/j9vm", condition: { exists: JAVA_HOME }, options: "shr" }
+
+# Made with Bob

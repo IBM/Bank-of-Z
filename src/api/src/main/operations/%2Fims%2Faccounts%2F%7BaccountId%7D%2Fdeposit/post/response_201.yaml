@@ -1,0 +1,20 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\"\
+          .\"ACCID-AS\"}}"
+    - availableBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\"\
+          .\"BALANCE-AS\""
+    - actualBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\"\
+          .\"BALANCE-AS\""

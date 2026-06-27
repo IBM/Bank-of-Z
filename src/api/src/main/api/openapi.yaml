@@ -197,6 +197,52 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /ims/accounts/{customerId}/{accountId}/deposit:
+    post:
+      tags:
+        - Accounts
+      summary: Deposit funds to account
+      description: Deposit funds into a specific account
+      operationId: depositToIMSAccount
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier for the customer identifier
+          schema:
+            type: string
+            example: "000000015" #pragma: allowlist secret
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "1504" #pragma: allowlist secret
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+      responses:
+        '201':
+          description: Deposit successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /customers:
     post:
       tags:

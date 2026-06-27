@@ -11,5 +11,3 @@ mappings:
         required: true
         nullable: false
         template: "The requested customer was not found"
-
-# Made with Bob

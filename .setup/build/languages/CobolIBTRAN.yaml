@@ -25,7 +25,7 @@ tasks:
     variables:
       # IBTRAN uses LP(32) with JAVAIOP(JAVA64) for 31-bit to 64-bit Java bridge
       - name: compileParms
-        value: LIB,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64)
+        value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64),LIB
 
       # flag to perform linkedit
       - name: doLinkEdit
@@ -49,6 +49,7 @@ tasks:
           INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x'
           INCLUDE '/usr/lpp/java/java21/J21.0_64/lib/j9vm/libjvm31.x'
           ENTRY DLITCBL
+          NAME ${MEMBER}(R)
 
       # build record output deploy type
       - name: deployType

@@ -42,10 +42,12 @@ tasks:
       - name: javaHome
         value: /usr/lpp/java/J8.0_64
       
-      # Link edit stream to include IMS DLI and set entry point
+      # Link edit stream to include IMS DLI, JNI, and JVM libraries
       - name: linkEditStream
         value: |
           INCLUDE SYSLIB(DFSLI000)
+          INCLUDE '/usr/lpp/IBM/cobol_6.4/lib/igzxjni2.x'
+          INCLUDE '/usr/lpp/java/J8.0_64/lib/j9vm/libjvm31.x'
           ENTRY DLITCBL
 
       # build record output deploy type

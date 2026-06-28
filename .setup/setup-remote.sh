@@ -1,13 +1,14 @@
 #!/bin/bash
 
 #########################################################
-# Local Orchestrator Script for Bank of Z Setup
-# This script runs on your LOCAL machine and uses Zowe CLI
-# to coordinate setup on the remote z/OS USS system
+# Remote Setup Script for Bank of Z
+# This script runs on the REMOTE z/OS USS machine
+# and orchestrates the common setup phases.
 #
-# Used by: VSCode tasks workflow
+# Used by: setup-local.sh (invoked via Zowe CLI)
+#          GRUB workflow (run natively on USS)
 #
-# Usage: bash setup-local.sh [workspace_path]
+# Usage: bash setup-remote.sh [workspace_path]
 #########################################################
 
 set -e  # Exit on error
@@ -21,12 +22,12 @@ source "$SCRIPTS_DIR/config/setenv.sh" "$@"
 
 
 #########################################################
-# STAGE: Execute Common Setup Script on Remote
+# STAGE: Execute Common Setup Phases
 #########################################################
 stage_execute_common_setup() {
-    print_stage "STAGE: Execute Common Setup Script on Remote"
+    print_stage "STAGE: Execute Common Setup Phases"
     
-    print_info "Executing setup-common.sh on remote z/OS USS..."
+    print_info "Executing setup-common.sh phases..."
     print_info "This will:"
     print_info "  - Initialize workspace"
     print_info "  - Clone DBB accelerators"
@@ -34,36 +35,36 @@ stage_execute_common_setup() {
     print_info "  - Install Bank of Z application"
     echo ""
     
-    # Execute the common setup script on remote
-    print_info "Running: bash .setup/setup-common.sh"
+    # Execute each phase of setup-common.sh
+    print_info "Running: setup-common.sh"
     
     ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR" &
     PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
-        print_success "Remote validate-prereqs completed successfully"
+        print_success "validate-prereqs completed successfully"
     else
-        print_error "Failed to execute validate-prereqs on remote system"
+        print_error "Failed to execute validate-prereqs"
         exit 1
     fi
     
     ${SCRIPTS_DIR}/setup-common.sh environment "$BANK_OF_Z_WORK_DIR" &
     PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
-        print_success "Remote environment completed successfully"
+        print_success "environment completed successfully"
     else
-        print_error "Failed to execute environment on remote system"
+        print_error "Failed to execute environment"
         exit 1
     fi
     
     ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z "$BANK_OF_Z_WORK_DIR" &
     PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then
-        print_success "Remote install-bank-of-z completed successfully"
+        print_success "install-bank-of-z completed successfully"
     else
-        print_error "Failed to execute install-bank-of-z on remote system"
+        print_error "Failed to execute install-bank-of-z"
         exit 1
     fi
 
@@ -75,7 +76,7 @@ stage_execute_common_setup() {
 main() {
     echo ""
     echo -e "${GREEN}######################################################${NC}"
-    echo -e "${GREEN}#  Bank of Z - Common Setup Script (z/OS USS)        #${NC}"
+    echo -e "${GREEN}#  Bank of Z - Remote Setup Script (z/OS USS)        #${NC}"
     echo -e "${GREEN}######################################################${NC}"
     echo ""
     

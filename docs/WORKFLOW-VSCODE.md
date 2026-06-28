@@ -148,28 +148,35 @@ Local Machine                         z/OS USS
    │  └─ Zowe CLI ─────────────────→ git clone on USS
    │                                  (your branch)
    │
-   └─ Stage 3: Execute common setup
-      └─ Zowe CLI ─────────────────→ Runs setup-common.sh
-                                      ├─ Initialize workspace
-                                      ├─ Clone DBB
-                                      ├─ Deploy zBuilder
-                                      └─ Install Bank of Z
+   └─ Stage 3: Execute remote setup
+      └─ Zowe CLI ─────────────────→ Runs setup-remote.sh
+                                      └─ Runs setup-common.sh
+                                          ├─ Initialize workspace
+                                          ├─ Clone DBB
+                                          ├─ Deploy zBuilder
+                                          └─ Install Bank of Z
                                       
                                       ✅ Environment ready!
 ```
 
 ## 🔍 How It Works
 
-### Two-Script Architecture
+### Three-Script Architecture
 
-#### 1. Local Orchestrator ([`setup-local.sh`](../setup-local.sh:1))
+#### 1. Local Orchestrator ([`setup-local.sh`](../.setup/setup-local.sh:1))
 
 Runs on your local machine and:
-- Uses Zowe CLI to create remote workspace
+- Uses Zowe CLI to create the remote workspace
 - Clones your branch on USS
-- Triggers the common setup script remotely
+- Invokes `setup-remote.sh` on USS via Zowe CLI
 
-#### 2. Common Setup ([`setup-common.sh`](../setup-common.sh:1))
+#### 2. Remote Orchestrator ([`setup-remote.sh`](../.setup/setup-remote.sh:1))
+
+Runs natively on USS and:
+- Invoked by `setup-local.sh` via Zowe CLI
+- Calls `setup-common.sh` for each setup phase in sequence
+
+#### 3. Common Setup ([`setup-common.sh`](../.setup/setup-common.sh:1))
 
 Runs natively on USS and:
 - Detects it's running from cloned repository
@@ -371,13 +378,13 @@ git checkout feature-branch
 
 ### Setup Without Full Rebuild
 
-To skip certain stages, modify [`setup-common.sh`](../setup-common.sh:1) temporarily or create a custom task.
+To skip certain stages, modify [`setup-common.sh`](../.setup/setup-common.sh) temporarily or create a custom task.
 
 ### Parallel Development
 
 Multiple developers can work simultaneously:
 - Each uses their own branch
-- Each has their own workspace path in [`config.yaml`](../config/config.yaml:1)
+- Each has their own workspace path in [`config.yaml`](../.setup/config/config.yaml)
 - No conflicts on USS
 
 ## 📊 Performance Comparison

@@ -199,6 +199,7 @@
 
        01 len               pic 9(9) binary.
        01 JAVA-PRIMED       PIC X(1) VALUE 'N'.
+       01 JNIEnvPtr         USAGE POINTER.
        01 HISTSEG-PTR       USAGE POINTER.
        01 HISTSEG-LEN       PIC  S9(18) COMP-5.
        01 HISTSEG-BUFF-PTR  PIC 9(18) COMP-5 VALUE 0.

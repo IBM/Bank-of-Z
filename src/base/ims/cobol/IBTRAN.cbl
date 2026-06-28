@@ -503,11 +503,14 @@
            DISPLAY 'PRIME-JAVA: Initializing Java environment'.
            DISPLAY '========================================'.
            
-           DISPLAY 'Step 1: Setting address of JNIEnvPtr'.
+           DISPLAY 'Step 1: Getting JVM environment pointer'.
+           CALL 'GetJVMPtr' RETURNING JNIEnvPtr.
            DISPLAY 'JNIEnvPtr value: ' JNIEnvPtr.
+           
+           DISPLAY 'Step 2: Setting address of JNIEnv'.
            Set address of JNIEnv to JNIEnvPtr.
 
-           DISPLAY 'Step 2: Setting address of JNINativeInterface'.
+           DISPLAY 'Step 3: Setting address of JNINativeInterface'.
            Set address of JNINativeInterface to JNIEnv.
            DISPLAY 'JNI interface initialized'.
 

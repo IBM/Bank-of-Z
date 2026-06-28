@@ -37,17 +37,17 @@ tasks:
       
       # Java library paths for JNI
       - name: cobolJavaHome
-        value: /usr/lpp/IBM/cobol_6.4
+        value: /usr/lpp/IBM/cobol/igyv6r5
       
       - name: javaHome
-        value: /usr/lpp/java/J8.0_64
+        value: /usr/lpp/java/java21/J21.0_64
       
       # Link edit stream to include IMS DLI, JNI, and JVM libraries
       - name: linkEditStream
         value: |
           INCLUDE SYSLIB(DFSLI000)
-          INCLUDE '/usr/lpp/IBM/cobol_6.4/lib/igzxjni2.x'
-          INCLUDE '/usr/lpp/java/J8.0_64/lib/j9vm/libjvm31.x'
+          INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x'
+          INCLUDE '/usr/lpp/java/java21/J21.0_64/lib/j9vm/libjvm31.x'
           ENTRY DLITCBL
 
       # build record output deploy type

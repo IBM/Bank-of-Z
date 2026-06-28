@@ -357,6 +357,9 @@ activities:
             properties:
             - key: "template"
               value: "ims_catalog_populate"
+    types:
+      - name: 'PSBLOAD'
+      - name: 'DBDLOAD'
     is_artifact: False
     tags:
     - ims_catalog_management

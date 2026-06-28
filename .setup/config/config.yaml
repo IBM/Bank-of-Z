@@ -143,6 +143,7 @@ ims:
   dfs_joblib: "{{ ims.ims_hlq }}.JOBS"
   java_conf_path: "${HOME}/dfsjvmpr.props"
   ims_java_home: "/usr/lpp/ims/imsjava"
+  cobol_java_home: "/usr/lpp/IBM/cobol_6.4"
   db2_java_home: "/usr/lpp/db2d10"
   dfs_ims_userid: "${ZOS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"

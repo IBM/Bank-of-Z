@@ -35,12 +35,17 @@ tasks:
       - name: linkEditParms
         value: LIST,XREF,LET,RENT,DYNAM(DLL),CASE(MIXED)
       
-      # Link edit stream to include IMS DLI, JNI and JVM libraries
+      # Java library paths for JNI
+      - name: cobolJavaHome
+        value: /usr/lpp/IBM/cobol_6.4
+      
+      - name: javaHome
+        value: /usr/lpp/java/J8.0_64
+      
+      # Link edit stream to include IMS DLI and set entry point
       - name: linkEditStream
         value: |
           INCLUDE SYSLIB(DFSLI000)
-          INCLUDE SYSLIB(igzxjni2)
-          INCLUDE SYSLIB(libjvm31)
           ENTRY DLITCBL
 
       # build record output deploy type
@@ -136,7 +141,7 @@ tasks:
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SCEECPP}", condition: { exists: SCEECPP }, options: "shr" }
-          - {                 dsn: "${COBOL_JAVA_HOME}/lib", condition: { exists: COBOL_JAVA_HOME }, options: "shr" }
-          - {                 dsn: "${JAVA_HOME}/lib/j9vm", condition: { exists: JAVA_HOME }, options: "shr" }
+          - {                 dsn: "${cobolJavaHome}/lib", options: "shr" }
+          - {                 dsn: "${javaHome}/lib/j9vm", options: "shr" }
 
 # Made with Bob

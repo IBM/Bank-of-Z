@@ -22,7 +22,7 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
 ### Additionally for VSCode Task Workflows
 - Zowe CLI installed: `npm install -g @zowe/cli`
-- Zowe RSE API plugin: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+- Zowe RSE API plugin: `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - Configured Zowe profile for your z/OS system
 
 ## 🚀 Quick Start
@@ -1196,7 +1196,7 @@ After successful setup:
 npm install -g @zowe/cli
 
 # Install RSE API plugin
-zowe plugins install @zowe/rse-api-for-zowe-cli
+zowe plugins install @ibm/rse-api-for-zowe-cli
 
 # Verify installation
 zowe --version

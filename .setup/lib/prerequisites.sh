@@ -77,7 +77,7 @@ check_zowe_cli() {
     print_info "Checking Zowe RSE API plugin..."
     if ! zowe rse-api-for-zowe-cli --help &> /dev/null; then
         print_warning "Zowe RSE API plugin may not be installed"
-        print_info "Install with: zowe plugins install @zowe/rse-api-for-zowe-cli"
+        print_info "Install with: zowe plugins install @ibm/rse-api-for-zowe-cli"
         return 1
     else
         print_success "Zowe RSE API plugin is available"

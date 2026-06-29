@@ -20,7 +20,6 @@ tasks:
     # source file association patterns - only IBTRAN
     sources:
       - "**/ims/cobol/IBTRAN.cbl"
-      - "**/cobol/IBTRAN.cbl"
 
     # overridable variables
     variables:

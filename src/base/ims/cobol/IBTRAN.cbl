@@ -199,7 +199,6 @@
 
        01 len               pic 9(9) binary.
        01 JAVA-PRIMED       PIC X(1) VALUE 'N'.
-       01 JNIEnvPtr         USAGE POINTER.
        01 HISTSEG-PTR       USAGE POINTER.
        01 HISTSEG-LEN       PIC  S9(18) COMP-5.
        01 HISTSEG-BUFF-PTR  PIC 9(18) COMP-5 VALUE 0.
@@ -504,14 +503,11 @@
            DISPLAY 'PRIME-JAVA: Initializing Java environment'.
            DISPLAY '========================================'.
            
-           DISPLAY 'Step 1: Getting JVM environment pointer'.
-           CALL 'GetJVMPtr' RETURNING JNIEnvPtr.
+           DISPLAY 'Step 1: Setting address of JNIEnvPtr'.
            DISPLAY 'JNIEnvPtr value: ' JNIEnvPtr.
-           
-           DISPLAY 'Step 2: Setting address of JNIEnv'.
            Set address of JNIEnv to JNIEnvPtr.
 
-           DISPLAY 'Step 3: Setting address of JNINativeInterface'.
+           DISPLAY 'Step 2: Setting address of JNINativeInterface'.
            Set address of JNINativeInterface to JNIEnv.
            DISPLAY 'JNI interface initialized'.
 

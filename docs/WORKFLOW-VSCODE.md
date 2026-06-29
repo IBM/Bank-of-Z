@@ -15,7 +15,7 @@ The VSCode task workflow is ideal for:
 ### Required Software
 
 - **Zowe CLI**: `npm install -g @zowe/cli`
-- **Zowe RSE API Plugin**: `zowe plugins install @zowe/rse-api-for-zowe-cli`
+- **Zowe RSE API Plugin**: `zowe plugins install @ibm/rse-api-for-zowe-cli`
 - **Git**: For local repository operations
 - **Node.js**: Required for Zowe CLI (v14 or higher)
 
@@ -37,7 +37,7 @@ npm install -g @zowe/cli
 zowe --version
 
 # Install RSE API plugin
-zowe plugins install @zowe/rse-api-for-zowe-cli
+zowe plugins install @ibm/rse-api-for-zowe-cli
 
 # Verify plugin
 zowe rse-api-for-zowe-cli --help

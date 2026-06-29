@@ -45,10 +45,10 @@ tasks:
       # Link edit stream to include IMS DLI, JNI, and JVM libraries
       - name: linkEditStream
         value: |
-          INCLUDE SYSLIB(DFSLI000)
+          INCLUDE RESLIB(DFSLI000)
+          INCLUDE SYSLIB(${MEMBER})
           INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x'
           INCLUDE '/usr/lpp/java/java21/J21.0_64/lib/j9vm/libjvm31.x'
-          ENTRY DLITCBL
           NAME ${MEMBER}(R)
 
       # build record output deploy type
@@ -145,6 +145,5 @@ tasks:
           - {                 dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SCEECPP}", condition: { exists: SCEECPP }, options: "shr" }
           - {                 dsn: "${cobolJavaHome}/lib", options: "shr" }
-          - {                 dsn: "${javaHome}/lib/j9vm", options: "shr" }
 
 # Made with Bob

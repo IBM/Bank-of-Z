@@ -42,7 +42,7 @@ stage_execute_pipeline() {
     set -o pipefail
     
     chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
-    bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+    bash ${SCRIPTS_DIR}/pipeline-common.sh build&
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then

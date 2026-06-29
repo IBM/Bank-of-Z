@@ -144,6 +144,5 @@ tasks:
           - { name: "SYSLIB", dsn: "${HLQ}.OBJ", options: "shr" }
           - {                 dsn: "${SCEELKED}", options: "shr" }
           - {                 dsn: "${SCEECPP}", condition: { exists: SCEECPP }, options: "shr" }
-          - {                 dsn: "${cobolJavaHome}/lib", options: "shr" }
 
 # Made with Bob

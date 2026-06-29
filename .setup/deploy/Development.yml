@@ -63,6 +63,12 @@ cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '200
 cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else 'IBMUSER' }}"
 cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defined else '' }}" #pragma: allowlist secret
 
+# Frontend Liberty Server (separate from z/OS Connect)
+frontend_root: "{{ extra_vars.frontend_root if extra_vars.frontend_root is defined else sandbox_path + '/frontend' }}"
+frontend_server_name: "{{ extra_vars.frontend_server_name if extra_vars.frontend_server_name is defined else 'bankz-frontend' }}"
+frontend_job_name: "{{ extra_vars.frontend_job_name if extra_vars.frontend_job_name is defined else 'FEBANKZ' }}"
+frontend_http_port: "{{ extra_vars.frontend_http_port if extra_vars.frontend_http_port is defined else '9081' }}"
+
 template_name_zosconnect_config:
   src: '../deploy/zos_connect_app_config.xml.j2'
   dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name}}.xml'
@@ -85,6 +91,19 @@ system_command_refresh_config:
 
 system_command_refresh_apps:
   cmd: 'MODIFY {{zos_connect_job_name}},REFRESH,APPS'
+  verbose: false
+  wait_time_s: 3
+  wait: true
+
+# System commands for Frontend Liberty server management
+system_command_start_frontend:
+  cmd: 'S {{frontend_job_name}}'
+  verbose: false
+  wait_time_s: 5
+  wait: true
+
+system_command_stop_frontend:
+  cmd: 'C {{frontend_job_name}}'
   verbose: false
   wait_time_s: 3
   wait: true

@@ -89,6 +89,14 @@ zosconnect:
   http_port: 9080
   https_port: 9443
 
+# Frontend Liberty Server (separate from z/OS Connect)
+frontend:
+  liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
+  server_dir: "{{sandbox.path}}/frontend"
+  server_name: "bankz-frontend"
+  http_port: 9081
+  https_port: 9444
+
 # ZOAU installation directory
 zoau:
   zoau_home: "/usr/lpp/IBM/zoautil"

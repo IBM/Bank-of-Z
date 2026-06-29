@@ -11,8 +11,7 @@
       * disclosure restricted by GSA ADP Schedule Contract
       * with IBM Corp.
       ******************************************************************
-     * Trigger rebuild to test DBB configuration changes
-      
+
       ENVIRONMENT DIVISION.
       *
        CONFIGURATION SECTION.

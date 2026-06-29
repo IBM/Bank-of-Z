@@ -48,6 +48,8 @@ cics_region:
     dds:
       dsndd:
         name:
+          - "DFHTABLE"
+        dsn:
           - "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
     steplib:
       top_data_sets:

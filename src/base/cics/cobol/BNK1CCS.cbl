@@ -161,6 +161,30 @@
 
        01 WS-ABEND-PGM                  PIC X(8) VALUE 'ABNDPROC'.
 
+      *
+      * Temporary snapshot of current map input data.
+      * Populated by CAPTURE-CURRENT-DATA before any processing.
+      *
+       01 WS-SNAPSHOT.
+          03 WS-SNAP-TITLE              PIC X(10).
+          03 WS-SNAP-FIRST-NAME         PIC X(50).
+          03 WS-SNAP-INITIALS           PIC X(10).
+          03 WS-SNAP-LAST-NAME          PIC X(50).
+          03 WS-SNAP-DOB.
+             05 WS-SNAP-DOB-DD          PIC 99.
+             05 WS-SNAP-DOB-MM          PIC 99.
+             05 WS-SNAP-DOB-YYYY        PIC 9999.
+          03 WS-SNAP-ADDR-LINE1         PIC X(50).
+          03 WS-SNAP-ADDR-LINE2         PIC X(50).
+          03 WS-SNAP-CITY               PIC X(50).
+          03 WS-SNAP-POSTCODE           PIC X(10).
+          03 WS-SNAP-COUNTRY            PIC X(50).
+          03 WS-SNAP-SORTCODE           PIC 9(6).
+          03 WS-SNAP-CUSTNO             PIC 9(10).
+          03 WS-SNAP-CREDIT-SCORE       PIC 999.
+          03 WS-SNAP-CAPTURE-DATE       PIC X(10).
+          03 WS-SNAP-CAPTURE-TIME       PIC X(8).
+
        01 ABNDINFO-REC.
            COPY ABNDINFO.
 
@@ -1660,6 +1684,57 @@
            END-EXEC.
 
        PTD999.
+           EXIT.
+
+
+      *----------------------------------------------------------------*
+      *  CAPTURE-CURRENT-DATA                                           *
+      *  Retrieve the current map input data and store it into          *
+      *  the WS-SNAPSHOT temporary variable area.                       *
+      *----------------------------------------------------------------*
+       CAPTURE-CURRENT-DATA SECTION.
+       CCD-SNAP10.
+
+      *
+      *    First get the current date and time so the snapshot
+      *    is timestamped.
+      *
+           PERFORM POPULATE-TIME-DATE.
+
+           MOVE WS-ORIG-DATE           TO WS-SNAP-CAPTURE-DATE.
+
+           STRING WS-TIME-NOW-GRP-HH   DELIMITED BY SIZE
+                  ':'                  DELIMITED BY SIZE
+                  WS-TIME-NOW-GRP-MM   DELIMITED BY SIZE
+                  ':'                  DELIMITED BY SIZE
+                  WS-TIME-NOW-GRP-SS   DELIMITED BY SIZE
+                  INTO WS-SNAP-CAPTURE-TIME
+           END-STRING.
+
+      *
+      *    Copy all customer input fields from the received map
+      *    into the snapshot temporary variables.
+      *
+           MOVE CUSTTITI               TO WS-SNAP-TITLE.
+           MOVE CHRISTNI               TO WS-SNAP-FIRST-NAME.
+           MOVE CUSTINSI               TO WS-SNAP-INITIALS.
+           MOVE CUSTSNI                TO WS-SNAP-LAST-NAME.
+
+           MOVE DOBDDI                 TO WS-SNAP-DOB-DD.
+           MOVE DOBMMI                 TO WS-SNAP-DOB-MM.
+           MOVE DOBYYI                 TO WS-SNAP-DOB-YYYY.
+
+           MOVE CUSTAD1I               TO WS-SNAP-ADDR-LINE1.
+           MOVE CUSTAD2I               TO WS-SNAP-ADDR-LINE2.
+           MOVE CITYI                  TO WS-SNAP-CITY.
+           MOVE POSTCODEI              TO WS-SNAP-POSTCODE.
+           MOVE COUNTRYI               TO WS-SNAP-COUNTRY.
+
+           MOVE SORTCI                 TO WS-SNAP-SORTCODE.
+           MOVE CUSTNO2I               TO WS-SNAP-CUSTNO.
+           MOVE CREDSCI                TO WS-SNAP-CREDIT-SCORE.
+
+       CCD-SNAP999.
            EXIT.
 
 

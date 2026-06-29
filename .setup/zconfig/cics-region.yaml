@@ -46,8 +46,8 @@ cics_region:
         - SYS1.MIGLIB
         - TCPIP.SEZATCP
     dds:
-      name: DFHTABLE
-      dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLSE.SOURCE"
+      - name: DFHTABLE
+        dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLSE.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"

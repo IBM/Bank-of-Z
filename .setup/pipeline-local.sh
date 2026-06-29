@@ -95,7 +95,7 @@ stage_execute_pipeline() {
     REMOTE_TAR=$(grep "\[DBB-BUILD\]\[TAR-PATH\]" /tmp/pipeline.log | tail -1 | sed 's/.*\[TAR-PATH\][[:space:]]*//' | tr -d '[:space:]' || true)
     if [[ -n "$REMOTE_TAR" && "$REMOTE_TAR" != "NONE" ]]; then        
         BUILD_NUMBER=$(basename "$REMOTE_TAR" | sed "s/^${APP_BASE_NAME}-//; s/\.tar$//")
-        LOCAL_TAR_PATH="$HOME/packages/${APP_BASE_NAME}.${APP_RELEASE_VERSION}/${BUILD_NUMBER}.tar"
+        LOCAL_TAR_PATH="$HOME/packages/${APP_BASE_NAME}/${APP_BASE_NAME}.${APP_RELEASE_VERSION}.${BUILD_NUMBER}.tar"
         mkdir -p "$(dirname "$LOCAL_TAR_PATH")"
         print_info "Downloading tar artifact: $REMOTE_TAR -> $LOCAL_TAR_PATH"
         zowe rse-api-for-zowe-cli download uss-file "$REMOTE_TAR" -b -f "$LOCAL_TAR_PATH"

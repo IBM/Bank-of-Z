@@ -124,12 +124,16 @@ application:
             value: TEST
 
         # ----- Compiler parameters for IBTRAN (IMS Java bridge) -----
-        # IBTRAN is a special IMS program that bridges COBOL and Java.
-        # It requires PGMNAME(LONGMIXED) for mixed-case entry points
-        # and NODYNAM because it is statically linked with Java libs.
+        # IBTRAN is a special IMS program that bridges 31-bit COBOL to 64-bit Java.
+        # Critical parameters:
+        #   LP(32)           - 31-bit addressing mode
+        #   JAVAIOP(JAVA64)  - Enable 31-bit to 64-bit Java bridge via igzxjni2.x
+        #   DLL              - Create DLL-style load module
+        #   RENT             - Reentrant code required for IMS
+        #   PGMNAME(LONGMIXED) - Mixed-case entry points for Java interop
         - name: compileParms
           forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
-          value: NODYNAM,MAP,OBJECT,APOST,XREF,PGMNAME(LONGMIXED),NOEXP,NORENT
+          value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64),LIB
           append:
           - condition:
               exists: errPrefix
@@ -149,14 +153,15 @@ application:
 
         # ----- Link-edit instream for IBTRAN -----
         # Includes the IMS language interface (DFSLI000),
-        # the compiled object, and the IBM COBOL Java library
-        # needed for the Java bridge. Names the output module IBTRAN.
+        # the compiled object, and the 31-bit to 64-bit Java bridge libraries
+        # (igzxjni2.x and libjvm31.x) for JVM=3164 interoperability.
         - name: linkEditStream
           forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
           value: |2
               INCLUDE  RESLIB(DFSLI000)
               INCLUDE  SYSLIB(${MEMBER})
-              INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzcjava.x'
+              INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x'
+              INCLUDE '/usr/lpp/java/java21/J21.0_64/lib/j9vm/libjvm31.x'
               NAME     IBTRAN(R)
 
         # ----- Link-edit instream for IMS batch programs -----

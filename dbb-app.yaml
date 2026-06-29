@@ -299,7 +299,22 @@ application:
           value: "src/api/src/main/liberty/config/server.xml"
         - name: cicsXmlPath
           value: "src/api/src/main/liberty/config/cics.xml"
-    
+
+    # ----------------------------------------------------------
+    # ImsJavaBuilder task
+    # Compiles the IMS Java JMP project via Maven and packages
+    # the resulting JAR with deployType=IMS-JAR so Wazi Deploy
+    # copies it to the IMS Java classpath directory on USS.
+    # ----------------------------------------------------------
+    - task: ImsJavaBuilder
+      variables:
+        # Path to the Maven executable on z/OS USS
+        - name: mavenPath
+          value: "/usr/local/sandboxes/tools/apache-maven-3.6.3/bin/mvn"
+        # Relative path (from repo root) to the Maven project directory
+        - name: configSources
+          value: "src/base/ims/java"
+
     - task: zOSConnect
       variables:
         - name: configSources

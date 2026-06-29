@@ -47,6 +47,7 @@ lifecycles:
       - Languages    # Defined in Languages.yaml
       - VanillaFrontend
       - ServerXmlPackager
+      - ImsJavaBuilder
       - zOSConnect
       - Package
       - Finish
@@ -81,6 +82,7 @@ lifecycles:
       - Languages    # Defined in Languages.yaml
       - VanillaFrontend
       - ServerXmlPackager
+      - ImsJavaBuilder
       - zOSConnect
       - Package
       - Finish
@@ -108,6 +110,7 @@ lifecycles:
       - Languages    # Defined in Languages.yaml
       - VanillaFrontend
       - ServerXmlPackager
+      - ImsJavaBuilder
       - zOSConnect
       - Package
       - Finish
@@ -226,6 +229,8 @@ tasks:
             copyMode: TEXT
           - deployType: WAR
             copyMode: BINARY
+          - deployType: IMS-JAR
+            copyMode: BINARY
 
   # build finialization
   - task: Finish
@@ -239,6 +244,10 @@ tasks:
   # Custom task for server.xml packaging
   - task: ServerXmlPackager
     script: groovy/ServerXmlPackager.groovy
+
+  # Custom task for IMS Java build and JAR packaging
+  - task: ImsJavaBuilder
+    script: groovy/ImsJavaBuilder.groovy
   
   # default empty Languages stage
   # to be replaced by content of Languges.yaml

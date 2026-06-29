@@ -48,7 +48,7 @@ drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
 drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*"  2>/dev/null
 drm "${APP_BASE_NAME}.DBB.*"  2>/dev/null
 sleep 5
-tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)"
+tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(100,20) CYL"
 # =========================
 # Cleanup
 # =========================

@@ -118,6 +118,9 @@ ims_steplib_hlq: "{{ extra_vars.ims_steplib_hlq if extra_vars.ims_steplib_hlq is
 ims_plex: "{{ extra_vars.ims_plex if extra_vars.ims_plex is defined else default_ims_plex}}"
 ims_route: "{{ extra_vars.ims_route if extra_vars.ims_route is defined else default_ims_route}}"
 
+# Sandbox path — used by types_pattern_mapping.yml to locate the IMS JAR deployment directory
+sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined else '/usr/local/sandboxes/bank-of-z' }}"
+
 # Variables for ims_acb_gen building block
 ims_acb_gen_default:
    acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIB"

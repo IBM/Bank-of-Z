@@ -155,13 +155,6 @@ fi
 set -e
 
 # =========================
-# Build IMS java code
-# =========================
-cd src/base/ims/java
-$SANDBOX_DIR/../tools/apache-maven-3.6.3/bin/mvn  clean install -DoutputDir=$SANDBOX_DIR/jars
-cd -
-
-# =========================
 # Collect tar file
 # =========================
 SRC_TAR=$(ls -t ${DBB_LOG_FOLDER}/*-*.tar 2>/dev/null | head -1 || true)

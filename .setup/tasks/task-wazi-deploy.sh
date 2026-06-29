@@ -33,6 +33,7 @@ export DBB_LOG_FOLDER="${DBB_LOG_FOLDER:-$(get_section_value 'dbb' 'dbb_log_dir'
 export DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 'deploy_log_dir')}"
 export TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
 export ZOS_CONNECT_SERVER_FOLDER="${ZOS_CONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
+export SANDBOX_PATH="${SANDBOX_PATH:-$(get_section_value 'sandbox' 'path')}"
 export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
@@ -172,6 +173,7 @@ CMD="wazideploy-deploy \
  -e hlq=$TARGET_HLQ \
  -e deploy_cfg_home=$ZDEPLOY_FOLDER \
  -e zos_connect_root=$ZOS_CONNECT_SERVER_FOLDER \
+ -e sandbox_path=$SANDBOX_PATH \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
  --evidencesFileName ${evidenceDir}/evidence-bankz.yaml $@"

@@ -46,11 +46,8 @@ cics_region:
         - SYS1.MIGLIB
         - TCPIP.SEZATCP
     dds:
-      dsndd:
-        name:
-          - "DFHTABLE"
-        dsn:
-          - "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
+      name: DFHTABLE
+      dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLSE.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -87,3 +84,4 @@ cics_region:
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - "EYUSMSSJ.jvmprofile"
+ 

@@ -17,7 +17,8 @@ version: 1.0.0
 include:
   - file: languages/Transfer.yaml
   - file: languages/BMS.yaml
-  - file: languages/Cobol.yaml
+  # Temporarily disabled to test CobolIBTRAN.yaml
+  # - file: languages/Cobol.yaml
   - file: languages/CobolIBTRAN.yaml
   - file: languages/CobolTestcase.yaml
   - file: languages/CPP.yaml

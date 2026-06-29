@@ -18,6 +18,10 @@ tasks:
     # source file association patterns
     sources:
       - "**/cobol/**.cbl"
+    
+    # exclude IBTRAN.cbl - it has its own configuration in CobolIBTRAN.yaml
+    excludes:
+      - "**/cobol/IBTRAN.cbl"
 
     # overridable variables
     variables:

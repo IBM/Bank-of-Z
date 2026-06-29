@@ -50,7 +50,13 @@ stage_stop_tasks() {
     # Stop IMS1
     # =========================
     jcan P "IMS1*" 2>/dev/null
-    set -e    
+    
+    # ===========================
+    # Clean application datasets
+    # ===========================
+    sleep 5
+    drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
+    set -e
 }
 
 #########################################################

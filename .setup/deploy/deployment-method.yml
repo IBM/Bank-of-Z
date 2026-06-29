@@ -414,10 +414,11 @@ activities:
         - name: 'Copy to USS'
           steps:
           - name: USS_COPY
+    is_artifact: True
     types:
-       - name: 'IMS-JAR'
+       - name: 'jar'
     tags:
-    - deploy
+    - deploy_jar
     is_artifact: True
 
   - name: 'Deploy WAR files'

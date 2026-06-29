@@ -23,7 +23,7 @@ import com.ibm.dbb.task.TaskConstants
  * This script mirrors VanillaFrontend.groovy and zOSConnect (buildOpenAPIv3):
  * 1. Detects whether any IMS Java source files changed (pipeline/impact builds)
  * 2. Runs mvn clean install, depositing the JAR into outputDirectory (the DBB
- *    package staging area) via -DoutputDir — same pattern as the api.war
+ *    package staging area) via -DoutputDir - same pattern as the api.war
  * 3. Registers the JAR in the build map with deployType=IMS-JAR so the Package
  *    task pulls it into the tar, and Wazi Deploy copies it to sandbox/jars
  *
@@ -34,7 +34,7 @@ import com.ibm.dbb.task.TaskConstants
 log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
 
 // -------------------------------------------------------------------------
-// Context variables — same as VanillaFrontend
+// Context variables - same as VanillaFrontend
 // -------------------------------------------------------------------------
 def workspace       = context.getVariable(TaskConstants.WORKSPACE)
 def appDirName      = context.getVariable(TaskConstants.APP_DIR_NAME)
@@ -46,10 +46,10 @@ log.info("App Dir Name:     ${appDirName}")
 log.info("Output Directory: ${outputDirectory}")
 
 // -------------------------------------------------------------------------
-// Config variables — supplied in dbb-app.yaml task block
+// Config variables - supplied in dbb-app.yaml task block
 // -------------------------------------------------------------------------
 
-// Path to the Maven executable (required — never hardcoded here)
+// Path to the Maven executable (required - never hardcoded here)
 def mavenPath = config.getVariable('mavenPath')
 if (!mavenPath) {
     log.error("ImsJavaBuilder: 'mavenPath' configuration variable is required but not set.")
@@ -108,7 +108,7 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
 }
 
 // -------------------------------------------------------------------------
-// Build environment — propagate current environment variables
+// Build environment - propagate current environment variables
 // -------------------------------------------------------------------------
 def envList = []
 System.getenv().each { k, v -> envList << "$k=$v" }
@@ -124,7 +124,7 @@ try {
 
     // Maven's pom.xml uses <directory>${outputDir}</directory> which makes the
     // entire Maven build dir (including mvn clean) point at that path. We must
-    // NOT pass outputDirectory directly — mvn clean would wipe everything
+    // NOT pass outputDirectory directly - mvn clean would wipe everything
     // VanillaFrontend and ServerXmlPackager already wrote there.
     // Instead, build into a private temp dir then copy only the JAR across.
     def mvnWorkDir = new File("${outputDirectory}/ims-java-build-temp")
@@ -175,7 +175,7 @@ try {
 
     // -------------------------------------------------------------------------
     // Find the JAR Maven produced in the temp build dir, then copy it into
-    // outputDirectory so the Package task can pick it up — same as VanillaFrontend
+    // outputDirectory so the Package task can pick it up - same as VanillaFrontend
     // copying its WAR into outputDirectory after creating it in a temp dir.
     // -------------------------------------------------------------------------
     def jarFiles = mvnWorkDir.listFiles({ f ->
@@ -191,15 +191,15 @@ try {
     // Pick the most recently modified jar in case there are multiple
     def sourceJar = jarFiles.sort { a, b -> b.lastModified() <=> a.lastModified() }.first()
     def jarFile = new File("${outputDirectory}/${sourceJar.name}")
-    log.info("Copying JAR: ${sourceJar.absolutePath} → ${jarFile.absolutePath}")
+    log.info("Copying JAR: ${sourceJar.absolutePath} - ${jarFile.absolutePath}")
     jarFile.bytes = sourceJar.bytes
 
-    // Clean up the Maven temp dir — only the JAR in outputDirectory is needed
+    // Clean up the Maven temp dir - only the JAR in outputDirectory is needed
     mvnWorkDir.deleteDir()
     log.info("JAR in output directory: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
 
     // -------------------------------------------------------------------------
-    // Register JAR in build map — same pattern as VanillaFrontend for its WAR
+    // Register JAR in build map - same pattern as VanillaFrontend for its WAR
     // -------------------------------------------------------------------------
     log.info("=" * 80)
     log.info("Registering JAR in build map")
@@ -223,7 +223,7 @@ try {
     buildMap.addOutput(jarFile.absolutePath, "IMS-JAR", null, null)
     log.info("Output registered: ${jarFile.absolutePath} with deployType=IMS-JAR")
 
-    // Add marker to BUILD_LIST — must be the same path used in createBuildMap()
+    // Add marker to BUILD_LIST - must be the same path used in createBuildMap()
     buildList.add(relativeMarkerPath)
     log.info("Added ${relativeMarkerPath} to BUILD_LIST (total files: ${buildList.size()})")
 

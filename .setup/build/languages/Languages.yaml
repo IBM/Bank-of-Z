@@ -17,8 +17,7 @@ version: 1.0.0
 include:
   - file: languages/Transfer.yaml
   - file: languages/BMS.yaml
-  # Temporarily disabled to test CobolIBTRAN.yaml
-  # - file: languages/Cobol.yaml
+  - file: languages/Cobol.yaml
   - file: languages/CobolIBTRAN.yaml
   - file: languages/CobolTestcase.yaml
   - file: languages/CPP.yaml
@@ -35,7 +34,8 @@ tasks:
     tasks:
      - Transfer       # Defined in Transfer.yaml
      - BMS            # Defined in BMS.yaml
-     - Cobol          # Defined in CobolIBTRAN.yaml and Cobol.yaml
+     - Cobol          # Defined in Cobol.yaml
+     - CobolIBTRAN    # Defined in CobolIBTRAN.yaml (IBTRAN-specific)
      - CobolTestcase  # Defined in CobolTestcase.yaml
      - CPP            # Defined in CPP.yaml
      - Assembler      # Defined in Assembler.yaml

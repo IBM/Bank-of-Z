@@ -12,7 +12,7 @@
       * with IBM Corp.
       ******************************************************************
 
-      ENVIRONMENT DIVISION.
+       ENVIRONMENT DIVISION.
       *
        CONFIGURATION SECTION.
       *

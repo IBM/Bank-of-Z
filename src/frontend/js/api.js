@@ -283,16 +283,27 @@ class AccountsApi extends BaseApi {
 
     /**
      * Deposit funds to an account
-     * POST /accounts/{accountId}/deposit
+     * POST /accounts/{accountId}/deposit (CICS)
+     * POST /ims/accounts/{customerId}/{accountId}/deposit (IMS)
      * @param {string} accountId - Unique identifier for the account
      * @param {Object} depositData - Deposit data
      * @param {number} depositData.amount - Deposit amount (must be positive, minimum 0.01)
      * @param {string} depositData.sortCode - 6-digit bank sort code
      * @param {string} [depositData.description] - Description of the deposit (max 40 characters)
+     * @param {string} [customerId] - Customer ID (required for IMS, optional for CICS)
      * @returns {Promise<Object>} Deposit result with updated balances
      */
-    async depositToAccount(accountId, depositData) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/deposit`, {
+    async depositToAccount(accountId, depositData, customerId = null) {
+        let url;
+        if (customerId) {
+            // IMS endpoint: /ims/accounts/{customerId}/{accountId}/deposit
+            url = `${this.configuration.baseUrl}/ims/accounts/${customerId}/${accountId}/deposit`;
+        } else {
+            // CICS endpoint: /accounts/{accountId}/deposit
+            url = `${this.configuration.baseUrl}/accounts/${accountId}/deposit`;
+        }
+        
+        return this.request(url, {
             method: 'POST',
             body: JSON.stringify(depositData)
         });

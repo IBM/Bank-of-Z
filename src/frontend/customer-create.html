@@ -37,8 +37,9 @@
         </cds-layer>
 
         <cds-grid class="cds--content">
-            <cds-column lg="8" md="6" sm="4">
-                <cds-stack gap="7">
+            <cds-column lg="16" md="8" sm="4">
+                <div class="form-constrained">
+                    <cds-stack gap="7">
                     <cds-select id="title" label-text="Title">
                         <cds-select-item value="Mr">Mr</cds-select-item>
                         <cds-select-item value="Mrs">Mrs</cds-select-item>
@@ -116,11 +117,7 @@
                     </cds-date-picker>
                     <cds-button id="submit-btn" type="submit" style="width:100%;">Submit</cds-button>
                 </cds-stack>
-            </cds-column>
-            <cds-column lg="8" md="2" sm="0">
-                <img class="page-image"
-                        src="assets/images/ibm-fireside-chat-trans-bus.png" 
-                        alt="customer">
+                </div>
             </cds-column>
         </cds-grid>
     </div>

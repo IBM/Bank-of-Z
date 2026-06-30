@@ -23,30 +23,67 @@
     <!-- Main Content -->
     <cds-layer class="cds--white landing-page">
         <!-- Banner -->
-        <cds-layer class="landing-page__banner landing-page__heading">
-            <cds-breadcrumb>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="account-deposit.html">Deposit Funds</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-            </cds-breadcrumb>
-            <h1>Deposit Funds to Account</h1>
+        <cds-layer class="layer landing-page__banner">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="account-deposit.html">Deposit Funds</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>Deposit Funds to Account</h1>
+            </div>
         </cds-layer>
 
-        <!-- Form Content -->
+        <div class="cds--content">
+            <!-- Error/Notification Container -->
+            <div id="notification-container"></div>
+        </div>
+
+        <!-- Search Section -->
         <cds-grid class="cds--content">
-            <cds-column lg="6" md="4" sm="2">
-                <cds-form id="deposit-form">
+            <cds-column lg="16" md="8" sm="4">
+                <cds-stack gap="7">
+                    <cds-form-item>
+                        <cds-text-input
+                            id="customerId"
+                            label="Customer ID"
+                            placeholder="C1234567 or I000000015"
+                            helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234567 or I000000015)">
+                        </cds-text-input>
+                    </cds-form-item>
+                    <cds-button id="search-accounts-btn">Search Accounts</cds-button>
+                </cds-stack>
+            </cds-column>
+        </cds-grid>
+
+        <!-- Account Selection Section -->
+        <cds-grid class="cds--content" id="account-selection-section" style="display: none;">
+            <cds-column lg="16" md="8" sm="4">
+                <h3>Select Account for Deposit</h3>
+                <p>Click on an account to proceed with deposit:</p>
+                <div id="accounts-table"></div>
+            </cds-column>
+        </cds-grid>
+
+        <!-- Deposit Form Section -->
+        <cds-grid class="cds--content" id="deposit-form-section" style="display: none;">
+            <cds-column lg="16" md="8" sm="4">
+                <h3>Deposit to Account</h3>
+                <cds-form id="deposit-form" class="form-constrained">
                     <cds-stack gap="7">
                         <cds-form-item>
-                            <cds-text-input id="accountId" label="Account ID"
-                                placeholder="Enter account ID (e.g., 101, 201)" required
-                                helper-text="Enter the account number to deposit funds into">
+                            <cds-text-input id="selectedAccountId" label="Account ID" readonly>
+                            </cds-text-input>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-text-input id="selectedAccountType" label="Account Type" readonly>
                             </cds-text-input>
                         </cds-form-item>
 
@@ -72,11 +109,9 @@
                         </cds-form-item>
 
                         <cds-button id="submit-btn" type="submit">Deposit Funds</cds-button>
+                        <cds-button id="back-btn" kind="secondary">Back to Account Selection</cds-button>
                     </cds-stack>
                 </cds-form>
-            </cds-column>
-            <cds-column lg="10" md="4" sm="2">
-                <img class="page-image" src="assets/images/ibm-db2-support.png" alt="deposit">
             </cds-column>
         </cds-grid>
     </cds-layer>
@@ -106,13 +141,19 @@
         src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
     <script type="module"
         src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/loading.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/notification.min.js"></script>
 
     <!-- Page Script -->
     <script type="module">
         import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, validateCustomerId, parseCustomerId } from './js/utils.js';
         import { config } from './config.js';
+
+        let selectedAccount = null;
+        let selectedCustomerId = null;
+        let selectedSystem = null;
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
@@ -122,33 +163,177 @@
             // Set default sort code
             document.getElementById('sortCode').value = config.defaults.sortCode;
 
+            // Handle search accounts
+            document.getElementById('search-accounts-btn').addEventListener('click', searchCustomerAccounts);
+            document.getElementById('customerId').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchCustomerAccounts();
+                }
+            });
+
             // Handle form submission
             document.getElementById('submit-btn').addEventListener('click', async (e) => {
                 e.preventDefault();
                 await handleDeposit();
             });
 
+            // Handle back button
+            document.getElementById('back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('deposit-form-section').style.display = 'none';
+                document.getElementById('account-selection-section').style.display = 'block';
+            });
         });
 
+        function displayNotification(kind, title, message) {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = `
+                <cds-inline-notification kind="${kind}" title="${title}" subtitle="${message}" hide-close-button></cds-inline-notification>
+                <br />
+            `;
+            // Scroll to top to ensure notification is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function clearNotification() {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = '';
+        }
+
+        async function searchCustomerAccounts() {
+            const customerIdInput = document.getElementById('customerId').value.trim();
+            
+            // Clear any previous notifications
+            clearNotification();
+            
+            if (!customerIdInput) {
+                displayNotification('error', 'Validation Error', 'Please enter a Customer ID');
+                return;
+            }
+
+            // Validate Customer ID
+            const validation = validateCustomerId(customerIdInput);
+            if (!validation.valid) {
+                displayNotification('error', 'Validation Error', validation.error);
+                return;
+            }
+            
+            // Parse to get numeric ID and system
+            const parsed = parseCustomerId(customerIdInput);
+            const customerId = parsed.customerId;
+            const system = parsed.system;
+
+            showLoadingModal(`Searching for ${system} customer accounts...`);
+
+            try {
+                const response = await api.customers.getCustomerAccounts(customerId, system);
+                const accounts = response.accounts || [];
+                
+                hideLoadingModal();
+                
+                if (accounts.length === 0) {
+                    displayNotification('error', 'No Results', 'No accounts found for this customer');
+                    document.getElementById('account-selection-section').style.display = 'none';
+                    document.getElementById('deposit-form-section').style.display = 'none';
+                } else {
+                    selectedCustomerId = customerId;
+                    selectedSystem = system;
+                    displayAccountsList(accounts);
+                }
+            } catch (error) {
+                hideLoadingModal();
+                displayNotification('error', 'Error', 'Customer not found or error loading accounts');
+                document.getElementById('account-selection-section').style.display = 'none';
+                document.getElementById('deposit-form-section').style.display = 'none';
+            }
+        }
+
+        function displayAccountsList(accounts) {
+            document.getElementById('account-selection-section').style.display = 'block';
+            document.getElementById('deposit-form-section').style.display = 'none';
+            
+            let tableRows = '';
+            accounts.forEach((account, index) => {
+                const accountNumber = account.accountNumber || account.accountId || 'N/A';
+                tableRows += `
+                    <tr class="account-row" data-account-index="${index}" style="cursor: pointer;">
+                        <td>${account.accountId || 'N/A'}</td>
+                        <td>${accountNumber}</td>
+                        <td>${account.accountType || 'N/A'}</td>
+                        <td>${account.currency || 'N/A'}</td>
+                        <td>${account.status || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('accounts-table').innerHTML = `
+                <table class="cds--data-table cds--data-table--zebra">
+                    <thead>
+                        <tr>
+                            <th>Account ID</th>
+                            <th>Account Number</th>
+                            <th>Account Type</th>
+                            <th>Currency</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            `;
+            
+            // Add click handlers to rows
+            const rows = document.querySelectorAll('.account-row');
+            rows.forEach(row => {
+                row.addEventListener('click', () => {
+                    const index = parseInt(row.getAttribute('data-account-index'));
+                    selectedAccount = accounts[index];
+                    showDepositForm();
+                });
+            });
+        }
+
+        function showDepositForm() {
+            document.getElementById('account-selection-section').style.display = 'none';
+            document.getElementById('deposit-form-section').style.display = 'block';
+            
+            // Populate account info
+            document.getElementById('selectedAccountId').value = selectedAccount.accountId || '';
+            document.getElementById('selectedAccountType').value = selectedAccount.accountType || '';
+            
+            // Clear previous deposit values
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            
+            // Scroll to form
+            window.scrollTo({ top: document.getElementById('deposit-form-section').offsetTop - 100, behavior: 'smooth' });
+        }
+
         async function handleDeposit() {
-            const accountId = document.getElementById('accountId').value.trim();
+            if (!selectedAccount) {
+                displayNotification('error', 'Error', 'No account selected');
+                return;
+            }
+
+            const accountId = selectedAccount.accountId;
             const amount = parseFloat(document.getElementById('amount').value.trim());
             const sortCode = document.getElementById('sortCode').value.trim();
             const description = document.getElementById('description').value.trim();
 
+            // Clear any previous notifications
+            clearNotification();
+
             // Validation
-            if (!accountId) {
-                showErrorModal('Validation Error', 'Please enter an account ID');
-                return;
-            }
 
             if (!amount || amount <= 0) {
-                showErrorModal('Validation Error', 'Please enter a valid deposit amount greater than 0');
+                displayNotification('error', 'Validation Error', 'Please enter a valid deposit amount greater than 0');
                 return;
             }
 
             if (!sortCode || !/^\d{6}$/.test(sortCode)) {
-                showErrorModal('Validation Error', 'Please enter a valid 6-digit sort code');
+                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit sort code');
                 return;
             }
 
@@ -162,19 +347,38 @@
             showLoadingModal('Processing deposit...');
 
             try {
-                const result = await api.accounts.depositToAccount(accountId, depositData);
+                const result = await api.accounts.depositToAccount(accountId, depositData, selectedCustomerId);
                 hideLoadingModal();
+                
+                // The API returns arrays of all customer accounts
+                // Find the balance for the specific account we deposited to
+                let balanceDisplay = 'N/A';
+                if (Array.isArray(result.availableBalance) && result.availableBalance.length > 0) {
+                    // If accountId is in the array format, parse it
+                    const accountIds = result.accountId ? result.accountId.replace(/[\[\]]/g, '').split(',') : [];
+                    const accountIndex = accountIds.findIndex(id => id.trim() === accountId.toString());
+                    
+                    if (accountIndex >= 0 && accountIndex < result.availableBalance.length) {
+                        balanceDisplay = result.availableBalance[accountIndex].toFixed(2);
+                    } else {
+                        // Fallback: use the first balance
+                        balanceDisplay = result.availableBalance[0].toFixed(2);
+                    }
+                }
                 
                 showSuccessModal(
                     'Deposit Successful',
-                    `Successfully deposited $${amount.toFixed(2)} to account ${accountId}. New balance: $${result.availableBalance?.toFixed(2) || 'N/A'}. Transaction reference: ${result.transactionReference || 'N/A'}`
+                    `Successfully deposited $${amount.toFixed(2)} to account ${accountId}. New balance: $${balanceDisplay}`
                 );
 
-                // Clear form — <cds-form> is a web component, not a native <form>, so reset fields individually
-                document.getElementById('accountId').value = '';
+                // Clear form and reset to search
                 document.getElementById('amount').value = '';
                 document.getElementById('sortCode').value = config.defaults.sortCode;
                 document.getElementById('description').value = '';
+                
+                // Go back to account selection
+                document.getElementById('deposit-form-section').style.display = 'none';
+                document.getElementById('account-selection-section').style.display = 'block';
             } catch (error) {
                 hideLoadingModal();
                 console.error('Deposit error:', error);

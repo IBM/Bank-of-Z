@@ -1,7 +1,7 @@
 ---
 version: "1.0"
 response_201.yaml:
-  condition: "$zosAssetResponse.message.\"OUTPUT-AREA\".\"ACCOUNT-SUMMARY\" = true"
+  condition: "$exists($zosAssetResponse.message.\"OUTPUT-AREA\".\"MSG-OUT\")"
   httpStatusCode: 201
 response_400.yaml:
   httpStatusCode: 400

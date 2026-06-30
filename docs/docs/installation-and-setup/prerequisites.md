@@ -67,7 +67,7 @@ Bank of Z requires the following IDE extensions.
 
 **Note:** If you are using VS Code, configure the required Zowe Explorer profiles before beginning the installation. For profile creation instructions, see the [IBM Z Open Editor](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html) documentation.
 
-For installation procedures, see [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html).
+For installation procedures, see [IDE Setup](ide-setup.md).
 
 ### Verify Software Installation
 
@@ -109,7 +109,7 @@ git --version
 ### Zowe CLI
 
 Bank of Z requires Zowe CLI Version 3.x (LTS) and the IBM RSE API plug-in for communication with the target z/OS environment.
-For installation instructions, see the [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html) section.
+For installation instructions, see the [IDE Setup](ide-setup.md) section.
 
 Verify the installation:
 
@@ -183,4 +183,4 @@ Depending on your environment, appropriate security definitions must also be con
 
 >**Note:** Access to z/OS environments, middleware environments, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding with the installation.
 
-After completing the prerequisite checks, continue to [Environment Configuration](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/environment-configuration.html).
+After completing the prerequisite checks, continue to [Environment Configuration](environment-configuration.md).

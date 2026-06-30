@@ -23,7 +23,7 @@ The profile typically includes:
 
 If you are using Visual Studio Code, see the [IBM Z® Open Editor](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html) documentation for instructions on creating Zowe Explorer configuration profiles for the required profile types, including z/OSMF, SSH, TSO, Debug, and CICS.
 
-For a complete sample configuration, see [Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html).
+For a complete sample configuration, see [Configuration Reference](../reference/configuration-reference.md).
 
 ### Example Configuration
 
@@ -97,7 +97,7 @@ Save the configuration in:
 ~/.zowe/zowe.config.json
 ```
 
-For a complete description of all configuration options, see the [Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html).
+For a complete description of all configuration options, see the [Configuration Reference](../reference/configuration-reference.md).
 
 ## Verify Connectivity
 
@@ -141,7 +141,7 @@ Before deployment, ensure that the following prerequisites are available in your
 
 Bank of Z also requires appropriate security definitions to be configured in the site’s security manager (for example, RACF or an equivalent product). The required security definitions depend on the target environment and are not currently documented as part of the Bank of Z installation process.
 
-Additional deployment-specific configuration requirement is described in the [Build and Deploy](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/build-and-deploy.html).
+Additional deployment-specific configuration requirement is described in the [Build and Deploy](build-and-deploy.md).
 
 ## Validate Configuration
 
@@ -159,4 +159,4 @@ Before building the application, verify that:
 
 ## Next Step
 
-After completing the environment configuration, continue to [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html) to install and configure the supported development tools and extensions.
+After completing the environment configuration, continue to [IDE Setup](ide-setup.md) to install and configure the supported development tools and extensions.

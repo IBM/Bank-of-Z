@@ -193,10 +193,10 @@ Run the **Setup Bank of Z Environment** task from the Command Palette:
 2. Run **Tasks: Run Task**.
 3. Select **Setup Bank of Z Environment**.
 
-For detailed workflow instructions, see [VS Code Workflow](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/vscode-workflow.html).
+For detailed workflow instructions, see [VS Code Workflow](../development-workflows/vscode-workflow.md).
 
 ## GRUB Workflow Commands
 
 The GRUB workflow synchronizes local changes to USS and runs the Bank of Z setup process.
 
-See to [GRUB Workflow](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/grub-workflow.html) for environment-specific configuration and run procedures.
+See to [GRUB Workflow](../development-workflows/grub-workflow.md) for environment-specific configuration and run procedures.

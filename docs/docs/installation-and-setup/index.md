@@ -22,5 +22,5 @@ The Bank of Z installation process consists of the following stages:
 5. Deploy application resources and services.
 6. Verify the installation.
 
-![Build the Bank of Z Application](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/images/build-boz-app.jpg)
+![Build the Bank of Z Application](images/build-boz-app.jpg)
 

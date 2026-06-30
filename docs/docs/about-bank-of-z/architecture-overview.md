@@ -11,5 +11,5 @@ Banking operations are processed by either CICS or IMS Transaction Manager (IMS 
 
 This architecture demonstrates how multiple IBM Z technologies can be combined to deliver a unified application experience while supporting modern development and deployment practices.
 
-![Architecture Diagram](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/about-bank-of-z/images/architecture-diagram.jpg)
+![Architecture Diagram](images/architecture-diagram.jpg)
 

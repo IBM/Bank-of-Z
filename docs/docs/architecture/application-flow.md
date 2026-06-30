@@ -37,12 +37,12 @@ This routing model demonstrates how multiple IBM Z transaction-processing techno
 
 ## Request Flow Diagram
 
-![Request Flow Diagram](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/architecture/images/request-flow-diagram.jpg)
+![Request Flow Diagram](images/request-flow-diagram.jpg)
 
 ## External Integration
 
 For selected operations, Bank of Z can exchange information with external systems through IBM MQ. This enables integration scenarios such as processing inbound money transfer requests from external banking applications.
 
-![External Integration](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/architecture/images/external-integration.jpg)
+![External Integration](images/external-integration.jpg)
 
 This architecture enables a single web application to provide a consistent user experience while supporting business functions that execute across multiple IBM Z transaction-processing environments.

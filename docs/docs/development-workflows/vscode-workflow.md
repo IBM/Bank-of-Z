@@ -6,7 +6,7 @@ title: VS Code Workflow
 
 The VS Code workflow supports Git-based development using Visual Studio Code, Zowe CLI, and the Bank of Z automation scripts. This workflow is designed for collaborative development and environments where source changes are managed through a shared Git repository.
 
-Before using this workflow, complete the [Installation and Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/) procedures and verify connectivity to the target z/OS environment.
+Before using this workflow, complete the [Installation and Setup](../installation-and-setup/) procedures and verify connectivity to the target z/OS environment.
 
 ## Workflow Overview
 
@@ -117,10 +117,10 @@ Use the VS Code workflow when:
 
 ## Related Information
 
-[Installation and Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/)
+[Installation and Setup](../installation-and-setup/)
 
-[GRUB Workflow](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/grub-workflow.html)
+[GRUB Workflow](grub-workflow.md)
 
-[Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html)
+[Configuration Reference](../reference/configuration-reference.md)
 
-[Troubleshooting Guide](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/troubleshooting/)
+[Troubleshooting Guide](../troubleshooting/)

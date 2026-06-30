@@ -11,7 +11,7 @@ Requests are submitted through a browser-based user interface and routed through
 
 This architecture demonstrates how modern interfaces, APIs, transaction-processing systems, databases, and messaging technologies can work together within an IBM Z environment.
 
-![Architecture Diagram](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/about-bank-of-z/images/architecture-diagram.jpg)
+![Architecture Diagram](../about-bank-of-z/images/architecture-diagram.jpg)
 
 The application combines:
 

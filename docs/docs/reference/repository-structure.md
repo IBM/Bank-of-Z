@@ -67,4 +67,4 @@ The repository includes resources that support local development workflows.
 
 Documentation is maintained alongside the application source and includes setup instructions, tutorials, architecture information, reference material, and troubleshooting guidance.
 
-See the [Tutorials](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/index.html) for guided development scenarios and the [Architecture](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/architecture/) for information about the Bank of Z solution design.
+See the [Tutorials](../tutorials/) for guided development scenarios and the [Architecture](../architecture/) for information about the Bank of Z solution design.

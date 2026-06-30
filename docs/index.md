@@ -4,7 +4,7 @@ title: Home
 ---
 
 <div class="hero-banner">
-    <img src="{{ site.baseurl }}/images/bank-of-z-banner.jpg" alt="Bank of Z">
+    <img src="images/bank-of-z-banner.jpg" alt="Bank of Z">
     <div class="hero-overlay">
         <h1>Bank of Z</h1>
         <p>
@@ -37,42 +37,42 @@ Bank of Z provides guided scenarios that demonstrate common IBM Z development an
 
 <div class="doc-cards">
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/about-bank-of-z/">
+<a class="doc-card" href="docs/about-bank-of-z/">
 <h3>About Bank of Z</h3>
 <p>Learn about Bank of Z, its purpose, capabilities, architecture overview, and key concepts</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/installation-and-setup/">
+<a class="doc-card" href="docs/installation-and-setup/">
 <h3>Installation and Setup</h3>
 <p>Install, configure, and verify your development environment.</p>
 </a>
 
-<a class="doc-card" href="https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/quick-start.html">
+<a class="doc-card" href="docs/installation-and-setup/quick-start.html">
 <h3>Quick Start</h3>
 <p>Begin with a guided walkthrough to install and validate your Bank of Z environment.</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/tutorials/">
+<a class="doc-card" href="docs/tutorials/">
 <h3>Tutorials</h3>
 <p>Follow hands-on tutorials and walkthroughs.</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/development-workflows/">
+<a class="doc-card" href="docs/development-workflows/">
 <h3>Development Workflows</h3>
 <p>Understand build, deployment, testing, and development processes.</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/architecture/">
+<a class="doc-card" href="docs/architecture/">
 <h3>Architecture</h3>
 <p>Understand the solution architecture, application components, and request flow.</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/reference/">
+<a class="doc-card" href="docs/reference/">
 <h3>Reference</h3>
 <p>Access configuration information, repository structure, commands, and glossary terms.</p>
 </a>
 
-<a class="doc-card" href="{{ site.baseurl }}/docs/troubleshooting/">
+<a class="doc-card" href="docs/troubleshooting/">
 <h3>Troubleshooting</h3>
 <p>Resolve common setup, build, deployment, and runtime issues.</p>
 </a>

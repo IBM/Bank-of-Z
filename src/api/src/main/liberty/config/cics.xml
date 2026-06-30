@@ -5,7 +5,7 @@
   </featureManager>
 
   <zosconnect_cicsIpicConnection id="bankzCicsConnection" host="${CICS_HOST}" port="${CICS_PORT}"
-    authDataRef="cicsCredentials" />
+    authDataRef="cicsCredentials" connectionTimeout="300s" requestTimeout="300s" />
 
   <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
-</server>
+</server> 

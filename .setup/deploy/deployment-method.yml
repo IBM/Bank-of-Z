@@ -357,10 +357,12 @@ activities:
             properties:
             - key: "template"
               value: "ims_catalog_populate"
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
       - name: 'PSBLOAD'
       - name: 'DBDLOAD'
-    is_artifact: False
+    is_artifact: True
     tags:
     - ims_catalog_management
 
@@ -380,6 +382,8 @@ activities:
                 value: job_submit
               - key: var_job_submit
                 value: jcl_ims_maclib
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
       - name: 'PSBLOAD'
       - name: 'DBDLOAD'
@@ -403,6 +407,8 @@ activities:
                 value: job_submit
               - key: var_job_submit
                 value: jcl_ims_spoc
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
       - name: 'PSBLOAD'
       - name: 'DBDLOAD'
@@ -420,9 +426,10 @@ activities:
     is_artifact: True
     types:
        - name: 'jar'
+    is_artifact: True
     tags:
     - deploy_jar
-    is_artifact: True
+    - deploy
 
   - name: 'Deploy WAR files'
     description: 'Copy the z/OS Connect WAR files into the destination folder'
@@ -437,9 +444,10 @@ activities:
             - never
     types:
        - name: 'war'
+    is_artifact: True
     tags:
     - zosconnect_copy
-    is_artifact: True
+    - deploy
 
   - name: 'Deploy Config Files'
     description: 'Process and deploy z/OS Connect configuration files with variable substitution'
@@ -453,11 +461,14 @@ activities:
             loop:
                loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
                loop_var: "api_name"
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
        - name: 'war'
+    is_artifact: True
     tags:
     - zosconnect_config
-    is_artifact: True
+    - deploy
 
   - name: 'Refresh z/OS Connect'
     description: 'Refresh z/OS Connect config and applications'
@@ -470,12 +481,17 @@ activities:
               value: 'system_command'
             - key: 'var_system_command'
               value: 'system_command_refresh_config'
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
           - name: 'Refresh z/OS Applications'
             properties:
             - key: 'template'
               value: 'system_command'
             - key: 'var_system_command'
               value: 'system_command_refresh_apps'
+    types:
+       - name: 'war'
+    is_artifact: True
     tags:
     - zosconnect_refresh
     - deploy

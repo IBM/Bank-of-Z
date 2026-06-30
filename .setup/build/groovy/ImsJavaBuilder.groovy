@@ -14,6 +14,7 @@
 import com.ibm.dbb.build.*
 import com.ibm.dbb.build.report.*
 import com.ibm.dbb.build.report.records.*
+import com.ibm.dbb.metadata.BuildResult
 import com.ibm.dbb.task.TaskConstants
 
 /**
@@ -62,20 +63,29 @@ if (!gradlePath) {
 // Shell to use when invoking Gradle (same as zOSConnect / VanillaFrontend)
 def shell = config.getVariable('shellEnvironment') ?: '/bin/sh'
 
+// Optional debug flag - appends --debug to Gradle invocation (same as zOSConnect gradleDebug)
+def gradleDebug = config.getBooleanVariable('gradleDebug', false)
+
 // Relative path (from workspace/appDirName) to the Gradle project directory
 def imsJavaRelativePath = config.getVariable('configSources') ?: 'src/base/ims/java'
 def imsJavaPath = "${workspace}/${appDirName}/${imsJavaRelativePath}"
 
+// Log file - same naming convention as zOSConnect (<appDirName>.ImsJavaBuilder.log)
+def logFile = new File("${logsDirectory}/${appDirName}.ImsJavaBuilder.log")
+
 log.info("Gradle executable: ${gradlePath}")
 log.info("Shell:             ${shell}")
+log.info("Gradle debug:      ${gradleDebug}")
 log.info("IMS Java path:     ${imsJavaPath}")
+log.info("Log file:          ${logFile.absolutePath}")
 
 // -------------------------------------------------------------------------
-// Verify Maven project directory exists
+// Verify Gradle project directory exists
 // -------------------------------------------------------------------------
 def imsJavaDir = new File(imsJavaPath)
 if (!imsJavaDir.exists() || !imsJavaDir.isDirectory()) {
     log.error("IMS Java directory not found at: ${imsJavaPath}")
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 
@@ -138,41 +148,39 @@ try {
     }
     gradleWorkDir.mkdirs()
 
-    def gradleCmd = "${gradlePath} clean jar -PoutputDir=${gradleWorkDir.absolutePath}"
+    def gradleCmd = "${gradlePath} clean jar -PoutputDir=${gradleWorkDir.absolutePath}${gradleDebug ? ' --debug' : ''}"
     def gradleArgs = [shell, '-c', gradleCmd]
     log.info("Executing: ${gradleArgs.join(' ')}")
     log.info("Working directory: ${imsJavaPath}")
+    log.info("Gradle log file:   ${logFile.absolutePath}")
 
     def gradleProc = gradleArgs.execute(env, new File(imsJavaPath))
 
-    // Stream Gradle output to the DBB logger in real time
-    gradleProc.consumeProcessOutputStream(new OutputStream() {
-        private StringBuilder line = new StringBuilder()
-        void write(int b) {
-            if (b == (int)'\n') {
-                log.info("[GRADLE] ${line.toString()}")
-                line = new StringBuilder()
-            } else {
-                line.append((char)b)
+    // Stream Gradle output to the DBB logger and log file simultaneously (stderr merged in)
+    logFile.parentFile?.mkdirs()
+    logFile.withWriter('UTF-8') { writer ->
+        def mergedStream = new OutputStream() {
+            private StringBuilder line = new StringBuilder()
+            void write(int b) {
+                if (b == (int)'\n') {
+                    def lineStr = line.toString()
+                    log.info("[GRADLE] ${lineStr}")
+                    writer.writeLine(lineStr)
+                    line = new StringBuilder()
+                } else {
+                    line.append((char)b)
+                }
             }
         }
-    })
-    gradleProc.consumeProcessErrorStream(new OutputStream() {
-        private StringBuilder line = new StringBuilder()
-        void write(int b) {
-            if (b == (int)'\n') {
-                log.info("[GRADLE-ERR] ${line.toString()}")
-                line = new StringBuilder()
-            } else {
-                line.append((char)b)
-            }
-        }
-    })
-
-    gradleProc.waitFor()
+        gradleProc.consumeProcessOutputStream(mergedStream)
+        gradleProc.consumeProcessErrorStream(mergedStream)
+        gradleProc.waitFor()
+    }
 
     if (gradleProc.exitValue() != 0) {
         log.error("Gradle build failed with exit code: ${gradleProc.exitValue()}")
+        log.error("See log file for details: ${logFile.absolutePath}")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
 
@@ -189,6 +197,7 @@ try {
     if (!jarFiles || jarFiles.length == 0) {
         log.error("No JAR found in Gradle work dir after build: ${gradleWorkDir.absolutePath}")
         gradleWorkDir.deleteDir()
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
 
@@ -212,6 +221,7 @@ try {
     def buildGroup = context.getVariable("BUILD_GROUP")
     if (!buildGroup) {
         log.error("BUILD_GROUP not found in context. MetadataInit must run before this task.")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
 
@@ -240,6 +250,7 @@ try {
 
 } catch (Exception e) {
     log.error("ImsJavaBuilder failed: ${e.message}", e)
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 

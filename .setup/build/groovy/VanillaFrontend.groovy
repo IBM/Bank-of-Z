@@ -5,6 +5,7 @@
 import com.ibm.dbb.build.*
 import com.ibm.dbb.build.report.*
 import com.ibm.dbb.build.report.records.*
+import com.ibm.dbb.metadata.BuildResult
 import com.ibm.dbb.task.TaskConstants
 
 /**
@@ -43,6 +44,7 @@ log.info("Vanilla frontend directory: ${vanillaFrontendPath}")
 def vanillaFrontendDir = new File(vanillaFrontendPath)
 if (!vanillaFrontendDir.exists() || !vanillaFrontendDir.isDirectory()) {
     log.error("Vanilla frontend directory not found at: ${vanillaFrontendPath}")
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 
@@ -113,6 +115,7 @@ try {
     
     if (copyProc.exitValue() != 0) {
         log.error("Failed to copy frontend files")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     
@@ -143,6 +146,7 @@ try {
     if (warProc.exitValue() != 0) {
         log.error("Failed to create WAR file")
         log.error("WAR creation output: ${warProc.err.text}")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     
@@ -161,6 +165,7 @@ try {
     def buildGroup = context.getVariable("BUILD_GROUP")
     if (!buildGroup) {
         log.error("BUILD_GROUP not found in context")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     
@@ -204,6 +209,7 @@ try {
     
 } catch (Exception e) {
     log.error("VanillaFrontend failed: ${e.message}", e)
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 

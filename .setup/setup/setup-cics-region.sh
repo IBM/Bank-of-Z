@@ -156,10 +156,10 @@ fi
 deactivate
 
 
-export RIGHT = 'APPLID of CICS                       X'
-export LEFT = '               APPLID=CICS'
-export SPACES = 8 - ${#APP_SHORT_NAME}
-export MIDDLE = $(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
+export RIGHT='APPLID of CICS                       X'
+export LEFT='               APPLID=CICS'
+export SPACES=8 - ${#APP_SHORT_NAME}
+export MIDDLE=$(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
 
 rm -f "/tmp/tcpip-create*"
 rm -f "/tmp/plt-create*"

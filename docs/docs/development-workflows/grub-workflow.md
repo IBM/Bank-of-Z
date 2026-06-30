@@ -9,7 +9,7 @@ GRUB (Git Remote User Build) supports rapid development and testing by synchroni
 
 Unlike the VS Code workflow, GRUB does not require changes to be committed or pushed before they can be tested.
 
-Before using this workflow, complete the [Installation and Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/) procedures and verify that GRUB is configured for your environment.
+Before using this workflow, complete the [Installation and Setup](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/) procedures and verify that GRUB is configured for your environment.
 
 ## Workflow Overview
 
@@ -101,14 +101,14 @@ Use the GRUB workflow when:
 
 ## Related Information
 
-[Workflow Overview](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/)
+[Workflow Overview](https://pages.github.com/Bank-of-Z/docs/docs/development-workflows/)
 
-[VS Code Workflow](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/vscode-workflow.html)
+[VS Code Workflow](https://pages.github.com/Bank-of-Z/docs/docs/development-workflows/vscode-workflow.html)
 
-[Development Best Practices](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/development-best-practices.html)
+[Development Best Practices](https://pages.github.com/Bank-of-Z/docs/docs/development-workflows/development-best-practices.html)
 
-[Workflow Comparison](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows/workflow-comparison.html)
+[Workflow Comparison](https://pages.github.com/Bank-of-Z/docs/docs/development-workflows/workflow-comparison.html)
 
-[Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html)
+[Configuration Reference](https://pages.github.com/Bank-of-Z/docs/docs/reference/configuration-reference.html)
 
-[Troubleshooting](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/troubleshooting/)
+[Troubleshooting](https://pages.github.com/Bank-of-Z/docs/docs/troubleshooting/)

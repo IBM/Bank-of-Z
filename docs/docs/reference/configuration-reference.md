@@ -12,7 +12,7 @@ Bank of Z uses the `.setup/config/config.yaml` file to define environment-specif
 The configuration file supports:
 
 - Hierarchical configuration using YAML sections
-- Variable expansion using `${section.key}` syntax
+- Variable expansion using `{{section.key}` syntax
 - Environment variable references using `${ENV_VAR}` syntax
 - Comments using the `#` character
 

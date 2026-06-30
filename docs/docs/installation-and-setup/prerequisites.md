@@ -38,7 +38,7 @@ If you are using IBM Premium Bob for Z (Bob IDE), ensure that your workstation m
 | zConfig | 0.6.0 |
 | CICS TS Resource Builder | 1.0.6 |
 | Maven | 3.6.3 |
-| Gradle | Pending SME confirmation |
+| Gradle | 9.5.1 |
 | z/OS Connect | 3.0.101 |
 
 **Note:** A pre-existing Db2 subsystem (DBD1) is required before deploying Bank of Z.
@@ -67,7 +67,7 @@ Bank of Z requires the following IDE extensions.
 
 **Note:** If you are using VS Code, configure the required Zowe Explorer profiles before beginning the installation. For profile creation instructions, see the [IBM Z Open Editor](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html) documentation.
 
-For installation procedures, see [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html).
+For installation procedures, see [IDE Setup](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/ide-setup.html).
 
 ### Verify Software Installation
 
@@ -109,7 +109,7 @@ git --version
 ### Zowe CLI
 
 Bank of Z requires Zowe CLI Version 3.x (LTS) and the IBM RSE API plug-in for communication with the target z/OS environment.
-For installation instructions, see the [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html) section.
+For installation instructions, see the [IDE Setup](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/ide-setup.html) section.
 
 Verify the installation:
 
@@ -183,4 +183,4 @@ Depending on your environment, appropriate security definitions must also be con
 
 >**Note:** Access to z/OS environments, middleware environments, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding with the installation.
 
-After completing the prerequisite checks, continue to [Environment Configuration](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/environment-configuration.html).
+After completing the prerequisite checks, continue to [Environment Configuration](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/environment-configuration.html).

@@ -10,7 +10,7 @@
  * OR DISCLOSURE RESTRICTED BY GSA ADP SCHEDULE                   *
  * CONTRACT WITH IBM CORPORATION                                  *
  *                                                                *
-*******************************HACK***********************************/
+******************************************************************/
 package nazare.jmp.message;
 
 import com.ibm.ims.application.IMSFieldMessage;

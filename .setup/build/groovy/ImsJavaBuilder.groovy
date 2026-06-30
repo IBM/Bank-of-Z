@@ -107,12 +107,17 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def allFiles = changedFiles + deletedFiles + renamedFiles
 
     log.info("> Checking ${allFiles.size()} changed files for IMS Java changes")
-    log.info("> Looking for files under: '${imsJavaRelativePath}/'")
+    log.info("> Looking for files containing: '${imsJavaRelativePath}/'")
 
     def isJavaChanged = false
     allFiles.each { file ->
+        log.info("> Checking file: ${file}")
+        // Files contain paths like "Bank-of-Z/src/base/ims/java/nazare/jmp/controller/IMSBankHistory.java"
+        // Check if the path contains the IMS Java directory (with or without leading slash)
         if (file.contains("/${imsJavaRelativePath}/") ||
-            file.contains("${imsJavaRelativePath}/")) {
+            file.contains("${imsJavaRelativePath}/") ||
+            file.endsWith("/${imsJavaRelativePath}") ||
+            file.endsWith("${imsJavaRelativePath}")) {
             isJavaChanged = true
             log.info("> IMS Java file detected: ${file}")
         }

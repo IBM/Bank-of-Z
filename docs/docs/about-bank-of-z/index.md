@@ -28,4 +28,7 @@ Watch the following overview to learn about the goals of Bank of Z, the IBM Z te
 
 **Note:** The video includes the original design scenario used during the development of Bank of Z. The current architecture documentation describes the supported implementation of the application.
 
-[Introduction Video](https://github.com/IBM/Bank-of-Z/releases/download/v1/bank_of_z_intro.mp4)
+<video controls width="100%" style="max-width: 960px;">
+  <source src="https://github.com/IBM/Bank-of-Z/releases/download/v1/bank_of_z_intro.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>

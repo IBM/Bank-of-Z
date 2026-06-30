@@ -17,7 +17,10 @@ Bank of Z is provided as a self-contained repository that includes the applicati
 
 Watch the following demonstration for a complete walkthrough of the Bank of Z installation, build, deployment, verification, and application startup workflow.
 
-[Quick Start demo video](https://github.com/IBM/Bank-of-Z/releases/download/v1/bank_of_z_quick_start.mov)
+<video controls width="100%" style="max-width: 960px;">
+  <source src="https://github.com/IBM/Bank-of-Z/releases/download/v1/bank_of_z_quick_start.mov" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Getting Started
 

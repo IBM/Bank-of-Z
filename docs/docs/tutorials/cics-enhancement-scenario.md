@@ -43,7 +43,10 @@ The demonstration covers:
 - Generating an implementation plan
 - Creating an implementation checklist
 
-[Understand and Plan the Enhancement video](https://github.com/IBM/Bank-of-Z/releases/download/v1/cics_functional_enhancement_understand.mp4)
+<video controls width="100%" style="max-width: 960px;">
+  <source src="https://github.com/IBM/Bank-of-Z/releases/download/v1/cics_functional_enhancement_understand.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Part 2: Implement and Validate the Enhancement
 
@@ -59,7 +62,10 @@ The demonstration covers:
 - Validating database updates
 - Verifying the enhancement through the Bank of Z web application
 
-[Implement and Validate the Enhancement video](https://github.com/IBM/Bank-of-Z/releases/download/v1/cics_functional_enhancement_implement.mp4)
+<video controls width="100%" style="max-width: 960px;">
+  <source src="https://github.com/IBM/Bank-of-Z/releases/download/v1/cics_functional_enhancement_implement.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Outcome
 

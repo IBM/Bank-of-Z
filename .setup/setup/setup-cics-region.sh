@@ -170,7 +170,7 @@ run_job_and_wait "/tmp/tcpip-create-$$.jcl" "8"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
-run_job_and_wait "/tmp/plt-create.jcl" "8"
+run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
 
 # =========================
 # Stage 4: Start CICS region

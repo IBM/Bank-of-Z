@@ -37,7 +37,6 @@ If you are using IBM Premium Bob for Z (Bob IDE), ensure that your workstation m
 | Zowe CLI | 3.x (LTS) |
 | zConfig | 0.6.0 |
 | CICS TS Resource Builder | 1.0.6 |
-| Maven | 3.6.3 |
 | Gradle | 9.5.1 |
 | z/OS Connect | 3.0.101 |
 

@@ -5,7 +5,7 @@
 //* CREATE PDS FOR ASSEMBLER SOURCE AND ADD DFHPLTSI MEMBER
 //*-------------------------------------------------------------------
 //ALLOC    EXEC PGM=IEFBR14
-//TABLES   DD DSN=BANKZ.CICSBOZ.TABLES.SOURCE,
+//TABLES   DD DSN={{ cics_hlq }}.TABLES.SOURCE,
 //         DISP=(NEW,CATLG,DELETE),
 //         SPACE=(TRK,(10,5,10)),
 //         DCB=(RECFM=FB,LRECL=80,BLKSIZE=3120),
@@ -28,7 +28,7 @@
          DFHPLT TYPE=FINAL
          END   DFHPLTBA
 /*
-//SYSUT2   DD DSN=BANKZ.CICSBOZ.TABLES.SOURCE(DFHPLTSI),
+//SYSUT2   DD DSN={{ cics_hlq }}.TABLES.SOURCE(DFHPLTSI),
 //         DISP=SHR
 //*-------------------------------------------------------------------
 //* Made with Bob

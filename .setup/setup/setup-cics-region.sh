@@ -155,7 +155,20 @@ fi
 
 deactivate
 
-run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/tcpip-create.jcl" "8"
+
+RIGHT = 'APPLID of CICS                       X'
+LEFT = '               APPLID=CICS'
+SPACES = 8 - ${#APP_SHORT_NAME}
+MIDDLE = $(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
+
+rm -f "/tmp/tcpip-create*"
+rm -f "/tmp/plt-create*"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --extraVar "applid_line=${LEFT}${MIDDLE}${RIGHT} --templateFile "$SCRIPTS_DIR/../jcl/cics/tcpip-create.j2"  --outputFile "/tmp/tcpip-create-$$.jcl"
+run_job_and_wait "/tmp/tcpip-create-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
 run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/plt-create.jcl" "8"
 
 # =========================

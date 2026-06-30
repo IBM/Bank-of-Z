@@ -7,7 +7,7 @@
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
    DELETE -
-      BANKZ.CICSBOZ.TCP.CONFIG -
+      {{ cics_hlq }}.TCP.CONFIG -
       PURGE -
       ERASE
 //*
@@ -16,15 +16,15 @@
 //DEFINE   EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
-  DEFINE CLUSTER (NAME(BANKZ.CICSBOZ.TCP.CONFIG) VOLUMES(USRVS1) -
+  DEFINE CLUSTER (NAME({{ cics_hlq }}.TCP.CONFIG) VOLUMES(USRVS1) -
       CYL(1 1) -
       RECORDSIZE(150 150) FREESPACE(0 15) -
       INDEXED ) -
       DATA ( -
-        NAME(BANKZ.CICSBOZ.TCP.CONFIG.DATA) -
+        NAME({{ cics_hlq }}.TCP.CONFIG.DATA) -
         KEYS (16 0) ) -
       INDEX ( -
-        NAME(BANKZ.CICSBOZ.TCP.CONFIG.INDEX) )
+        NAME({{ cics_hlq }}.TCP.CONFIG.INDEX) )
 /*
 /*
 //*
@@ -47,7 +47,7 @@
                PRGNAME=EZACICDF,  Name of the generated program        X
                FILNAME=EZACONFG   DD name of the configuration file
          EZACICD TYPE=CICS,       Generate configuration record        X
-               APPLID=CICSBOZ,    APPLID of CICS                       X
+{{ applid_line }}
                TCPADDR=TCPIP,     Address space name for TCP/IP        X
                NTASKS=20,         Number of reusable MVS subtasks      X
                DPRTY=10,          Priority difference (CICS-Subtask)   X
@@ -57,7 +57,7 @@
                ERRORTD=CSMT       Name of TD queue for error messages
          EZACICD TYPE=LISTENER,   Create Listener Record               X
                FORMAT=STANDARD,   Standard Listener                    X
-               APPLID=CICSBOZ,    APPLID of CICS                       X
+{{ applid_line  }}
                TRANID=CSKL,       Use standard transaction ID          X
                PORT=3010,         Use port number 3010                 X
                AF=INET,           Listener Address Family              X
@@ -90,5 +90,5 @@
 //*
 //FILELOAD EXEC PGM=*.LINK.SYSLMOD,
 //            COND=((4,LT,DEFINE),(4,LT,ASM),(4,LT,LINK))
-//EZACONFG DD DSNAME=BANKZ.CICSBOZ.TCP.CONFIG,DISP=OLD
+//EZACONFG DD DSNAME={{ cics_hlq }}.TCP.CONFIG,DISP=OLD
 //*

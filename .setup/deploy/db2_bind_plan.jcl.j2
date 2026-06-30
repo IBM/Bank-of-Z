@@ -1,33 +1,28 @@
 //*----------------------------------------------------------------*
 //*  Licensed Materials - Property of IBM                          *
-//*  (c) Copyright IBM Corp. 2021,2026 All Rights Reserved         *
+//*  (c) Copyright IBM Corp. 2022,2026 All Rights Reserved         *
 //*  US Government Users Restricted Rights - Use, duplication or   *
 //*  disclosure restricted by GSA ADP Schedule Contract with       *
 //*  IBM Corp                                                      *
 //*----------------------------------------------------------------*
 //********************************************************************
-//*               BIND - BIND THE DB2 PACKAGE                        *
+//*               BIND - BIND THE DB2 PLAN                           *
 //********************************************************************
-//{{parameters['db2_system']['package_jobcard'].strip()}}
+//{{parameters['db2_system']['plan_jobcard'].strip()}}
 //JOBLIB   DD  DISP=SHR,
 //             DSN={{parameters['db2_system']['sdsnload']}}
-//PKGBIND EXEC PGM=IKJEFT01,DYNAMNBR=20,COND=(4,LT)
+//PLABIND EXEC PGM=IKJEFT01,DYNAMNBR=20,COND=(4,LT)
 //SYSTSPRT DD  SYSOUT=*
 //SYSPRINT DD  SYSOUT=*
 //SYSUDUMP DD  SYSOUT=*
 //SYSIN    DD  DUMMY
 //SYSTSIN  DD  *
 DSN SYSTEM ({{parameters['db2_system']['subsys']}})
-{% for artifact in wd_artifacts %}
-BIND  PACKAGE({{parameters['db2_system']['package']}}) +
-   MEMBER({{ artifact['name'] }}) +
-   LIBRARY('{{item_type['pds']['name']|upper}}') +
+BIND  PLAN({{parameters['db2_system']['plan']}}) +
+   PKLIST({{parameters['db2_system']['plan_pklist']}}) +
    QUALIFIER({{parameters['db2_system']['qualifier']}}) +
    OWNER({{parameters['db2_system']['sqlid']}}) +
-   ACTION({{parameters['db2_system']['package_action']}}) +
-   ISOLATION(CS) +
-   RELEASE(COMMIT)
-{% endfor %}
+   ISOLATION(UR)
 END
 /*
 

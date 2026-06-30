@@ -159,6 +159,10 @@ activities:
                 value: db2_bind_plan
               - key: var_type
                 value: type_dbrm_temp
+              - key: var_template_name
+                value: db2_bind_plan_template
+            plan_tags:
+            - never
     types:
       - name: "DBRM"
     is_artifact: True

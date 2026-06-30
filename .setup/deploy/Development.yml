@@ -55,6 +55,7 @@ default_db2_subsys: "DBD1"
 default_db2_plan_pklist: "NULLID.*,BANKZPACK.*"
 default_db2_action: "REPLACE"
 db2_bind_package_template: "db2_bind_package.jcl.j2"
+db2_bind_plan_template: "db2_bind_plan.jcl.j2"
 
 # z/OS Connect
 zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"

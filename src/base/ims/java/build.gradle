@@ -1,0 +1,39 @@
+/*******************************************************************************
+ * Licensed Materials - Property of IBM
+ * (c) Copyright IBM Corporation 2026. All Rights Reserved.
+ *
+ * Note to U.S. Government Users Restricted Rights:
+ * Use, duplication or disclosure restricted by GSA ADP Schedule
+ * Contract with IBM Corp.
+ *******************************************************************************/
+
+plugins {
+    id 'java'
+}
+
+group = 'com.ibm.ims'
+version = '1.0.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// Allow the output directory to be overridden via -PoutputDir=<path>
+def outputDir = project.findProperty('outputDir') ?: layout.buildDirectory.get().asFile.absolutePath
+
+jar {
+    destinationDirectory = file(outputDir)
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.ibm.db2:jcc:12.1.4.0'
+    implementation 'com.ibm.ims:udb:15.166'
+    implementation 'com.ibm.jzos:ibmjzos:2.4.11.3'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+}

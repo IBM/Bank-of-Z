@@ -22,13 +22,15 @@ import com.ibm.dbb.task.TaskConstants
  *
  * This script mirrors VanillaFrontend.groovy and zOSConnect (buildOpenAPIv3):
  * 1. Detects whether any IMS Java source files changed (pipeline/impact builds)
- * 2. Runs mvn clean install, depositing the JAR into outputDirectory (the DBB
- *    package staging area) via -DoutputDir - same pattern as the api.war
+ * 2. Runs gradle clean jar, depositing the JAR into outputDirectory (the DBB
+ *    package staging area) via -PoutputDir - same pattern as the api.war
  * 3. Registers the JAR in the build map with deployType=IMS-JAR so the Package
  *    task pulls it into the tar, and Wazi Deploy copies it to sandbox/jars
  *
- * The Maven executable path is supplied via the 'mavenPath' config variable so
- * it is never hardcoded in this script.
+ * The Gradle executable path is supplied via the 'gradlePath' config variable,
+ * shared with the zOSConnect task so it is never hardcoded in this script.
+ * Gradle is invoked via the 'shellEnvironment' shell (same pattern as zOSConnect)
+ * so the correct z/OS USS environment is in place when the build runs.
  */
 
 log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
@@ -49,20 +51,24 @@ log.info("Output Directory: ${outputDirectory}")
 // Config variables - supplied in dbb-app.yaml task block
 // -------------------------------------------------------------------------
 
-// Path to the Maven executable (required - never hardcoded here)
-def mavenPath = config.getVariable('mavenPath')
-if (!mavenPath) {
-    log.error("ImsJavaBuilder: 'mavenPath' configuration variable is required but not set.")
-    log.error("Add mavenPath to the ImsJavaBuilder task configuration in dbb-app.yaml.")
+// Path to the Gradle executable (shared with zOSConnect task - required)
+def gradlePath = config.getVariable('gradlePath')
+if (!gradlePath) {
+    log.error("ImsJavaBuilder: 'gradlePath' configuration variable is required but not set.")
+    log.error("Add gradlePath to the ImsJavaBuilder task configuration in dbb-app.yaml.")
     return 8
 }
 
-// Relative path (from workspace/appDirName) to the Maven project directory
+// Shell to use when invoking Gradle (same as zOSConnect / VanillaFrontend)
+def shell = config.getVariable('shellEnvironment') ?: '/bin/sh'
+
+// Relative path (from workspace/appDirName) to the Gradle project directory
 def imsJavaRelativePath = config.getVariable('configSources') ?: 'src/base/ims/java'
 def imsJavaPath = "${workspace}/${appDirName}/${imsJavaRelativePath}"
 
-log.info("Maven executable: ${mavenPath}")
-log.info("IMS Java path:    ${imsJavaPath}")
+log.info("Gradle executable: ${gradlePath}")
+log.info("Shell:             ${shell}")
+log.info("IMS Java path:     ${imsJavaPath}")
 
 // -------------------------------------------------------------------------
 // Verify Maven project directory exists
@@ -115,48 +121,47 @@ System.getenv().each { k, v -> envList << "$k=$v" }
 def env = envList as String[]
 
 // -------------------------------------------------------------------------
-// Run Maven build
+// Run Gradle build
 // -------------------------------------------------------------------------
 try {
     log.info("=" * 80)
-    log.info("Running Maven build")
+    log.info("Running Gradle build")
     log.info("=" * 80)
 
-    // Maven's pom.xml uses <directory>${outputDir}</directory> which makes the
-    // entire Maven build dir (including mvn clean) point at that path. We must
-    // NOT pass outputDirectory directly - mvn clean would wipe everything
-    // VanillaFrontend and ServerXmlPackager already wrote there.
-    // Instead, build into a private temp dir then copy only the JAR across.
-    def mvnWorkDir = new File("${outputDirectory}/ims-java-build-temp")
-    if (mvnWorkDir.exists()) {
-        log.info("Cleaning existing Maven work dir: ${mvnWorkDir.absolutePath}")
-        mvnWorkDir.deleteDir()
+    // Build into a private temp dir then copy only the JAR across, so that
+    // gradle clean does not wipe anything VanillaFrontend / ServerXmlPackager
+    // already wrote into outputDirectory.
+    def gradleWorkDir = new File("${outputDirectory}/ims-java-build-temp")
+    if (gradleWorkDir.exists()) {
+        log.info("Cleaning existing Gradle work dir: ${gradleWorkDir.absolutePath}")
+        gradleWorkDir.deleteDir()
     }
-    mvnWorkDir.mkdirs()
+    gradleWorkDir.mkdirs()
 
-    def mvnArgs = [mavenPath, 'clean', 'install', "-DoutputDir=${mvnWorkDir.absolutePath}"]
-    log.info("Executing: ${mvnArgs.join(' ')}")
+    def gradleCmd = "${gradlePath} clean jar -PoutputDir=${gradleWorkDir.absolutePath}"
+    def gradleArgs = [shell, '-c', gradleCmd]
+    log.info("Executing: ${gradleArgs.join(' ')}")
     log.info("Working directory: ${imsJavaPath}")
 
-    def mvnProc = mvnArgs.execute(env, new File(imsJavaPath))
+    def gradleProc = gradleArgs.execute(env, new File(imsJavaPath))
 
-    // Stream Maven output to the DBB logger in real time
-    mvnProc.consumeProcessOutputStream(new OutputStream() {
+    // Stream Gradle output to the DBB logger in real time
+    gradleProc.consumeProcessOutputStream(new OutputStream() {
         private StringBuilder line = new StringBuilder()
         void write(int b) {
             if (b == (int)'\n') {
-                log.info("[MVN] ${line.toString()}")
+                log.info("[GRADLE] ${line.toString()}")
                 line = new StringBuilder()
             } else {
                 line.append((char)b)
             }
         }
     })
-    mvnProc.consumeProcessErrorStream(new OutputStream() {
+    gradleProc.consumeProcessErrorStream(new OutputStream() {
         private StringBuilder line = new StringBuilder()
         void write(int b) {
             if (b == (int)'\n') {
-                log.info("[MVN-ERR] ${line.toString()}")
+                log.info("[GRADLE-ERR] ${line.toString()}")
                 line = new StringBuilder()
             } else {
                 line.append((char)b)
@@ -164,38 +169,37 @@ try {
         }
     })
 
-    mvnProc.waitFor()
+    gradleProc.waitFor()
 
-    if (mvnProc.exitValue() != 0) {
-        log.error("Maven build failed with exit code: ${mvnProc.exitValue()}")
+    if (gradleProc.exitValue() != 0) {
+        log.error("Gradle build failed with exit code: ${gradleProc.exitValue()}")
         return 8
     }
 
-    log.info("Maven build completed successfully")
+    log.info("Gradle build completed successfully")
 
     // -------------------------------------------------------------------------
-    // Find the JAR Maven produced in the temp build dir, then copy it into
-    // outputDirectory so the Package task can pick it up - same as VanillaFrontend
-    // copying its WAR into outputDirectory after creating it in a temp dir.
+    // Find the JAR Gradle produced in the temp build dir, then copy it into
+    // outputDirectory so the Package task can pick it up.
     // -------------------------------------------------------------------------
-    def jarFiles = mvnWorkDir.listFiles({ f ->
+    def jarFiles = gradleWorkDir.listFiles({ f ->
         f.name.endsWith('.jar') && !f.name.endsWith('-sources.jar')
     } as FileFilter)
 
     if (!jarFiles || jarFiles.length == 0) {
-        log.error("No JAR found in Maven work dir after build: ${mvnWorkDir.absolutePath}")
-        mvnWorkDir.deleteDir()
+        log.error("No JAR found in Gradle work dir after build: ${gradleWorkDir.absolutePath}")
+        gradleWorkDir.deleteDir()
         return 8
     }
 
     // Pick the most recently modified jar in case there are multiple
     def sourceJar = jarFiles.sort { a, b -> b.lastModified() <=> a.lastModified() }.first()
     def jarFile = new File("${outputDirectory}/${sourceJar.name}")
-    log.info("Copying JAR: ${sourceJar.absolutePath} - ${jarFile.absolutePath}")
+    log.info("Copying JAR: ${sourceJar.absolutePath} -> ${jarFile.absolutePath}")
     jarFile.bytes = sourceJar.bytes
 
-    // Clean up the Maven temp dir - only the JAR in outputDirectory is needed
-    mvnWorkDir.deleteDir()
+    // Clean up the Gradle temp dir - only the JAR in outputDirectory is needed
+    gradleWorkDir.deleteDir()
     log.info("JAR in output directory: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
 
     // -------------------------------------------------------------------------
@@ -211,8 +215,8 @@ try {
         return 8
     }
 
-    // pom.xml is the stable marker for this Maven project
-    String relativeMarkerPath = "${imsJavaRelativePath}/pom.xml"
+    // build.gradle is the stable marker for this Gradle project
+    String relativeMarkerPath = "${imsJavaRelativePath}/build.gradle"
 
     if (buildGroup.buildMapExists(relativeMarkerPath)) {
         log.info("Deleting existing build map for ${relativeMarkerPath}")
@@ -231,6 +235,7 @@ try {
     log.info("ImsJavaBuilder completed successfully")
     log.info("JAR:         ${jarFile.absolutePath}")
     log.info("Deploy Type: IMS-JAR")
+    log.info("Build tool:  Gradle")
     log.info("=" * 80)
 
 } catch (Exception e) {

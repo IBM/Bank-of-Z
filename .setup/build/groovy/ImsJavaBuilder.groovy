@@ -149,7 +149,7 @@ try {
     // Build the options list: [gradlePath, clean, jar, -PoutputDir=..., (--debug)]
     // Shell is set as the command and gradle invocation is passed as options,
     // exactly as zOSConnect does with UnixExec
-    def optionsList = [gradlePath, 'clean', 'jar', "-PoutputDir=${gradleWorkDir.absolutePath}"]
+    List<String> optionsList = [gradlePath.toString(), 'clean', 'jar', "-PoutputDir=${gradleWorkDir.absolutePath}".toString()]
     if (gradleDebug) optionsList << '--debug'
 
     log.info("Executing: ${shell} ${optionsList.join(' ')}")

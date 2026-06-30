@@ -73,7 +73,7 @@
     <script type="module">
         import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate } from './js/utils.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatDate, parseCustomerId, validateCustomerId } from './js/utils.js';
         
         let currentCustomer = null;
         
@@ -93,18 +93,27 @@
         });
         
         async function searchCustomer() {
-            const customerId = document.getElementById('customerId').value.trim();
+            const input = document.getElementById('customerId').value.trim();
             
-            if (!customerId) {
+            if (!input) {
                 showErrorModal('Validation Error', 'Please enter a customer ID');
                 return;
             }
             
+            const validation = validateCustomerId(input);
+            if (!validation.valid) {
+                showErrorModal('Validation Error', validation.error);
+                return;
+            }
+            
+            const parsed = parseCustomerId(input);
+            
             showLoadingModal('Searching for customer...');
             
             try {
-                const customer = await api.customers.getCustomer(customerId);
+                const customer = await api.customers.getCustomer(parsed.customerId, parsed.system);
                 currentCustomer = customer;
+                currentCustomer._system = parsed.system;
                 hideLoadingModal();
                 displayCustomerInfo(customer);
             } catch (error) {

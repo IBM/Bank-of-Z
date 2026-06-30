@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="DELCUSZ" originalName="DELCUSZ" included="Y" path="DELCUSZ" fileName="DELCUS.cpy" structureIndex="0" structSrcFileName="DELCUS_request_0.cpy" srcLine="01 DELCUSZ.">
+                <startPos>1</startPos>
+                <bytes>399</bytes>
+                <maxBytes>399</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="COMM-EYE" originalName="COMM-EYE" included="Y" path="DELCUSZ.COMM-EYE" srcLine="03 COMM-EYE PIC X(4) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-SCODE" originalName="COMM-SCODE" included="Y" path="DELCUSZ.COMM-SCODE" srcLine="03 COMM-SCODE PIC X(6) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-CUSTNO" originalName="COMM-CUSTNO" included="Y" path="DELCUSZ.COMM-CUSTNO" srcLine="03 COMM-CUSTNO PIC X(10) USAGE DISPLAY.">
+                    <startPos>11</startPos>
+                    <bytes>10</bytes>
+                    <maxBytes>10</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-NAME" originalName="COMM-NAME" included="Y" path="DELCUSZ.COMM-NAME" srcLine="03 COMM-NAME.">
+                    <startPos>21</startPos>
+                    <bytes>110</bytes>
+                    <maxBytes>110</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-TITLE" originalName="COMM-TITLE" included="Y" path="DELCUSZ.COMM-NAME.COMM-TITLE" srcLine="05 COMM-TITLE PIC X(10) USAGE DISPLAY.">
+                        <startPos>21</startPos>
+                        <bytes>10</bytes>
+                        <maxBytes>10</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-FIRST-NAME" originalName="COMM-FIRST-NAME" included="Y" path="DELCUSZ.COMM-NAME.COMM-FIRST-NAME" srcLine="05 COMM-FIRST-NAME PIC X(50) USAGE DISPLAY.">
+                        <startPos>31</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-LAST-NAME" originalName="COMM-LAST-NAME" included="Y" path="DELCUSZ.COMM-NAME.COMM-LAST-NAME" srcLine="05 COMM-LAST-NAME PIC X(50) USAGE DISPLAY.">
+                        <startPos>81</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+                <field name="COMM-DOB" originalName="COMM-DOB" included="Y" path="DELCUSZ.COMM-DOB" srcLine="03 COMM-DOB.">
+                    <startPos>131</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-DOB-DAY" originalName="COMM-DOB-DAY" included="Y" path="DELCUSZ.COMM-DOB.COMM-DOB-DAY" srcLine="05 COMM-DOB-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>131</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-DOB-MONTH" originalName="COMM-DOB-MONTH" included="Y" path="DELCUSZ.COMM-DOB.COMM-DOB-MONTH" srcLine="05 COMM-DOB-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>133</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-DOB-YEAR" originalName="COMM-DOB-YEAR" included="Y" path="DELCUSZ.COMM-DOB.COMM-DOB-YEAR" srcLine="05 COMM-DOB-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>135</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="COMM-PHONE" originalName="COMM-PHONE" included="Y" path="DELCUSZ.COMM-PHONE" srcLine="03 COMM-PHONE PIC X(20) USAGE DISPLAY.">
+                    <startPos>139</startPos>
+                    <bytes>20</bytes>
+                    <maxBytes>20</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-ADDR" originalName="COMM-ADDR" included="Y" path="DELCUSZ.COMM-ADDR" srcLine="03 COMM-ADDR.">
+                    <startPos>159</startPos>
+                    <bytes>210</bytes>
+                    <maxBytes>210</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-ADDR-LINE1" originalName="COMM-ADDR-LINE1" included="Y" path="DELCUSZ.COMM-ADDR.COMM-ADDR-LINE1" srcLine="05 COMM-ADDR-LINE1 PIC X(50) USAGE DISPLAY.">
+                        <startPos>159</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-ADDR-LINE2" originalName="COMM-ADDR-LINE2" included="Y" path="DELCUSZ.COMM-ADDR.COMM-ADDR-LINE2" srcLine="05 COMM-ADDR-LINE2 PIC X(50) USAGE DISPLAY.">
+                        <startPos>209</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-CITY" originalName="COMM-CITY" included="Y" path="DELCUSZ.COMM-ADDR.COMM-CITY" srcLine="05 COMM-CITY PIC X(50) USAGE DISPLAY.">
+                        <startPos>259</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-POSTCODE" originalName="COMM-POSTCODE" included="Y" path="DELCUSZ.COMM-ADDR.COMM-POSTCODE" srcLine="05 COMM-POSTCODE PIC X(10) USAGE DISPLAY.">
+                        <startPos>309</startPos>
+                        <bytes>10</bytes>
+                        <maxBytes>10</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-COUNTRY" originalName="COMM-COUNTRY" included="Y" path="DELCUSZ.COMM-ADDR.COMM-COUNTRY" srcLine="05 COMM-COUNTRY PIC X(50) USAGE DISPLAY.">
+                        <startPos>319</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                </field>
+                <field name="COMM-STATUS" originalName="COMM-STATUS" included="Y" path="DELCUSZ.COMM-STATUS" srcLine="03 COMM-STATUS PIC X(10) USAGE DISPLAY.">
+                    <startPos>369</startPos>
+                    <bytes>10</bytes>
+                    <maxBytes>10</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-CREATED-DATE" originalName="COMM-CREATED-DATE" included="Y" path="DELCUSZ.COMM-CREATED-DATE" srcLine="03 COMM-CREATED-DATE.">
+                    <startPos>379</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-CREATED-DAY" originalName="COMM-CREATED-DAY" included="Y" path="DELCUSZ.COMM-CREATED-DATE.COMM-CREATED-DAY" srcLine="05 COMM-CREATED-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>379</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CREATED-MONTH" originalName="COMM-CREATED-MONTH" included="Y" path="DELCUSZ.COMM-CREATED-DATE.COMM-CREATED-MONTH" srcLine="05 COMM-CREATED-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>381</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CREATED-YEAR" originalName="COMM-CREATED-YEAR" included="Y" path="DELCUSZ.COMM-CREATED-DATE.COMM-CREATED-YEAR" srcLine="05 COMM-CREATED-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>383</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="COMM-CREDIT-SCORE" originalName="COMM-CREDIT-SCORE" included="Y" path="DELCUSZ.COMM-CREDIT-SCORE" srcLine="03 COMM-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.">
+                    <startPos>387</startPos>
+                    <bytes>3</bytes>
+                    <maxBytes>3</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="3" scale="0"/>
+                </field>
+                <field name="COMM-CS-REVIEW-DATE" originalName="COMM-CS-REVIEW-DATE" included="Y" path="DELCUSZ.COMM-CS-REVIEW-DATE" srcLine="03 COMM-CS-REVIEW-DATE.">
+                    <startPos>390</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="STRUCT"/>
+                    <field name="COMM-CS-REVIEW-DAY" originalName="COMM-CS-REVIEW-DAY" included="Y" path="DELCUSZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-DAY" srcLine="05 COMM-CS-REVIEW-DAY PIC 9(2) USAGE DISPLAY.">
+                        <startPos>390</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CS-REVIEW-MONTH" originalName="COMM-CS-REVIEW-MONTH" included="Y" path="DELCUSZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-MONTH" srcLine="05 COMM-CS-REVIEW-MONTH PIC 9(2) USAGE DISPLAY.">
+                        <startPos>392</startPos>
+                        <bytes>2</bytes>
+                        <maxBytes>2</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                    </field>
+                    <field name="COMM-CS-REVIEW-YEAR" originalName="COMM-CS-REVIEW-YEAR" included="Y" path="DELCUSZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-YEAR" srcLine="05 COMM-CS-REVIEW-YEAR PIC 9(4) USAGE DISPLAY.">
+                        <startPos>394</startPos>
+                        <bytes>4</bytes>
+                        <maxBytes>4</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                    </field>
+                </field>
+                <field name="COMM-DEL-SUCCESS" originalName="COMM-DEL-SUCCESS" included="Y" path="DELCUSZ.COMM-DEL-SUCCESS" srcLine="03 COMM-DEL-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>398</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-DEL-FAIL-CD" originalName="COMM-DEL-FAIL-CD" included="Y" path="DELCUSZ.COMM-DEL-FAIL-CD" srcLine="03 COMM-DEL-FAIL-CD PIC X USAGE DISPLAY.">
+                    <startPos>399</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

@@ -1100,6 +1100,10 @@ resourceDefinitions:
       concurrency: THREADSAFE
       cedf: NO
   - program:
+      name: EQAVRM
+      group: EQA
+      cedf: NO
+  - program:
       name: EZACIC00
       group: SOCKETS
       cedf: YES

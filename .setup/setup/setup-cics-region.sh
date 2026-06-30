@@ -48,7 +48,7 @@ drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
 drm "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.*"  2>/dev/null
 drm "${APP_BASE_NAME}.DBB.*"  2>/dev/null
 sleep 5
-tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(100,20) CYL"
+tsocmd "ALLOC DA('${APP_BASE_NAME}.${APP_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)"
 # =========================
 # Cleanup
 # =========================
@@ -154,6 +154,23 @@ else
 fi
 
 deactivate
+
+
+export RIGHT='APPLID of CICS                       X'
+export LEFT='               APPLID=CICS'
+export SPACES=$((8-${#APP_SHORT_NAME} - 1))
+export MIDDLE=$(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
+
+rm -f "/tmp/tcpip-create*"
+rm -f "/tmp/plt-create*"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --extraVar "applid_line=${LEFT}${MIDDLE}${RIGHT}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/cics/tcpip-create.j2"  --outputFile "/tmp/tcpip-create-$$.jcl"
+run_job_and_wait "/tmp/tcpip-create-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
+run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
 
 # =========================
 # Stage 4: Start CICS region

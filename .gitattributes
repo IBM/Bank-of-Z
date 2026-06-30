@@ -8,8 +8,11 @@
 *.rex zos-working-tree-encoding=ibm-1047 
 #.txt zos-working-tree-encoding=ibm-1047 
 *.groovy zos-working-tree-encoding=ibm-1047 
-*.sh zos-working-tree-encoding=ibm-1047 
-*.properties zos-working-tree-encoding=ibm-1047 
+*.sh zos-working-tree-encoding=ibm-1047
+# GRUB wrapper scripts should stay UTF-8 (contain emojis, run locally)
+.grub/*.sh zos-working-tree-encoding=utf-8
+.grub/**/*.sh zos-working-tree-encoding=utf-8
+*.properties zos-working-tree-encoding=ibm-1047
 *.asm zos-working-tree-encoding=ibm-1047 
 *.jcl zos-working-tree-encoding=ibm-1047 
 *.csd zos-working-tree-encoding=ibm-1047 

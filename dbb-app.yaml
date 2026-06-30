@@ -59,7 +59,7 @@ application:
           value: true
 
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+          value: [".*","**/.*","**.html","**.css","**.js","**.java","**.png","**.groovy","**.json","**.md","**/LoadData/**"]
 
         
         # Uncomment to log every file scanned during analysis:

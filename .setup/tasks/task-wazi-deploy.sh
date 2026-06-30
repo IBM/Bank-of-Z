@@ -34,7 +34,8 @@ export DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 
 export TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
 export ZOS_CONNECT_SERVER_FOLDER="${ZOS_CONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
 export SANDBOX_PATH="${SANDBOX_PATH:-$(get_section_value 'sandbox' 'path')}"
-export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)"
+# Only auto-detect package if PACKAGE_URL not already set (e.g., by incremental build script)
+export PACKAGE_URL="${PACKAGE_URL:-$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)}"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 export PYTHONUNBUFFERED=1 

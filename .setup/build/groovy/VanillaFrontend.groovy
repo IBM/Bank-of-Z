@@ -58,29 +58,41 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def deletedFiles = context.getVariable(TaskConstants.DELETED_FILES) ?: []
     def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
     def allFiles = changedFiles + deletedFiles + renamedFiles
-    
-    log.info("> Checking for frontend changes in ${allFiles.size()} files")
-    log.info("> Looking for files containing: '${vanillaFrontendRelativePath}/'")
-    
+
     def isFrontendChanged = false
+
+    // First: check DBB's own CHANGED_FILES list (for non-excluded file types)
     allFiles.each { file ->
-        log.info("> Checking file: ${file}")
-        // Files contain paths like "Bank-of-Z/src/frontend/admin.html"
-        // Check if the path contains the frontend directory (with or without leading slash)
         if (file.contains("/${vanillaFrontendRelativePath}/") ||
-            file.contains("${vanillaFrontendRelativePath}/") ||
-            file.endsWith("/${vanillaFrontendRelativePath}") ||
-            file.endsWith("${vanillaFrontendRelativePath}")) {
+            file.contains("${vanillaFrontendRelativePath}/")) {
             isFrontendChanged = true
-            log.info("> Frontend file detected: ${file}")
         }
     }
-    
+
+    // Fallback: html/css/js are excluded from DBB's scanner so won't appear in
+    // CHANGED_FILES - use git diff directly to detect frontend changes
+    if (!isFrontendChanged) {
+        log.info("> CHANGED_FILES has no frontend entries - checking git diff directly")
+        def repoDir = new File("${workspace}/${appDirName}")
+        // Unset GIT_DIR so git uses the current directory, not the DBB-set git location
+        def gitEnv = System.getenv().findAll { k, v -> k != "GIT_DIR" }
+                         .collect { k, v -> "$k=$v" } as String[]
+        def gitProc = ["git", "diff", "--name-only", "HEAD~1", "HEAD"].execute(gitEnv, repoDir)
+        gitProc.waitFor()
+        def gitOutput = gitProc.text?.trim() ?: ""
+        gitOutput.eachLine { line ->
+            if (line.contains("${vanillaFrontendRelativePath}/")) {
+                isFrontendChanged = true
+                log.info("> Frontend file detected via git diff: ${line}")
+            }
+        }
+    }
+
     if (!isFrontendChanged) {
         log.info("> No frontend changes detected - skipping frontend build")
         return 0
     }
-    
+
     println("> Frontend changes detected - proceeding with build")
 } else {
     println("> Full build - proceeding with frontend build")

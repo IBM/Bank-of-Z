@@ -8,4 +8,5 @@ providerProperties:
   language: "COBOL"
   program: "INQCUST"
   connectionRef: "bankzCicsConnection"
+  timeout: 300000
   ccsid: "037"

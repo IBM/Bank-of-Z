@@ -1,12 +1,12 @@
 # Bank of Z Documentation
 
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ibm.github.io/Bank-of-Z/)
 
 Official documentation for Bank of Z - a sample banking application that demonstres modern IBM Z development, DevSecOps, deployment, and modernization practices.
 
 ## 🌐 Live Documentation
 
-Visit the documentation site: **https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/**
+Visit the documentation site: **https://ibm.github.io/Bank-of-Z/**
 
 ## 📚 About This Repository
 
@@ -30,7 +30,7 @@ That's it! The TOC and navigation update automatically.
 
 ```bash
 # Clone the repository
-git clone https://github.com/IBMZAtlas/Bank-of-Z-doc.git
+git clone https://github.com/IBM/Bank-of-Z.git
 cd Bank-of-Z-doc
 
 # Install dependencies

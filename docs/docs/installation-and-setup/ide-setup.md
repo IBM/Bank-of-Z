@@ -18,7 +18,7 @@ macOS 26
 OpenShift Dev Spaces 3.20 or later
 GitHub Codespaces
 
-For supported platform requirements and minimum software versions, see [Prerequisites](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/prerequisites.html).
+For supported platform requirements and minimum software versions, see [Prerequisites](prerequisites.md).
 
 ## Before You Begin
 
@@ -29,7 +29,7 @@ Before installing and configuring your development environment, ensure that the 
 - Git
 - Zowe CLI
 
-For prerequisite software versions and installation requirements, see [Prerequisites](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/prerequisites.html).
+For prerequisite software versions and installation requirements, see [Prerequisites](prerequisites.md).
 
 ## Install Zowe CLI
 
@@ -68,7 +68,7 @@ zowe plugins list
 Install the following extensions before working with Bank of Z.
 Bank of Z requires several IBM extension packs and technology-specific extensions.
 
-Review the required extension list in [Prerequisites](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/prerequisites.html) before installing them using one of the methods described below.
+Review the required extension list in [Prerequisites](prerequisites.md) before installing them using one of the methods described below.
 
 ### Extension Components
 
@@ -169,8 +169,8 @@ After installation:
 - Verify connectivity to the target z/OS environment
 - Open the Bank of Z repository and confirm that workspace tasks are available
 
-**Note:** If issues occur during installation or configuration, see the [Troubleshooting](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/troubleshooting/).
+**Note:** If issues occur during installation or configuration, see the [Troubleshooting](../troubleshooting/index.md).
 
 ## Next Step
 
-After configuring your development environment, continue to [Build and Deploy](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/build-and-deploy.html) to build and deploy the Bank of Z application.
+After configuring your development environment, continue to [Build and Deploy](build-and-deploy.md) to build and deploy the Bank of Z application.

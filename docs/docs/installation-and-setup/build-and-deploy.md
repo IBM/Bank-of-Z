@@ -46,7 +46,7 @@ Typical build outputs include:
 - Java archive (JAR) files
 - z/OS Connect API artifacts
 
-![Bank of Z build process](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/images/build-boz-app.jpg)
+![Bank of Z build process](images/build-boz-app.jpg)
 
 *Figure 1. Displays the relationship between source assets and generated application components.*
 
@@ -67,7 +67,7 @@ These components are deployed as part of the complete Bank of Z environment.
 
 The deployment process automatically provisions the required CICS runtime and z/OS Connect environment, then deploys the application resources used by the CICS-based banking services.
 
-![Deploy a CICS Db2 z/OS Connect Application](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/images/cics-db2-zosconnect-deployment.jpg)
+![Deploy a CICS Db2 z/OS Connect Application](images/cics-db2-zosconnect-deployment.jpg)
 
 *Figure 2. CICS, Db2, and z/OS Connect deployment workflow.*
 
@@ -86,7 +86,7 @@ These are deployed as part of the complete environment.
 
 The deployment process provisions IMS resources and deploys application components used by IMS-based banking services.
 
-![Deploy an IMS TM/DB-Db2-z/OS Connect Application](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/images/ims-db2-zosconnect-deployment.jpg)
+![Deploy an IMS TM/DB-Db2-z/OS Connect Application](images/ims-db2-zosconnect-deployment.jpg)
 
 *Figure 3. IMS TM/DB, Db2, and z/OS Connect deployment workflow.*
 
@@ -112,8 +112,8 @@ After deployment is complete, verify that:
 - IBM MQ resources are operational
 - Application transactions execute successfully
 
-For detailed validation procedures, see [Verification](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/verification.html).
+For detailed validation procedures, see [Verification](verification.md).
 
 ## Next Step
 
-Continue to [Verification](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/verification.html) to confirm that the Bank of Z environment and application components are functioning correctly.
+Continue to [Verification](verification.md) to confirm that the Bank of Z environment and application components are functioning correctly.

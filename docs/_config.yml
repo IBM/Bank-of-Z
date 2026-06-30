@@ -1,12 +1,20 @@
 # Site settings
-title: Bank of Z 
+title: Bank of Z
 description: Sample Z application showing how to work with mainframe software
-baseurl: "/IBMZAtlas/Bank-of-Z-doc"
-url: "https://pages.github.ibm.com"
+baseurl: "/Bank-of-Z"
+url: "https://ibm.github.io"
+repository_url: "https://github.com/IBM/Bank-of-Z"
 
 # Build settings
 markdown: kramdown
 theme: jekyll-theme-cayman
+
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
 
 # Defaults
 defaults:
@@ -21,6 +29,7 @@ defaults:
 
 # Exclude from processing
 exclude:
+  - README.md
   - Gemfile
   - Gemfile.lock
   - node_modules

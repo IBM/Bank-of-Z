@@ -38,7 +38,7 @@ The **Prerequisites** topic includes:
 - z/OS environment requirements
 - Access requirements
 
-For more information, see [Prerequisites](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/prerequisites.html).
+For more information, see [Prerequisites](prerequisites.md).
 
 ## Step 2: Set Up Your Development Environment
 
@@ -51,7 +51,7 @@ Bank of Z supports the following IDEs:
 
 Install the required development tools and IDE extensions, then verify that your development environment is configured correctly before continuing.
 
-For more information, see [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html).
+For more information, see [IDE Setup](ide-setup.md).
 
 ## Step 3: Configure Your Environment
 
@@ -64,7 +64,7 @@ Typical activities include:
 - Updating environment-specific configuration files
 - Reviewing environment-specific application settings
 
-For more information, see [Environment Configuration](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/environment-configuration.html).
+For more information, see [Environment Configuration](environment-configuration.md).
 
 ## Step 4: Build and Deploy Bank of Z
 
@@ -72,7 +72,7 @@ Build the application source and deploy the generated artifacts to the target en
 
 The build and deployment process installs the required application components and runtime resources used by Bank of Z.
 
-For more information, see [Build and Deploy](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/build-and-deploy.html).
+For more information, see [Build and Deploy](build-and-deploy.md).
 
 ## Step 5: Verify the Installation
 
@@ -85,14 +85,14 @@ Verification activities include:
 - Verifying middleware connectivity
 - Reviewing setup results
 
-For more information, see [Verification](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/verification.html).
+For more information, see [Verification](verification.md).
 
 ## Next Steps
 
 After successfully installing and validating your Bank of Z environment, continue with the following topics:
 
-- [Tutorials](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials.html)
-- [Development Workflows](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows.html)
-- [Architecture](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/development-workflows.html)
-- [Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference.html)
-- [Troubleshooting](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/troubleshooting.html)
+- [Tutorials](../tutorials/)
+- [Development Workflows](../development-workflows/)
+- [Architecture](../architecture/)
+- [Reference](../reference/)
+- [Troubleshooting](../troubleshooting/)

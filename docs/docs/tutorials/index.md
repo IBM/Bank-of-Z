@@ -22,9 +22,9 @@ Complete the tutorials in the following order:
 
 | Tutorial | Description |
 |-----------|-------------|
-| [**Build and Deploy Bank of Z**](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/build-and-deploy-boz.html) | Build application components and deploy them to the target environment. |
-| [**Make Your First Change**](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/make-your-first-change.html) | Perform a simple application change and promote it through the development workflow. |
-| [**CICS Enhancement Scenario**](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application component. |
-| [**IMS Enhancement Scenario**](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/IMS-enhancement-scenario.html) | Implement and deploy an enhancement to an IMS-based application component. |
+| [**Build and Deploy Bank of Z**](build-and-deploy-boz.html) | Build application components and deploy them to the target environment. |
+| [**Make Your First Change**](make-your-first-change.html) | Perform a simple application change and promote it through the development workflow. |
+| [**CICS Enhancement Scenario**](cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application component. |
+| [**IMS Enhancement Scenario**](IMS-enhancement-scenario.html) | Implement and deploy an enhancement to an IMS-based application component. |
 
 Each tutorial focuses on a specific development scenario while demonstrating the tools, processes, and deployment patterns used throughout Bank of Z.

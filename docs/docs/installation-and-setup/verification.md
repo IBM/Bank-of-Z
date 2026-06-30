@@ -106,4 +106,4 @@ A successful installation should provide:
 
 ## Next Step
 
-After verification is complete, continue to the [Tutorials](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/tutorials/) section to learn how to build, deploy, and enhance Bank of Z application components.
+After verification is complete, continue to the [Tutorials](../tutorials/) section to learn how to build, deploy, and enhance Bank of Z application components.

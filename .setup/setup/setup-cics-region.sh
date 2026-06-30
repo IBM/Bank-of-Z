@@ -156,6 +156,7 @@ fi
 deactivate
 
 run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/tcpip-create.jcl" "8"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/cics/plt-create.jcl" "8"
 
 # =========================
 # Stage 4: Start CICS region

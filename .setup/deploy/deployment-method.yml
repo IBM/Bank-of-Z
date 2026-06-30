@@ -148,6 +148,8 @@ activities:
                 value: db2_bind_package
               - key: var_type
                 value: type_dbrm_temp
+              - key: var_template_name
+                value: db2_bind_package_template
           - name: BIND_PLAN
             short_name: BIND_PLAN
             description: |
@@ -157,6 +159,10 @@ activities:
                 value: db2_bind_plan
               - key: var_type
                 value: type_dbrm_temp
+              - key: var_template_name
+                value: db2_bind_plan_template
+            plan_tags:
+            - never
     types:
       - name: "DBRM"
     is_artifact: True
@@ -239,6 +245,8 @@ activities:
             properties:
               - key: template
                 value: db2_bind_package
+              - key: var_template_name
+                value: db2_bind_package_template
           - name: BIND_PLAN
             short_name: BIND_PLAN
             description: |
@@ -426,7 +434,6 @@ activities:
     is_artifact: True
     types:
        - name: 'jar'
-    is_artifact: True
     tags:
     - deploy_jar
     - deploy

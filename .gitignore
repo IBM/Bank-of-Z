@@ -20,3 +20,4 @@ vsix-extensions/
 tools/
 imsbank_provisioning/
 .setup/jcl/ims/Db2-grant-sysadm.jcl
+docs/_site

@@ -45,6 +45,7 @@ stage_stop_tasks() {
     # Stop IBM zconn servers
     # =========================
     jcan P "BAQ${APP_NAME}"  2>/dev/null
+    jcan P  "FE${APP_NAME}"  2>/dev/null
     
     # =========================
     # Stop IMS1
@@ -347,6 +348,32 @@ stage_setup_zosconnect_server() {
     fi
 
 }
+#########################################################
+# STAGE: Setup Frontend Liberty server
+#########################################################
+stage_setup_frontend_server() {
+    print_stage "STAGE: Setup Frontend Liberty server"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-frontend-server.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-frontend-server.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Bank of Z Frontend Liberty server setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-frontend-server.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    if bash .setup/setup/setup-frontend-server.sh; then
+        print_success "Frontend Liberty server setup completed successfully"
+    else
+        print_error "Failed to setup Frontend Liberty server"
+        exit 1
+    fi
+
+}
+
 
 
 #########################################################
@@ -469,6 +496,8 @@ main_setup() {
     stage_setup_ims_bankz_regions
     
     stage_setup_zosconnect_server
+    
+    stage_setup_frontend_server
     
     # Summary
     print_stage "SETUP COMPLETE"

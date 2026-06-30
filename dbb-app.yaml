@@ -37,7 +37,7 @@ application:
             - scanner: Dummy
               extensions: yaml
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]  
+          value: [".*","**/.*","**.html","**.png","**.css","**.js","**.groovy","**.json","**.md","**/LoadData/**"]
 
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
@@ -45,7 +45,7 @@ application:
         - name: continueOnScanFailure
           value: true
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+          value: [".*","**/.*","**.html","**.png","**.css","**.js","**.groovy","**.json","**.md","**/LoadData/**"]
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -59,7 +59,7 @@ application:
           value: true
 
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+          value: [".*","**/.*","**.html","**.png","**.css","**.js","**.groovy","**.json","**.md","**/LoadData/**"]
 
         
         # Uncomment to log every file scanned during analysis:
@@ -302,16 +302,19 @@ application:
 
     # ----------------------------------------------------------
     # ImsJavaBuilder task
-    # Compiles the IMS Java JMP project via Maven and packages
+    # Compiles the IMS Java JMP project via Gradle and packages
     # the resulting JAR with deployType=IMS-JAR so Wazi Deploy
     # copies it to the IMS Java classpath directory on USS.
     # ----------------------------------------------------------
     - task: ImsJavaBuilder
       variables:
-        # Path to the Maven executable on z/OS USS
-        - name: mavenPath
-          value: "/usr/local/sandboxes/tools/apache-maven-3.6.3/bin/mvn"
-        # Relative path (from repo root) to the Maven project directory
+        # Path to the Gradle executable on z/OS USS (shared with zOSConnect)
+        - name: gradlePath
+          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+        # Shell used to invoke Gradle (same as zOSConnect)
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
+        # Relative path (from repo root) to the Gradle project directory
         - name: configSources
           value: "src/base/ims/java"
 

@@ -28,6 +28,7 @@ export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')} #p
 export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
+export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 
 # IMS environment variables
 export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
@@ -147,6 +148,26 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     </connectionFactory>
 
     <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+</server>
+EOF
+
+# =========================
+# Configure CORS for frontend server
+# =========================
+cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="CORS configuration for frontend server">
+    <featureManager>
+        <feature>cors-1.0</feature>
+    </featureManager>
+    
+    <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
+    <cors domain="/api"
+          allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
+          allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
+          allowedHeaders="*"
+          allowCredentials="true"
+          maxAge="3600" />
 </server>
 EOF
 

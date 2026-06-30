@@ -50,7 +50,7 @@ default_plan_jobcard: "BINDPLA JOB 'WD-PLANBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIF
 default_db2_sqlid: "IBMUSER"
 default_db2_package: "BANKZPACK"
 default_db2_plan: "BANKZPLN"
-default_db2_qualifier: "IBMUSER"
+default_db2_qualifier: "BANKZ"
 default_db2_subsys: "DBD1"
 default_db2_plan_pklist: "NULLID.*,BANKZPACK.*"
 default_db2_action: "REPLACE"

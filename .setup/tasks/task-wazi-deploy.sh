@@ -38,6 +38,7 @@ export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || 
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 export PYTHONUNBUFFERED=1 
+export DEPLOY_TEMPLATES_PATH="$SCRIPTS_DIR/../deploy"
 # =========================
 # Output directories
 # =========================

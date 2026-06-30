@@ -1,0 +1,70 @@
+# Table of Contents - Auto-generated from docs/ folder
+# Run: python3 scripts/fix_toc_now.py to regenerate
+
+- title: About Bank of Z
+  url: /docs/about-bank-of-z/
+  children:
+  - title: Key Capabilities
+    url: /docs/about-bank-of-z/key-capabilities.html
+- title: Architecture
+  url: /docs/architecture/
+  children:
+  - title: Application Components
+    url: /docs/architecture/application-components.html
+  - title: Application Flow
+    url: /docs/architecture/application-flow.html
+- title: Installation and Setup
+  url: /docs/installation-and-setup/
+  children:
+  - title: Quick Start
+    url: /docs/installation-and-setup/quick-start.html
+  - title: Prerequisites
+    url: /docs/installation-and-setup/prerequisites.html
+  - title: Environment Configuration
+    url: /docs/installation-and-setup/environment-configuration.html
+  - title: IDE Setup
+    url: /docs/installation-and-setup/ide-setup.html
+  - title: Build and Deploy
+    url: /docs/installation-and-setup/build-and-deploy.html
+  - title: Verification
+    url: /docs/installation-and-setup/verification.html
+- title: Tutorials
+  url: /docs/tutorials/
+  children:
+  - title: Build and Deploy Bank of Z
+    url: /docs/tutorials/build-and-deploy-boz.html
+  - title: Make Your First Change
+    url: /docs/tutorials/make-your-first-change.html
+  - title: CICS Enhancement Scenario
+    url: /docs/tutorials/cics-enhancement-scenario.html
+  - title: IMS Enhancement Scenario
+    url: /docs/tutorials/IMS-enhancement-scenario.html
+- title: Development Workflows
+  url: /docs/development-workflows/
+  children:
+  - title: VS Code Workflow
+    url: /docs/development-workflows/vscode-workflow.html
+  - title: GRUB Workflow
+    url: /docs/development-workflows/grub-workflow.html
+  - title: Development Best Practices
+    url: /docs/development-workflows/development-best-practices.html
+  - title: Workflow Comparison
+    url: /docs/development-workflows/workflow-comparison.html
+- title: Reference
+  url: /docs/reference/
+  children:
+  - title: Configuration Reference
+    url: /docs/reference/configuration-reference.html
+  - title: Repository Structure
+    url: /docs/reference/repository-structure.html
+  - title: Commands Reference
+    url: /docs/reference/commands-reference.html
+  - title: Glossary
+    url: /docs/reference/glossary.html
+- title: Troubleshooting
+  url: /docs/troubleshooting/
+ 
+ 
+
+ 
+

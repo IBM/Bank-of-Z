@@ -9,6 +9,8 @@ This section describes how to configure connectivity and application settings re
 
 Before proceeding, ensure that you have completed the prerequisites and have access to a supported z/OS environment.
 
+**Note:** This topic describes the common environment configuration required to build and deploy Bank of Z. It focuses on the standard development workflow and does not include IBM Premium Bob for Z-specific configuration. See [IBM Premium Bob for Z](https://bob.ibm.com/docs/ide) documentation for product-specific setup instructions.
+
 ## Configure a Zowe Profile
 
 Create a Zowe CLI profile that provides connectivity to the target z/OS environment.
@@ -23,7 +25,7 @@ The profile typically includes:
 
 If you are using Visual Studio Code, see the [IBM Z® Open Editor](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html) documentation for instructions on creating Zowe Explorer configuration profiles for the required profile types, including z/OSMF, SSH, TSO, Debug, and CICS.
 
-For a complete sample configuration, see [Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html).
+For a complete sample configuration, see [Configuration Reference](https://pages.github.com/Bank-of-Z/docs/docs/reference/configuration-reference.html).
 
 ### Example Configuration
 
@@ -97,7 +99,7 @@ Save the configuration in:
 ~/.zowe/zowe.config.json
 ```
 
-For a complete description of all configuration options, see the [Configuration Reference](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/reference/configuration-reference.html).
+For a complete description of all configuration options, see the [Configuration Reference](https://pages.github.com/Bank-of-Z/docs/docs/reference/configuration-reference.html).
 
 ## Verify Connectivity
 
@@ -141,7 +143,7 @@ Before deployment, ensure that the following prerequisites are available in your
 
 Bank of Z also requires appropriate security definitions to be configured in the site’s security manager (for example, RACF or an equivalent product). The required security definitions depend on the target environment and are not currently documented as part of the Bank of Z installation process.
 
-Additional deployment-specific configuration requirement is described in the [Build and Deploy](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/build-and-deploy.html).
+Additional deployment-specific configuration requirement is described in the [Build and Deploy](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/build-and-deploy.html).
 
 ## Validate Configuration
 
@@ -159,4 +161,4 @@ Before building the application, verify that:
 
 ## Next Step
 
-After completing the environment configuration, continue to [IDE Setup](https://pages.github.ibm.com/IBMZAtlas/Bank-of-Z-doc/docs/installation-and-setup/ide-setup.html) to install and configure the supported development tools and extensions.
+After completing the environment configuration, continue to [IDE Setup](https://pages.github.com/Bank-of-Z/docs/docs/installation-and-setup/ide-setup.html) to install and configure the supported development tools and extensions.

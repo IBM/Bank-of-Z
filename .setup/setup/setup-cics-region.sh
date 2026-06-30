@@ -200,16 +200,14 @@ if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PO
 else
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
     rm -f /tmp/dtcn.ports*
-    #iconv -t ISO8859-1 -f IBM-1047 "$DTCN_PORTS" > "$DTCN_PORTS_TMP"
     cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
     echo "" >> "$DTCN_PORTS_TMP"
     echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
     cp "${DTCN_PORTS_TMP}" "$DTCN_PORTS"
 
-    #jcan P "EQAPROF"  2>/dev/null
-    opercmd "C EQAPROF"  #2>/dev/null
+    opercmd "C EQAPROF"  
     sleep 5
-    opercmd "S EQAPROF" 2>/dev/null &
+    opercmd "S EQAPROF" 
     sleep 5
 fi
 

@@ -489,6 +489,8 @@ activities:
               value: 'system_command'
             - key: 'var_system_command'
               value: 'system_command_refresh_apps'
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
        - name: 'war'
     is_artifact: True

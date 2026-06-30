@@ -38,7 +38,7 @@ If you are using IBM Premium Bob for Z (Bob IDE), ensure that your workstation m
 | zConfig | 0.6.0 |
 | CICS TS Resource Builder | 1.0.6 |
 | Maven | 3.6.3 |
-| Gradle | Pending SME confirmation |
+| Gradle | 9.5.1 |
 | z/OS Connect | 3.0.101 |
 
 **Note:** A pre-existing Db2 subsystem (DBD1) is required before deploying Bank of Z.

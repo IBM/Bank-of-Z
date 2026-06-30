@@ -21,3 +21,11 @@ The project can be used to:
 - Extend and customize a sample banking application
 
 Bank of Z is intended for educational, demonstration, and proof-of-concept purposes.
+
+## Introduction Video
+
+Watch the following overview to learn about the goals of Bank of Z, the IBM Z technologies it demonstrates, and the background behind its hybrid application architecture.
+
+**Note:** The video includes the original design scenario used during the development of Bank of Z. The current architecture documentation describes the supported implementation of the application.
+
+[Introduction Video](https://github.com/IBM/Bank-of-Z/releases/download/v1/bank_of_z_intro.mp4)

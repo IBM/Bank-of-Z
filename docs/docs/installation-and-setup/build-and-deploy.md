@@ -84,7 +84,7 @@ Deployment activities typically include:
 
 These are deployed as part of the complete environment.
 
-The deployment process provisions IMS resources and deploys application components used by IMS-based banking services.
+The deployment process automatically provisions the required IMS runtime resources and deploys the application components used by the IMS-based banking services.
 
 ![Deploy an IMS TM/DB-Db2-z/OS Connect Application](images/ims-db2-zosconnect-deployment.jpg)
 

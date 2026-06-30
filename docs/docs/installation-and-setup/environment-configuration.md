@@ -9,6 +9,8 @@ This section describes how to configure connectivity and application settings re
 
 Before proceeding, ensure that you have completed the prerequisites and have access to a supported z/OS environment.
 
+**Note:** This topic describes the common environment configuration required to build and deploy Bank of Z. It focuses on the standard development workflow and does not include IBM Premium Bob for Z-specific configuration. See [IBM Premium Bob for Z](https://bob.ibm.com/docs/ide) documentation for product-specific setup instructions.
+
 ## Configure a Zowe Profile
 
 Create a Zowe CLI profile that provides connectivity to the target z/OS environment.
@@ -111,23 +113,6 @@ zowe rse check status
 ```
 
 Successful responses confirm connectivity to the target z/OS system.
-
-## Configure Environment-Specific Settings
-
-Depending on your deployment environment, you might need to update environment-specific configuration files.
-
-Typical configuration includes:
-
-| File | Purpose |
-|------|---------|
-| `host_vars/ode.yml` | Target environment settings |
-| `inventories/ode` | Inventory definition for deployment targets |
-| `ims-dbdc.yml` | IMS configuration settings |
-| `db2.yml` | Db2 configuration settings |
-| `bank.yml` | Application-specific configuration |
-| `zcee.yml` | z/OS Connect configuration |
-
-Review and update these files with values appropriate for your environment before beginning the build and deployment process.
 
 ## Configure Application Resources
 

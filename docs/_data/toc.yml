@@ -31,14 +31,10 @@
 - title: Tutorials
   url: /docs/tutorials/
   children:
-  - title: Build and Deploy Bank of Z
-    url: /docs/tutorials/build-and-deploy-boz.html
   - title: Make Your First Change
     url: /docs/tutorials/make-your-first-change.html
   - title: CICS Enhancement Scenario
     url: /docs/tutorials/cics-enhancement-scenario.html
-  - title: IMS Enhancement Scenario
-    url: /docs/tutorials/IMS-enhancement-scenario.html
 - title: Development Workflows
   url: /docs/development-workflows/
   children:

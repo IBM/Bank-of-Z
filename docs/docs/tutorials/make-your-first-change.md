@@ -10,7 +10,7 @@ Learn the standard Bank of Z development workflow by making a simple application
 
 ## Development Workflow
 
-- Make changes to your COBOL programs, copybooks, z/OS assets (copybooks, JSON files, and OpenAPI YAML files)
+- Make changes to your z/OS assets (COBOL programs, copybooks, JSON files, and OpenAPI YAML files)
 - Commit your changes to the Git repository
 - Run the build pipeline using VS Code tasks or the command-line tools
 - Review the build output and generated artifacts

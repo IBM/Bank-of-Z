@@ -69,7 +69,7 @@ These components are deployed as part of the complete Bank of Z environment.
 
 The deployment process automatically provisions the required CICS runtime and z/OS Connect environment, then deploys the application resources used by the CICS-based banking services.
 
-<img src="images/cics-db2-zosconnect-deployment.png" alt="Deploy a CICS Db2 z/OS Connect Application" style="max-width:600px width=100%; height=auto;">
+<img src="images/cics-db2-zosconnect-deployment.png" alt="Deploy a CICS Db2 z/OS Connect Application" style="width:500px !important; height=auto !important;">
 
 ![Deploy a CICS Db2 z/OS Connect Application](images/cics-db2-zosconnect-deployment.png)
 

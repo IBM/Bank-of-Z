@@ -37,7 +37,7 @@ application:
             - scanner: Dummy
               extensions: yaml
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.png","**.css","**.js","**.groovy","**.json","**.md","**/LoadData/**"]
+          value: [".*","**/.*","**.png","**.groovy","**.json","**.md","**/LoadData/**"]
 
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
@@ -59,7 +59,7 @@ application:
           value: true
 
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.png","**.css","**.js","**.groovy","**.json","**.md","**/LoadData/**"]
+          value: [".*","**/.*","**.png","**.groovy","**.json","**.md","**/LoadData/**"]
 
         
         # Uncomment to log every file scanned during analysis:

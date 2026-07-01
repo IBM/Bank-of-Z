@@ -160,7 +160,6 @@ The target environment should include:
 
 | Component | Requirement |
 |------------|------------|
-| Ansible | 2.15 or later |
 | USS Access | Required |
 | Dataset Creation Permissions | Required |
 | Application Deployment Permissions | Required |

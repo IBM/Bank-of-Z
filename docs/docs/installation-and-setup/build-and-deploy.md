@@ -48,7 +48,7 @@ Typical build outputs include:
 <p style="text-align: center;">
 <img src="images/build-boz-app.png"
     alt="Bank of Z build process"
-    width="450">
+    width="auto; height:900px;">
 </p>
 
 ![Bank of Z build process](images/build-boz-app.png)

@@ -497,8 +497,12 @@
       *
               IF COMM-FACILTYPE = 496
                  MOVE 'PDR' TO HV-PROCTRAN-TYPE
-                 MOVE COMM-ORIGIN(1:14) TO
-                    HV-PROCTRAN-DESC
+                 IF COMM-DESCRIPTION OF COMM-ORIGIN NOT = SPACES
+                    MOVE COMM-DESCRIPTION OF COMM-ORIGIN
+                       TO HV-PROCTRAN-DESC
+                 ELSE
+                    MOVE COMM-ORIGIN(1:14) TO HV-PROCTRAN-DESC
+                 END-IF
               END-IF
 
            ELSE
@@ -510,8 +514,12 @@
       *
               IF COMM-FACILTYPE = 496
                  MOVE 'PCR' TO HV-PROCTRAN-TYPE
-                 MOVE COMM-ORIGIN(1:14) TO
-                    HV-PROCTRAN-DESC
+                 IF COMM-DESCRIPTION OF COMM-ORIGIN NOT = SPACES
+                    MOVE COMM-DESCRIPTION OF COMM-ORIGIN
+                       TO HV-PROCTRAN-DESC
+                 ELSE
+                    MOVE COMM-ORIGIN(1:14) TO HV-PROCTRAN-DESC
+                 END-IF
               END-IF
 
            END-IF.

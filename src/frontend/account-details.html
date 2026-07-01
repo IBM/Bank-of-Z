@@ -75,6 +75,7 @@
                     </div>
                     <br>
                     <cds-button id="update-btn">Update Account</cds-button>
+                    <cds-button id="view-transactions-btn" kind="tertiary">View Transactions</cds-button>
                 </form>
             </div>
         </div>
@@ -127,6 +128,9 @@
 
             // Handle update
             document.getElementById('update-btn').addEventListener('click', updateAccount);
+            
+            // Handle view transactions
+            document.getElementById('view-transactions-btn').addEventListener('click', viewTransactions);
         });
 
         async function searchAccount(customerId = null) {
@@ -265,6 +269,11 @@
                     showErrorModal('Error', error.message || 'Failed to update account');
                 }
             }
+        }
+        
+        function viewTransactions() {
+            if (!currentAccount) return;
+            window.location.href = `account-transactions.html?accountId=${currentAccount.accountId}`;
         }
     </script>
 </body>

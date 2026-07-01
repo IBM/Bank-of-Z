@@ -1,0 +1,41 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQTRANL-COMMAREA:
+        required: false
+        nullable: false
+        mappings:
+        - INQTRANL-EYE:
+            required: false
+            nullable: false
+            template: "ITRL"
+        - INQTRANL-SORTCODE:
+            required: false
+            nullable: false
+            expression: "$number($substringBefore($pathParameters.accountId, '-'))"
+        - INQTRANL-ACCNO:
+            required: false
+            nullable: false
+            expression: "$number($substringAfter($pathParameters.accountId, '-'))"
+        - INQTRANL-FROM-DATE:
+            required: false
+            nullable: false
+            expression: "$exists($queryParameters.fromDate) ? $number($replace($queryParameters.fromDate,\
+              \ '-', '')) : 20200101"
+        - INQTRANL-TO-DATE:
+            required: false
+            nullable: false
+            expression: "$exists($queryParameters.toDate) ? $number($replace($queryParameters.toDate,\
+              \ '-', '')) : 20301231"
+        - INQTRANL-LIMIT:
+            required: false
+            nullable: false
+            expression: "$exists($queryParameters.limit) ? $number($queryParameters.limit)\
+              \ : 50"
+        - INQTRANL-OFFSET:
+            required: false
+            nullable: false
+            expression: "$exists($queryParameters.offset) ? $number($queryParameters.offset)\
+              \ : 0"

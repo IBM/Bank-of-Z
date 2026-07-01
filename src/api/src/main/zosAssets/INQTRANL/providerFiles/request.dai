@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1">
+            <field name="INQTRANL-COMMAREA" originalName="INQTRANL-COMMAREA" included="Y" path="INQTRANL-COMMAREA" fileName="INQTRANL.cpy" structureIndex="0" structSrcFileName="INQTRANL-COMMAREA_request_0.cpy" srcLine="01 INQTRANL-COMMAREA.">
+                <startPos>1</startPos>
+                <bytes>14551</bytes>
+                <maxBytes>14551</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="INQTRANL-EYE" originalName="INQTRANL-EYE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-EYE" srcLine="03 INQTRANL-EYE PIC X(4) USAGE DISPLAY.">
+                    <startPos>1</startPos>
+                    <bytes>4</bytes>
+                    <maxBytes>4</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="INQTRANL-SORTCODE" originalName="INQTRANL-SORTCODE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-SORTCODE" srcLine="03 INQTRANL-SORTCODE PIC 9(6) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>6</bytes>
+                    <maxBytes>6</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                </field>
+                <field name="INQTRANL-ACCNO" originalName="INQTRANL-ACCNO" included="Y" path="INQTRANL-COMMAREA.INQTRANL-ACCNO" srcLine="03 INQTRANL-ACCNO PIC 9(8) USAGE DISPLAY.">
+                    <startPos>11</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQTRANL-FROM-DATE" originalName="INQTRANL-FROM-DATE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-FROM-DATE" srcLine="03 INQTRANL-FROM-DATE PIC 9(8) USAGE DISPLAY.">
+                    <startPos>19</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQTRANL-TO-DATE" originalName="INQTRANL-TO-DATE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TO-DATE" srcLine="03 INQTRANL-TO-DATE PIC 9(8) USAGE DISPLAY.">
+                    <startPos>27</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                </field>
+                <field name="INQTRANL-LIMIT" originalName="INQTRANL-LIMIT" included="Y" path="INQTRANL-COMMAREA.INQTRANL-LIMIT" srcLine="03 INQTRANL-LIMIT PIC 9(3) USAGE DISPLAY.">
+                    <startPos>35</startPos>
+                    <bytes>3</bytes>
+                    <maxBytes>3</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="3" scale="0"/>
+                </field>
+                <field name="INQTRANL-OFFSET" originalName="INQTRANL-OFFSET" included="Y" path="INQTRANL-COMMAREA.INQTRANL-OFFSET" srcLine="03 INQTRANL-OFFSET PIC 9(5) USAGE DISPLAY.">
+                    <startPos>38</startPos>
+                    <bytes>5</bytes>
+                    <maxBytes>5</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="5" scale="0"/>
+                </field>
+                <field name="INQTRANL-TOTAL-COUNT" originalName="INQTRANL-TOTAL-COUNT" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TOTAL-COUNT" srcLine="03 INQTRANL-TOTAL-COUNT PIC 9(5) USAGE DISPLAY.">
+                    <startPos>43</startPos>
+                    <bytes>5</bytes>
+                    <maxBytes>5</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="5" scale="0"/>
+                </field>
+                <field name="INQTRANL-RETURNED-COUNT" originalName="INQTRANL-RETURNED-COUNT" included="Y" path="INQTRANL-COMMAREA.INQTRANL-RETURNED-COUNT" srcLine="03 INQTRANL-RETURNED-COUNT PIC 9(3) USAGE DISPLAY.">
+                    <startPos>48</startPos>
+                    <bytes>3</bytes>
+                    <maxBytes>3</maxBytes>
+                    <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                        <typeConverter>ZONEDDECIMAL</typeConverter>
+                    </marshaller>
+                    <applicationDatatype datatype="DECIMAL" precision="3" scale="0"/>
+                </field>
+                <field name="INQTRANL-SUCCESS" originalName="INQTRANL-SUCCESS" included="Y" path="INQTRANL-COMMAREA.INQTRANL-SUCCESS" srcLine="03 INQTRANL-SUCCESS PIC X USAGE DISPLAY.">
+                    <startPos>51</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="INQTRANL-TRANSACTIONS" originalName="INQTRANL-TRANSACTIONS" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS" minOccurs="100" maxOccurs="100" srcLine="03 INQTRANL-TRANSACTIONS OCCURS 100 TIMES.">
+                    <startPos>52</startPos>
+                    <bytes>14500</bytes>
+                    <maxBytes>14500</maxBytes>
+                    <marshaller alignment="NATURAL"/>
+                    <applicationDatatype datatype="ARRAY"/>
+                    <field name="INQTRANL-TRAN-ID" originalName="INQTRANL-TRAN-ID" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-ID" srcLine="05 INQTRANL-TRAN-ID PIC X(50) USAGE DISPLAY.">
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-SORTCODE" originalName="INQTRANL-TRAN-SORTCODE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-SORTCODE" srcLine="05 INQTRANL-TRAN-SORTCODE PIC 9(6) USAGE DISPLAY.">
+                        <bytes>6</bytes>
+                        <maxBytes>6</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-ACCNO" originalName="INQTRANL-TRAN-ACCNO" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-ACCNO" srcLine="05 INQTRANL-TRAN-ACCNO PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-DATE" originalName="INQTRANL-TRAN-DATE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DATE" srcLine="05 INQTRANL-TRAN-DATE PIC 9(8) USAGE DISPLAY.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="8" scale="0"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-DATE-GRP" originalName="INQTRANL-TRAN-DATE-GRP" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DATE-GRP" redefines="INQTRANL-TRAN-DATE" srcLine="05 INQTRANL-TRAN-DATE-GRP REDEFINES INQTRANL-TRAN-DATE.">
+                        <bytes>8</bytes>
+                        <maxBytes>8</maxBytes>
+                        <applicationDatatype datatype="STRUCT"/>
+                        <field name="INQTRANL-TRAN-DATE-YYYY" originalName="INQTRANL-TRAN-DATE-YYYY" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DATE-GRP.INQTRANL-TRAN-DATE-YYYY" srcLine="07 INQTRANL-TRAN-DATE-YYYY PIC 9(4) USAGE DISPLAY.">
+                            <bytes>4</bytes>
+                            <maxBytes>4</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="4" scale="0"/>
+                        </field>
+                        <field name="INQTRANL-TRAN-DATE-MM" originalName="INQTRANL-TRAN-DATE-MM" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DATE-GRP.INQTRANL-TRAN-DATE-MM" srcLine="07 INQTRANL-TRAN-DATE-MM PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="INQTRANL-TRAN-DATE-DD" originalName="INQTRANL-TRAN-DATE-DD" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DATE-GRP.INQTRANL-TRAN-DATE-DD" srcLine="07 INQTRANL-TRAN-DATE-DD PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                    </field>
+                    <field name="INQTRANL-TRAN-TIME" originalName="INQTRANL-TRAN-TIME" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TIME" srcLine="05 INQTRANL-TRAN-TIME PIC 9(6) USAGE DISPLAY.">
+                        <bytes>6</bytes>
+                        <maxBytes>6</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="6" scale="0"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-TIME-GRP" originalName="INQTRANL-TRAN-TIME-GRP" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TIME-GRP" redefines="INQTRANL-TRAN-TIME" srcLine="05 INQTRANL-TRAN-TIME-GRP REDEFINES INQTRANL-TRAN-TIME.">
+                        <bytes>6</bytes>
+                        <maxBytes>6</maxBytes>
+                        <applicationDatatype datatype="STRUCT"/>
+                        <field name="INQTRANL-TRAN-TIME-HH" originalName="INQTRANL-TRAN-TIME-HH" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TIME-GRP.INQTRANL-TRAN-TIME-HH" srcLine="07 INQTRANL-TRAN-TIME-HH PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="INQTRANL-TRAN-TIME-MM" originalName="INQTRANL-TRAN-TIME-MM" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TIME-GRP.INQTRANL-TRAN-TIME-MM" srcLine="07 INQTRANL-TRAN-TIME-MM PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                        <field name="INQTRANL-TRAN-TIME-SS" originalName="INQTRANL-TRAN-TIME-SS" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TIME-GRP.INQTRANL-TRAN-TIME-SS" srcLine="07 INQTRANL-TRAN-TIME-SS PIC 9(2) USAGE DISPLAY.">
+                            <bytes>2</bytes>
+                            <maxBytes>2</maxBytes>
+                            <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+<typeConverter>ZONEDDECIMAL</typeConverter>
+                            </marshaller>
+                            <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
+                        </field>
+                    </field>
+                    <field name="INQTRANL-TRAN-REF" originalName="INQTRANL-TRAN-REF" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-REF" srcLine="05 INQTRANL-TRAN-REF PIC 9(12) USAGE DISPLAY.">
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="12" scale="0"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-TYPE" originalName="INQTRANL-TRAN-TYPE" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-TYPE" srcLine="05 INQTRANL-TRAN-TYPE PIC X(3) USAGE DISPLAY.">
+                        <bytes>3</bytes>
+                        <maxBytes>3</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-DESC" originalName="INQTRANL-TRAN-DESC" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-DESC" srcLine="05 INQTRANL-TRAN-DESC PIC X(40) USAGE DISPLAY.">
+                        <bytes>40</bytes>
+                        <maxBytes>40</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="INQTRANL-TRAN-AMOUNT" originalName="INQTRANL-TRAN-AMOUNT" included="Y" path="INQTRANL-COMMAREA.INQTRANL-TRANSACTIONS.INQTRANL-TRAN-AMOUNT" srcLine="05 INQTRANL-TRAN-AMOUNT PIC S9(10)V9(2) USAGE DISPLAY.">
+                        <bytes>12</bytes>
+                        <maxBytes>12</maxBytes>
+                        <marshaller isSigned="Y" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
+                            <typeConverter>ZONEDDECIMAL</typeConverter>
+                        </marshaller>
+                        <applicationDatatype datatype="DECIMAL" precision="12" scale="2"/>
+                    </field>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

@@ -44,7 +44,7 @@ mvn liberty:stop-server
 - [x] GET /customers/{customerId}/accounts - Get customer accounts (maps to INQACCCU.cbl)
 - [x] POST /customers - Create customer (maps to CRECUST.cbl)
 - [x] PUT /customers/{customerId} - Update customer (maps to UPDCUST.cbl)
-- [x] DELETE /customers/{customerId} - Delete customer (maps to DELCUS.cbl)
+- [ ] DELETE /customers/{customerId} - Delete customer (maps to DELCUS.cbl)
 
 #### Account Management
 - [x] GET /accounts/{accountId} - Get account details (maps to INQACC.cbl)
@@ -57,8 +57,8 @@ mvn liberty:stop-server
 - [x] GET /accounts/{accountId}/balances - Get account balances
 
 #### Transaction Management
-- [ ] GET /accounts/{accountId}/transactions - Get transaction history
-- [ ] GET /accounts/{accountId}/transactions/{transactionId} - Get transaction details
+- [x] GET /accounts/{accountId}/transactions - Get transaction history
+- [x] GET /accounts/{accountId}/transactions/{transactionId} - Get transaction details
 
 ---
 

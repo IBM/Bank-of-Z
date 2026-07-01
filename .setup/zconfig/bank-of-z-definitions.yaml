@@ -140,6 +140,42 @@ resourceDefinitions:
       executionset: FULLAPI
       jvm: "NO"
   - program:
+      name: INQTRANL
+      group: BANKZGRP
+      description: Inquire Transaction List for Account
+      language: COBOL
+      reload: "NO"
+      resident: "NO"
+      usage: NORMAL
+      uselpacopy: "NO"
+      status: ENABLED
+      cedf: "YES"
+      datalocation: ANY
+      execkey: USER
+      concurrency: THREADSAFE
+      api: CICSAPI
+      dynamic: "NO"
+      executionset: FULLAPI
+      jvm: "NO"
+  - program:
+      name: INQTRAND
+      group: BANKZGRP
+      description: Inquire Transaction Detail
+      language: COBOL
+      reload: "NO"
+      resident: "NO"
+      usage: NORMAL
+      uselpacopy: "NO"
+      status: ENABLED
+      cedf: "YES"
+      datalocation: ANY
+      execkey: USER
+      concurrency: THREADSAFE
+      api: CICSAPI
+      dynamic: "NO"
+      executionset: FULLAPI
+      jvm: "NO"
+  - program:
       name: BNK1B2B
       group: BANKZGRP
       description: BANK Online Bank to Bank Transfer

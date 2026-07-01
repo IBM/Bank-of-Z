@@ -1,11 +1,12 @@
 ---
 version: 1.0
 type: "cicsCommarea-1.0"
-description: "Debit/Credit Function CICS Program"
+description: "Inquire Transaction List - Query transactions by account with date filtering\
+  \ and pagination"
 providerProperties:
   transidUsage: "EIB_ONLY"
-  transid: "OMEN"
+  transid: "ITRL"
   language: "COBOL"
-  program: "DBCRFUN"
+  program: "INQTRANL"
   connectionRef: "bankzCicsConnection"
   ccsid: "037"

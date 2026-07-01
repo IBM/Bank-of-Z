@@ -45,11 +45,8 @@ Typical build outputs include:
 - Db2 tables and plans
 - Java archive (JAR) files
 - z/OS Connect API artifacts
-<p style="text-align: center;">
-<img src="images/build-boz-app.png"
-    alt="Bank of Z build process"
-    style="height:500px; width:auto;">
-</p>
+
+![Bank of Z build process](images/build-boz-app.ab6aec17.png)
 
 ![Bank of Z build process](images/build-boz-app.png)
 

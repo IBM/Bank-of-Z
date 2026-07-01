@@ -37,7 +37,7 @@ application:
             - scanner: Dummy
               extensions: yaml
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]  
+          value: [".*","**/.*","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
 
       # Variable overrides for the FullAnalysis task
     - task: FullAnalysis
@@ -45,7 +45,7 @@ application:
         - name: continueOnScanFailure
           value: true
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+          value: [".*","**/.*","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
 
     # ----------------------------------------------------------
     # ImpactAnalysis task
@@ -59,7 +59,7 @@ application:
           value: true
 
         - name: excludeFileList
-          value: [".*","**/.*","**.html","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
+          value: [".*","**/.*","**.java","**.png","**.css","**.js","**.groovy","**.json","**.md","**.java","**/LoadData/**"]
 
         
         # Uncomment to log every file scanned during analysis:

@@ -46,6 +46,8 @@ Typical build outputs include:
 - Java archive (JAR) files
 - z/OS Connect API artifacts
 
+<img src="images/build-boz-app.png" alt="Bank of Z build process" style="max-width:600px width=100%; height=auto;">
+
 ![Bank of Z build process](images/build-boz-app.png)
 
 *Figure 1. Displays the relationship between source assets and generated application components.*
@@ -66,6 +68,8 @@ The generated artifacts are used by the deployment process to provision and conf
 These components are deployed as part of the complete Bank of Z environment.
 
 The deployment process automatically provisions the required CICS runtime and z/OS Connect environment, then deploys the application resources used by the CICS-based banking services.
+
+<img src="images/cics-db2-zosconnect-deployment.png" alt="Deploy a CICS Db2 z/OS Connect Application" style="max-width:600px width=100%; height=auto;">
 
 ![Deploy a CICS Db2 z/OS Connect Application](images/cics-db2-zosconnect-deployment.png)
 

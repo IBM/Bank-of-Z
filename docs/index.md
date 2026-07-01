@@ -19,6 +19,8 @@ Welcome to the Bank of Z documentation. Use this guide to explore the applicatio
 
 The documentation includes installation guidance, development workflows, architecture information, tutorials, reference material, and troubleshooting resources.
 
+<img src="docs/about-bank-of-z/images/architecture-diagram.png" alt="Sample Online Banking Application" style="max-width:600px width=100%; height=auto;">
+
 ![Sample Online Banking Application](docs/about-bank-of-z/images/architecture-diagram.png)
 
 ## What You Can Learn

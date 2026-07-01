@@ -22,7 +22,10 @@ cd "$SCRIPTS_DIR"
 # =========================
 # Environment
 # =========================
-export DBB_HOME="${DBB_HOME:-$(get_section_value 'dbb' 'dbb_home')}"
+export DBB_CONFG_HOME=$(get_section_value 'dbb' 'dbb_home')
+if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
+    export DBB_HOME=$DBB_CONFG_HOME
+fi
 export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 export ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
 export WAZIDEPLOY_HOME="${WAZIDEPLOY_HOME:-$(get_section_value 'wazideploy' 'wazideploy_home')}"

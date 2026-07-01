@@ -77,7 +77,7 @@ print_info "${CYAN}[VALIDATE]${NC} ========================================="
 print_info "${CYAN}[VALIDATE]${NC} Checking DBB Runtime Environment"
 print_info "${CYAN}[VALIDATE]${NC} ========================================="
 
-DBB_MIN_VERSION="3.0.4.1"
+DBB_MIN_VERSION="3.0.5"
 
 if command -v dbb >/dev/null 2>&1; then
     DBB_OUTPUT=$(dbb --version 2>&1 || true)

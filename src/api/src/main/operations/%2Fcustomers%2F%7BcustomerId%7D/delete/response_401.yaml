@@ -6,8 +6,8 @@ mappings:
     - code:
         required: true
         nullable: false
-        template: "NOT_FOUND"
+        template: "UNAUTHORIZED"
     - message:
         required: true
         nullable: false
-        template: "Customer not found"
+        template: "Authentication required"

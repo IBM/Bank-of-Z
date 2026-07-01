@@ -1,0 +1,68 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "DELCUSZ" : {
+          "type" : "object",
+          "properties" : {
+            "COMM-EYE" : { "maxLength" : 4, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-EYE PIC X(4) USAGE DISPLAY.", "name" : "COMM-EYE" } },
+            "COMM-SCODE" : { "maxLength" : 6, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-SCODE PIC X(6) USAGE DISPLAY.", "name" : "COMM-SCODE" } },
+            "COMM-CUSTNO" : { "maxLength" : 10, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-CUSTNO PIC X(10) USAGE DISPLAY.", "name" : "COMM-CUSTNO" } },
+            "COMM-NAME" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-TITLE" : { "maxLength" : 10, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-TITLE PIC X(10) USAGE DISPLAY.", "name" : "COMM-TITLE" } },
+                "COMM-FIRST-NAME" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-FIRST-NAME PIC X(50) USAGE DISPLAY.", "name" : "COMM-FIRST-NAME" } },
+                "COMM-LAST-NAME" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-LAST-NAME PIC X(50) USAGE DISPLAY.", "name" : "COMM-LAST-NAME" } }
+              }
+            },
+            "COMM-DOB" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-DOB-DAY" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-DOB-DAY PIC 99 USAGE DISPLAY.", "name" : "COMM-DOB-DAY" } },
+                "COMM-DOB-MONTH" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-DOB-MONTH PIC 99 USAGE DISPLAY.", "name" : "COMM-DOB-MONTH" } },
+                "COMM-DOB-YEAR" : { "minimum" : 0, "maximum" : 9999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-DOB-YEAR PIC 9999 USAGE DISPLAY.", "name" : "COMM-DOB-YEAR" } }
+              }
+            },
+            "COMM-PHONE" : { "maxLength" : 20, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-PHONE PIC X(20) USAGE DISPLAY.", "name" : "COMM-PHONE" } },
+            "COMM-ADDR" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-ADDR-LINE1" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-ADDR-LINE1 PIC X(50) USAGE DISPLAY.", "name" : "COMM-ADDR-LINE1" } },
+                "COMM-ADDR-LINE2" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-ADDR-LINE2 PIC X(50) USAGE DISPLAY.", "name" : "COMM-ADDR-LINE2" } },
+                "COMM-CITY" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CITY PIC X(50) USAGE DISPLAY.", "name" : "COMM-CITY" } },
+                "COMM-POSTCODE" : { "maxLength" : 10, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-POSTCODE PIC X(10) USAGE DISPLAY.", "name" : "COMM-POSTCODE" } },
+                "COMM-COUNTRY" : { "maxLength" : 50, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "05 COMM-COUNTRY PIC X(50) USAGE DISPLAY.", "name" : "COMM-COUNTRY" } }
+              }
+            },
+            "COMM-STATUS" : { "maxLength" : 10, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-STATUS PIC X(10) USAGE DISPLAY.", "name" : "COMM-STATUS" } },
+            "COMM-CREATED-DATE" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-CREATED-DAY" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CREATED-DAY PIC 99 USAGE DISPLAY.", "name" : "COMM-CREATED-DAY" } },
+                "COMM-CREATED-MONTH" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CREATED-MONTH PIC 99 USAGE DISPLAY.", "name" : "COMM-CREATED-MONTH" } },
+                "COMM-CREATED-YEAR" : { "minimum" : 0, "maximum" : 9999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CREATED-YEAR PIC 9999 USAGE DISPLAY.", "name" : "COMM-CREATED-YEAR" } }
+              }
+            },
+            "COMM-CREDIT-SCORE" : { "minimum" : 0, "maximum" : 999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-CREDIT-SCORE PIC 999 USAGE DISPLAY.", "name" : "COMM-CREDIT-SCORE" } },
+            "COMM-CS-REVIEW-DATE" : {
+              "type" : "object",
+              "properties" : {
+                "COMM-CS-REVIEW-DAY" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CS-REVIEW-DAY PIC 99 USAGE DISPLAY.", "name" : "COMM-CS-REVIEW-DAY" } },
+                "COMM-CS-REVIEW-MONTH" : { "minimum" : 0, "maximum" : 99, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CS-REVIEW-MONTH PIC 99 USAGE DISPLAY.", "name" : "COMM-CS-REVIEW-MONTH" } },
+                "COMM-CS-REVIEW-YEAR" : { "minimum" : 0, "maximum" : 9999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "05 COMM-CS-REVIEW-YEAR PIC 9999 USAGE DISPLAY.", "name" : "COMM-CS-REVIEW-YEAR" } }
+              }
+            },
+            "COMM-DEL-SUCCESS" : { "maxLength" : 1, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-DEL-SUCCESS PIC X USAGE DISPLAY.", "name" : "COMM-DEL-SUCCESS" } },
+            "COMM-DEL-FAIL-CD" : { "maxLength" : 1, "type" : "string", "x-ibm-zcon-metadata" : { "type" : "03 COMM-DEL-FAIL-CD PIC X USAGE DISPLAY.", "name" : "COMM-DEL-FAIL-CD" } }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

@@ -351,10 +351,14 @@
             document.getElementById('details-section').style.display = 'block';
 
             try {
-                // For IMS accounts, use customerId; for CICS, use accountId
+                // Determine system type from customer ID prefix
+                const customerIdStr = (customerId || account.customerId || '').toString().toUpperCase();
+                const isIMS = customerIdStr.startsWith('I');
+                
+                // For IMS accounts, use customerId; for CICS, use accountId only
                 const balance = await api.accounts.getAccountBalances(
-                    customerId ? null : account.accountId,
-                    customerId
+                    account.accountId,
+                    isIMS ? (customerId || account.customerId) : null
                 );
                 
                 // Handle IMS array response - use the account index if available

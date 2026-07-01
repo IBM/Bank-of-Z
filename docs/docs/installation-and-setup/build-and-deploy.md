@@ -46,7 +46,7 @@ Typical build outputs include:
 - Java archive (JAR) files
 - z/OS Connect API artifacts
 
-<img src="images/build-boz-app.png" alt="Bank of Z build process" style="max-width:auto !important; height=200px !important;">
+<img src="images/build-boz-app.png" alt="Bank of Z build process" style="max-width:500px; width=auto !important; height=200px !important;">
 
 ![Bank of Z build process](images/build-boz-app.png)
 

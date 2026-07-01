@@ -9,7 +9,7 @@ title: Home
         <h1>Bank of Z</h1>
         <p>
             Modern IBM Z development, build, deployment,
-            and modernization practices.
+            and modernization practices
         </p>
     </div>
 </div>

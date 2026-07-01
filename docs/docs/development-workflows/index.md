@@ -55,7 +55,7 @@ A task-based workflow that integrates source code editing, Git operations, build
 
 A development workflow optimized for rapid iteration, allowing you to synchronize changes directly to the target environment and run build and deployment activities without requiring committed changes.
 
-![Workflow Diagram](images/workflow-overview.jpg)
+![Workflow Diagram](images/workflow-overview.png)
 
 
 The following sections describe each workflow in more detail and provide guidance for common development scenarios.

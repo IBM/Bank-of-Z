@@ -3,19 +3,18 @@ services:
   zosConnect:
     image: icr.io/zosconnect/ibm-zcon-designer:3.0.101
     platform: linux/amd64
+    # Environment variables are loaded from .env file in the project root
+    # Create .env file with CICS and IMS connection settings
     environment:
-      # IMPORTANT: These environment variables must be set on the host before starting containers
-      # Format: - VAR_NAME (without =value) passes the value from host environment to container
-      # Example: export CICS_USER=myuser CICS_PASSWORD=mypass before running docker-compose up  #pragma: allowlist secret
-      - CICS_USER
-      - CICS_PASSWORD  #pragma: allowlist secret
-      - CICS_HOST
-      - CICS_PORT
-      - IMS_USER
-      - IMS_PASSWORD  #pragma: allowlist secret
-      - IMS_HOST
-      - IMS_PORT
-      - IMS_DATASTORE
+      - CICS_USER=${CICS_USER}
+      - CICS_PASSWORD=${CICS_PASSWORD}
+      - CICS_HOST=${CICS_HOST}
+      - CICS_PORT=${CICS_PORT}
+      - IMS_USER=${IMS_USER}
+      - IMS_PASSWORD=${IMS_PASSWORD}
+      - IMS_HOST=${IMS_HOST}
+      - IMS_PORT=${IMS_PORT}
+      - IMS_DATASTORE=${IMS_DATASTORE}
       - HTTP_PORT=9080
       - zosconnect_remote_download_allowlist=BLOCK_ALL
     ports:

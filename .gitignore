@@ -2,6 +2,7 @@
 /.settings/
 /.bob/*.json
 /.setup/.env
+.env
 provisioning/
 /.pydevproject
 build.log

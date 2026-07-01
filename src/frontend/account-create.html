@@ -38,9 +38,11 @@
             <h1>Create new account</h1>
         </cds-layer>
 
-        <!-- Form Content -->
-        <cds-grid class="cds--content">
-            <cds-column lg="16" md="8" sm="4">
+        <div class="cds--content">
+            <cds-stack gap="7">
+                <h2>Account Information</h2>
+                
+                <!-- Form Content -->
                 <cds-form id="account-form" class="form-constrained">
                     <cds-stack gap="7">
                         <cds-form-item>
@@ -74,8 +76,8 @@
                         <cds-button id="submit-btn" type="submit">Submit</cds-button>
                     </cds-stack>
                 </cds-form>
-            </cds-column>
-        </cds-grid>
+            </cds-stack>
+        </div>
     </cds-layer>
 
     <!-- Carbon Web Components - Component-specific imports -->

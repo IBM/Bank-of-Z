@@ -27,6 +27,17 @@ class ApiConfiguration {
 }
 
 /**
+ * Helper function to determine system type from customer ID
+ * @param {string} customerId - Customer ID with prefix (C for CICS, I for IMS)
+ * @returns {string} 'IMS' or 'CICS'
+ */
+function getSystemFromCustomerId(customerId) {
+    if (!customerId) return 'CICS';
+    const idStr = customerId.toString().toUpperCase();
+    return idStr.startsWith('I') ? 'IMS' : 'CICS';
+}
+
+/**
  * Base API client with common request handling
  */
 class BaseApi {
@@ -295,13 +306,28 @@ class AccountsApi extends BaseApi {
      */
     async depositToAccount(accountId, depositData, customerId = null) {
         let url;
-        if (customerId) {
+        const system = getSystemFromCustomerId(customerId);
+        
+        console.log('=== DEPOSIT DEBUG ===');
+        console.log('customerId received:', customerId);
+        console.log('system determined:', system);
+        
+        // Strip the C/I prefix to get numeric ID for API
+        const numericCustomerId = customerId ? customerId.toString().replace(/^[CI]/i, '') : null;
+        console.log('numericCustomerId:', numericCustomerId);
+        
+        if (system === 'IMS' && numericCustomerId) {
             // IMS endpoint: /ims/accounts/{customerId}/{accountId}/deposit
-            url = `${this.configuration.baseUrl}/ims/accounts/${customerId}/${accountId}/deposit`;
+            url = `${this.configuration.baseUrl}/ims/accounts/${numericCustomerId}/${accountId}/deposit`;
+            console.log('Using IMS endpoint');
         } else {
             // CICS endpoint: /accounts/{accountId}/deposit
             url = `${this.configuration.baseUrl}/accounts/${accountId}/deposit`;
+            console.log('Using CICS endpoint');
         }
+        
+        console.log('Final URL:', url);
+        console.log('===================');
         
         return this.request(url, {
             method: 'POST',

@@ -196,7 +196,7 @@ print_info "${CYAN}[VALIDATE]${NC} ========================================="
 print_info "${CYAN}[VALIDATE]${NC} Checking Wazi Deploy Installation"
 print_info "${CYAN}[VALIDATE]${NC} ========================================="
 
-WAZIDEPLOY_MIN_VERSION="3.0.7.1"
+WAZIDEPLOY_MIN_VERSION="3.0.7.3"
 
 if [ -f "$WAZIDEPLOY_HOME/bin/activate" ]; then
     print_info "${CYAN}[VALIDATE]${NC} Found Wazi Deploy activation script: $WAZIDEPLOY_HOME/bin/activate"

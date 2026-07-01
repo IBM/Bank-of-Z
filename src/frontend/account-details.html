@@ -125,16 +125,22 @@
             const accountIdParam = urlParams.get('id') || urlParams.get('accountId');
             
             if (customerIdParam) {
-                // Determine system type based on customer ID length
-                // IMS customer IDs are 9 digits, CICS are typically shorter
-                const system = customerIdParam.length === 9 ? 'IMS' : 'CICS';
-                const formattedCustomerId = formatCustomerId(customerIdParam, system);
+                // Parse customer ID to get system type and numeric ID
+                const parsed = parseCustomerId(customerIdParam);
+                if (!parsed) {
+                    displayNotification('error', 'Invalid Customer ID', 'Please provide a valid customer ID with prefix (C or I)');
+                    return;
+                }
+                
+                const { system, customerId: numericCustomerId } = parsed;
+                const formattedCustomerId = formatCustomerId(numericCustomerId, system);
                 
                 // Populate the Customer ID field
                 document.getElementById('customerId').value = formattedCustomerId;
                 
                 if (accountIdParam) {
                     // Direct link to specific account - load it directly
+                    // Pass the original customerIdParam (with prefix) so searchAccount can parse it
                     searchAccount(accountIdParam, customerIdParam);
                 } else {
                     // Just customer ID provided - search for all accounts
@@ -265,18 +271,40 @@
             });
         }
 
-        async function searchAccount(customerIdParam = null) {
+        async function searchAccount(accountIdParam, customerIdParam) {
             // This function is kept for URL parameter support
             const urlParams = new URLSearchParams(window.location.search);
-            const accountId = urlParams.get('id') || urlParams.get('accountId');
-            const customerId = urlParams.get('customerId');
+            const accountId = accountIdParam || urlParams.get('id') || urlParams.get('accountId');
+            const customerIdFromUrl = customerIdParam || urlParams.get('customerId');
             
             if (!accountId) return;
+
+            // Parse customer ID to strip prefix if present
+            let numericCustomerId = null;
+            let system = 'CICS';
+            if (customerIdFromUrl) {
+                console.log('searchAccount - Parsing customer ID:', customerIdFromUrl);
+                const parsed = parseCustomerId(customerIdFromUrl);
+                console.log('searchAccount - Parsed result:', parsed);
+                if (parsed) {
+                    numericCustomerId = parsed.customerId;
+                    system = parsed.system;
+                    console.log('searchAccount - Set system to:', system);
+                } else {
+                    // If parsing fails, assume it's already numeric
+                    numericCustomerId = customerIdFromUrl;
+                    console.log('searchAccount - Parsing failed, using as-is');
+                }
+            }
+            console.log('searchAccount - Final system:', system, 'numericCustomerId:', numericCustomerId);
 
             showLoadingModal('Searching for account...');
 
             try {
-                const response = await api.accounts.getAccount(accountId, customerId);
+                // For CICS accounts, pass null for customerId to route to /api/accounts/
+                // For IMS accounts, pass the numeric customerId to route to /api/ims/accounts/
+                const customerIdForApi = system === 'IMS' ? numericCustomerId : null;
+                const response = await api.accounts.getAccount(accountId, customerIdForApi);
                 
                 // Handle IMS response which may return multiple accounts
                 let account = response;
@@ -325,10 +353,13 @@
                     account._accountIndex = accountIndex; // Store index for balance lookup
                 }
                 
+                // Store account with system metadata
+                account._customerId = numericCustomerId; // Store numeric ID
+                account._system = system; // Store system type
+                console.log('searchAccount - Storing on account: _system =', system, '_customerId =', numericCustomerId);
                 currentAccount = account;
-                currentAccount._customerId = customerId; // Store for later use
                 hideLoadingModal();
-                await displayAccountDetails(account, customerId);
+                await displayAccountDetails(account, numericCustomerId);
             } catch (error) {
                 hideLoadingModal();
                 showErrorModal('Error', 'Account not found or error loading data');
@@ -351,14 +382,29 @@
             document.getElementById('details-section').style.display = 'block';
 
             try {
-                // Determine system type from customer ID prefix
-                const customerIdStr = (customerId || account.customerId || '').toString().toUpperCase();
-                const isIMS = customerIdStr.startsWith('I');
+                // Use the system type stored on the account object (set when account was selected)
+                // If not available, fall back to checking customer ID prefix
+                const system = account._system || (account.customerId && account.customerId.toString().startsWith('I') ? 'IMS' : 'CICS');
+                const isIMS = system === 'IMS';
                 
-                // For IMS accounts, use customerId; for CICS, use accountId only
+                // Use the numeric customer ID (already stripped of prefix when stored)
+                const numericCustomerId = customerId || account._customerId || account.customerId;
+                
+                // Debug logging
+                console.log('displayAccountDetails - Debug Info:');
+                console.log('  account._system:', account._system);
+                console.log('  account._customerId:', account._customerId);
+                console.log('  customerId param:', customerId);
+                console.log('  account.customerId:', account.customerId);
+                console.log('  Determined system:', system);
+                console.log('  isIMS:', isIMS);
+                console.log('  numericCustomerId:', numericCustomerId);
+                console.log('  Will call getAccountBalances with:', account.accountId, isIMS ? numericCustomerId : null);
+                
+                // For IMS accounts, use numeric customerId; for CICS, use accountId only
                 const balance = await api.accounts.getAccountBalances(
                     account.accountId,
-                    isIMS ? (customerId || account.customerId) : null
+                    isIMS ? numericCustomerId : null
                 );
                 
                 // Handle IMS array response - use the account index if available

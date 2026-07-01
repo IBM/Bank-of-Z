@@ -43,12 +43,12 @@
         <div class="cds--content">
             <!-- Error/Notification Container -->
             <div id="notification-container"></div>
-        </div>
-
-        <!-- Search Section -->
-        <cds-grid class="cds--content">
-            <cds-column lg="16" md="8" sm="4">
-                <cds-stack gap="7">
+            
+            <cds-stack gap="7">
+                <!-- Search Section -->
+                <cds-grid>
+                    <cds-column lg="16" md="8" sm="4">
+                        <cds-stack gap="7">
                     <cds-form-item>
                         <cds-text-input
                             id="customerId"
@@ -57,24 +57,21 @@
                             helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234567 or I000000015)">
                         </cds-text-input>
                     </cds-form-item>
-                    <cds-button id="search-accounts-btn">Search Accounts</cds-button>
-                </cds-stack>
-            </cds-column>
-        </cds-grid>
-
-        <!-- Account Selection Section -->
-        <cds-grid class="cds--content" id="account-selection-section" style="display: none;">
-            <cds-column lg="16" md="8" sm="4">
-                <h3>Select Account for Deposit</h3>
-                <p>Click on an account to proceed with deposit:</p>
-                <div id="accounts-table"></div>
-            </cds-column>
-        </cds-grid>
-
-        <!-- Deposit Form Section -->
-        <cds-grid class="cds--content" id="deposit-form-section" style="display: none;">
-            <cds-column lg="16" md="8" sm="4">
-                <h3>Deposit to Account</h3>
+                            <cds-button id="search-accounts-btn">Search Accounts</cds-button>
+                        </cds-stack>
+                    </cds-column>
+                </cds-grid>
+                
+                <!-- Account Selection Section -->
+                <cds-layer class="layer" id="account-selection-section" style="display: none;">
+                    <h3>Select Account for Deposit</h3>
+                    <p>Click on an account to proceed with deposit:</p>
+                    <div id="accounts-table"></div>
+                </cds-layer>
+                
+                <!-- Deposit Form Section -->
+                <cds-layer class="layer" id="deposit-form-section" style="display: none;">
+                    <h3>Deposit to Account</h3>
                 <cds-form id="deposit-form" class="form-constrained">
                     <cds-stack gap="7">
                         <cds-form-item>
@@ -112,8 +109,9 @@
                         <cds-button id="back-btn" kind="secondary">Back to Account Selection</cds-button>
                     </cds-stack>
                 </cds-form>
-            </cds-column>
-        </cds-grid>
+                </cds-layer>
+            </cds-stack>
+        </div>
     </cds-layer>
 
     <!-- Carbon Web Components - Component-specific imports -->
@@ -237,7 +235,9 @@
                     document.getElementById('account-selection-section').style.display = 'none';
                     document.getElementById('deposit-form-section').style.display = 'none';
                 } else {
-                    selectedCustomerId = customerId;
+                    // Store the FULL customer ID with prefix (e.g., "C1234" or "I000000015")
+                    // so the API routing logic can determine the correct endpoint
+                    selectedCustomerId = customerIdInput;
                     selectedSystem = system;
                     displayAccountsList(accounts);
                 }

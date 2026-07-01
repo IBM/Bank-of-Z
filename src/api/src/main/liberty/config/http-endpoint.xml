@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <!-- Disable HTTPS redirect for local development -->
+    <httpEndpoint id="defaultHttpEndpoint" 
+                  host="*" 
+                  httpPort="9080">
+        <httpOptions removeServerHeader="true" />
+    </httpEndpoint>
+</server>
+
+<!-- Made with Bob -->

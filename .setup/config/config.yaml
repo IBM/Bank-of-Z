@@ -83,7 +83,7 @@ taz:
 
 # z/OS Connect (API exposure)
 zosconnect:
-  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin/"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin"
   server_dir: "{{sandbox.path}}/zosconnect-server"
   server_name: "bankOfZServer"
   http_port: 9080

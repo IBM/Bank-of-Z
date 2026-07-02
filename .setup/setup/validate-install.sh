@@ -22,7 +22,10 @@ cd "$SCRIPTS_DIR"
 # =========================
 # Environment
 # =========================
-export DBB_HOME="${DBB_HOME:-$(get_section_value 'dbb' 'dbb_home')}"
+export DBB_CONFG_HOME=$(get_section_value 'dbb' 'dbb_home')
+if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
+    export DBB_HOME=$DBB_CONFG_HOME
+fi
 export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 export ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
 export WAZIDEPLOY_HOME="${WAZIDEPLOY_HOME:-$(get_section_value 'wazideploy' 'wazideploy_home')}"
@@ -77,7 +80,7 @@ print_info "${CYAN}[VALIDATE]${NC} ========================================="
 print_info "${CYAN}[VALIDATE]${NC} Checking DBB Runtime Environment"
 print_info "${CYAN}[VALIDATE]${NC} ========================================="
 
-DBB_MIN_VERSION="3.0.4.1"
+DBB_MIN_VERSION="3.0.5"
 
 if command -v dbb >/dev/null 2>&1; then
     DBB_OUTPUT=$(dbb --version 2>&1 || true)

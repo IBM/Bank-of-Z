@@ -25,7 +25,10 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-export DBB_HOME=$(get_section_value 'dbb' 'dbb_home')
+export DBB_CONFG_HOME=$(get_section_value 'dbb' 'dbb_home')
+if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
+    export DBB_HOME=$DBB_CONFG_HOME
+fi
 export DBB_BUILD=$(get_section_value 'dbb' 'dbb_build')
 export DBB_CWD=$(get_section_value 'dbb' 'dbb_cwd')
 export DBB_APP_CONF=$(get_section_value 'dbb' 'dbb_app_conf')

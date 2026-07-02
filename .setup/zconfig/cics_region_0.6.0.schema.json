@@ -1202,17 +1202,9 @@
           "title": "installation"
         },
         "region_dir": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
           "description": "Base directory for the region",
-          "title": "region_dir"
+          "title": "region_dir",
+          "type": "string"
         },
         "volumes": {
           "anyOf": [
@@ -2844,6 +2836,45 @@
           "default": null,
           "description": "Region tags YAML file path to be created for this region",
           "title": "region_taggings"
+        },
+        "resource_definition_overrides": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Resource overrides YAML file path to be created for this region",
+          "title": "resource_definition_overrides"
+        },
+        "startup_programs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StartupProgramsConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Configure programs to run during CICS startup (PLTPI)",
+          "title": "startup_programs"
+        },
+        "shutdown_programs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShutdownProgramsConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Configure programs to run during CICS shutdown (PLTSD)",
+          "title": "shutdown_programs"
         }
       },
       "required": [
@@ -3017,6 +3048,45 @@
       "title": "SeqUnit",
       "type": "string"
     },
+    "ShutdownProgramsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "first_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Programs to run in first quiesce stage",
+          "title": "first_phase"
+        },
+        "second_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Programs to run in second quiesce stage",
+          "title": "second_phase"
+        }
+      },
+      "title": "ShutdownProgramsConfig",
+      "type": "object"
+    },
     "SslOptions": {
       "enum": [
         "NO",
@@ -3026,6 +3096,45 @@
       ],
       "title": "SslOptions",
       "type": "string"
+    },
+    "StartupProgramsConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "second_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Programs to run in 2nd initialization stage (first PLT pass)",
+          "title": "second_phase"
+        },
+        "third_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Programs to run in 3rd initialization stage (second PLT pass)",
+          "title": "third_phase"
+        }
+      },
+      "title": "StartupProgramsConfig",
+      "type": "object"
     },
     "TdIntrapartitionInputs": {
       "additionalProperties": false,

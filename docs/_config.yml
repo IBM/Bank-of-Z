@@ -1,0 +1,45 @@
+# Site settings
+title: Bank of Z
+description: Sample Z application showing how to work with mainframe software
+baseurl: "/Bank-of-Z"
+url: "https://ibm.github.io"
+repository_url: "https://github.com/IBM/Bank-of-Z"
+
+# Build settings
+markdown: kramdown
+theme: jekyll-theme-cayman
+
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+  - scope:
+      path: "docs"
+    values:
+      layout: "default"
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - scripts/
+  - TOC_GUIDE.md
+  - EDITING_GUIDE.md
+  - STYLE_GUIDE.md
+  - DYNAMIC_TOC_GUIDE.md
+  - SETUP_COMPLETE.md

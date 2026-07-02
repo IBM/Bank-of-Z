@@ -155,18 +155,70 @@ fi
 
 deactivate
 
+
 # =========================
-# Stage 4: Start CICS region
+# Stage 4: Create DEBUG Items
 # =========================
-print_stage "STAGE 4: Start CICS region"
+print_stage "Stage 4: Create DEBUG Items"
+export RIGHT='APPLID of CICS                       X'
+export LEFT='               APPLID=CICS'
+export SPACES=$((8-${#APP_SHORT_NAME} - 1))
+export MIDDLE=$(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
+
+rm -f "/tmp/tcpip-create*"
+rm -f "/tmp/plt-create*"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --extraVar "applid_line=${LEFT}${MIDDLE}${RIGHT}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/cics/tcpip-create.j2"  --outputFile "/tmp/tcpip-create-$$.jcl"
+run_job_and_wait "/tmp/tcpip-create-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
+run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
+
+opercmd "S EQARMTD"
+
+# =========================
+# Stage 5: Start CICS region
+# =========================
+print_stage "STAGE 5: Start CICS region"
 
 jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" 
 sleep 10
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
 sleep 10
 
+
+# ======================================
+# Stage 6: Add CICS region to dtcn.ports
+# ======================================
+print_stage "Stage 6: Add CICS region to dtcn.ports"
 # =========================
-# Stage 5: Cleanup
+# Update /etc/debug/dtcn.ports
+# =========================
+DTCN_PORTS="/etc/debug/dtcn.ports"
+DTCN_PORTS_TMP="/tmp/dtcn.ports$$"
+print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
+
+if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PORTS}"; then
+    print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICSBOZ already present in ${DTCN_PORTS}"
+else
+    print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
+    chtag -tc IBM-1047 "$DTCN_PORTS"
+    rm -f /tmp/dtcn.ports*
+    cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
+    echo "" >> "$DTCN_PORTS_TMP"
+    echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
+    cp "${DTCN_PORTS_TMP}" "$DTCN_PORTS"
+    chtag -r "$DTCN_PORTS"
+    opercmd "C EQAPROF"  
+    sleep 5
+    opercmd "S EQAPROF" 
+    sleep 5
+fi
+
+# =========================
+# Stage 7: Cleanup
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 exit 0

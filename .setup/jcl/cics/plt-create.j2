@@ -1,0 +1,34 @@
+//CREPLT   JOB (ACCT),'CREATE PLT SOURCE',
+//         CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID,
+//         MSGLEVEL=(1,1),REGION=0M
+//*-------------------------------------------------------------------
+//* CREATE PDS FOR ASSEMBLER SOURCE AND ADD DFHPLTSI MEMBER
+//*-------------------------------------------------------------------
+//ALLOC    EXEC PGM=IEFBR14
+//TABLES   DD DSN={{ cics_hlq }}.TABLES.SOURCE,
+//         DISP=(NEW,CATLG,DELETE),
+//         SPACE=(TRK,(10,5,10)),
+//         DCB=(RECFM=FB,LRECL=80,BLKSIZE=3120),
+//         UNIT=SYSDA
+//*-------------------------------------------------------------------
+//* ADD DFHPLTSI MEMBER TO THE PDS
+//*-------------------------------------------------------------------
+//ADDMEM   EXEC PGM=IEBGENER
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD DUMMY
+//SYSUT1   DD *
+         PRINT NOGEN
+         TITLE 'DFHPLTSI - PLT:  Sockets=YES DT=Yes   '
+         DFHPLT TYPE=INITIAL,SUFFIX=SI
+*------------------------------------------------------------------
+         DFHPLT TYPE=ENTRY,PROGRAM=DFHDELIM
+         DFHPLT TYPE=ENTRY,PROGRAM=EZACIC20
+         DFHPLT TYPE=ENTRY,PROGRAM=EQA0CPLT
+*------------------------------------------------------------------
+         DFHPLT TYPE=FINAL
+         END   DFHPLTBA
+/*
+//SYSUT2   DD DSN={{ cics_hlq }}.TABLES.SOURCE(DFHPLTSI),
+//         DISP=SHR
+//*-------------------------------------------------------------------
+//* Made with Bob

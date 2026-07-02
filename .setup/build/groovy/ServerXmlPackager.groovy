@@ -5,8 +5,9 @@
 import com.ibm.dbb.build.*
 import com.ibm.dbb.build.report.*
 import com.ibm.dbb.build.report.records.*
-import com.ibm.dbb.task.TaskConstants
 import com.ibm.dbb.metadata.*
+import com.ibm.dbb.metadata.BuildResult
+import com.ibm.dbb.task.TaskConstants
 
 /**
  * ServerXmlPackager - DBB script to package server.xml and cics.xml for Bank-of-Z deployment
@@ -37,6 +38,7 @@ def serverXmlRelativePath = config.getVariable('serverXmlPath')
 if (!serverXmlRelativePath) {
     log.error("serverXmlPath configuration variable is required but not set")
     log.error("Please add serverXmlPath to the ServerXmlPackager task configuration in dbb-app.yaml")
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 
@@ -65,6 +67,7 @@ if (processCicsXml) {
 def serverXmlFile = new File(serverXmlPath)
 if (!serverXmlFile.exists()) {
     log.error("server.xml not found at: ${serverXmlPath}")
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 
@@ -74,6 +77,7 @@ if (processCicsXml) {
     cicsXmlFile = new File(cicsXmlPath)
     if (!cicsXmlFile.exists()) {
         log.error("cics.xml not found at: ${cicsXmlPath}")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     log.info("Found server.xml and cics.xml")
@@ -126,6 +130,7 @@ try {
     def buildGroup = context.getVariable("BUILD_GROUP")
     if (buildGroup == null) {
         log.error("BUILD_GROUP not found in context. MetadataInit task must run before this task.")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     
@@ -143,6 +148,7 @@ try {
     
     if (copyServerProc.exitValue() != 0) {
         log.error("Failed to copy server.xml file")
+        context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
         return 8
     }
     
@@ -188,6 +194,7 @@ try {
         
         if (copyCicsProc.exitValue() != 0) {
             log.error("Failed to copy cics.xml file")
+            context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
             return 8
         }
         
@@ -234,6 +241,7 @@ try {
     
 } catch (Exception e) {
     log.error("ServerXmlPackager failed: ${e.message}", e)
+    context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
 

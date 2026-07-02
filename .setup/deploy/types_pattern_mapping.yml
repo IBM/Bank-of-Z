@@ -18,12 +18,20 @@
 #  Exceptions: Deploying into Online regions where concurrent allocations are expected
 # 
 
+bankz_pds_load_spec:
+  type: LIBRARY
+  space_primary: 100CYL
+  space_secondary: 20CYL
+  record_format: U
+  record_length: 0
+  block_size: 32760
+
 types:
   - pattern: .*\.LOAD$ 
     pds: 
       name: "{{ hlq }}.LOAD"
       backup: "{{ hlq }}.BACK.LOAD"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     is_load: true
     force_lock: true
     force: true
@@ -32,7 +40,7 @@ types:
     pds: 
       name: "{{ hlq }}.LOADLIB"
       backup: "{{ hlq }}.BACK.LOADLIB"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     is_load: true
     force_lock: True
     force: true
@@ -43,7 +51,7 @@ types:
     pds: 
       name: "{{ hlq }}.LOADLIB"
       backup: "{{ hlq }}.BACK.LOADLIB"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     is_load: true
     force_lock: true
     use_native_copy: true
@@ -81,7 +89,14 @@ types:
      directory_backup: "{{ uss_root }}/sh/back/"
      dest_mode: 0777
      artifact_mode: 0755
-  - pattern: .*\.WAR$
+  - pattern: .*-frontend.*\.WAR$
+    uss:
+       dest: '{{frontend_root}}/servers/{{frontend_server_name}}/apps'
+       backup_dest: '{{frontend_root}}/backup/apps'
+       mode: 0755
+    mode: 0777
+    is_binary: True
+  - pattern: ^(?!.*-frontend).*\.WAR$
     uss:
        dest: '{{zos_connect_root}}/apps'
        backup_dest: '{{zos_connect_root}}/backup/apps'
@@ -92,7 +107,7 @@ types:
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.PGMLIB"
       backup: "{{ hlq }}.BACK.PGMLIB"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     is_load: True
     aliases: True
     force_lock: True
@@ -101,7 +116,7 @@ types:
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.PSBLIB"
       backup: "{{ hlq }}.BACK.PSBLIB"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     is_load: True
     is_ims_psb: True
     force_lock: True
@@ -110,11 +125,18 @@ types:
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.DBDLIB"
       backup: "{{ hlq }}.BACK.DBDLIB"
-      spec: "{{ common_pds_load_spec }}"
+      spec: "{{ bankz_pds_load_spec }}"
     force_lock: True
     is_load: True
     is_ims_dbd: True
     use_native_copy: true
+  - pattern: .*\.JAR$
+    uss:
+      dest: "{{ sandbox_path }}/jars"
+      backup_dest: "{{ sandbox_path }}/jars/back"
+      mode: 0755
+    mode: 0777
+    is_binary: True
 type_dbrm_temp:
   - type: "DBRM"
     pattern: .*.DBRM$

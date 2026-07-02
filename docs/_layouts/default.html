@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} - {{ site.title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #161616;
+            background: #f4f4f4;
+        }
+        
+        /* Header */
+        .header {
+            background: #ffffff;
+            color: white;
+            border-bottom: 1px solid #e0e0e0;
+            height: 56px;
+            padding: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1584px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 56px;
+        }
+        
+        .site-title {
+            font-size: 2.25 rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: #FFFFFF;
+        }
+        
+        .site-title a {
+            color: #161616;
+            text-decoration: none;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-nav{
+    margin-left:auto;
+}
+
+.header-nav a{
+    color:#161616;
+    text-decoration:none;
+    font-size:1rem;
+    font-weight:500;
+    padding:0 12px;
+}
+
+.header-nav a:hover{
+    color:#0F62FE;
+}
+        
+        /* Main Container */
+        .container {
+            max-width: 1584px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 256px 1fr;
+            gap: 0;
+            min-height: calc(100vh - 48px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: #ffffff;
+            padding: 2rem 0;
+            border-right: 1px solid #e0e0e0;
+            height: calc(100vh - 48px);
+            overflow-y: auto;
+            position: sticky;
+            top: 64px;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #f4f4f4;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #c6c6c6;
+            border-radius: 4px;
+        }
+        
+        .sidebar h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.32px;
+            color: #525252;
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* TOC Styling - IBM Style */
+        .toc {
+            list-style: none;
+        }
+        
+        .toc-section {
+            margin-bottom: 0;
+            border-left: 3px solid transparent;
+        }
+        
+        .toc-section.active {
+            border-left-color: #0f62fe;
+        }
+        
+        .toc-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background 0.11s;
+            position: relative;
+        }
+        
+        .toc-section-header:hover {
+            background: #e8e8e8;
+        }
+        
+        .toc-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #161616;
+            text-decoration: none;
+            flex: 1;
+            letter-spacing: 0.16px;
+        }
+        
+        .toc-section-title:hover {
+            color: #0f62fe;
+        }
+        
+        .toc-toggle {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.11s;
+            color: #525252;
+            font-size: 12px;
+        }
+        
+        .toc-section.collapsed .toc-toggle {
+            transform: rotate(-90deg);
+        }
+        
+        .toc-children {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.24s cubic-bezier(0.2, 0, 0.38, 0.9);
+        }
+        
+        .toc-section.collapsed .toc-children {
+            max-height: 0;
+        }
+        
+        .toc-children li {
+            margin: 0;
+        }
+        
+        .toc-children a {
+            display: block;
+            padding: 0.5rem 1rem 0.5rem 2rem;
+            font-size: 0.875rem;
+            color: #525252;
+            text-decoration: none;
+            transition: all 0.11s;
+            letter-spacing: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .toc-children a:hover {
+            background: #e8e8e8;
+            color: #0f62fe;
+            border-left-color: #0f62fe;
+            font-weight: 600;
+        }
+        
+        .toc-children a.active {
+            background: #e0e0e0;
+            color: #161616;
+            font-weight: 600;
+            border-left-color: #0f62fe;
+        }
+        
+        /* Content Area */
+        .content {
+            background: #ffffff;
+            padding: 3rem;
+            width: 100%;
+            max-width: none;
+        }
+        
+        .content h1 {
+            font-size: 2.625rem;
+            font-weight: 300;
+            line-height: 1.19;
+            letter-spacing: 0;
+            color: #161616;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .content h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            line-height: 1.25;
+            letter-spacing: 0;
+            color: #161616;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.334;
+            letter-spacing: 0;
+            color: #161616;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            line-height: 1.29;
+            letter-spacing: 0;
+            color: #161616;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .content p {
+            font-size: 1rem;
+            line-height: 1.5;
+            letter-spacing: 0;
+            color: #525252;
+            margin-bottom: 1rem;
+        }
+        
+        .content ul, .content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content li {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #525252;
+            margin-bottom: 0.5rem;
+        }
+        
+        .content a {
+            color: #0f62fe;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.11s;
+        }
+        
+        .content a:hover {
+            border-bottom-color: #0f62fe;
+        }
+        
+        .content code {
+            background: #f4f4f4;
+            padding: 0.125rem 0.5rem;
+            border-radius: 2px;
+            font-family: 'IBM Plex Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #161616;
+        }
+        
+        .content pre {
+            background: #262626;
+            color: #f4f4f4;
+            padding: 1rem;
+            border-radius: 0;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'IBM Plex Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.43;
+        }
+        
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: #f4f4f4;
+        }
+
+        .content img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 2rem auto;
+        }
+        
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .content th {
+            background: #e0e0e0;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #161616;
+            border-bottom: 1px solid #c6c6c6;
+        }
+        
+        .content td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.875rem;
+            color: #525252;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #262626;
+            color: #f4f4f4;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1056px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .content {
+                padding: 2rem 1rem;
+            }
+        }
+        
+        @media (max-width: 672px) {
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            .content {
+                padding: 1.5rem 1rem;
+            }
+            
+            .content h1 {
+                font-size: 2rem;
+            }
+            
+            .content h2 {
+                font-size: 1.5rem;
+            }
+        }
+            /* Hero Banner */
+.hero-banner {
+    position: relative;
+    margin: -3rem -3rem 3rem -3rem;
+    overflow: hidden;
+}
+.hero-banner img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.55);
+}
+.hero-overlay {
+    position: absolute;
+    left: 60px;
+    bottom: 60px;
+    color: white;
+    max-width: 700px;
+}
+.hero-overlay h1 {
+    color: white !important;
+    font-size: 4rem !important;
+    font-weight: 300 !important;
+    margin: 0 0 1rem 0 !important;
+    border: none !important;
+}
+.hero-overlay p {
+    color: white !important;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.doc-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: 24px;
+    margin: 2rem 0;
+    width: 100%;
+}
+.doc-card {
+    display: block;
+    padding: 24px;
+    min-height: 180px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+.doc-card:hover {
+    border-left: 4px solid #0F62FE;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.doc-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.5rem;
+}
+.doc-card p {
+    margin: 0;
+    color: #525252;
+}
+@media (max-width: 900px) {
+    .doc-cards {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="site-title">
+                <a href="{{ site.baseurl }}/">{{ site.title }}</a>
+            </div>
+
+            <nav class="header-nav">
+                <a href="{{ site.repository_url }}" target="_blank">
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+<div class="page-layout">
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Documentation</h3>
+            <ul class="toc">
+                {% for section in site.data.toc %}
+                <li class="toc-section {% if section.children %}{% unless page.url contains section.url %}collapsed{% endunless %}{% endif %} {% if page.url contains section.url %}active{% endif %}">
+                    {% if section.children %}
+                    <div class="toc-section-header" onclick="toggleSection(this)">
+                        <a href="{{ site.baseurl }}{{ section.url }}" class="toc-section-title">
+                            {{ section.title }}
+                        </a>
+                        <span class="toc-toggle">▼</span>
+                    </div>
+                    <ul class="toc-children">
+                        {% for child in section.children %}
+                        <li>
+                            <a href="{{ site.baseurl }}{{ child.url }}"
+                               {% if page.url contains child.url %}class="active"{% endif %}>
+                                {{ child.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="toc-section-header">
+                        <a href="{{ site.baseurl }}{{ section.url }}" class="toc-section-title">
+                            {{ section.title }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <main class="content">
+            {{ content }}
+        </main>
+    </div><!-- page-layout -->
+
+    <footer class="footer">
+        <p>&copy; {{ 'now' | date: "%Y" }} {{ site.title }}. All rights reserved.</p>
+        <p>{{ site.description }}</p>
+    </footer>
+    
+    <script>
+    function toggleSection(header) {
+        const section = header.parentElement;
+        section.classList.toggle('collapsed');
+    }
+    
+    // Auto-expand active section on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Expand sections containing active links
+        const activeLinks = document.querySelectorAll('.toc-children a.active');
+        activeLinks.forEach(link => {
+            const section = link.closest('.toc-section');
+            if (section) {
+                section.classList.remove('collapsed');
+            }
+        });
+    });
+    </script>
+</body>
+</html>

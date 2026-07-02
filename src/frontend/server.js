@@ -73,13 +73,9 @@ const server = http.createServer((req, res) => {
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
-    // Keep the URL path as-is - the API is deployed at /api/ context
-    const urlPath = req.url;
-    
-    // Construct the full API URL using the configured API_BASE_URL
-    const apiUrl = `${API_BASE_URL}${urlPath}`;
-    
-    console.log(`Proxying API request to: ${apiUrl}`);
+    // Keep the URL path as-is — both local Docker and z/OS Liberty serve the API at /api.
+    const apiUrl = new URL(`${API_BASE_URL}${req.url}`);
+    console.log(`Proxying API request to: ${apiUrl.href}`);
 
     const options = {
         method: req.method,

@@ -6,15 +6,15 @@ services:
     # Environment variables are loaded from .env file in the project root
     # Create .env file with CICS and IMS connection settings
     environment:
-      - CICS_USER=${CICS_USER}
-      - CICS_PASSWORD=${CICS_PASSWORD}
-      - CICS_HOST=${CICS_HOST}
-      - CICS_PORT=${CICS_PORT}
-      - IMS_USER=${IMS_USER}
-      - IMS_PASSWORD=${IMS_PASSWORD}
-      - IMS_HOST=${IMS_HOST}
-      - IMS_PORT=${IMS_PORT}
-      - IMS_DATASTORE=${IMS_DATASTORE}
+      - CICS_USER
+      - CICS_PASSWORD
+      - CICS_HOST
+      - CICS_PORT
+      - IMS_USER
+      - IMS_PASSWORD
+      - IMS_HOST
+      - IMS_PORT
+      - IMS_DATASTORE
       - HTTP_PORT=9080
       - zosconnect_remote_download_allowlist=BLOCK_ALL
     ports:

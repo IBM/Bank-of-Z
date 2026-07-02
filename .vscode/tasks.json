@@ -24,7 +24,7 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "detail": "Setup Bank of Z on z/OS USS via Zowe CLI (clones branch, runs setup-common.sh remotely)"
+            "detail": "Setup Bank of Z on z/OS USS via Zowe CLI (clones branch, runs setup-remote.sh remotely)"
         },
         {
             "label": "Run Pipeline Simulation",

@@ -44,6 +44,10 @@ cics_region:
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
+        - TCPIP.SEZATCP
+    dds:
+      - name: DFHTABLE
+        dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -65,6 +69,10 @@ cics_region:
     xppt: "NO"
     xuser: "NO"
     xfct: "NO"
+    xtst: "NO"
+    xdct: "NO"
+    tcpip: "YES"
+    pltpi: "SI"
 
   extensions:
     cics_cmci:
@@ -76,3 +84,4 @@ cics_region:
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - "EYUSMSSJ.jvmprofile"
+ 

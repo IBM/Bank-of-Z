@@ -29,6 +29,7 @@ export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
+export FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
 
 # IMS environment variables
 export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
@@ -152,6 +153,69 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
 EOF
 
 # =========================
+# Configure HTTPS for z/OS Connect server
+# =========================
+print_info "${CYAN}[ZOSCONNECT]${NC} Configuring HTTPS..."
+
+# Get z/OS Connect HTTPS port from config
+ZOSCONNECT_HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
+
+# Create security directory
+mkdir -p "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/resources/security"
+
+# Generate self-signed certificate for z/OS Connect HTTPS
+print_info "${CYAN}[ZOSCONNECT]${NC} Generating SSL certificate for z/OS Connect..."
+"${JAVA_HOME}/bin/keytool" -genkeypair \
+    -alias defaultKeyPair \
+    -keyalg RSA \
+    -keysize 2048 \
+    -validity 365 \
+    -storetype PKCS12 \
+    -keystore "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/resources/security/key.p12" \
+    -storepass Liberty \
+    -keypass Liberty \
+    -dname "CN=${APP_BASE_NAME_LOWER}Server, OU=Bank of Z, O=IBM, L=Hursley, ST=Hampshire, C=UK" \
+    -noprompt
+
+if [ $? -eq 0 ]; then
+    print_success "SSL certificate generated for z/OS Connect"
+else
+    print_warning "Failed to generate SSL certificate for z/OS Connect"
+fi
+
+# Configure HTTPS in server.xml
+cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/https.xml" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="HTTPS configuration for z/OS Connect">
+    <featureManager>
+        <feature>ssl-1.0</feature>
+    </featureManager>
+    
+    <!-- SSL/TLS Configuration -->
+    <keyStore id="defaultKeyStore"
+              location="\${server.config.dir}/resources/security/key.p12"
+              type="PKCS12"
+              password="Liberty" />
+    
+    <ssl id="defaultSSLConfig"
+         keyStoreRef="defaultKeyStore"
+         trustDefaultCerts="true"
+         sslProtocol="TLSv1.2" />
+    
+    <sslDefault sslRef="defaultSSLConfig" />
+    
+    <!-- Enable HTTPS port -->
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpsPort="${ZOSCONNECT_HTTPS_PORT}">
+        <tcpOptions soReuseAddr="true" />
+        <httpOptions removeServerHeader="true" />
+    </httpEndpoint>
+</server>
+EOF
+
+print_success "HTTPS configured for z/OS Connect on port ${ZOSCONNECT_HTTPS_PORT}"
+
+# =========================
 # Configure CORS for frontend server
 # =========================
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
@@ -161,9 +225,9 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
         <feature>cors-1.0</feature>
     </featureManager>
     
-    <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
+    <!-- Allow requests from frontend Liberty server -->
     <cors domain="/api"
-          allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
+          allowedOrigins="https://*:${FRONTEND_HTTPS_PORT}"
           allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
           allowedHeaders="*"
           allowCredentials="true"

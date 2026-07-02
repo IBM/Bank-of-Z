@@ -80,13 +80,17 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
         <feature>servlet-6.0</feature>
         <feature>jsp-3.1</feature>
         <feature>transportSecurity-1.0</feature>
+        <feature>ssl-1.0</feature>
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
     <httpEndpoint id="defaultHttpEndpoint"
                   httpPort="${frontend.http.port}"
                   httpsPort="${frontend.https.port}"
-                  host="*" />
+                  host="*">
+        <tcpOptions soReuseAddr="true" />
+        <httpOptions removeServerHeader="true" />
+    </httpEndpoint>
 
     <!-- Application Configuration -->
     <webApplication id="bank-frontend" 
@@ -101,8 +105,18 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
              maxFileSize="20" 
              maxFiles="10" />
 
-    <!-- SSL Configuration (optional - for HTTPS) -->
-    <keyStore id="defaultKeyStore" password="Liberty" />
+    <!-- SSL/TLS Configuration for HTTPS -->
+    <keyStore id="defaultKeyStore"
+              location="${server.config.dir}/resources/security/key.p12"
+              type="PKCS12"
+              password="Liberty" />
+    
+    <ssl id="defaultSSLConfig"
+         keyStoreRef="defaultKeyStore"
+         trustDefaultCerts="true"
+         sslProtocol="TLSv1.2" />
+    
+    <sslDefault sslRef="defaultSSLConfig" />
 
 </server>
 EOF
@@ -180,6 +194,33 @@ print_info "${CYAN}[FRONTEND]${NC} Creating apps directory..."
 mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/apps"
 
 # =========================
+# Configure SSL/TLS for HTTPS
+# =========================
+print_info "${CYAN}[FRONTEND]${NC} Configuring SSL/TLS for HTTPS..."
+mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/resources/security"
+
+# Generate self-signed certificate for HTTPS
+# Note: For production, replace with a proper certificate from a CA
+print_info "${CYAN}[FRONTEND]${NC} Generating self-signed SSL certificate..."
+"${JAVA_HOME}/bin/keytool" -genkeypair \
+    -alias defaultKeyPair \
+    -keyalg RSA \
+    -keysize 2048 \
+    -validity 365 \
+    -storetype PKCS12 \
+    -keystore "${WLP_USER_DIR}/servers/${SERVER_NAME}/resources/security/key.p12" \
+    -storepass Liberty \
+    -keypass Liberty \
+    -dname "CN=${SERVER_NAME}, OU=Bank of Z, O=IBM, L=Hursley, ST=Hampshire, C=UK" \
+    -noprompt
+
+if [ $? -eq 0 ]; then
+    print_success "SSL certificate generated successfully"
+else
+    print_warning "Failed to generate SSL certificate. HTTPS may not work properly."
+fi
+
+# =========================
 # Start the server
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Starting frontend server..."
@@ -197,7 +238,13 @@ print_info "  Started Task: FE${APP_BASE_NAME}"
 print_info "  PROCLIB Member: SYS1.PROCLIB(FE${APP_BASE_NAME})"
 print_info ""
 print_info "To access the frontend:"
-print_info "  http://localhost:${FRONTEND_HTTP_PORT}/"
+print_info "  HTTP:  http://localhost:${FRONTEND_HTTP_PORT}/"
+print_info "  HTTPS: https://localhost:${FRONTEND_HTTPS_PORT}/"
+print_info ""
+print_info "SSL/TLS Configuration:"
+print_info "  Certificate: Self-signed (for development)"
+print_info "  Location: ${WLP_USER_DIR}/servers/${SERVER_NAME}/resources/security/key.p12"
+print_info "  Note: For production, replace with a CA-signed certificate"
 print_info ""
 print_info "To manage the server:"
 print_info "  Start:  S FE${APP_BASE_NAME}"

@@ -156,6 +156,10 @@ fi
 deactivate
 
 
+# =========================
+# Stage 4: Create DEBUG Items
+# =========================
+print_stage "Stage 4: Create DEBUG Items"
 export RIGHT='APPLID of CICS                       X'
 export LEFT='               APPLID=CICS'
 export SPACES=$((8-${#APP_SHORT_NAME} - 1))
@@ -172,10 +176,12 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
 run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
 
+opercmd "S EQARMTD"
+
 # =========================
-# Stage 4: Start CICS region
+# Stage 5: Start CICS region
 # =========================
-print_stage "STAGE 4: Start CICS region"
+print_stage "STAGE 5: Start CICS region"
 
 jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" 
 sleep 10
@@ -184,9 +190,9 @@ sleep 10
 
 
 # ======================================
-# Stage 5: Add CICS region to dtcn.ports
+# Stage 6: Add CICS region to dtcn.ports
 # ======================================
-
+print_stage "Stage 6: Add CICS region to dtcn.ports"
 # =========================
 # Update /etc/debug/dtcn.ports
 # =========================
@@ -212,7 +218,7 @@ else
 fi
 
 # =========================
-# Stage 5: Cleanup
+# Stage 7: Cleanup
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 exit 0

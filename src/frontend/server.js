@@ -73,9 +73,9 @@ const server = http.createServer((req, res) => {
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
-    // Strip /api prefix for local Docker z/OS Connect
-    const urlPath = req.url.startsWith('/api/') ? req.url.substring(4) : req.url;
-    const apiUrl = new URL(`${API_BASE_URL}${urlPath}`);
+    // Strip the /api prefix added by the frontend — the backend serves at the root.
+    const backendPath = req.url.startsWith('/api') ? req.url.slice(4) : req.url;
+    const apiUrl = new URL(`${API_BASE_URL}${backendPath}`);
     console.log(`Proxying API request to: ${apiUrl.href}`);
 
     const options = {

@@ -53,6 +53,10 @@ if [ -d "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
     rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 fi
 
+# Guard against CWWKE0045E: remove the exact target server dir Liberty will check,
+# in case a previous partial run left it behind despite the parent rm above
+rm -rf "${WLP_USER_DIR}/servers/${SERVER_NAME}"
+
 # Create server using WLP_USER_DIR so Liberty writes directly to our target location
 WLP_USER_DIR="$WLP_USER_DIR" "${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}"
 

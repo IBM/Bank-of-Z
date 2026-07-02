@@ -198,19 +198,19 @@ print_stage "Stage 6: Add CICS region to dtcn.ports"
 # =========================
 DTCN_PORTS="/etc/debug/dtcn.ports"
 DTCN_PORTS_TMP="/tmp/dtcn.ports$$"
-
 print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
 
 if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PORTS}"; then
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICSBOZ already present in ${DTCN_PORTS}"
 else
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
+    chtag -tc IBM-1047 "$DTCN_PORTS"
     rm -f /tmp/dtcn.ports*
     cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
     echo "" >> "$DTCN_PORTS_TMP"
     echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
     cp "${DTCN_PORTS_TMP}" "$DTCN_PORTS"
-
+    chtag -r "$DTCN_PORTS"
     opercmd "C EQAPROF"  
     sleep 5
     opercmd "S EQAPROF" 

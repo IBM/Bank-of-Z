@@ -11,5 +11,3 @@ mappings:
         required: true
         nullable: false
         template: "Access to this resource is forbidden"
-
-# Made with Bob

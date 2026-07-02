@@ -36,9 +36,12 @@
             <h1>Create new customer</h1>
         </cds-layer>
 
-        <cds-grid class="cds--content">
-            <cds-column lg="8" md="6" sm="4">
-                <cds-stack gap="7">
+        <div class="cds--content">
+            <cds-stack gap="7">
+                <h2>Customer Information</h2>
+                
+                <div class="form-constrained">
+                    <cds-stack gap="7">
                     <cds-select id="title" label-text="Title">
                         <cds-select-item value="Mr">Mr</cds-select-item>
                         <cds-select-item value="Mrs">Mrs</cds-select-item>
@@ -116,14 +119,10 @@
                     </cds-date-picker>
                     <cds-button id="submit-btn" type="submit" style="width:100%;">Submit</cds-button>
                 </cds-stack>
-            </cds-column>
-            <cds-column lg="8" md="2" sm="0">
-                <img class="page-image"
-                        src="assets/images/ibm-fireside-chat-trans-bus.png" 
-                        alt="customer">
-            </cds-column>
-        </cds-grid>
-    </div>
+                </div>
+            </cds-stack>
+        </div>
+    </cds-layer>
 
     <!-- Carbon Web Components - Component-specific imports -->
     <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>

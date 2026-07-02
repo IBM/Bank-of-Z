@@ -62,14 +62,16 @@ cd "$SCRIPTS_DIR/../zconfig"
 print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking for existing IMS regions..."
 if zconfig ls 2>/dev/null | grep -q "ims://${IMS_DATASTORE}"; then
     print_info "${CYAN}[ZCONFIG-IMS]${NC} Found existing IMS region ims://${IMS_DATASTORE}, removing..."
-    set +e
-    zconfig rm ims://${IMS_DATASTORE} -v
-    sleep 5
-    set -e
-    print_success "Existing IMS region removed"
 else
-    print_info "${CYAN}[ZCONFIG-IMS]${NC} No existing IMS region found, proceeding with creation"
+    print_info "${CYAN}[ZCONFIG-IMS]${NC} No existing IMS region found in zconfig, attempting cleanup anyway..."
 fi
+
+# Always attempt to remove the IMS region to clean up any leftover datasets
+set +e
+zconfig rm ims://${IMS_DATASTORE} -v
+sleep 5
+set -e
+print_success "IMS region cleanup completed"
 
 # =========================
 # Cleanup USS directories
@@ -85,12 +87,12 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
-# Set IMS user to current user instead of ibmuser
-# Ensure ZOS_USER is set (fallback to USER if not set)
-: ${ZOS_USER:=$(printf '%s' "${USER:-${LOGNAME}}" | tr '[:lower:]' '[:upper:]')}
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${ZOS_USER}"
+# Set IMS user to current user
+IMS_USER=$(printf '%s' "${USER:-${LOGNAME}}" | tr '[:lower:]' '[:upper:]')
+IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
-zconfig apply -e ims_user="${ZOS_USER}" ims-region.yaml -v
+zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}" ims-region.yaml -v
 
 RC=$?
 if [ "$RC" -eq 0 ]; then

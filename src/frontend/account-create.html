@@ -38,10 +38,12 @@
             <h1>Create new account</h1>
         </cds-layer>
 
-        <!-- Form Content -->
-        <cds-grid class="cds--content">
-            <cds-column lg="6" md="4" sm="2">
-                <cds-form id=account-form">
+        <div class="cds--content">
+            <cds-stack gap="7">
+                <h2>Account Information</h2>
+                
+                <!-- Form Content -->
+                <cds-form id="account-form" class="form-constrained">
                     <cds-stack gap="7">
                         <cds-form-item>
                             <cds-text-input id="customerNumber" label="Customer Number"
@@ -74,11 +76,8 @@
                         <cds-button id="submit-btn" type="submit">Submit</cds-button>
                     </cds-stack>
                 </cds-form>
-            </cds-column>
-            <cds-column lg="10" md="4" sm="2">
-                <img class="page-image" src="assets/images/ibm-db2-support.png" alt="account">
-            </cds-column>
-        </cds-grid>
+            </cds-stack>
+        </div>
     </cds-layer>
 
     <!-- Carbon Web Components - Component-specific imports -->

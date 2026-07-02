@@ -1,0 +1,29 @@
+---
+version: "1.2"
+mappings:
+- message:
+    mappings:
+    - INPUT-AREA:
+        required: false
+        nullable: false
+        mappings:
+        - TRAN-CODE:
+            required: false
+            nullable: false
+            template: "IBTRAN"
+        - IN-ACCID:
+            required: false
+            nullable: false
+            template: "{{$pathParameters.accountId}}"
+        - IN-AMOUNT:
+            required: false
+            nullable: false
+            template: "{{$body.amount}}"
+        - IN-TRXTYPE:
+            required: false
+            nullable: false
+            template: "D"
+        - IN-CUSTID:
+            required: false
+            nullable: false
+            template: "{{$pathParameters.customerId}}"

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
+    <message id="1">
+        <segment id="1" name="IBTRAN-INPUT" originalName="IBTRAN-INPUT">
+            <field name="INPUT-AREA" originalName="INPUT-AREA" included="Y" path="INPUT-AREA" fileName="IBTRAN.cpy" structureIndex="0" structSrcFileName="INPUT-AREA_request_0.cpy" srcLine="01 INPUT-AREA.">
+                <startPos>1</startPos>
+                <bytes>56</bytes>
+                <maxBytes>56</maxBytes>
+                <applicationDatatype datatype="STRUCT"/>
+                <field name="LL-IN" originalName="LL-IN" included="Y" path="INPUT-AREA.LL-IN" srcLine="05 LL-IN PIC 9(4) USAGE COMP.">
+                    <startPos>1</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="ZZ-IN" originalName="ZZ-IN" included="Y" path="INPUT-AREA.ZZ-IN" srcLine="05 ZZ-IN PIC 9(4) USAGE COMP.">
+                    <startPos>3</startPos>
+                    <bytes>2</bytes>
+                    <maxBytes>2</maxBytes>
+                    <marshaller isNativeInteger="N" alignment="NATURAL"/>
+                    <applicationDatatype datatype="USHORT" precision="4"/>
+                </field>
+                <field name="TRAN-CODE" originalName="TRAN-CODE" included="Y" path="INPUT-AREA.TRAN-CODE" srcLine="05 TRAN-CODE PIC X(8) USAGE DISPLAY.">
+                    <startPos>5</startPos>
+                    <bytes>8</bytes>
+                    <maxBytes>8</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="IN-ACCID" originalName="IN-ACCID" included="Y" path="INPUT-AREA.IN-ACCID" srcLine="05 IN-ACCID PIC X(18) USAGE DISPLAY.">
+                    <startPos>13</startPos>
+                    <bytes>18</bytes>
+                    <maxBytes>18</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="IN-AMOUNT" originalName="IN-AMOUNT" included="Y" path="INPUT-AREA.IN-AMOUNT" srcLine="05 IN-AMOUNT PIC X(16) USAGE DISPLAY.">
+                    <startPos>31</startPos>
+                    <bytes>16</bytes>
+                    <maxBytes>16</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="IN-TRXTYPE" originalName="IN-TRXTYPE" included="Y" path="INPUT-AREA.IN-TRXTYPE" srcLine="05 IN-TRXTYPE PIC X USAGE DISPLAY.">
+                    <startPos>47</startPos>
+                    <bytes>1</bytes>
+                    <maxBytes>1</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="IN-CUSTID" originalName="IN-CUSTID" included="Y" path="INPUT-AREA.IN-CUSTID" srcLine="05 IN-CUSTID PIC X(9) USAGE DISPLAY.">
+                    <startPos>48</startPos>
+                    <bytes>9</bytes>
+                    <maxBytes>9</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+            </field>
+        </segment>
+    </message>
+</ns2:message>

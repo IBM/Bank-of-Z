@@ -120,7 +120,48 @@ try {
     }
     
     log.info("Frontend files copied successfully")
-    
+
+    // Step 2b: Rewrite config.js with absolute API base URL so the browser
+    //          points directly at z/OS Connect (port 9080) rather than the
+    //          frontend Liberty server (port 9081).  Falls back to the
+    //          relative path '/api' if the host/port variables are not set.
+    def apiHost = System.getenv('ZOSCONNECT_HOST') ?: System.getenv('ZOS_HOST') ?: ''
+    if (!apiHost) {
+        // Derive from system hostname at build time (runs on USS)
+        def hostnameProc = [shell, "-c", "hostname"].execute(env, new File(workspace))
+        hostnameProc.waitFor()
+        apiHost = hostnameProc.exitValue() == 0 ? hostnameProc.text.trim() : ''
+    }
+    def apiPort = System.getenv('ZOSCONNECT_PORT') ?: '9080'
+    def apiBaseUrl = apiHost ? "http://${apiHost}:${apiPort}/api" : '/api'
+    log.info("Setting API baseUrl in config.js to: ${apiBaseUrl}")
+
+    def configJsFile = new File("${tempWarDir.absolutePath}/config.js")
+    configJsFile.text = """\
+/*
+ *
+ *    Copyright IBM Corp. 2023
+ *
+ */
+
+/**
+ * Application Configuration
+ */
+export const config = {
+    api: {
+        // Base URL for API endpoints.
+        // Set at WAR build time by VanillaFrontend.groovy.
+        // Points to z/OS Connect on port 9080.
+        baseUrl: '${apiBaseUrl}'
+    },
+    defaults: {
+        sortCode: '987654'
+    }
+};
+
+// Made with Bob
+"""
+
     // Step 3: Remove unnecessary files (package.json, server.js, README, .gitignore, node_modules if any)
     log.info("Step 3: Cleaning up unnecessary files")
     def cleanupFiles = ['package.json', 'server.js', 'README.md', '.gitignore', 'node_modules']

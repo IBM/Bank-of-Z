@@ -151,6 +151,20 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
 </server>
 EOF
 
+# Deploy API WAR file configuration
+# =========================
+# Note: WAR file will be copied by Wazi Deploy after build completes
+# Setup script only creates the configuration file
+# Using 'api' as the ID to match the actual WAR filename (api.war)
+echo "<server><webApplication id=\"api\" location=\"\${server.config.dir}/apps/api.war\" name=\"api\" contextRoot=\"/api\"/></server>" \
+    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/api.xml"
+
+# =========================
+# Deploy Frontend WAR file configuration
+# =========================
+echo "<server><webApplication id=\"bank-frontend-vanilla\" location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\" name=\"bank-frontend-vanilla\" contextRoot=\"/bank-frontend-vanilla\"/></server>" \
+    > "${SANDBOX_DIR}/zosconnect-server/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/bank-frontend-vanilla.xml"
+
 # =========================
 # Configure CORS for frontend server
 # =========================
@@ -160,7 +174,7 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     <featureManager>
         <feature>cors-1.0</feature>
     </featureManager>
-    
+
     <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
     <cors domain="/api"
           allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
@@ -173,7 +187,7 @@ EOF
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \
-   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp\
+   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp \
    ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml
 
 opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &

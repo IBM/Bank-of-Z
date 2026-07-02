@@ -11,5 +11,3 @@ mappings:
         required: true
         nullable: false
         template: "The requested account was not found"
-
-# Made with Bob

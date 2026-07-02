@@ -11,5 +11,3 @@ mappings:
         required: true
         nullable: false
         template: "Authentication credentials are missing or invalid"
-
-# Made with Bob

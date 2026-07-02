@@ -1,0 +1,102 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "message" : {
+      "type" : "object",
+      "properties" : {
+        "OUTPUT-AREA" : {
+          "type" : "object",
+          "properties" : {
+            "LL-OUT" : {
+              "minimum" : 0,
+              "maximum" : 9999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 LL-OUT PIC 9(4) USAGE COMP.",
+                "name" : "LL-OUT"
+              }
+            },
+            "ZZ-OUT" : {
+              "minimum" : 0,
+              "maximum" : 9999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 ZZ-OUT PIC 9(4) USAGE COMP.",
+                "name" : "ZZ-OUT"
+              }
+            },
+            "MSG-OUT" : {
+              "maxLength" : 43,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "05 MSG-OUT PIC X(43) USAGE DISPLAY.",
+                "name" : "MSG-OUT"
+              }
+            },
+            "BAL" : {
+              "type" : "object",
+              "properties" : {
+                "BALANCE-ZONED1" : {
+                  "maxLength" : 16,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "10 BALANCE-ZONED1 PIC Z(13).9(2) USAGE DISPLAY.",
+                    "name" : "BALANCE-ZONED1"
+                  }
+                },
+                "fill_0" : {
+                  "maxLength" : 27,
+                  "type" : "string",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "10 FILLER PIC X(27) USAGE DISPLAY.",
+                    "name" : "fill_0"
+                  }
+                }
+              }
+            },
+            "ACCOUNT-SUMMARY" : {
+              "type" : "array",
+              "maxItems" : 6,
+              "minItems" : 1,
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "BALANCE-AS" : {
+                    "multipleOf" : 0.01,
+                    "minimum" : -9.99999999999999E12,
+                    "maximum" : 9.99999999999999E12,
+                    "type" : "number",
+                    "format" : "decimal",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "10 BALANCE-AS PIC S9(13)V9(2) USAGE COMP-3.",
+                      "name" : "BALANCE-AS"
+                    }
+                  },
+                  "ACCTYPE-AS" : {
+                    "maxLength" : 1,
+                    "type" : "string",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "10 ACCTYPE-AS PIC X USAGE DISPLAY.",
+                      "name" : "ACCTYPE-AS"
+                    }
+                  },
+                  "ACCID-AS" : {
+                    "minimum" : -9223372036854775808,
+                    "maximum" : 9223372036854775807,
+                    "type" : "integer",
+                    "x-ibm-zcon-metadata" : {
+                      "type" : "10 ACCID-AS PIC S9(18) USAGE COMP-5.",
+                      "name" : "ACCID-AS"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "description" : "General wrapper for IMS Transaction message z/OS Asset responses"
+}

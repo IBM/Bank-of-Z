@@ -1,0 +1,8 @@
+---
+version: 1.0
+type: "imsTransaction-1.0"
+description: "IMS account transaction service"
+providerProperties:
+  language: "COBOL"
+  transactionCode: "IBTRAN"
+  connectionRef: "imsConn"

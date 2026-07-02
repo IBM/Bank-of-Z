@@ -171,13 +171,19 @@
              USING  IOPCBA, DBPCB1.
 
        BEGIN.
-
+           DISPLAY '*** IBSCUDAT: PROGRAM STARTED ***'.
            MOVE 0 TO TERM-IO.
            SET ADDRESS OF LTERMPCB TO ADDRESS OF IOPCBA.
+           DISPLAY '*** IBSCUDAT: ENTERING MESSAGE LOOP ***'.
            PERFORM WITH TEST BEFORE UNTIL TERM-IO = 1
+              DISPLAY '*** IBSCUDAT: CALLING GU FOR INPUT MESSAGE ***'
               CALL 'CBLTDLI' USING GU, LTERMPCB, INPUT-AREA
+              DISPLAY '*** IBSCUDAT: GU RETURNED, TPSTAT = ' TPSTAT
               IF TPSTAT  = '  ' OR TPSTAT = MESSAGE-EXIST
               THEN
+                DISPLAY '*** IBSCUDAT: MESSAGE RECEIVED ***'
+                DISPLAY '*** IBSCUDAT: TRAN-CODE = ' TRAN-CODE
+                DISPLAY '*** IBSCUDAT: CUSTID-IN = ' CUSTID-IN
       * RETRIEVE CUSTOMER ACCOUNT INFO
                 PERFORM SET-CUSTOMER-DATA thru SET-CUSTOMER-DATA-END
 
@@ -185,6 +191,7 @@
               ELSE
                 IF TPSTAT = NO-MORE-MESSAGE
                 THEN
+                  DISPLAY '*** IBSCUDAT: NO MORE MESSAGES ***'
                   MOVE 1 TO TERM-IO
                 ELSE
                   DISPLAY 'GU FROM IOPCB FAILED WITH STATUS CODE: '
@@ -192,18 +199,42 @@
                 END-IF
               END-IF
            END-PERFORM.
+           DISPLAY '*** IBSCUDAT: PROGRAM ENDING ***'.
            STOP RUN.
 
       * PROCEDURE SET-CUSTOMER-DATA
        SET-CUSTOMER-DATA.
       *    SET A CUSTOMER'S DATA
+           DISPLAY '*** SET-CUSTOMER-DATA: STARTING ***'.
+           DISPLAY '*** INPUT DATA RECEIVED: ***'.
+           DISPLAY '*** CUSTID-IN = ' CUSTID-IN.
+           DISPLAY '*** FIRSTNAME-IN = ' FIRSTNAME-IN.
+           DISPLAY '*** LASTNAME-IN = ' LASTNAME-IN.
+           DISPLAY '*** ADDRESS-IN = ' ADDRESS-IN.
+           DISPLAY '*** CITY-IN = ' CITY-IN.
+           DISPLAY '*** STATE-IN = ' STATE-IN.
+           DISPLAY '*** ZIPCODE-IN = ' ZIPCODE-IN.
+           DISPLAY '*** PHONE-IN = ' PHONE-IN.
            MOVE ZEROS TO OUTPUT-AREA.
            MOVE CUSTID-IN TO CUSTID.
+           DISPLAY '*** SET-CUSTOMER-DATA: CUSTID = ' CUSTID.
            SET ADDRESS OF DBPCB TO ADDRESS OF DBPCB1.
+           DISPLAY '*** SET-CUSTOMER-DATA: CALLING GHU ***'.
            CALL 'CBLTDLI'
              USING GHU, DBPCB, CUSTOMER-SEG, CUSTOMER-SSA1.
+           DISPLAY '*** SET-CUSTOMER-DATA: GHU RETURNED, DBSTAT = '
+             DBSTAT.
            IF DBSTAT = SPACES
       *      UPDATE THE CUSTOMER'S DATA
+             DISPLAY '*** SET-CUSTOMER-DATA: CUSTOMER FOUND ***'
+             DISPLAY '*** OLD DATA FROM DATABASE: ***'
+             DISPLAY '*** OLD FIRSTNAME-CD = ' FIRSTNAME-CD
+             DISPLAY '*** OLD LASTNAME-CD = ' LASTNAME-CD
+             DISPLAY '*** OLD ADDRESS-CD = ' ADDRESS-CD
+             DISPLAY '*** OLD CITY-CD = ' CITY-CD
+             DISPLAY '*** OLD STATE-CD = ' STATE-CD
+             DISPLAY '*** OLD ZIPCODE-CD = ' ZIPCODE-CD
+             DISPLAY '*** OLD PHONE-CD = ' PHONE-CD
              MOVE FIRSTNAME-IN TO FIRSTNAME-CD
              MOVE LASTNAME-IN TO LASTNAME-CD
              MOVE ADDRESS-IN TO ADDRESS-CD
@@ -211,34 +242,57 @@
              MOVE STATE-IN TO STATE-CD
              MOVE ZIPCODE-IN TO ZIPCODE-CD
              MOVE PHONE-IN TO PHONE-CD
+             DISPLAY '*** NEW DATA TO UPDATE: ***'
+             DISPLAY '*** NEW FIRSTNAME-CD = ' FIRSTNAME-CD
+             DISPLAY '*** NEW LASTNAME-CD = ' LASTNAME-CD
+             DISPLAY '*** NEW ADDRESS-CD = ' ADDRESS-CD
+             DISPLAY '*** NEW CITY-CD = ' CITY-CD
+             DISPLAY '*** NEW STATE-CD = ' STATE-CD
+             DISPLAY '*** NEW ZIPCODE-CD = ' ZIPCODE-CD
+             DISPLAY '*** NEW PHONE-CD = ' PHONE-CD
+             DISPLAY '*** SET-CUSTOMER-DATA: CALLING REPL ***'
              CALL 'CBLTDLI'
                USING REPL, DBPCB, CUSTOMER-SEG
+             DISPLAY '*** SET-CUSTOMER-DATA: REPL RETURNED, DBSTAT = '
+               DBSTAT
              IF DBSTAT = SPACES
+               DISPLAY '*** SET-CUSTOMER-DATA: UPDATE SUCCESSFUL ***'
                MOVE CUSTOMER-IN TO CUSTOMER-OUT
              ELSE
+               DISPLAY '*** SET-CUSTOMER-DATA: UPDATE FAILED ***'
                MOVE DBSTAT TO RF-SC
                MOVE REPLFAILED TO MSG-OUT
              END-IF
            ELSE
              IF DBSTAT = GB OR DBSTAT = GE
+               DISPLAY '*** SET-CUSTOMER-DATA: CUSTOMER NOT FOUND ***'
                MOVE NOCUSTOMER TO MSG-OUT
              ELSE
+               DISPLAY '*** SET-CUSTOMER-DATA: BAD STATUS CODE ***'
                MOVE DBSTAT TO SC
                MOVE BAD-STATUS TO MSG-OUT
              END-IF
            END-IF.
+           DISPLAY '*** SET-CUSTOMER-DATA: ENDING ***'.
        SET-CUSTOMER-DATA-END.
 
       * PROCEDURE INSERT-IO : INSERT FOR IOPCB REQUEST HANDLER
 
        INSERT-IO.
+           DISPLAY '*** INSERT-IO: STARTING ***'.
            COMPUTE LL-OUT = LENGTH OF OUTPUT-AREA.
            MOVE 0 TO ZZ-OUT.
+           DISPLAY '*** INSERT-IO: LL-OUT = ' LL-OUT.
+           DISPLAY '*** INSERT-IO: MSG-OUT = ' MSG-OUT.
+           DISPLAY '*** INSERT-IO: CALLING ISRT ***'.
            CALL 'CBLTDLI' USING ISRT, LTERMPCB, OUTPUT-AREA.
-
+           DISPLAY '*** INSERT-IO: ISRT RETURNED, TPSTAT = ' TPSTAT.
            IF TPSTAT NOT = SPACES
              THEN
              DISPLAY 'INSERT TO IOPCB FAILED WITH STATUS CODE: '
                 TPSTAT
+           ELSE
+             DISPLAY '*** INSERT-IO: OUTPUT SENT SUCCESSFULLY ***'
            END-IF.
+           DISPLAY '*** INSERT-IO: ENDING ***'.
        INSERT-IO-END.

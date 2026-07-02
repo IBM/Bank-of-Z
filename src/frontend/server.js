@@ -73,38 +73,30 @@ const server = http.createServer((req, res) => {
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
-    // Strip /api prefix for local Docker z/OS Connect
-    const urlPath = req.url.startsWith('/api/') ? req.url.substring(4) : req.url;
-    const apiUrl = new URL(`${API_BASE_URL}${urlPath}`);
+    // Keep the URL path as-is — both local Docker and z/OS Liberty serve the API at /api.
+    const apiUrl = new URL(`${API_BASE_URL}${req.url}`);
     console.log(`Proxying API request to: ${apiUrl.href}`);
 
     const options = {
-        hostname: apiUrl.hostname,
-        port: apiUrl.port || 80,
-        path: apiUrl.pathname + apiUrl.search,
         method: req.method,
         headers: {
             'Content-Type': 'application/json',
-            'Host': apiUrl.host,
             ...req.headers
         }
     };
 
-    // Remove host header from original request to avoid conflicts
+    // Remove host header to avoid conflicts
     delete options.headers.host;
 
-    const proxyReq = http.request(options, (proxyRes) => {
+    const proxyReq = http.request(apiUrl, options, (proxyRes) => {
         // Forward status code and headers
         res.writeHead(proxyRes.statusCode, proxyRes.headers);
-
-        // Pipe response back to client
         proxyRes.pipe(res);
     });
 
     proxyReq.on('error', (error) => {
         console.error('Proxy request failed:', error);
-        console.error('Target URL:', apiUrl.href);
-        console.error('Options:', options);
+        console.error('Target URL:', apiUrl);
         res.writeHead(502, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Bad Gateway', message: error.message }));
     });

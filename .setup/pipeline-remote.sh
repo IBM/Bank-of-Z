@@ -29,6 +29,7 @@ stage_execute_pipeline() {
     fi
     print_info "  - Run static scan"
     print_info "  - Run DBB build"
+    print_info "  - Run Unit test"
     print_info "  - Deploy build"
     echo ""
     
@@ -42,7 +43,7 @@ stage_execute_pipeline() {
     set -o pipefail
     
     chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
-    bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+    bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-unittest-and-deploy&
     PID=$!
     # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
     if wait "$PID"; then

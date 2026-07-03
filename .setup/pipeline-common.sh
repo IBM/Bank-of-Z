@@ -72,6 +72,37 @@ stage_build_bank_of_z() {
 }
 
 #########################################################
+# STAGE: Unit Test Bank of Z
+#########################################################
+stage_unit_test_bank_of_z() {
+    print_stage "STAGE: Unit Test Bank of Z"
+    
+    # Verify installation script exists
+    if [ ! -f "$BANK_DIR/.setup/tasks/task-taz-unit-test.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/tasks/task-taz-unit-test.sh"
+        exit 1
+    fi
+    
+    # Run installation script
+    print_info "Running Bank of Z unit test script..."
+    print_info "Executing: bash $BANK_DIR/.setup/tasks/task-taz-unit-test.sh"
+    cd "$BANK_DIR"
+    
+    set -o pipefail
+    chmod +x ${BANK_DIR}/.setup/tasks/task-taz-unit-test.sh
+    bash ${BANK_DIR}/.setup/tasks/task-taz-unit-test.sh&
+    PID=$!
+    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+    if wait "$PID"; then
+        print_success "Bank of Z application unit test completed successfully"
+    else
+        print_error "Failed to unit test Bank of Z"
+        exit 1
+    fi
+}
+
+
+#########################################################
 # STAGE: Deploy Bank of Z
 #########################################################
 stage_deploy_bank_of_z() {
@@ -197,6 +228,19 @@ main_build() {
     print_phase_next_step "build"
 }
 
+main_unit_test() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_unit_test_bank_of_z
+
+    # Summary
+    print_stage "UNIT TEST COMPLETE"
+    print_success "Unit test completed successfully!"
+}
+
 main_deploy() {
     echo ""
     SYS=$(uname -Ia)
@@ -232,6 +276,9 @@ main() {
             shift  # Remove 'build' from parameters
             main_build "$@"
             ;;
+        unit-test)
+            main_unit_test
+            ;;
         deploy)
             main_deploy
             ;;
@@ -246,6 +293,14 @@ main() {
             main_build "$@"
             main_deploy
             ;;
+        scan-build-unittest-and-deploy)
+            shift  # Remove 'scan-build-unittest-and-deploy' from parameters
+            main_static_scan
+            main_build "$@"
+            main_unit_test
+            main_deploy
+            ;;
+
         -h|--help|help|"")
             print_usage
             ;;

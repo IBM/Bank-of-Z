@@ -47,18 +47,19 @@ if [ -d "$WLP_USER_DIR" ]; then
     rm -rf "$WLP_USER_DIR"
 fi
 
-# Also remove any leftover server Liberty may have created under its own usr/ directory
+# Create server directory structure
+mkdir -p "$WLP_USER_DIR/servers"
+
+# Remove any stale server Liberty may have created under its own usr/ directory
+rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
+
+# Create the server using Liberty's server command (creates under LIBERTY_HOME/usr by default)
+"${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+
+# Move server to our WLP_USER_DIR
 if [ -d "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
-    print_warning "Removing stale server under Liberty home: ${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
-    rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
+    mv "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
 fi
-
-# Guard against CWWKE0045E: remove the exact target server dir Liberty will check,
-# in case a previous partial run left it behind despite the parent rm above
-rm -rf "${WLP_USER_DIR}/servers/${SERVER_NAME}"
-
-# Create server using WLP_USER_DIR so Liberty writes directly to our target location
-WLP_USER_DIR="$WLP_USER_DIR" "${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}"
 
 RC=$?
 if [ $RC -eq 0 ]; then

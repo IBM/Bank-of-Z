@@ -47,9 +47,6 @@ if [ -d "$WLP_USER_DIR" ]; then
     rm -rf "$WLP_USER_DIR"
 fi
 
-# Create server directory structure
-mkdir -p "$WLP_USER_DIR/servers"
-
 # Remove any stale server Liberty may have created under its own usr/ directory
 rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 

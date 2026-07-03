@@ -74,12 +74,12 @@ wazideploy:
 
 # TAZ Unit Test configuration
 taz:
-  taz_home: "/usr/local/sandboxes/tools/taz-280/test-cli"
+  taz_home: "/usr/lpp/IBM/idz/usr/lpp/IBM/debug/test-cli"
   test_dir: "{{sandbox.path}}/${REPO_NAME}"
-  proclib: "SYS1.PROCLIB"
   library: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
   hlq: "EQAW"
   steplib: "{{taz.hlq}}.SEQAMOD"
+  proclib: "{{taz.hlq}}.SEQASAMP"
 
 # z/OS Connect (API exposure)
 zosconnect:

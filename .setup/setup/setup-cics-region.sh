@@ -176,7 +176,6 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "cics_hlq=${APP_BASE_NAME}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
 run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
 
-opercmd "S EQARMTD"
 
 # =========================
 # Stage 5: Start CICS region
@@ -204,7 +203,18 @@ if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PO
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICSBOZ already present in ${DTCN_PORTS}"
 else
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
-    chtag -tc IBM-1047 "$DTCN_PORTS"
+    
+  
+    if netstat | grep -q "EQARMTD"
+    then 
+      echo "EQARMTD started";
+    else
+      opercmd "S EQARMTD"
+    fi
+
+   
+
+
     rm -f /tmp/dtcn.ports*
     cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
     echo "" >> "$DTCN_PORTS_TMP"

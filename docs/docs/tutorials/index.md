@@ -16,13 +16,9 @@ By completing these tutorials, learn how to:
 - Use modern IBM Z development workflows and tooling
 - Verify application behavior after deployment
 
-## Tutorial Sequence
-
-Complete the tutorials in the following order:
+## Available Tutorials
 
 | Tutorial | Description |
 |-----------|-------------|
-| [**Make Your First Change**](make-your-first-change.html) | Perform a simple application change and promote it through the development workflow. |
+| [**Deploy Bank of Z**](deploy-bank-of-z.html) | Watch a complete first-time deployment of Bank of Z. |
 | [**CICS Enhancement Scenario**](cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application component. |
-
-Each tutorial focuses on a specific development scenario while demonstrating the tools, processes, and deployment patterns used throughout Bank of Z.

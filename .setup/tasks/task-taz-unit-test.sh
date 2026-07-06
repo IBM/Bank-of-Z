@@ -92,6 +92,8 @@ cd logs/taz
 rm -rf .taz-edt*
 
 print_info "${CYAN}[TAZ-UNITTEST]${NC} Starting unit tests ..."
+print_info "${CYAN}[TAZ-UNITTEST]${NC}   DBRM: ${EQA_DBG_DBRM}"
+print_info "${CYAN}[TAZ-UNITTEST]${NC}   LOAD: ${APP_LIBRARY}"
 
 "${TAZ_CLI}" unittest run "${TAZ_TEST_PATH}" \
   --procLib "${PROCLIB}" \

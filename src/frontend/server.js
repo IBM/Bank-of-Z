@@ -4,7 +4,8 @@
  *
  */
 
-const http = require('http');
+const http  = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
@@ -79,6 +80,7 @@ function proxyApiRequest(req, res) {
 
     const options = {
         method: req.method,
+        rejectUnauthorized: false,
         headers: {
             'Content-Type': 'application/json',
             ...req.headers
@@ -88,7 +90,8 @@ function proxyApiRequest(req, res) {
     // Remove host header to avoid conflicts
     delete options.headers.host;
 
-    const proxyReq = http.request(apiUrl, options, (proxyRes) => {
+    const transport = apiUrl.protocol === 'https:' ? https : http;
+    const proxyReq = transport.request(apiUrl, options, (proxyRes) => {
         // Forward status code and headers
         res.writeHead(proxyRes.statusCode, proxyRes.headers);
         proxyRes.pipe(res);

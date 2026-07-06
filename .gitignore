@@ -21,3 +21,7 @@ tools/
 imsbank_provisioning/
 .setup/jcl/ims/Db2-grant-sysadm.jcl
 docs/_site
+.env
+.gitignore
+scripts/update-frontend-file.sh
+scripts/update-frontend-file-zos.sh

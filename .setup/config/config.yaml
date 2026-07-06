@@ -76,7 +76,8 @@ wazideploy:
 taz:
   taz_home: "/usr/lpp/IBM/idz/usr/lpp/IBM/debug/test-cli"
   test_dir: "{{sandbox.path}}/${REPO_NAME}/taz-unit-test"
-  library: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
+  library: "{{app.base_name}}.{{app.zos_version}}.DBRM"
+  dbrm: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
   hlq: "EQAW"
   steplib: "{{taz.hlq}}.SEQAMOD"
   proclib: "SYS1.PROCLIB"

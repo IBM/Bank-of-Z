@@ -26,7 +26,7 @@ export TAZ_TEST_PATH=${TAZ_TEST_PATH:-$(get_section_value 'taz' 'test_dir')}
 export PROCLIB=${PROCLIB:-$(get_section_value 'taz' 'proclib')}
 export APP_LIBRARY=${APP_LIBRARY:-$(get_section_value 'taz' 'library')}
 export ENGINE_DSN=${ENGINE_DSN:-$(get_section_value 'taz' 'steplib')}
-
+export EQA_DBG_DBRM=${APP_DBRM:-$(get_section_value 'taz' 'dbrm')}
 export STEPLIB="${ENGINE_DSN}"
 export TAZ_CLI="${TAZ_INSTALL_DIR}/bin/taz"
 

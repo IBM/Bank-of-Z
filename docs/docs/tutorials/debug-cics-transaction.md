@@ -6,7 +6,7 @@ title: Debug a CICS Transaction
 
 ## Overview
 
-This tutorial shows how to debug the Bank of Z `INQCUST` COBOL program — the CICS customer inquiry transaction — using IBM Z Open Debug in Visual Studio Code together with the **Debug Profile Service (DPS)**. The Debug Profile Service routes a debug session to your specific VS Code instance without affecting other users of the same CICS region.
+This tutorial shows how to debug the Bank of Z `INQCUST` COBOL program — the CICS customer inquiry transaction — using IBM Z Open Debug in Visual Studio Code together with the **Debug Profile Service (DPS)** and **Remote Debug Service (RDS)**. The Debug Profile Service manages debug profiles to identify a transaction to debug without affecting other transactions running on the same CICS region; the Remote Debug Service routes a debug session to your specific VS Code instance.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ The **Debug Profile Service** holds named profiles. When a CICS transaction runs
 | Component | Role | Port (Bank of Z default) |
 |-----------|------|--------------------------|
 | Debug Profile Service (DPS) | Stores and serves debug profiles | 8192 |
-| Remote Debug Server (RDS) | Protocol bridge between DPS and VS Code DAP | 8194 |
+| Remote Debug Service (RDS) | Protocol bridge between DPS and VS Code DAP (Debug Adapter Protocol) | 8194 |
 | IBM Z Open Debug (VS Code extension) | DAP client; renders source, breakpoints, variables | — |
 
 

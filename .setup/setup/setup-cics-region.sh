@@ -207,14 +207,13 @@ else
   
     if netstat | grep -q "EQARMTD"
     then 
-      echo "EQARMTD started";
+      echo "EQARMTD is started";
     else
+      echo "Starting Remote Debug Service (EQARMTD)"
       opercmd "S EQARMTD"
     fi
 
-   
-
-
+    chtag -tc IBM-1047 "$DTCN_PORTS"
     rm -f /tmp/dtcn.ports*
     cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
     echo "" >> "$DTCN_PORTS_TMP"

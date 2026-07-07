@@ -24,5 +24,6 @@ Complete the tutorials in the following order:
 |-----------|-------------|
 | [**Make Your First Change**](make-your-first-change.html) | Perform a simple application change and promote it through the development workflow. |
 | [**CICS Enhancement Scenario**](cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application component. |
+| [**CICS Debugging Scenario**](debug-cics-transaction.html) | Debug a CICS transaction in VS Code IDE. |
 
 Each tutorial focuses on a specific development scenario while demonstrating the tools, processes, and deployment patterns used throughout Bank of Z.

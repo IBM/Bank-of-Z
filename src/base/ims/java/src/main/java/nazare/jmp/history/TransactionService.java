@@ -2,8 +2,6 @@
  *                                                                *
  * LICENSED MATERIALS - PROPERTY OF IBM                           *
  *                                                                *
- * "Object Code Only (OCO)"                                       *
- *                                                                *
  * (C) COPYRIGHT IBM CORP. 2026 ALL RIGHTS RESERVED               *
  *                                                                *
  * US GOVERNMENT USERS RESTRICTED RIGHTS - USE, DUPLICATION,      *

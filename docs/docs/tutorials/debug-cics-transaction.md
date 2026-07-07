@@ -61,7 +61,7 @@ zowe config secure
 
 Enter your TSO user ID and password when prompted.
 
-**Step 2.3:** Verify that the debug profile resolves correctly:
+**Step 1.3:** Verify that the debug profile resolves correctly:
 
 ```bash
 zowe config list --root
@@ -98,7 +98,7 @@ The DPS profile tells CICS which programs to intercept and for whom. You can cre
 
 **Step 3.1:** In the VS Code Activity Bar, open the **Zowe Explorer** panel
 
-**Step 3.2:** Expand the **Debug Profiles** tree node. Right-click on **CICS** and select **Create**.
+**Step 3.2:** In the **Z/OS DEBUGGER PROFILES** section expand the **Debug Profiles** tree node. Right-click on **CICS** and select **Create**.
 
 **Step 3.3:** Fill in the profile details:
 
@@ -111,7 +111,7 @@ The DPS profile tells CICS which programs to intercept and for whom. You can cre
 
 Select **Save**. The profile is registered with the DPS on z/OS.
 
-**Step 3.4:** Activate the profile by right-clicking it and selecting **Activate for Debug**. The icon turns green when active.
+**Step 3.4:** Activate the profile by right-clicking it and selecting **Activate for Debug**. The icon of a bug with a green dot appears at the profile when active.
 
 With the profile active, any invocation of `INQCUST` under `CICSUSER` (the ID used by zOS Connect) user ID is intercepted by CICS and parked until VS Code attaches.
 

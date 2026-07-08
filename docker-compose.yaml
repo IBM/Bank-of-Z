@@ -33,7 +33,7 @@ services:
     command: node server.js
     environment:
       - PORT=3001
-      - API_BASE_URL=https://9.114.13.95:9443
+      - API_BASE_URL=http://9.114.13.95:9080
     ports:
       - "3001:3001"
     volumes:

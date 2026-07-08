@@ -44,7 +44,7 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" ]]; then
 
 # Global
 _BPXK_AUTOCVT=ON
-export PYTHONUNBUFFERED=1
+PYTHONUNBUFFERED=1
 ZOS_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 
  # Application
@@ -80,7 +80,6 @@ DBB_CWD=$(get_section_value 'dbb' 'dbb_cwd')
 DBB_APP_CONF=$(get_section_value 'dbb' 'dbb_app_conf')
 DBB_LOG_FOLDER=$(get_section_value 'dbb' 'dbb_log_dir')
 JAVA_HOME=$(get_section_value 'dbb' 'java_home')
-API_BASE=$(get_section_value 'dbb' 'api_base')
 DBB_BUILD_PATH=$(get_section_value 'dbb' 'dbb_build')
 DBB_LOG_FOLDER="${DBB_LOG_FOLDER:-$(get_section_value 'dbb' 'dbb_log_dir')}"
 
@@ -137,7 +136,7 @@ ZCS_HOME=$(get_section_value 'zconfig' 'zcb_home')
 ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
 
 # Debug
-export DEBUG_HLQ=$(get_section_value 'debug' 'hlq')
+DEBUG_HLQ=$(get_section_value 'debug' 'hlq')
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

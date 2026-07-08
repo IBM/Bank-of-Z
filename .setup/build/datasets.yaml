@@ -110,9 +110,9 @@ variables:
   - name: CSSLIB
     value: SYS1.CSSLIB
 
-  # Optional TAz library containing necessary copybooks. 
+  # Optional Debug library containing necessary copybooks. 
   - name: SEQASAMP
-    value: EQA.V16R0M0.SEQASAMP
+    value: EQAW.SEQASAMP
 
   # IBM ADFz Common Components
   - name: SIPVMODA

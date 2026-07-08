@@ -58,6 +58,7 @@ stage_stop_tasks() {
     # ===========================
     sleep 5
     drm "${APP_BASE_NAME}.${APP_ZOS_VERSION}.*" 2>/dev/null
+    drm "${APP_BASE_NAME}.*" 2>/dev/null
     set -e
 }
 

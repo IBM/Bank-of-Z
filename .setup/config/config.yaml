@@ -46,9 +46,6 @@ dbb:
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
   dbb_log_dir: "{{sandbox.path}}/logs/dbb"
 
-# API build output directory
-api_base: "{{sandbox.path}}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build"
-
 # zBuilder framework configuration
 zbuilder:
   source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"

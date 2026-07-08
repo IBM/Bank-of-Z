@@ -104,34 +104,33 @@ SCAN_MAX_RC=${SCAN_MAX_RC:-$(get_section_value 'zcodescan' 'max_rc')}
 # z/OS connect
 ZOSCONNECT_HOME=$(get_section_value 'zosconnect' 'zosconnect_home')
 ZOSCONNECT_HTTP_PORT=$(get_section_value 'zosconnect' 'http_port')
-ZOS_CONNECT_SERVER_FOLDER="${ZOS_CONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
+ZOSCONNECT_SERVER_FOLDER="${ZOSCONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
 
 # CICS
 CICS_USER=${CICS_USER:-$(get_section_value 'cics' 'user')}
 CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')} #pragma: allowlist secret
 CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
-CMCI_PORT=${CMCI_PORT:-$(get_section_value 'cics' 'cmci_port')}
-IPIC_PORT=${IPIC_PORT:-$(get_section_value 'cics' 'ipic_port')}
-DEBUG_PORT=${DEBUG_PORT:-$(get_section_value 'cics' 'debug_port')}
+CICS_CMCI_PORT=${CICS_CMCI_PORT:-$(get_section_value 'cics' 'cmci_port')}
+CICS_DEBUG_PORT=${CICS_DEBUG_PORT:-$(get_section_value 'cics' 'debug_port')}
 
 # IMS
-APP_IMS_HLQ=${APP_IMS_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
+IMS_APP_HLQ=${IMS_APP_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
 IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
 IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
 IMS_USER=${IMS_USER:-$(get_section_value 'ims' 'user')}
 IMS_PASSWORD=${IMS_PASSWORD:-$(get_section_value 'ims' 'password')} #pragma: allowlist secret
 IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
-JAVA_CONF_PATH=${JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
-DFS_IMS_SSID=${DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
+IMS_JAVA_CONF_PATH=${IMS_JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
+IMS_DFS_IMS_SSID=${IMS_DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
 
 # Fronted
 FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
-LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
+FRONTEND_LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
 FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
 
 # ZConfig
-ZCS_HOME=$(get_section_value 'zconfig' 'zcb_home')
+ZCONFIG_ZCB_HOME=$(get_section_value 'zconfig' 'zcb_home')
 ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
 
 # Debug

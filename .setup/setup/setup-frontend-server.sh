@@ -40,14 +40,14 @@ if [ -d "$WLP_USER_DIR" ]; then
 fi
 
 # Remove any stale server Liberty may have created under its own usr/ directory
-rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
+rm -rf "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 
-# Create the server using Liberty's server command (creates under LIBERTY_HOME/usr by default)
-"${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+# Create the server using Liberty's server command (creates under FRONTEND_LIBERTY_HOME/usr by default)
+"${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
 
 # Move server to our WLP_USER_DIR
-if [ -d "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
-    mv "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
+if [ -d "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
+    mv "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
 fi
 
 RC=$?
@@ -137,7 +137,7 @@ cat > "/tmp/FE${APP_BASE_NAME}.jcl" << EOF
 //* WebSphere Liberty - Frontend Server
 //* Bank of Z Frontend Application Server
 //*
-// SET LIBHOME='${LIBERTY_HOME}'
+// SET LIBHOME='${FRONTEND_LIBERTY_HOME}'
 //*
 //FEBANKZ     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=2G,
 //    TIME=NOLIMIT,

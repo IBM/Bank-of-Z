@@ -71,7 +71,7 @@ resolve_path() {
 #   #APP_BASE_NAME
 #   #APP_SHORT_NAME
 #   #APP_ZOS_VERSION
-#   #IPIC_PORT
+#   #CICS_IPIC_PORT
 #
 # Usage:
 #   submit_jcl myjob.jcl
@@ -87,7 +87,7 @@ submit_jcl() {
         | sed "s/#APP_BASE_NAME/${APP_BASE_NAME:-}/g" \
         | sed "s/#APP_SHORT_NAME/${APP_SHORT_NAME:-}/g" \
         | sed "s/#APP_ZOS_VERSION/${APP_ZOS_VERSION:-}/g" \
-        | sed "s/#IPIC_PORT/${IPIC_PORT:-}/g" \
+        | sed "s/#CICS_IPIC_PORT/${CICS_IPIC_PORT:-}/g" \
         > "$tmp_jcl"
 
     # Submit JCL asynchronously

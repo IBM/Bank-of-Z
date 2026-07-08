@@ -22,7 +22,7 @@ exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-CICS]${NC} $lin
 # Environment
 # =========================
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")
-export ZCS_HOME=$(echo "$ZCS_HOME" | sed "s|~|$HOME|g")
+export ZCONFIG_ZCB_HOME=$(echo "$ZCONFIG_ZCB_HOME" | sed "s|~|$HOME|g")
 
 
 export PATH="$ZOAU_HOME/bin:$PATH"
@@ -94,18 +94,18 @@ resourceOverrides:
         name: ZOSEE
         group: BANKZGRP
       overrides:
-        portnumber: $IPIC_PORT
+        portnumber: $CICS_IPIC_PORT
     - selector:
         name: EQADTCN
         group: EQA
       overrides:
-        portnumber: $DEBUG_PORT
+        portnumber: $CICS_DEBUG_PORT
   - ipconn:
     - selector:
         name: ZOSCONN
         group: BANKZGRP
       overrides:
-        port: $IPIC_PORT
+        port: $CICS_IPIC_PORT
 EOF
 
 print_success "Overrides file created successfully!"
@@ -115,7 +115,7 @@ print_success "Overrides file created successfully!"
 # =========================
 print_stage "STAGE 3: Create CICS instance with zconfig"
 
-export PATH="$ZCS_HOME/bin:$PATH"
+export PATH="$ZCONFIG_ZCB_HOME/bin:$PATH"
 
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
     source "$ZCONFIG_HOME/bin/activate"
@@ -132,7 +132,7 @@ zconfig apply \
   -e region_hlq="${APP_BASE_NAME}" \
   -e region_uss_dir="$SANDBOX_DIR" \
   -e java_home="/usr/lpp/java/java21/current_64" \
-  -e cmci_port="$CMCI_PORT" \
+  -e cmci_port="$CICS_CMCI_PORT" \
   -e debug_hlq="$DEBUG_HLQ" \
   cics-region.yaml
 

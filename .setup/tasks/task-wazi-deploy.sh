@@ -173,7 +173,7 @@ CMD="wazideploy-deploy \
  -e application=$APP_BASE_NAME \
  -e hlq=$TARGET_HLQ \
  -e deploy_cfg_home=$ZDEPLOY_FOLDER \
- -e zos_connect_root=$ZOS_CONNECT_SERVER_FOLDER \
+ -e zos_connect_root=$ZOSCONNECT_SERVER_FOLDER \
  -e sandbox_path=$SANDBOX_DIR \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \

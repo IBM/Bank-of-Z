@@ -27,10 +27,10 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 for file in ${SANDBOX_DIR}/${REPO_NAME}/src/base/ims/LoadData/*.data; do
     name=$(basename $file .data)
     set +e
-    drm ${APP_IMS_HLQ}.${name}.INPUT 2>/dev/null
+    drm ${IMS_APP_HLQ}.${name}.INPUT 2>/dev/null
     set -e
-    dtouch -tbasic -s24000 -rfb -l200 ${APP_IMS_HLQ}.${name}.INPUT
-    cp "$file" "//'${APP_IMS_HLQ}.${name}.INPUT'"
+    dtouch -tbasic -s24000 -rfb -l200 ${IMS_APP_HLQ}.${name}.INPUT
+    cp "$file" "//'${IMS_APP_HLQ}.${name}.INPUT'"
 done
 
 # LOAD

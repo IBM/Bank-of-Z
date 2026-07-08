@@ -28,9 +28,9 @@ stage_stop_tasks() {
     # =========================
     # Stop IBM IMS regions
     # =========================
-    jsub "${APP_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-    jsub "${APP_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-    jsub "${APP_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
     sleep 5
     jcan P "IMS2JMP1" 2>/dev/null
     jcan P "IMS2MPP1" 2>/dev/null

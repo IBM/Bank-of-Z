@@ -70,7 +70,7 @@ resolve_path() {
 # Supported placeholders:
 #   #APP_BASE_NAME
 #   #APP_SHORT_NAME
-#   #APP_VERSION
+#   #APP_ZOS_VERSION
 #   #IPIC_PORT
 #
 # Usage:
@@ -86,7 +86,7 @@ submit_jcl() {
     cat "$jcl_file" \
         | sed "s/#APP_BASE_NAME/${APP_BASE_NAME:-}/g" \
         | sed "s/#APP_SHORT_NAME/${APP_SHORT_NAME:-}/g" \
-        | sed "s/#APP_VERSION/${APP_VERSION:-}/g" \
+        | sed "s/#APP_ZOS_VERSION/${APP_ZOS_VERSION:-}/g" \
         | sed "s/#IPIC_PORT/${IPIC_PORT:-}/g" \
         > "$tmp_jcl"
 

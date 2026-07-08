@@ -21,14 +21,7 @@ exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-IMS]${NC} $line
 # =========================
 # Environment
 # =========================
-export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
-export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")
-export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
-export BOZ_IMS_HLQ=${BOZ_IMS_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
-
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -36,9 +29,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # Stop IBM BOZ regions
 # =========================
 set +e
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+jsub "${APP_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+jsub "${APP_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+jsub "${APP_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
 sleep 5
 jcan P "IMS2JMP1" 2>/dev/null
 jcan P "IMS2MPP1" 2>/dev/null

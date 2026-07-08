@@ -22,14 +22,6 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-export LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
-export LIBERTY_HOME=$(echo "$LIBERTY_HOME" | sed "s|~|$HOME|g")
-export JAVA_HOME=$(get_section_value 'java' 'java_home')
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
-export FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
-export ZOSCONNECT_HTTP_PORT=$(get_section_value 'zosconnect' 'http_port')
-
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 

@@ -20,7 +20,12 @@ python:
 app:
   base_name: "BANKZ"
   short_name: "BOZ"
-  zos_version: "V0R1M0"
+  version: "0"
+  release: "1"
+  modification: "0"
+  zos_version: "V{{app.version}}R{{app.release}}M{{app.modification}}"
+  full_version: "{{app.version}}.{{app.release}}.{{app.modification}}"
+  description: "Bank of Z a modern IBM Z development, build, deployment, and modernization practices"
 
 # Sandbox root directory (USS)
 sandbox:
@@ -72,14 +77,9 @@ wazideploy:
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
   deploy_log_dir: "{{sandbox.path}}/logs/deploy"
 
-# TAZ Unit Test configuration
-taz:
-  taz_home: "/usr/local/sandboxes/tools/taz-280/test-cli"
-  test_dir: "{{sandbox.path}}/${REPO_NAME}"
-  proclib: "SYS1.PROCLIB"
-  library: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
+# Debug
+debug:
   hlq: "EQAW"
-  steplib: "{{taz.hlq}}.SEQAMOD"
 
 # z/OS Connect (API exposure)
 zosconnect:

@@ -83,13 +83,13 @@ DBB_BUILD_PATH=$(get_section_value 'dbb' 'dbb_build')
 DBB_LOG_FOLDER="${DBB_LOG_FOLDER:-$(get_section_value 'dbb' 'dbb_log_dir')}"
 
 # Wazi Deploy
-WAZIDEPLOY_HOME="${WAZIDEPLOY_HOME:-$(get_section_value 'wazideploy' 'wazideploy_home')}"
+DEPLOY_WAZIDEPLOY_HOME="${DEPLOY_WAZIDEPLOY_HOME:-$(get_section_value 'wazideploy' 'wazideploy_home')}"
 DEPLOY_PYENV_ACTIVATE_PATH="${DEPLOY_PYENV_ACTIVATE_PATH:-$(get_section_value 'wazideploy' 'wazideploy_home')/bin/activate}"
-DEPLOYMENT_METHOD="${DEPLOYMENT_METHOD:-$(get_section_value 'wazideploy' 'deployment_method')}"
+DEPLOY_DEPLOYMENT_METHOD="${DEPLOY_DEPLOYMENT_METHOD:-$(get_section_value 'wazideploy' 'deployment_method')}"
 DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-$(get_section_value 'wazideploy' 'deployment_envfile')}"
-ZDEPLOY_FOLDER="${ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_dir')}"
+DEPLOY_ZDEPLOY_FOLDER="${DEPLOY_ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_dir')}"
 DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 'deploy_log_dir')}"
-TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
+DEPLOY_TYPES_MAPPING_FILES="${DEPLOY_TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
 
 # ZCodeScan
 SCAN_PYENV_ACTIVATE_PATH=${PYENV_ACTIVATE_PATH:-$(get_section_value 'zcodescan' 'zcodescan_home')/bin/activate}

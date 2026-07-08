@@ -198,11 +198,11 @@ print_info "${CYAN}[VALIDATE]${NC} ========================================="
 
 WAZIDEPLOY_MIN_VERSION="3.0.7.3"
 
-if [ -f "$WAZIDEPLOY_HOME/bin/activate" ]; then
-    print_info "${CYAN}[VALIDATE]${NC} Found Wazi Deploy activation script: $WAZIDEPLOY_HOME/bin/activate"
+if [ -f "$DEPLOY_WAZIDEPLOY_HOME/bin/activate" ]; then
+    print_info "${CYAN}[VALIDATE]${NC} Found Wazi Deploy activation script: $DEPLOY_WAZIDEPLOY_HOME/bin/activate"
     
     # Test wazideploy-deploy version
-    WAZIDEPLOY_OUTPUT=$(bash -c "source '$WAZIDEPLOY_HOME/bin/activate' && wazideploy-deploy --version 2>&1" || true)
+    WAZIDEPLOY_OUTPUT=$(bash -c "source '$DEPLOY_WAZIDEPLOY_HOME/bin/activate' && wazideploy-deploy --version 2>&1" || true)
     
     print_info "${CYAN}[VALIDATE]${NC} Wazi Deploy Output:"
     if [ -n "$WAZIDEPLOY_OUTPUT" ]; then
@@ -231,7 +231,7 @@ if [ -f "$WAZIDEPLOY_HOME/bin/activate" ]; then
     fi
 else
     print_error "${RED}[VALIDATE]${NC} Wazi Deploy activation script not found"
-    print_error "${RED}[VALIDATE]${NC} Expected location: $WAZIDEPLOY_HOME/bin/activate"
+    print_error "${RED}[VALIDATE]${NC} Expected location: $DEPLOY_WAZIDEPLOY_HOME/bin/activate"
     VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
 fi
 

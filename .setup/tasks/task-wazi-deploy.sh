@@ -96,8 +96,8 @@ if [[ "$PACKAGE_URL" != /* ]]; then
 fi
 
 # Copy types_pattern_mapping.yml for BankZ artifact deployment
-if [ -f "$TYPES_MAPPING_FILES" ]; then
-    TARGET_TYPES_DIR="$ZDEPLOY_FOLDER/deployment-configuration/global"
+if [ -f "$DEPLOY_TYPES_MAPPING_FILES" ]; then
+    TARGET_TYPES_DIR="$DEPLOY_ZDEPLOY_FOLDER/deployment-configuration/global"
     
     # Create target directory if it doesn't exist
     if [ ! -d "$TARGET_TYPES_DIR" ]; then
@@ -107,14 +107,14 @@ if [ -f "$TYPES_MAPPING_FILES" ]; then
     
     # Copy the types mapping file
     if [ -d "$TARGET_TYPES_DIR" ]; then
-        cp "$TYPES_MAPPING_FILES" "$TARGET_TYPES_DIR/types_pattern_mapping.yml"
+        cp "$DEPLOY_TYPES_MAPPING_FILES" "$TARGET_TYPES_DIR/types_pattern_mapping.yml"
         print_info "${CYAN}[WAZIDEPLOY]${NC} Copied types_pattern_mapping.yml to $TARGET_TYPES_DIR"
     else
         print_error "${CYAN}[WAZIDEPLOY]${NC} Failed to create target directory: $TARGET_TYPES_DIR"
         print_error "${CYAN}[WAZIDEPLOY]${NC} BankZ artifact deployment may fail"
     fi
 else
-    print_warning "${CYAN}[WAZIDEPLOY]${NC} types_pattern_mapping.yml not found at: $TYPES_MAPPING_FILES"
+    print_warning "${CYAN}[WAZIDEPLOY]${NC} types_pattern_mapping.yml not found at: $DEPLOY_TYPES_MAPPING_FILES"
     print_warning "${CYAN}[WAZIDEPLOY]${NC} BankZ artifact deployment may use default mappings"
 fi
 
@@ -132,7 +132,7 @@ print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate for BankZ"
 CMD="wazideploy-generate \
  --deploymentPlanName $APP_BASE_NAME \
  --deploymentPlanVersion $APP_FULL_VERSION \
- --deploymentMethod $DEPLOYMENT_METHOD \
+ --deploymentMethod $DEPLOY_DEPLOYMENT_METHOD \
  --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
  --deploymentPlanReport $outputDir/deploymentPlanReport-bankz.html \
  --packageInputFile $PACKAGE_URL"
@@ -172,7 +172,7 @@ CMD="wazideploy-deploy \
  -e script_dir=$SCRIPTS_DIR \
  -e application=$APP_BASE_NAME \
  -e hlq=$TARGET_HLQ \
- -e deploy_cfg_home=$ZDEPLOY_FOLDER \
+ -e deploy_cfg_home=$DEPLOY_ZDEPLOY_FOLDER \
  -e zos_connect_root=$ZOSCONNECT_SERVER_FOLDER \
  -e sandbox_path=$SANDBOX_DIR \
  $CICS_CREDS \

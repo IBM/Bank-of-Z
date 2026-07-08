@@ -11,7 +11,6 @@ const path = require('path');
 
 const PORT         = process.env.PORT || 3001;
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9080';
-const KEYRING      = process.env.KEYRING; // e.g. safkeyring://IBMUSER/BOZRING
 
 // MIME types for different file extensions
 const mimeTypes = {
@@ -109,12 +108,15 @@ function proxyApiRequest(req, res) {
     req.pipe(proxyReq);
 }
 
-// Start server — HTTPS if KEYRING is set, HTTP otherwise
+// Start server — HTTPS if SSL_CERT and SSL_KEY env vars are set, HTTP otherwise
 let server;
-if (KEYRING) {
+const SSL_CERT = process.env.SSL_CERT; // path to PEM cert file
+const SSL_KEY  = process.env.SSL_KEY;  // path to PEM key file
+
+if (SSL_CERT && SSL_KEY) {
     const tlsOptions = {
-        pfx: KEYRING,
-        passphrase: 'password'
+        cert: fs.readFileSync(SSL_CERT),
+        key:  fs.readFileSync(SSL_KEY)
     };
     server = https.createServer(tlsOptions, requestHandler);
     console.log(`Server will run at https://0.0.0.0:${PORT}/`);

@@ -76,4 +76,36 @@ then
   rc=$?
   tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH"
 fi
+
+# Export cert and key to PEM files on USS for Node.js to read
+if test $rc -eq 0
+then
+  outdir="/u/$userid/boz-certs"
+  mkdir -p "$outdir"
+
+  # Export the signed server cert as PEM
+  tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
+   DSN('$userid.BOZ.CERT') FORMAT(CERTB64)"
+  # Convert EBCDIC dataset to ASCII PEM file
+  cp "//'${userid}.BOZ.CERT'" "$outdir/server.crt"
+  iconv -f IBM-1047 -t ISO8859-1 "$outdir/server.crt" > "$outdir/server.crt.pem"
+  mv "$outdir/server.crt.pem" "$outdir/server.crt"
+
+  # Export the private key as PEM
+  tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
+   DSN('$userid.BOZ.KEY') FORMAT(PKCS12DER) PASSWORD('password')"
+  # Convert PKCS12 to PEM key using openssl if available
+  if command -v openssl >/dev/null 2>&1; then
+    openssl pkcs12 -in "//'${userid}.BOZ.KEY'" -nocerts -nodes \
+      -passin pass:password -out "$outdir/server.key" 2>/dev/null
+  else
+    cp "//'${userid}.BOZ.KEY'" "$outdir/server.key"
+  fi
+
+  chmod 600 "$outdir/server.key"
+  echo "Cert and key exported to $outdir"
+  echo "Start Node server with:"
+  echo "  SSL_CERT=$outdir/server.crt SSL_KEY=$outdir/server.key node server.js"
+fi
+
 exit $rc

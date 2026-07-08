@@ -9,8 +9,9 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3001;
+const PORT         = process.env.PORT || 3001;
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9080';
+const KEYRING      = process.env.KEYRING; // e.g. safkeyring://IBMUSER/BOZRING
 
 // MIME types for different file extensions
 const mimeTypes = {
@@ -31,7 +32,7 @@ const mimeTypes = {
     '.otf': 'font/otf'
 };
 
-const server = http.createServer((req, res) => {
+const requestHandler = (req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 
     // Check if this is an API request (IMS, customers, accounts endpoints)
@@ -70,7 +71,7 @@ const server = http.createServer((req, res) => {
             res.end(content, 'utf-8');
         }
     });
-});
+};
 
 // Proxy API requests to backend
 function proxyApiRequest(req, res) {
@@ -108,11 +109,25 @@ function proxyApiRequest(req, res) {
     req.pipe(proxyReq);
 }
 
+// Start server — HTTPS if KEYRING is set, HTTP otherwise
+let server;
+if (KEYRING) {
+    const tlsOptions = {
+        pfx: KEYRING,
+        passphrase: 'password'
+    };
+    server = https.createServer(tlsOptions, requestHandler);
+    console.log(`Server will run at https://0.0.0.0:${PORT}/`);
+} else {
+    server = http.createServer(requestHandler);
+    console.log(`Server will run at http://localhost:${PORT}/`);
+}
+
 server.listen(PORT, () => {
     console.log('='.repeat(60));
     console.log('Bank of Z Sample Application - Vanilla JavaScript Frontend');
     console.log('='.repeat(60));
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Server running on port ${PORT}`);
     console.log(`Press Ctrl+C to stop the server`);
     console.log('='.repeat(60));
 });

@@ -35,12 +35,10 @@ sandbox:
 zconfig:
   zconfig_home: "/usr/local/sandboxes/tools/zconfig"
   zcb_home: "/usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6"
-  java_home: "{{java.java_home}}"
 
 # DBB (Dependency Based Build)
 dbb:
   dbb_home: "/usr/local/sandboxes/tools/dbb"
-  java_home: "{{java.java_home}}"
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
@@ -50,12 +48,10 @@ dbb:
 zbuilder:
   source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   target_dir: "{{sandbox.path}}/zBuilder"
-  java_home: "{{java.java_home}}"
 
 # ZCodeScan (static analysis)
 zcodescan:
   zcodescan_home: "/global/opt/pyenv/akf"
-  java_home: "{{java.java_home}}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
   output_dir: "{{sandbox.path}}/zcodescan"

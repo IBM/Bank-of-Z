@@ -16,7 +16,7 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
-exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-INSTALL]${NC} $line"; done) 2>&1
+exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-CICS]${NC} $line"; done) 2>&1
 
 # =========================
 # Environment
@@ -177,7 +177,7 @@ print_stage "STAGE 5: Start CICS region"
 
 jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" 
 sleep 10
-print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICS Region Job Started"
+print_info "${CYAN}[ZCONFIG-CICS]${NC} CICS Region Job Started"
 sleep 10
 
 
@@ -190,12 +190,12 @@ print_stage "Stage 6: Add CICS region to dtcn.ports"
 # =========================
 DTCN_PORTS="/etc/debug/dtcn.ports"
 DTCN_PORTS_TMP="/tmp/dtcn.ports$$"
-print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
+print_info "${CYAN}[ZCONFIG-CICS]${NC} Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
 
 if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PORTS}"; then
-    print_info "${CYAN}[ZCONFIG-INSTALL]${NC} CICSBOZ already present in ${DTCN_PORTS}"
+    print_info "${CYAN}[ZCONFIG-CICS]${NC} CICSBOZ already present in ${DTCN_PORTS}"
 else
-    print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
+    print_info "${CYAN}[ZCONFIG-CICS]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
     chtag -tc IBM-1047 "$DTCN_PORTS"
     rm -f /tmp/dtcn.ports*
     cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"

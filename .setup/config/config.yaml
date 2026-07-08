@@ -63,7 +63,6 @@ zcodescan:
 # Wazi Deploy (deployment automation)
 wazideploy:
   wazideploy_home: "/global/opt/pyenv/gdp"
-  deployment_method_cics: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml"
   deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"

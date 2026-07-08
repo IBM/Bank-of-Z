@@ -1,0 +1,53 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - customerId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\".\"\
+          CUSTID-OUT\"}}"
+    - firstName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\".\"\
+          FIRSTNAME-OUT\"}}"
+    - lastName:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\".\"\
+          LASTNAME-OUT\"}}"
+    - phoneNumber:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\".\"\
+          PHONE-OUT\"}}"
+    - address:
+        required: false
+        nullable: false
+        mappings:
+        - addressLine1:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\"\
+              .\"ADDRESS-OUT\"}}"
+        - addressLine2:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\"\
+              .\"STATE-OUT\"}}"
+        - city:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\"\
+              .\"CITY-OUT\"}}"
+        - postalCode:
+            required: false
+            nullable: false
+            template: "{{$zosAssetResponse.message.\"OUTPUT-AREA\".\"CUSTOMER-OUT\"\
+              .\"ZIPCODE-OUT\"}}"
+        - country:
+            required: false
+            nullable: false
+            template: "USA"

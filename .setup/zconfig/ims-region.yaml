@@ -3,8 +3,6 @@
 vars:
   imsid: IMS2
   ims_hlq: BANKZ.IMS2
-  ims_user: ibmuser
-  ims_password: SYS1SYS1
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: IMSV15
@@ -12,7 +10,7 @@ ims:
   db2_hlq: DB2V13
   ims_type: DB/DC
   ims_unit: SYSALLDA
-  ims_target_user: "{{ vars.ims_user }}"
+  ims_target_user: "{{ vars.ims_user_lower }}"
   ims_lgmsg:
     primary_space: 84
     secondary_space: 63
@@ -498,18 +496,8 @@ ims:
     - member_name: DFSJVMMS
       config:
         jvm_options:
-        - option: -Ddb2Hostname
-          value: localhost
-        - option: -Ddb2Port
-          value: 8102
-        - option: -Ddb2Location
-          value: DBD1LOC
-        - option: -Ddb2Username
-          value: "{{ vars.ims_user }}"
-        - option: -Ddb2Username
-          value: "{{ vars.ims_password }}"
         - option: -Xoptionsfile
-          value: "/u/{{ vars.ims_user }}/dfsjvmpr.props"
+          value: "/u/{{ vars.ims_user_lower }}/dfsjvmpr.props"
         - option: -Xmx128M
         - option: -Xmn64M
         - option: -XX:+Enable3164Interoperability

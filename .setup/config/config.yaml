@@ -83,7 +83,7 @@ taz:
 
 # z/OS Connect (API exposure)
 zosconnect:
-  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin/"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin"
   server_dir: "{{sandbox.path}}/zosconnect-server"
   server_name: "bankOfZServer"
   http_port: 9080
@@ -151,6 +151,7 @@ ims:
   dfs_joblib: "{{ ims.ims_hlq }}.JOBS"
   java_conf_path: "${HOME}/dfsjvmpr.props"
   ims_java_home: "/usr/lpp/ims/imsjava"
+  cobol_java_home: "/usr/lpp/IBM/cobol/igyv6r5"
   db2_java_home: "/usr/lpp/db2d10"
   dfs_ims_userid: "${ZOS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"

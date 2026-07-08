@@ -5,110 +5,86 @@ title: GRUB Workflow
 
 # GRUB Workflow
 
-GRUB (Git Remote User Build) supports rapid development and testing by synchronizing local changes directly to z/OS USS and automatically running Bank of Z setup and build activities.
+The GRUB workflow synchronizes local file changes directly to z/OS USS and automatically runs the setup or pipeline scripts. No commit or push to a remote repository is required — GRUB transfers only changed files, making it the fastest option for iterative development.
 
-Unlike the VS Code workflow, GRUB does not require changes to be committed or pushed before they can be tested.
+Before using this workflow, complete [Deploy Using GRUB](../installation-and-setup/deploy-grub.md) to set up your environment.
 
-Before using this workflow, complete the [Installation and Setup](../installation-and-setup/) procedures and verify that GRUB is configured for your environment.
-
-## Workflow Overview
-
-The GRUB workflow is optimized for rapid iteration:
-
-1. Make Changes
-2. Synchronize Changes
-3. Run Setup and Build Activities
-4. Review Results
-5. Validate Changes
-
-## Development Process
+## Daily Development Cycle
 
 ### 1. Make Changes
 
-Modify application source code in your local workspace.
+Modify application source code in your local workspace. No commit required. Common changes include:
 
-Changes can include:
-
-- COBOL programs
-- Copybooks
+- COBOL programs and copybooks
 - BMS maps
-- z/OS Connect assets
+- z/OS Connect API assets
 - Configuration files
-- Deployment resources
 
-### 2. Synchronize Changes
+### 2. Trigger a GRUB Sync
 
-Run GRUB to synchronize local changes directly to z/OS USS.
+Trigger a GRUB sync from your local machine. GRUB analyzes your local changes, creates patch files, and transfers only the modified files to USS.
 
-Only changed files are transferred to the target environment.
+Refer to your GRUB documentation for the specific command or UI action for your installation.
 
-### 3. Run Setup and Build Activities
+### 3. What Runs Automatically
 
-After synchronization completes, the Bank of Z setup process runs automatically on z/OS USS.
+```
+Local Machine                    z/OS USS
+─────────────                    ────────
+GRUB analyzes changes
+Creates patch files
+Transfers changed files ────────→ Patches applied to USS
+                                  setup-remote.sh runs natively
+                                  ├─ validate-prereqs
+                                  ├─ environment
+                                  └─ install-bank-of-z
+```
 
-The process updates the workspace, prepares build dependencies, deploys required framework components, and updates application artifacts.
+GRUB detects that it is running from within the Bank-of-Z repository and uses the synced files directly — no re-cloning occurs. This is what makes subsequent syncs significantly faster than a full setup.
 
-### 4. Review Results
+### 4. Validate Changes
 
-Review synchronization output, build logs, and setup messages.
+Open the Bank of Z frontend to verify your changes are live:
 
-Resolve any issues before continuing development activities.
+```
+http://<your-zos-host>:9080/bank-frontend-vanilla
+```
 
-### 5. Validate Changes
+---
 
-Verify that the updated application behaves as expected in the target environment.
+## How Stage Detection Works
 
-Run tests and validate application behavior before making additional changes.
+When `setup-remote.sh` runs on USS after a GRUB sync, it detects that it is executing from within the Bank-of-Z repository and uses that location directly:
 
-## How the Workflow Works
+```bash
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    if [[ "$repo_name" == "Bank-of-Z" ]]; then
+        # GRUB workflow — use current repository location
+        BANK_DIR="$(git rev-parse --show-toplevel)"
+    fi
+fi
+```
 
-When GRUB synchronizes changes to z/OS USS:
+This means your uncommitted local changes are used as-is, and no clone from GitHub is attempted.
 
-1. Local changes are analyzed
-2. Modified files are transferred to USS
-3. The Bank of Z setup process is invoked
-4. Build and deployment activities are completed
-5. Updated application components become available for testing
+---
 
-The setup process detects that it is operating on an existing synchronized repository and uses that repository directly rather than cloning a new copy.
+## Why Use GRUB
 
-This approach:
+| Feature | Benefit |
+|---------|---------|
+| No commits required | Test changes immediately without a Git commit or push |
+| Patch-based sync | Only changed files are transferred — fast incremental updates |
+| Automatic setup | Environment is ready as soon as the sync completes |
+| Native execution | Runs directly on USS — no Zowe CLI overhead |
+| Works offline | No GitHub connectivity needed after initial clone |
 
-- Uses synchronized changes immediately
-- Avoids unnecessary repository cloning
-- Reduces setup time
-- Supports rapid development cycles
+---
 
-## Benefits of the GRUB Workflow
+## Related
 
-The GRUB workflow provides:
-
-- Rapid testing of local changes
-- No commit requirement before validation
-- Faster development feedback
-- Reduced synchronization overhead
-- Native execution on z/OS USS
-
-## When to Use This Workflow
-
-Use the GRUB workflow when:
-
-- You need rapid feedback during development
-- Changes are being tested frequently
-- You want to validate local changes before committing them
-- SSH access to z/OS USS is available
-- Fast iteration is more important than branch-based collaboration
-
-## Related Information
-
-[Workflow Overview](.)
-
-[VS Code Workflow](vscode-workflow.md)
-
-[Development Best Practices](development-best-practices.md)
-
-[Workflow Comparison](workflow-comparison.md)
-
-[Configuration Reference](../reference/configuration-reference.md)
-
-[Troubleshooting](../troubleshooting/)
+- [Zowe CLI Workflow](zowe-cli-workflow.md) — branch-based workflow with full Git traceability
+- [Workflow Comparison](workflow-comparison.md)
+- [GRUB Setup](../installation-and-setup/local-tools/grub-setup.md)
+- [Troubleshooting](../troubleshooting/)

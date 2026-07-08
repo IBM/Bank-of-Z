@@ -151,7 +151,8 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
 </server>
 EOF
 
-# =========================
+# Deploy API WAR file configuration
+# ==================# =========================
 # Configure CORS for frontend server
 # =========================
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
@@ -160,7 +161,7 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     <featureManager>
         <feature>cors-1.0</feature>
     </featureManager>
-    
+
     <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
     <cors domain="/api"
           allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
@@ -173,7 +174,7 @@ EOF
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \
-   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp\
+   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp \
    ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml
 
 opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &

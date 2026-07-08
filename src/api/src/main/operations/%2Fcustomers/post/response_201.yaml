@@ -6,8 +6,10 @@ mappings:
     - customerId:
         required: true
         nullable: false
-        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-NUMBER\"}}"
+        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-NUMBER\"\
+          }}"
     - sortCode:
         required: true
         nullable: false
-        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-SORTCODE\"}}"
+        template: "{{$zosAssetResponse.commarea.CRECUSTZ.\"COMM-KEY\".\"COMM-SORTCODE\"\
+          }}"

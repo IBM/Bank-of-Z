@@ -47,10 +47,10 @@ if [ -d "$WLP_USER_DIR" ]; then
     rm -rf "$WLP_USER_DIR"
 fi
 
-# Create server directory structure
-mkdir -p "$WLP_USER_DIR/servers"
+# Remove any stale server Liberty may have created under its own usr/ directory
+rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 
-# Create the server using Liberty's server command
+# Create the server using Liberty's server command (creates under LIBERTY_HOME/usr by default)
 "${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
 
 # Move server to our WLP_USER_DIR
@@ -102,7 +102,7 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
              maxFiles="10" />
 
     <!-- SSL Configuration (optional - for HTTPS) -->
-    <keyStore id="defaultKeyStore" password="Liberty" />
+    <keyStore id="defaultKeyStore" password="Liberty" /> <!-- pragma: allowlist secret -->
 
 </server>
 EOF

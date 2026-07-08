@@ -9,7 +9,7 @@ This section provides a quick reference for commonly used commands when setting 
 
 ## Zowe CLI Commands
 
-Use Zowe CLI to connect to z/OS systems and support the VS Code workflow.
+Use Zowe CLI to connect to z/OS systems and support the Zowe CLI workflow.
 
 ### Verify Installation
 
@@ -183,9 +183,9 @@ The following scripts are used by the Bank of Z automation workflows.
 | pipeline-local.sh | Initiates build and deployment processing |
 | pipeline-remote.sh | Runs build and deployment activities on z/OS USS |
 
-## VS Code Workflow Commands
+## Zowe CLI Workflow Commands
 
-The VS Code workflow is completed through a VS Code task.
+The Zowe CLI workflow is completed through a VS Code task or by running `setup-local.sh` directly.
 
 Run the **Setup Bank of Z Environment** task from the Command Palette:
 
@@ -193,7 +193,7 @@ Run the **Setup Bank of Z Environment** task from the Command Palette:
 2. Run **Tasks: Run Task**.
 3. Select **Setup Bank of Z Environment**.
 
-For detailed workflow instructions, see [VS Code Workflow](../development-workflows/vscode-workflow.md).
+For detailed workflow instructions, see [Zowe CLI Workflow](../development-workflows/zowe-cli-workflow.md).
 
 ## GRUB Workflow Commands
 

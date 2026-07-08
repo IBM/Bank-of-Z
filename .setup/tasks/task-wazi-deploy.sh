@@ -132,7 +132,6 @@ print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate for BankZ"
 CMD="wazideploy-generate \
  --deploymentPlanName $APP_BASE_NAME \
  --deploymentPlanVersion $APP_FULL_VERSION \
- --deploymentPlanDescription $APP_DESCRIPTION \
  --deploymentMethod $DEPLOYMENT_METHOD \
  --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
  --deploymentPlanReport $outputDir/deploymentPlanReport-bankz.html \
@@ -141,10 +140,18 @@ CMD="wazideploy-generate \
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
+${CMD}  --deploymentPlanDescription "$APP_DESCRIPTION" 2>&1 | tee "${outputDir}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE-BANKZ $line"
 done
+
+RC=${PIPESTATUS[0]}
+rm -f message.log
+
+if [ $RC -ne 0 ]; then
+    print_error "${CYAN}[WAZIDEPLOY]${NC} generate failed with RC=$RC"
+    exit $RC
+fi
 
 print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for BankZ"
 

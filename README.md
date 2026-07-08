@@ -12,7 +12,7 @@ For a detailed walkthrough of components and request flows, see the [Architectur
 
 ## Getting Started
 
-> **New here? Start with the [Quick Start guide →](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/quick-start)**
+> **New here? Start with the [Installation Overview →](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/)**
 
 Or follow the full setup path step by step:
 
@@ -20,9 +20,9 @@ Or follow the full setup path step by step:
 |------|------|
 | 1. Review prerequisites | [Prerequisites](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/prerequisites) |
 | 2. Configure your environment | [Environment Configuration](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/environment-configuration) |
-| 3. Set up your IDE | [IDE Setup](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/ide-setup) |
-| 4. Build and deploy | [Build and Deploy](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/build-and-deploy) |
-| 5. Make your first change | [Tutorial: Make Your First Change](https://ibm.github.io/Bank-of-Z/docs/tutorials/make-your-first-change) |
+| 3. Set up local tools | [Local Tools Setup](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/local-tools/) |
+| 4. Deploy Bank of Z | [Deploying Bank of Z](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/deploying) |
+| 5. Follow a tutorial | [Tutorials](https://ibm.github.io/Bank-of-Z/docs/tutorials/) |
 
 ## Documentation
 
@@ -30,13 +30,13 @@ Or follow the full setup path step by step:
 |-------|-------------|
 | [About Bank of Z](https://ibm.github.io/Bank-of-Z/docs/about-bank-of-z/) | Purpose, capabilities, and architecture overview |
 | [Architecture](https://ibm.github.io/Bank-of-Z/docs/architecture/) | Components, request flows, and external integrations |
-| [Quick Start](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/quick-start) | Get up and running quickly |
+| [Installation Overview](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/) | Installation workflow and stages |
 | [Prerequisites](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/prerequisites) | Local and z/OS software requirements |
 | [Environment Configuration](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/environment-configuration) | Zowe profile setup and connectivity |
-| [IDE Setup](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/ide-setup) | Extensions for VS Code and Bob IDE |
-| [Build and Deploy](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/build-and-deploy) | Build the application and deploy to z/OS |
-| [Development Workflows](https://ibm.github.io/Bank-of-Z/docs/development-workflows/) | VS Code and GRUB workflow guides |
-| [Tutorials](https://ibm.github.io/Bank-of-Z/docs/tutorials/) | Make your first change, CICS and IMS enhancement scenarios |
+| [Local Tools Setup](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/local-tools/) | IDE, Zowe CLI, and GRUB setup |
+| [Deploying Bank of Z](https://ibm.github.io/Bank-of-Z/docs/installation-and-setup/deploying) | Build the application and deploy to z/OS |
+| [Development Workflows](https://ibm.github.io/Bank-of-Z/docs/development-workflows/) | Zowe CLI and GRUB workflow guides |
+| [Tutorials](https://ibm.github.io/Bank-of-Z/docs/tutorials/) | Deploy Bank of Z, CICS enhancement scenario |
 | [Reference](https://ibm.github.io/Bank-of-Z/docs/reference/) | Commands, configuration, repository structure, glossary |
 | [Troubleshooting](https://ibm.github.io/Bank-of-Z/docs/troubleshooting/) | Common issues and solutions |
 

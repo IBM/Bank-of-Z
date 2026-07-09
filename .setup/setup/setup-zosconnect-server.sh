@@ -29,6 +29,7 @@ export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
 export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
+export FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
 
 # IMS environment variables
 export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
@@ -179,9 +180,9 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
         <feature>cors-1.0</feature>
     </featureManager>
 
-    <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
+    <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports) -->
     <cors domain="/api"
-          allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
+          allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}, https://*:${FRONTEND_HTTPS_PORT}"
           allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
           allowedHeaders="*"
           allowCredentials="true"

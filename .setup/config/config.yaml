@@ -87,7 +87,7 @@ zosconnect:
   server_dir: "{{sandbox.path}}/zosconnect-server"
   server_name: "bankOfZServer"
   http_port: 9080
-  https_port: 9443
+  https_port: 9445
 
 # Frontend Liberty Server (separate from z/OS Connect)
 frontend:

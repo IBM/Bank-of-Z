@@ -29,6 +29,7 @@ export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 export FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
 export ZOSCONNECT_HTTP_PORT=$(get_section_value 'zosconnect' 'http_port')
+export ZOSCONNECT_HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
 
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"

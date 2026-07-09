@@ -63,7 +63,7 @@ tsocmd "RACDCERT GENCERT \
  TRUST"
 tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
- CONNECT(CERTAUTH LABEL('VSICA') RING($ring) USAGE(PERSONAL))"
+ CONNECT(CERTAUTH LABEL('VSICA') RING($ring) USAGE(CERTAUTH))"
 tsocmd "RACDCERT ID($userid) \
  CONNECT(LABEL('$label') RING($ring) DEFAULT)"
 rc=$?

@@ -52,6 +52,7 @@ ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
 _BPXK_AUTOCVT=ON
 ZOS_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
+MQ_CPF=$(get_section_value 'mq' 'short_name')
 
 # =========================
 # Zowe Configuration

@@ -10,6 +10,8 @@ vars:
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
   eqaw_hlq: "EQAW.SEQAMOD"
+  mq_hlq: "MQCD94"         # TODO: need to put this somewhere else...
+  mq_name: "MQ21"          # TODO: need to put this somewhere else...
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -42,6 +44,9 @@ cics_region:
       top_data_sets:
         - "{{ vars.eqaw_hlq }}.SEQAMOD"
       data_sets:
+        - "{{ vars.mq_hlq }}.SCSQLOAD"
+        - "{{ vars.mq_hlq }}.SCSQAUTH"
+      data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
         - TCPIP.SEZATCP
@@ -52,6 +57,8 @@ cics_region:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
         - "{{ vars.db2_hlq }}.SDSNEXIT"
+      data_sets:
+        - "{{ vars.mq_hlq }}.SCSQAUTH"
 
   sit_parameters:
     start: INITIAL
@@ -60,6 +67,7 @@ cics_region:
     gmtran: CESL
     sec: "YES"
     db2conn: "YES"
+    mqconn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
     resoverrides: resourceOverrides.cicsoverrides.yaml
@@ -84,4 +92,3 @@ cics_region:
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - "EYUSMSSJ.jvmprofile"
- 

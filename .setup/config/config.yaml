@@ -11,7 +11,7 @@ repositories:
 # Java Home
 java:
   java_home: "/usr/local/sandboxes/tools/J21.0_64"
-  
+
 # Python Home
 python:
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
@@ -131,7 +131,7 @@ ims:
     ssl_port: 9966
   db2_database: "IMSBANK"
   db2_table: "HISTORY"
-  db2_plan_ibtran: "IBTRAN" 
+  db2_plan_ibtran: "IBTRAN"
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
@@ -202,3 +202,10 @@ db2:
   sdsnlod2: "DB2V13.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   runlib: "DBD1.RUNLIB.LOAD"
+
+# MQ configuration
+mq:
+  install_hlq: "MQCD94"
+  qmgr_hql: "CSQ.MQ21"
+  port: 1414
+  cpf: "!MQ21"

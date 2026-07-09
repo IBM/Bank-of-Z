@@ -1160,3 +1160,24 @@ resourceDefinitions:
       name: BANKZ
       group: BANKZGRP
       dsname01: BANKZ.V0R1M0.LOADLIB
+
+  # MQCONN Definitions
+  - mqconn:
+      name: BOZMQCON
+      group: BANKZGRP
+      description: "MQCONN for Bank of z"
+      mqname: "{{ vars.mq_name }}"
+      initqname: BOZ.CICS.INITQ
+      resyncmember: YES
+
+  # MQMONITOR Definitions
+  - mqmonitor:
+      name: BOZMQMON
+      group: BANKZGRP
+      autostart: YES
+      description: "MQMONITOR for Bank of z"
+      qname: BOZ.CICS.INITQ
+      status: ENABLED
+      transaction: CKTI
+
+  # CICS bridge / adapter definition are picked up via DFHLIST

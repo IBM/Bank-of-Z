@@ -1,7 +1,7 @@
 ---
 #
 # Licensed materials - Property of IBM
-# 5655-AC5 Copyright IBM Corp. 2024
+# 5655-AC5 Copyright IBM Corp. 2024, 2026
 # All rights reserved
 # US Government users restricted rights  -  Use, duplication or
 # disclosure restricted by GSA ADP schedule contract with IBM Corp.
@@ -61,7 +61,7 @@ application:
         - name: excludeFileList
           value: [".*","**/.*","**.png","**.groovy","**.json","**.md","**/LoadData/**"]
 
-        
+
         # Uncomment to log every file scanned during analysis:
         #- name: printScannedItems
         #  value: true
@@ -236,7 +236,7 @@ application:
               INCLUDE  SYSLIB(${MEMBER})
               INCLUDE RESLIB(DFSLI000)
               ENTRY CEESTART
-              
+
         # ----- Link-edit instream for batch DB2 PL/I programs -----
         # Batch programs use CEESTART but don't need DFSLI000
         # DB2 connection handled via DSN RUN in JCL
@@ -246,19 +246,19 @@ application:
               INCLUDE  SYSLIB(${MEMBER})
               ENTRY CEESTART
               NAME ${MEMBER}(R)
-              
+
         # ----- Deployment type -----
         # Controls which target library the load module is deployed to:
         #   IMSLOAD  - IMS program library (for all programs under ims/pli/)
         - name: deployType
           forFiles: "**/src/base/ims/pli/*.pli"
           value: IMSLOAD
-          
+
         # ----- Deployment type for batch programs -----
         - name: deployType
           forFiles: "**/src/base/batch/pli/*.pli"
           value: LOAD
-          
+
     - task: MetadataInit
       variables:
        - name: fileLocation # Location of file system metadata store.
@@ -290,7 +290,7 @@ application:
     # that will be replaced with environment-specific values during
     # deployment.
     # ----------------------------------------------------------
-    
+
     - task: ServerXmlPackager
       variables:
         - name: shellEnvironment
@@ -370,10 +370,10 @@ application:
         - name: assemblerParms
           value: OBJECT,NODECK
           append:
-          - condition: 
+          - condition:
               exists: errPrefix
             value: ADATA,EX(ADX(ELAXHASM))
-          - condition: 
+          - condition:
               exists: debug
               notExits: errPrefix
               eval: ${debug}
@@ -382,3 +382,19 @@ application:
         # Link edit parms
         - name: linkEditParms
           value: XREF,LIST
+
+    # ----------------------------------------------------------
+    # MQJavaBuilder task
+    # Compiles the MQ BoZ code.
+    # ----------------------------------------------------------
+    - task: MQJavaBuilder
+      variables:
+        # Path to the Gradle executable on z/OS USS
+        - name: gradlePath
+          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+        # Shell used to invoke Gradle
+        - name: shellEnvironment
+          value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
+        # Relative path (from repo root) to the Gradle project directory
+        - name: configSources
+          value: "src/base/mq/java"

@@ -1,0 +1,21 @@
+//IMSTYPE2 JOB
+//*
+//*********************************************************************
+//*  Submit IMS type-2 commands (CREATE PGM, CREATE TRAN, etc.)      *
+//*  stored in &SYSUID..IMSISO.TYPE2 via the IMS Operations Manager  *
+//*  SPOC batch interface (CSLUSPOC).                                 *
+//*                                                                   *
+//*  Before submitting:                                               *
+//*  1) Set IMSHLQ  to the HLQ of your IMS installation datasets     *
+//*  2) Set IMSPLEX to your IMSplex name                              *
+//*  3) Set IMSID   to the IMS subsystem ID (SSID) to route to       *
+//*********************************************************************
+// SET IMSHLQ=IMSV15
+// SET IMSPLEX=IMSPLEX
+// SET IMSID=IMS1
+//*
+//SPOC     EXEC PGM=CSLUSPOC,
+//  PARM=('IMSPLEX=&IMSPLEX,ROUTE=&IMSID,WAIT=60,F=WRAP')
+//STEPLIB  DD DISP=SHR,DSN=&IMSHLQ..SDFSRESL
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD DISP=SHR,DSN=&SYSUID..IMSISO.TYPE2

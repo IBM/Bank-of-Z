@@ -1,0 +1,57 @@
+//EQAWICRT JOB
+//*
+//*********************************************************************
+//* Licensed Materials - Property of IBM                              *
+//* 5724-T07                                                          *
+//* Copyright IBM Corp. 2016, 2022 All Rights Reserved                *
+//*                                                                   *
+//* US Government Users Restricted Rights - Use, duplication or       *
+//* disclosure restricted by GSA ADP Schedule Contract with IBM Corp. *
+//*                                                                   *
+//*********************************************************************
+//*                                                                   *
+//*  This JCL will link edit the IMS user exit routines supplied by   *
+//*  z/OS Debugger with your system's IMS RESLIB library and produce  *
+//*  load modules which can be included in your IMS control region    *
+//*  search path to enable the exits.                                 *
+//*                                                                   *
+//*  CAUTION: This is neither a JCL procedure nor a complete job.     *
+//*  Before using this job step, you will have to make the following  *
+//*  modifications:                                                   *
+//*                                                                   *
+//*  1) Change the DTHLQ symbolic parameter to the appropriate data   *
+//*     set prefix for your installed z/OS Debugger data sets.        *
+//*  2) Change the IMSHLQ symbolic parameter to the appropriate data  *
+//*     set prefix for your installed IMS data sets.                  *
+//*  3) Change the <ims-id> string to the subsystem identifier for    *
+//*     the IMS system that you would like to read the Transaction    *
+//*     Isolation settings from.                                      *
+//*  4) Change the <resDsn> string to the name of a data set xxxx     *
+//*  5) Change the <type2Dsn> string to the name of a data set xxxx   *
+//*                                                                   *
+//*  Notes:                                                           *
+//*                                                                   *
+//*  1. This job should complete with a return code 0.                *
+//*                                                                   *
+//*********************************************************************
+// SET DTHLQ=EQAW
+// SET IMSHLQ=IMSV15
+//DELETE    EXEC PGM=IDCAMS,REGION=1M
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+ DELETE &SYSUID..IMSISO.RES
+ DELETE &SYSUID..IMSISO.TYPE2
+ SET MAXCC=0
+/*
+//CREATE EXEC  PGM=EQANICRT,REGION=0M,
+// PARM=('READMASK IVP1')
+//STEPLIB  DD DSN=&DTHLQ..SEQAMOD,DISP=SHR
+//EQARESDS DD DSN=&SYSUID..IMSISO.RES,
+//            DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(20,20,0),RLSE),
+//            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//EQATY2DS DD DSN=&SYSUID..IMSISO.TYPE2,
+//            DISP=(NEW,CATLG,DELETE),
+//            SPACE=(TRK,(20,20,0),RLSE),
+//            DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//RESLIB   DD DSN=&IMSHLQ..SDFSRESL,DISP=SHR

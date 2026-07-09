@@ -1,0 +1,213 @@
+//EQAOPTS JOB 5724-T07,MSGLEVEL=(1,1),MSGCLASS=A
+//PROC JCLLIB ORDER=(ASM.SASMSAM1)
+// SET GPFMLIB=EQAW.SEQASAMP
+// SET GPFLMOD=&SYSUID..IMSISO.LOADLIB
+//*
+//********************************************************************
+//*  This job assembles and links a copy of EQAOPTS.
+//*
+//*  If you want to update the copy of EQAOPTS in the EQAW.SEQAMOD
+//*  data set that is managed by SMP/E, use the EQAUMODE usermod in
+//*  EQAW.SEQASAMP rather than this JCL.
+//*
+//*  Before running, do the following:
+//*
+//*  1. Edit the JOB card as appropriate for your installation
+//*  2. If the High Level Assembler ASMACL cataloged procedure is
+//*     not in your system's search path for cataloged procedures,
+//*     then uncomment the JCLLIB statement above and edit it
+//*     (if needed) to point to the library that contains the
+//*     ASMACL cataloged procedure.
+//*  3. Set GPFMLIB to hlq.SEQASAMP that contains the EQAXOPT macro.
+//*  4. Set GPFLMOD to the data set name that will contain
+//*     the new EQAOPTS load module. This data set should then be
+//*     placed in front of EQAW.SEQAMOD in the load module search
+//*     path.
+//*  5. Edit the assembler code below as appropriate.
+//********************************************************************
+//*
+//ASMGL EXEC ASMACL,REGION=32M,PARM.L='MAP,LET,LIST,XREF,RENT',
+//           PARM.C='RENT,NODECK,OBJECT'
+//C.SYSLIB  DD DSN=&GPFMLIB.,DISP=SHR
+//          DD DSN=SYS1.MACLIB,DISP=SHR
+//C.SYSIN   DD *
+***********************************************************************
+*                                                                     *
+* MODULE NAME = EQAOPTS                                               *
+*                                                                     *
+*/********************************************************************/
+*/********************************************************************/
+*/*                                                                  */
+*/*  IBM z/OS Debugger                                               */
+*/*                17.0                                              */
+*/*                                                                  */
+*/********************************************************************/
+*/* Licensed Materials - Property of IBM                             */
+*/*                                                                  */
+*/* 5724-T07: IBM z/OS Debugger                                      */
+*/* Copyright IBM Corp. 2004, 2024 All Rights Reserved               */
+*/*                                                                  */
+*/* US Government Users Restricted Rights - Use, duplication or      */
+*/* disclosure restricted by GSA ADP Schedule Contract with IBM Corp.*/
+*/*                                                                  */
+*/********************************************************************/
+*/* $MOD(EQAOPTS) COMP(INST)   PROD(DBGT): z/OS Debugger options     */
+*/*                                                                  */
+*/* FLAG REASON   RLSE YYMMDD ORIGIN  : FLAG DESCRIPTION             */
+*/* ---- -------- ---- ------ -------- ------------------------------*/
+*/* $B1= r95141  V17R0 250829 Bershad : CCSOURCEPATHFIRST            */
+*/* $YH= r94442  V17R0 240814 Young   : Remove                       */
+*/*                                     z/OS Debugger Code Coverage  */
+*/*                                      CCProgSelectDSN             */
+*/*                                      CCOutputDSN                 */
+*/*                                      CCOutputDSNAlloc            */
+*/* $A1= r92582  V16R0 230612 Riphagen: LDDAUTOLANGX                 */
+*/* $14= r91744  V16R0 221123 JG      : DOPTACBDSN no longer used    */
+*/* $CB= r91250  V16R0 220910 Campbell: BZUPLAYDSN, BZUPLAYDSNALLOC  */
+*/* $13= r90540  V16R0 220609 Ellis   : CICSASMPGMND                 */
+*/* $CA= r77854  V14R1 180319 Campbell: IMSISOORIGPSB                */
+*/* $12= r19030  V14R1 180208 JXu     : CEEREACTAFTERQDBG            */
+*/* $C9= r18514  V14R0 170526 Campbell: DISABLERLIM                  */
+*/* $11= c10571  V13R1 160513 RKraemer: P34850-nonLE CICS performance*/
+*/* $C8= f10521  V13R1 150901 Campbell: DOPTACBDSN, MAXTRANUSER      */
+*/* $YG= F10444  V13R1 150122 Young   : IgnoreODOLimit               */
+*/* $YF= F9921b  V12R1 130830 Young   : AltDisp                      */
+*/* $YE= F9921   V12R1 130806 Young   : AltDisp                      */
+*/* $YD= F9676   V12R1 130211 Young   : CCProgSelectDSN              */
+*/*                                     CCOutputDSN                  */
+*/*                                     CCOutputDSNAlloc             */
+*/* $C7= f9472a  V12R1 121002 Campbell: Change to DLAYDBGXRF,DSN     */
+*/* $L6= f9466   V12R1 120927 Lin     : STARTSTOPMSGDSN: Log data set*/
+*/* $YC= F9493   V12R1 120914 Young   : TCPIPDATADSN and HOSTPORTS   */
+*/* $L5= f9472   V11R1 120814 Lin     :DLAYDBGXRFDSN:IMS trn/usr xref*/
+*/* $L4= f9453   V11R1 120720 Lin     :DLAYDBGCND opt: monitor COND  */
+*/* $C6= f9406   V11R1 120530 Campbell: SESSIONTIMEOUT               */
+*/* $T2= D9277B  V10R1 120309 Piner   : DTCNDELETEDEADPROF           */
+*/* $X1= F9283   V12R1 120305 ANAYA   : MULTIPROCESS                 */
+*/* $C5= F9145a  V12R1 111110 Carter  : STARTSTOPMSG BATCHTSO Opnd   */
+*/* $C4= F9145   V11R1 111201 Carter  : DYNDEBUG/STARTSTOPMSG        */
+*/* $L3= F8840   V11R1 110718 Lin     : Delay debug support          */
+*/* $YB= F8561   V11R1 100726 Young   : COMMANDSDSN                  */
+*/*                                     LOGDSN                       */
+*/*                                     LOGDSNALLOC                  */
+*/*                                     PREFERENCESDSN               */
+*/*                                     SAVEBPDSNALLOC               */
+*/*                                     SAVESETDSNALLOC              */
+*/* $C3= F8272   V10R1 091007 Carter  : Add sample invocations       */
+*/* $C2= F7809   V10R1 090312 Carter  : Browse Mode support          */
+*/* $C1= F4549    V5R1 050322 Carter  : Save/Restore settings & BPs  */
+*/* $T1= D4142    V5R1 050104 Piner   : Fewer comments...            */
+*/* $L2= c3948c   V5R1 041202 ms      : comments                     */
+*/* $L2= c3948    V5R1 041117 Lin     : Options are optional         */
+*/* $L1= F3879    V5R1 041027 Lin     : Add SVCSCREEN option         */
+*/* $00= F3787    V5R1 041008 Lin     : Created                      */
+*/********************************************************************/
+*                                                                     *
+***********************************************************************
+*                                                                     *
+* DESCRIPTIVE NAME = z/OS Debugger options file                       *
+*                                                                     *
+* The EQAOPTS CSECT uses EQAXOPT to code z/OS Debugger options.       *
+*                                                                     *
+* EQAXOPT is a macro provided in EQAW.SEQASAMP that generates         *
+* z/OS Debugger options.                                              *
+*                                                                     *
+* Refer to the EQAXOPT macro for syntax and description of keywords.  *
+*                                                                     *
+***********************************************************************
+***********************************************************************
+EQAOPTS  CSECT ,
+EQAOPTS  AMODE 31
+EQAOPTS  RMODE ANY
+
+**********************************************************************
+* The following are sample EQAXOPT invocations that can be           *
+* uncommented and modified as necessary.  Note that some of the      *
+* lines below conflict with other lines.  You should only uncomment  *
+* the lines that you intend to modify.                               *
+**********************************************************************
+
+*        EQAXOPT  ALTDISP,OFF
+*        EQAXOPT  BROWSE,RACF
+*        EQAXOPT  BZUPLAYDSN,'&&USERID.DBGDTR.BZUPLAY'
+*        EQAXOPT  BZUPLAYDSNALLOC,'MGMTCLAS(STANDARD)                  +
+               STORCLAS(DEFAULT) LRECL(256) BLKSIZE(0) RECFM(F,B)      +
+               DSORG(PS) SPACE(2,2) TRACKS'
+*        EQAXOPT  CACHENUM,10
+*                                                                 2@E1A
+*        EQAXOPT CCSOURCEPATHFIRST,ON
+*        EQAXOPT CCSOURCEPATHFIRST,OFF
+*                                                                 3@YHD
+*        EQAXOPT  CODEPAGE,037
+*        EQAXOPT  COMMANDSDSN,'&&USERID.DBGTOOL.COMMANDS'
+*        EQAXOPT  CICSASMPGMND,NO                                  @13A
+*        EQAXOPT  DEFAULTVIEW,STANDARD
+*        EQAXOPT  DISABLERLIM,YES                                  @C9A
+*        EQAXOPT  CEEREACTAFTERQDBG,NO                             @12A
+*        EQAXOPT  DLAYDBG,NO                                       @L3A
+         EQAXOPT  DLAYDBGDSN,'USR.&&USERID.DLAYDBG.EQAUOPTS'       @L3A
+*        EQAXOPT  DLAYDBGTRC,2                                     @L3A
+*        EQAXOPT  DLAYDBGCND,ALL                                   @L4A
+*        EQAXOPT  DLAYDBGXRF,DSN,'EQAW.TRNUSRID.XREF'              @L5A
+*        EQAXOPT  DTCNDELETEDEADPROF,NO
+*        EQAXOPT  DTCNFORCECUID,NO
+*        EQAXOPT  DTCNFORCEIP,NO
+*        EQAXOPT  DTCNFORCELOADMODID,NO
+*        EQAXOPT  DTCNFORCENETNAME,NO
+*        EQAXOPT  DTCNFORCEPROGID,NO
+*        EQAXOPT  DTCNFORCETERMID,NO
+*        EQAXOPT  DTCNFORCETRANID,NO
+*        EQAXOPT  DTCNFORCEUSERID,NO
+*        EQAXOPT  DYNDEBUG,ON
+*        EQAXOPT  EQAQPP,OFF
+*        EQAXOPT  EXPLICITDEBUG,OFF
+*        EQAXOPT  GPFDSN,'DEVELP.TEST.GLBLPREF'
+*        EQAXOPT  HOSTPORTS                                        @yca
+*        EQAXOPT  HOSTPORTS,34500-35499                            @yca
+*        EQAXOPT  HOSTPORTS,(34500-35499,37500-38499)              @yca
+*        EQAXOPT  IGNOREODOLIMIT,NO                                @yga
+*        EQAXOPT  IMSISOORIGPSB,NO                                 @CAA
+*        EQAXOPT  LDDAUTOLANGX,OFF                                 @A1A
+*        EQAXOPT  LOGDSN,'&&USERID.DBGTOOL.LOG'
+*        EQAXOPT  LOGDSNALLOC,'MGMTCLAS(STANDARD) STORCLAS(DEFAULT)    +
+               LRECL(72) BLKSIZE(0) RECFM(F,B) DSORG(PS) SPACE(2,2)    +
+               CYL'
+*        EQAXOPT  MAXTRANUSER,15                                   @C8A
+*        EQAXOPT  MDBG,NO
+*        EQAXOPT  MULTIPROCESS,PARENT,EXEC=NONE
+*        EQAXOPT  NAMES,EXCLUDE,LOADMOD,'AQX*'
+*        EQAXOPT  NAMES,EXCLUDE,CU,BADNAME
+*        EQAXOPT  NAMES,INCLUDE,LOADMOD,CEEMYMOD
+*        EQAXOPT  NAMES,INCLUDE,CU,CEEMYCU
+*        EQAXOPT  NODISPLAY,DEFAULT
+*        EQAXOPT  PREFERENCESDSN,'&&USERID.DBGTOOL.PREFS'
+*        EQAXOPT  SAVEBPDSN,'&&USERID.DBGTOOL.SAVEBPS'
+*        EQAXOPT  SAVEBPDSNALLOC,'MGMTCLAS(STANDARD) STORCLAS(DEFAULT) +
+               LRECL(3204) BLKSIZE(0) RECFM(V,B) DSORG(PO)             +
+               DSNTYPE(LIBRARY) SPACE(1,3) CYL'
+*        EQAXOPT  SAVESETDSN,'&&USERID.DBGTOOL.SAVESETS'
+*        EQAXOPT  SAVESETDSNALLOC,'MGMTCLAS(STANDARD) STORCLAS(DEFAULT)+
+                LRECL(3204) BLKSIZE(0) RECFM(V,B) DSORG(PS) SPACE(2,2) +
+               TRACKS'
+*        EQAXOPT  SESSIONTIMEOUT,NEVER
+*        EQAXOPT  SESSIONTIMEOUT,QUITDEBUG,hhmmssnn
+*        EQAXOPT  SESSIONTIMEOUT,QUIT,hhmmssnn
+*        EQAXOPT  STARTSTOPMSG,NONE,WTO
+*        EQAXOPT  STARTSTOPMSG,ALL,WTO
+*        EQAXOPT  STARTSTOPMSG,(CICS,TSO,BATCHTSO,IMS,OTHER),WTO
+*        EQAXOPT  STARTSTOPMSGDSN,'EQAW.SSMSG.LOG'                 @L6A
+*        EQAXOPT  SUBSYS,'LAM'
+*        EQAXOPT  SUSAN,OFF                                        @11A
+*        EQAXOPT  SVCSCREEN,OFF,CONFLICT=NOOVERRIDE
+*        EQAXOPT  SVCSCREEN,(OFF,QUIET),CONFLICT=NOOVERRIDE
+*        EQAXOPT  SVCSCREEN,ON,CONFLICT=NOOVERRIDE,NOMERGE
+*        EQAXOPT  TCPIPDATADSN                                     @yca
+*        EQAXOPT  TCPIPDATADSN,'SYS2.TCPIP.DATA'                   @yca
+*        EQAXOPT  THREADTERMCOND,PROMPT
+*        EQAXOPT  TIMACB,EQASESSM
+         EQAXOPT  END
+         END ,
+//L.SYSLMOD DD DISP=SHR,DSN=&GPFLMOD.
+//L.SYSIN   DD *
+   NAME EQAOPTS(R)
+/*

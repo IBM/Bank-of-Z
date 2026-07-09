@@ -1,0 +1,21 @@
+//ISOCRT JOB
+//*
+//*********************************************************************
+//*  Delete and recreate &SYSUID..IMSISO.LOADLIB                     *
+//*  Step 1 - DELETE: removes the existing PDS if it exists          *
+//*  Step 2 - CREATE: allocates a new PDS with original parameters   *
+//*********************************************************************
+//DELETE   EXEC PGM=IDCAMS,REGION=1M
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
+ DELETE &SYSUID..IMSISO.LOADLIB
+ SET MAXCC=0
+/*
+//CREATE   EXEC PGM=IEFBR14
+//LOADLIB  DD DSN=&SYSUID..IMSISO.LOADLIB,
+//            DISP=(NEW,CATLG,DELETE),
+//            UNIT=3390,
+//            VOL=SER=USRVS1,
+//            STORCLAS=SCBASE,
+//            SPACE=(TRK,(85,3,30)),
+//            DCB=(RECFM=U,LRECL=0,BLKSIZE=32760,DSORG=PO)

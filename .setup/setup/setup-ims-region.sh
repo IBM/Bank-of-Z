@@ -83,14 +83,16 @@ rm -rf "$SANDBOX_DIR/diagnostics"
 # =========================
 # Stage 1: Create debug datasets for IMS
 # =========================
-run_job_and_wait "SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.jcl" "8"
-run_job_and_wait "SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.jcl" "8"
-run_job_and_wait "SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.jcl" "8"
-run_job_and_wait "SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.jcl" "8"
+print_stage "STAGE 1: Create Debugger Artifacts for IMS"
+
+run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.jcl" "8"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.jcl" "8"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.jcl" "8"
+run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.jcl" "8"
 # =========================
-# Stage 1: Create IMS instance with zconfig
+# Stage 2: Create IMS instance with zconfig
 # =========================
-print_stage "STAGE 1: Create IMS instance with zconfig"
+print_stage "STAGE 2: Create IMS instance with zconfig"
 
 cd "$SCRIPTS_DIR/../zconfig"
 
@@ -113,9 +115,9 @@ fi
 deactivate
 
 # =========================
-# Stage 2: Verify IMS region
+# Stage 3: Verify IMS region
 # =========================
-print_stage "STAGE 2: Verify IMS region"
+print_stage "STAGE 3: Verify IMS region"
 
 print_info "${CYAN}[ZCONFIG-IMS]${NC} Waiting for IMS regions to start..."
 sleep 15

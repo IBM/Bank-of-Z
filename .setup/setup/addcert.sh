@@ -59,6 +59,7 @@ tsocmd "RACDCERT GENCERT \
  ALTNAME(IP($ipaddr)) \
  WITHLABEL('$label') \
  SIZE(2048) \
+ KEYUSAGE(HANDSHAKE DATAENCRYPT DOCSIGN CERTSIGN) \
  TRUST"
 tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
@@ -80,7 +81,7 @@ fi
 # Export cert and key to PEM files on USS for Node.js to read
 if test $rc -eq 0
 then
-  outdir="/u/$userid/boz-certs"
+  outdir="/u/$(echo $userid | tr '[:upper:]' '[:lower:]')/boz-certs"
   mkdir -p "$outdir"
 
   # Export the signed server cert as PEM

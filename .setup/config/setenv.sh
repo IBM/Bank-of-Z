@@ -26,7 +26,7 @@ if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
 set -e
-export PATH="/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH"
+
 export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
 source "$LIB_DIR/colors.sh"

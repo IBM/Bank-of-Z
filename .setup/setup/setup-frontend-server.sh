@@ -80,6 +80,7 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
         <feature>servlet-6.0</feature>
         <feature>jsp-3.1</feature>
         <feature>transportSecurity-1.0</feature>
+        <feature>ssl-1.0</feature>
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
@@ -101,8 +102,12 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
              maxFileSize="20" 
              maxFiles="10" />
 
-    <!-- SSL Configuration (optional - for HTTPS) -->
-    <keyStore id="defaultKeyStore" password="Liberty" /> <!-- pragma: allowlist secret -->
+    <!-- SSL Configuration using RACF keyring -->
+    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
+    <keyStore id="defaultKeyStore"
+              location="safkeyring://IBMUSER/BOZRING"
+              type="JCERACFKS"
+              password="password"/>
 
 </server>
 EOF

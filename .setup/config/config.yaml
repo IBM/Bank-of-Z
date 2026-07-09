@@ -20,7 +20,12 @@ python:
 app:
   base_name: "BANKZ"
   short_name: "BOZ"
-  zos_version: "V0R1M0"
+  version: "0"
+  release: "1"
+  modification: "0"
+  zos_version: "V{{app.version}}R{{app.release}}M{{app.modification}}"
+  full_version: "{{app.version}}.{{app.release}}.{{app.modification}}"
+  description: "Bank of Z a modern IBM Z development, build, deployment, and modernization practices"
 
 # Sandbox root directory (USS)
 sandbox:
@@ -30,30 +35,23 @@ sandbox:
 zconfig:
   zconfig_home: "/usr/local/sandboxes/tools/zconfig"
   zcb_home: "/usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6"
-  java_home: "{{java.java_home}}"
 
 # DBB (Dependency Based Build)
 dbb:
   dbb_home: "/usr/local/sandboxes/tools/dbb"
-  java_home: "{{java.java_home}}"
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
   dbb_log_dir: "{{sandbox.path}}/logs/dbb"
 
-# API build output directory
-api_base: "{{sandbox.path}}/zDevOps/applications/CBSA/application/src/zCEE-API/cbsa-api/build"
-
 # zBuilder framework configuration
 zbuilder:
   source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   target_dir: "{{sandbox.path}}/zBuilder"
-  java_home: "{{java.java_home}}"
 
 # ZCodeScan (static analysis)
 zcodescan:
   zcodescan_home: "/global/opt/pyenv/akf"
-  java_home: "{{java.java_home}}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
   output_dir: "{{sandbox.path}}/zcodescan"
@@ -65,21 +63,15 @@ zcodescan:
 # Wazi Deploy (deployment automation)
 wazideploy:
   wazideploy_home: "/global/opt/pyenv/gdp"
-  deployment_method_cics: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy/deployment-configuration/deployment-method.yml"
   deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
   deploy_log_dir: "{{sandbox.path}}/logs/deploy"
 
-# TAZ Unit Test configuration
-taz:
-  taz_home: "/usr/local/sandboxes/tools/taz-280/test-cli"
-  test_dir: "{{sandbox.path}}/${REPO_NAME}"
-  proclib: "SYS1.PROCLIB"
-  library: "{{app.base_name}}.{{app.zos_version}}.LOADLIB"
+# Debug
+debug:
   hlq: "EQAW"
-  steplib: "{{taz.hlq}}.SEQAMOD"
 
 # z/OS Connect (API exposure)
 zosconnect:
@@ -107,6 +99,8 @@ zowe:
 
 # CICS attributes
 cics:
+  cics_hlq: "CICSTS63"
+  uss_dir: "/usr/lpp/cicsts/cicsts63"
   host: "localhost"
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
@@ -122,9 +116,9 @@ ims:
   password: "${IMS_PASSWORD}"
   datastore: "IMS2"
   ims_sys_hlq: "IMSV15"
-  ims_hlq: "{{app.base_name}}.IMS2"
+  ims_hlq: "{{app.base_name}}.{{ims.datastore}}"
   ims_home: "/usr/lpp/ims/ims15"
-  dfs_ds_volume_1: "IMSV15"
+  dfs_ds_volume_1: "{{ ims.ims_sys_hlq }}"
   ims_connect:
     hostname: "localhost"
     port: 9977
@@ -143,7 +137,7 @@ ims:
   use_pseudo_wfi: no
   dfs_auth_lib_hlq1: "{{ app.base_name }}"
   dfs_auth_lib_hlq2: "{{ ims.dfs_ims_ssid }}"
-  dfs_auth_lib_syshlq1: "IMSV15"
+  dfs_auth_lib_syshlq1: "{{ ims.ims_sys_hlq }}"
   dsnexit: "{{ db2.sdsnexit }}"
   dsnlod2: "{{ db2.sdsnlod2 }}"
   dsnload: "{{ db2.sdsnload }}"
@@ -192,14 +186,17 @@ ims:
 
 # DB2 configuration
 db2:
+  db2_hlq: "DB2V13"
   hostname: "localhost"
   sqlid: "${ZOS_USER}"
   ssid: "DBD1"
+  package: "BANKZPACK"
+  plan: "BANKZPLN"
   port: 8102
   password: "${ZOS_USER_PASSWORD}"
-  localtion: "DBD1LOC"
-  sdsnexit: "DB2V13.SDSNEXIT"
-  sdsnload: "DB2V13.SDSNLOAD"
-  sdsnlod2: "DB2V13.SDSNLOD2"
-  jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  runlib: "DBD1.RUNLIB.LOAD"
+  location: "{{ db2.ssid }}LOC"
+  sdsnexit: "{{ db2.db2_hlq }}.SDSNEXIT"
+  sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
+  sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
+  jobcard: "//{{jobname if jobname is defined else '{{ app.short_name }}JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  runlib: "{{ db2.ssid }}.RUNLIB.LOAD"

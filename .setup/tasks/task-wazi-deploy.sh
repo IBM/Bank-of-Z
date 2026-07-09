@@ -23,21 +23,11 @@ cd $SCRIPTS_DIR
 # =========================
 # Environment
 # =========================
-export PYENV_ACTIVATE_PATH="${PYENV_ACTIVATE_PATH:-$(get_section_value 'wazideploy' 'wazideploy_home')/bin/activate}"
-export DEPLOYMENT_METHOD="${DEPLOYMENT_METHOD:-$(get_section_value 'wazideploy' 'deployment_method')}"
-export DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-$(get_section_value 'wazideploy' 'deployment_envfile')}"
-export ZDEPLOY_FOLDER="${ZDEPLOY_FOLDER:-$(get_section_value 'wazideploy' 'zdeploy_dir')}"
+
 export TARGET_HLQ="${TARGET_HLQ:-"$APP_BASE_NAME.$APP_ZOS_VERSION"}"
-export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
-export DBB_LOG_FOLDER="${DBB_LOG_FOLDER:-$(get_section_value 'dbb' 'dbb_log_dir')}"
-export DEPLOY_LOG_FOLDER="${DEPLOY_LOG_FOLDER:-$(get_section_value 'wazideploy' 'deploy_log_dir')}"
-export TYPES_MAPPING_FILES="${TYPES_MAPPING_FILES:-$(get_section_value 'wazideploy' 'types_pattern_mapping')}"
-export ZOS_CONNECT_SERVER_FOLDER="${ZOS_CONNECT_SERVER_FOLDER:-$(get_section_value 'zosconnect' 'server_dir')/servers/bankzServer}"
-export SANDBOX_PATH="${SANDBOX_PATH:-$(get_section_value 'sandbox' 'path')}"
 export PACKAGE_URL="$(ls "$DBB_LOG_FOLDER/${APP_BASE_NAME}"*.tar 2>/dev/null || true)"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
-export PYTHONUNBUFFERED=1 
 export DEPLOY_TEMPLATES_PATH="$SCRIPTS_DIR/../deploy"
 # =========================
 # Output directories
@@ -106,8 +96,8 @@ if [[ "$PACKAGE_URL" != /* ]]; then
 fi
 
 # Copy types_pattern_mapping.yml for BankZ artifact deployment
-if [ -f "$TYPES_MAPPING_FILES" ]; then
-    TARGET_TYPES_DIR="$ZDEPLOY_FOLDER/deployment-configuration/global"
+if [ -f "$DEPLOY_TYPES_MAPPING_FILES" ]; then
+    TARGET_TYPES_DIR="$DEPLOY_ZDEPLOY_FOLDER/deployment-configuration/global"
     
     # Create target directory if it doesn't exist
     if [ ! -d "$TARGET_TYPES_DIR" ]; then
@@ -117,18 +107,18 @@ if [ -f "$TYPES_MAPPING_FILES" ]; then
     
     # Copy the types mapping file
     if [ -d "$TARGET_TYPES_DIR" ]; then
-        cp "$TYPES_MAPPING_FILES" "$TARGET_TYPES_DIR/types_pattern_mapping.yml"
+        cp "$DEPLOY_TYPES_MAPPING_FILES" "$TARGET_TYPES_DIR/types_pattern_mapping.yml"
         print_info "${CYAN}[WAZIDEPLOY]${NC} Copied types_pattern_mapping.yml to $TARGET_TYPES_DIR"
     else
         print_error "${CYAN}[WAZIDEPLOY]${NC} Failed to create target directory: $TARGET_TYPES_DIR"
         print_error "${CYAN}[WAZIDEPLOY]${NC} BankZ artifact deployment may fail"
     fi
 else
-    print_warning "${CYAN}[WAZIDEPLOY]${NC} types_pattern_mapping.yml not found at: $TYPES_MAPPING_FILES"
+    print_warning "${CYAN}[WAZIDEPLOY]${NC} types_pattern_mapping.yml not found at: $DEPLOY_TYPES_MAPPING_FILES"
     print_warning "${CYAN}[WAZIDEPLOY]${NC} BankZ artifact deployment may use default mappings"
 fi
 
-source "${PYENV_ACTIVATE_PATH}"
+source "${DEPLOY_PYENV_ACTIVATE_PATH}"
 
 # =========================
 # BankZ Deployment
@@ -140,7 +130,9 @@ print_info "${CYAN}[WAZIDEPLOY]${NC} ========================================="
 print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-generate for BankZ"
 
 CMD="wazideploy-generate \
- --deploymentMethod $DEPLOYMENT_METHOD \
+ --deploymentPlanName $APP_BASE_NAME \
+ --deploymentPlanVersion $APP_FULL_VERSION \
+ --deploymentMethod $DEPLOY_DEPLOYMENT_METHOD \
  --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
  --deploymentPlanReport $outputDir/deploymentPlanReport-bankz.html \
  --packageInputFile $PACKAGE_URL"
@@ -148,10 +140,18 @@ CMD="wazideploy-generate \
 print_info "${CYAN}[WAZIDEPLOY]${NC} Executing command:"
 print_info "${CYAN}[WAZIDEPLOY]${NC} \t$CMD"
 
-${CMD} 2>&1 | tee "${outputDir}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
+${CMD}  --deploymentPlanDescription "$APP_DESCRIPTION" 2>&1 | tee "${outputDir}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
 do
     print_info "${CYAN}[WAZIDEPLOY]${NC} [GENERATE-BANKZ $line"
 done
+
+RC=${PIPESTATUS[0]}
+rm -f message.log
+
+if [ $RC -ne 0 ]; then
+    print_error "${CYAN}[WAZIDEPLOY]${NC} generate failed with RC=$RC"
+    exit $RC
+fi
 
 print_info "${CYAN}[WAZIDEPLOY]${NC} Starting wazideploy-deploy for BankZ"
 
@@ -170,11 +170,12 @@ CMD="wazideploy-deploy \
  --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
  --envFile $DEPLOY_ENV_FILE \
  -e script_dir=$SCRIPTS_DIR \
+ -e @$CONFIG_FILE\
  -e application=$APP_BASE_NAME \
  -e hlq=$TARGET_HLQ \
- -e deploy_cfg_home=$ZDEPLOY_FOLDER \
- -e zos_connect_root=$ZOS_CONNECT_SERVER_FOLDER \
- -e sandbox_path=$SANDBOX_PATH \
+ -e deploy_cfg_home=$DEPLOY_ZDEPLOY_FOLDER \
+ -e zos_connect_root=$ZOSCONNECT_SERVER_FOLDER \
+ -e sandbox_path=$SANDBOX_DIR \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
  --evidencesFileName ${evidenceDir}/evidence-bankz.yaml $@"

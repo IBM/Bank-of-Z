@@ -309,49 +309,49 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
    [INFO] Running Bank of Z database setup script...
    [INFO] Executing: bash /usr/local/sandboxes/bank-of-z/Bank-of-Z/.setup/setup/setup-cics-region.sh
-   [INFO] [ZCONFIG-INSTALL] VS01       2026154  11:43:52.00             ISF031I CONSOLE IBMU0000 ACTIVATED
-   [INFO] [ZCONFIG-INSTALL] VS01       2026154  11:43:52.00            -C CICSBOZ
-   [INFO] [ZCONFIG-INSTALL] VS01       2026154  11:43:52.00             IEE301I CICSBOZ           CANCEL COMMAND ACCEPTED
-   [INFO] [ZCONFIG-INSTALL] ALLOC DA('BANKZ.V0R1M0.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] = STAGE 1: Create JVM profile file
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] [SUCCESS] JVM profile file created successfully!
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] = STAGE 2: Create CICS resource overrides file
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] [SUCCESS] Overrides file created successfully!
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] = STAGE 3: Create CICS instance with zconfig
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   JVM profile created successfully at '/usr/local/sandboxes/bank-of-z/CICSBOZ/JVMProfiles/EYUSMSSJ.jvmprofile'                               
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHLRQ'                                                                                      
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHLCD'                                                                      
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHTEMP'                                                                                     
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHINTRA'                                                                                    
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHDMPB'                                                                                     
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHAUXT'                                                                                     
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHBUXT'                                                                                     
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHDMPA'                                                                                     
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHSTART'                                                                                    
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHGCD'                                                                      
-   [INFO] [ZCONFIG-INSTALL] WARNING  Executing DFHCSDUP on 'BANKZ.CICSBOZ.DFHCSD' raised a warning. For more information, see the log:                                          
-   [INFO] [ZCONFIG-INSTALL]          '/u/ibmuser/.zconfig/logs/cics_region_CICSBOZ-2026-06-03T11:44:12.139233.txt'                                                              
-   [INFO] [ZCONFIG-INSTALL] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHCSD'                                                                      
-   [INFO] [ZCONFIG-INSTALL]   Applying configuration... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 0:00:16[SUCCESS] ZConfig completed successfully!
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] = STAGE 4: Start CICS region
-   [INFO] [ZCONFIG-INSTALL] =================================================================
-   [INFO] [ZCONFIG-INSTALL] 
-   [INFO] [ZCONFIG-INSTALL] JOB00179
-   [INFO] [ZCONFIG-INSTALL] [INFO] [ZCONFIG-INSTALL] CICS Region Job Started
+   [INFO] [ZCONFIG-CICS] VS01       2026154  11:43:52.00             ISF031I CONSOLE IBMU0000 ACTIVATED
+   [INFO] [ZCONFIG-CICS] VS01       2026154  11:43:52.00            -C CICSBOZ
+   [INFO] [ZCONFIG-CICS] VS01       2026154  11:43:52.00             IEE301I CICSBOZ           CANCEL COMMAND ACCEPTED
+   [INFO] [ZCONFIG-CICS] ALLOC DA('BANKZ.V0R1M0.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(5,5) CYL DIR(20)
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] = STAGE 1: Create JVM profile file
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] [SUCCESS] JVM profile file created successfully!
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] = STAGE 2: Create CICS resource overrides file
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] [SUCCESS] Overrides file created successfully!
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] = STAGE 3: Create CICS instance with zconfig
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] OUTPUT   JVM profile created successfully at '/usr/local/sandboxes/bank-of-z/CICSBOZ/JVMProfiles/EYUSMSSJ.jvmprofile'                               
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHLRQ'                                                                                      
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHLCD'                                                                      
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHTEMP'                                                                                     
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHINTRA'                                                                                    
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHDMPB'                                                                                     
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHAUXT'                                                                                     
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHBUXT'                                                                                     
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHDMPA'                                                                                     
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created data set: 'BANKZ.CICSBOZ.DFHSTART'                                                                                    
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHGCD'                                                                      
+   [INFO] [ZCONFIG-CICS] WARNING  Executing DFHCSDUP on 'BANKZ.CICSBOZ.DFHCSD' raised a warning. For more information, see the log:                                          
+   [INFO] [ZCONFIG-CICS]          '/u/ibmuser/.zconfig/logs/cics_region_CICSBOZ-2026-06-03T11:44:12.139233.txt'                                                              
+   [INFO] [ZCONFIG-CICS] OUTPUT   Successfully created and initialized data set: 'BANKZ.CICSBOZ.DFHCSD'                                                                      
+   [INFO] [ZCONFIG-CICS]   Applying configuration... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 0:00:16[SUCCESS] ZConfig completed successfully!
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] = STAGE 4: Start CICS region
+   [INFO] [ZCONFIG-CICS] =================================================================
+   [INFO] [ZCONFIG-CICS] 
+   [INFO] [ZCONFIG-CICS] JOB00179
+   [INFO] [ZCONFIG-CICS] [INFO] [ZCONFIG-CICS] CICS Region Job Started
    [SUCCESS] Bank of Z application setup completed successfully
 
    =================================================================

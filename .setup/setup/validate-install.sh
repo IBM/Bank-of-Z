@@ -26,9 +26,6 @@ export DBB_CONFG_HOME=$(get_section_value 'dbb' 'dbb_home')
 if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
     export DBB_HOME=$DBB_CONFG_HOME
 fi
-export ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
-export ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
-export WAZIDEPLOY_HOME="${WAZIDEPLOY_HOME:-$(get_section_value 'wazideploy' 'wazideploy_home')}"
 export PATH="$DBB_HOME/bin:$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -201,11 +198,11 @@ print_info "${CYAN}[VALIDATE]${NC} ========================================="
 
 WAZIDEPLOY_MIN_VERSION="3.0.7.3"
 
-if [ -f "$WAZIDEPLOY_HOME/bin/activate" ]; then
-    print_info "${CYAN}[VALIDATE]${NC} Found Wazi Deploy activation script: $WAZIDEPLOY_HOME/bin/activate"
+if [ -f "$DEPLOY_WAZIDEPLOY_HOME/bin/activate" ]; then
+    print_info "${CYAN}[VALIDATE]${NC} Found Wazi Deploy activation script: $DEPLOY_WAZIDEPLOY_HOME/bin/activate"
     
     # Test wazideploy-deploy version
-    WAZIDEPLOY_OUTPUT=$(bash -c "source '$WAZIDEPLOY_HOME/bin/activate' && wazideploy-deploy --version 2>&1" || true)
+    WAZIDEPLOY_OUTPUT=$(bash -c "source '$DEPLOY_WAZIDEPLOY_HOME/bin/activate' && wazideploy-deploy --version 2>&1" || true)
     
     print_info "${CYAN}[VALIDATE]${NC} Wazi Deploy Output:"
     if [ -n "$WAZIDEPLOY_OUTPUT" ]; then
@@ -234,7 +231,7 @@ if [ -f "$WAZIDEPLOY_HOME/bin/activate" ]; then
     fi
 else
     print_error "${RED}[VALIDATE]${NC} Wazi Deploy activation script not found"
-    print_error "${RED}[VALIDATE]${NC} Expected location: $WAZIDEPLOY_HOME/bin/activate"
+    print_error "${RED}[VALIDATE]${NC} Expected location: $DEPLOY_WAZIDEPLOY_HOME/bin/activate"
     VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
 fi
 

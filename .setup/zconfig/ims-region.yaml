@@ -3,11 +3,15 @@
 vars:
   imsid: IMS2
   ims_hlq: BANKZ.IMS2
+  ims_sys_hlq: IMSV15
+  ims_plex: PLEX2
+  db2_hlq: DB2V13
+  db2_ssid: DBD1
 ims:
   ims_id: "{{ vars.imsid }}"
-  ims_sys_hlq: IMSV15
+  ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"
-  db2_hlq: DB2V13
+  db2_hlq: "{{ vars.db2_hlq }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: "{{ vars.ims_user_lower }}"
@@ -26,7 +30,7 @@ ims:
         aoi_type1_security_mode: R
         appc_enablement: false
         appc_security_setting: F
-        ims_vtam_appl_id: IMS2
+        ims_vtam_appl_id: "{{ vars.imsid }}"
         automatic_restart_manager_registration: false
         dynamic_terminal_auto_signoff_time: 60
         automatic_restart: false
@@ -40,12 +44,12 @@ ims:
         maximum_number_dedb_buffers: 100
         dedb_buffer_pool_page_free_option: 0
         dedb_additional_buffers: 10
-        recovery_control_server_name: IMS2DRC
+        recovery_control_server_name: "{{ vars.imsid }}DRC"
         database_workarea_pool_size: 24576
         dfsdc_file_suffix: 0
         console_message_descriptor_overide: 7
         component_subset_configuration_file_suffix: '000' #$hg pratap has fixed it, need to merge the fix
-        database_server_name: IMS2DLI
+        database_server_name: "{{ vars.imsid }}DLI"
         database_server_private_size_for_program_scheduling_definition_files: 716800
         undeliverable_message_purge_time: 60
         database_scheduling_pool_size: 49152 #$hg204800
@@ -68,8 +72,8 @@ ims:
         number_of_format_fetch_request_elements: 30
         otma_xcf_group_name: IMSXCFGN
         high_communication_io_pool_upper_limit_expansion: 2047M
-        dependent_region_scheduling_connection_id: IMS2
-        ims_identifier: IMS2
+        dependent_region_scheduling_connection_id: "{{ vars.imsid }}"
+        ims_identifier: "{{ vars.imsid }}"
         time_to_calculate_iovf_free_space_for_each_open_area: 7200
         irlm_enablement: false
         database_lock_manager_server_name: XRLM
@@ -100,7 +104,7 @@ ims:
         open_transaction_server_synchronous_output_tpipe: false
         program_isolation_getmain_size_increment: 65536
         program_isolation_maximum_table_size: 1048576
-        ims_proclib_reader_procedure_name: IMS2RDR
+        ims_proclib_reader_procedure_name: "{{ vars.imsid }}RDR"
         suffix_of_the_program_preload_list_file: DC
         common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12288
         work_area_pool_size_for_program_scheduling_definition_files: 24576 #$hg974848
@@ -128,7 +132,7 @@ ims:
         shared_printer_router_message_exit: false
         sysout_class_for_spin_off_dumps: 0
         directed_load_standard_search_order: 0
-        external_subsystem_configuration_file_name: DBD1
+        external_subsystem_configuration_file_name: "{{ vars.db2_ssid }}"
         ims_nucleus_file_suffix: I
         ims_type_2_svc_number: 203
         shared_vso_remote_site_emergency_restart_option: NONE
@@ -145,7 +149,7 @@ ims:
       config:
         common_service_layer:
           cmdsec: false
-          imsplex: PLEX2
+          imsplex: "{{ vars.ims_plex }}"
           modblks: DYN
         dynamic_resources:
           autoexport: AUTO
@@ -181,7 +185,7 @@ ims:
             versions: 55
           acbmgmt: CATALOG
           access: UPDATE
-          ixvolser: IMSV15
+          ixvolser: "{{ vars.ims_sys_hlq }}"
     - member_name: DFSFIXDC
       config:
         nuc: 33
@@ -236,37 +240,37 @@ ims:
           descriptor_name: IMSDTOR1
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: TPIPE1
         - descriptor_type: D
           descriptor_name: IMSDTOR2
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: TPIPE2
         - descriptor_type: D
           descriptor_name: IMSDTOR3
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: TPIPE3
         - descriptor_type: D
           descriptor_name: IMSDTOR4
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: TPIPE4
         - descriptor_type: D
           descriptor_name: IMSDTOR5
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: TPIPE5
         - descriptor_type: D
           descriptor_name: IMSDTOR6
           descriptor_parameters:
           - type: IMSCON
-          - tmember: IMS2HWS
+          - tmember: "{{ vars.imsid }}HWS"
           - tpipe: IVPPIPE6
     - member_name: DFSDSCMI
       config:
@@ -361,7 +365,7 @@ ims:
         armrst: N
         sciname: 2SCI1
         imsplex:
-          name: PLEX2
+          name: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
       config:
         armrst: N
@@ -369,19 +373,19 @@ ims:
         cmdsec: N
         omname: 2OM1
         imsplex:
-          name: PLEX2
+          name: "{{ vars.ims_plex }}"
           auditlog: SYSLOG.OM2Q01.LOG
-        cmdtextdsn: IMSV15.SDFSDATA
+        cmdtextdsn: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:
         armrst: N
         rmname: 2RM1
         imsplex:
-          name: PLEX2
+          name: "{{ vars.ims_plex }}"
     - member_name: HWSCFODB
       config:
         hws:
-          id: IMS2HWS
+          id: "{{ vars.imsid }}HWS"
           xibarea: 100
           racf: false
           rrs: false
@@ -406,22 +410,22 @@ ims:
           - HWSSOAP1
           - HWSDPWR1
         datastore:
-          id: IMS2
+          id: "{{ vars.imsid }}"
           group: IMSXCFGN
-          member: IMS2HWS
-          tmember: IMS2
+          member: "{{ vars.imsid }}HWS"
+          tmember: "{{ vars.imsid }}"
           dru: HWSYDRU0
           appl: APPLID1
         imsplex:
-          member: IMS2HWS
-          tmember: PLEX2
+          member: "{{ vars.imsid }}HWS"
+          tmember: "{{ vars.ims_plex }}"
         adapter:
           xml: true
         odaccess:
           odbmautoconn: false
           imsplex:
             member: HWS1
-            tmember: PLEX2
+            tmember: "{{ vars.ims_plex }}"
           drdaport:
             id: 9978
             porttmot: 6000

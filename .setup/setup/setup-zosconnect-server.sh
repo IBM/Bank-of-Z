@@ -153,6 +153,23 @@ EOF
 
 # Deploy API WAR file configuration
 # ==================# =========================
+# Deploy SSL/TLS configuration (RACF keyring)
+# =========================
+OVERRIDES_DIR="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides"
+SSL_SRC_DIR="${BANK_DIR}/.setup/setup/zosconnect-ssl"
+if [ -d "$SSL_SRC_DIR" ]; then
+    print_info "${CYAN}[ZOSCONNECT]${NC} Deploying SSL configuration..."
+    cp "$SSL_SRC_DIR/tls.xml"           "$OVERRIDES_DIR/tls.xml"
+    cp "$SSL_SRC_DIR/http-endpoint.xml" "$OVERRIDES_DIR/http-endpoint.xml"
+    # Tag as ASCII so Liberty reads them correctly
+    chtag -t -c ISO8859-1 "$OVERRIDES_DIR/tls.xml"
+    chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
+    print_success "SSL configuration deployed"
+else
+    print_warning "SSL config directory not found, skipping: $SSL_SRC_DIR"
+fi
+
+# =========================
 # Configure CORS for frontend server
 # =========================
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF

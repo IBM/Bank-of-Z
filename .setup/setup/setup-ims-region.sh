@@ -85,6 +85,11 @@ rm -rf "$SANDBOX_DIR/diagnostics"
 # =========================
 print_stage "STAGE 1: Create Debugger Artifacts for IMS"
 
+rm -f /tmp/create-imsiso-loadlib*
+rm -f /tmp/create-imsiso-tables*
+rm -f /tmp/compile-eqaopts*
+rm -f /tmp/link-edit-imsiso-exit*
+
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${APP_BASE_NAME}.IMS" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.j2"  --outputFile "/tmp/create-imsiso-loadlib-$$.jcl"
 

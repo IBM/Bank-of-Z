@@ -40,18 +40,18 @@ if [ -d "$WLP_USER_DIR" ]; then
     # otherwise rm -rf returns RC=0 but leaves the directory skeleton behind,
     # causing CWWKE0045E on the subsequent 'server create'.
     set +e
-    "${LIBERTY_HOME}/bin/server" stop "${SERVER_NAME}" 2>/dev/null
+    "${FRONTEND_LIBERTY_HOME}/bin/server" stop "${SERVER_NAME}" 2>/dev/null
     sleep 3
     set -e
     rm -rf "$WLP_USER_DIR"
 fi
 
 # Remove any stale server Liberty may have created under its own default usr/ directory
-rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
+rm -rf "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 
 # Create the server. WLP_USER_DIR is exported so Liberty places it directly
 # under ${WLP_USER_DIR}/servers/${SERVER_NAME} — no mv needed.
-"${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+"${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
 
 if [ $? -eq 0 ]; then
     print_success "Frontend Liberty server created successfully at $WLP_USER_DIR"

@@ -35,7 +35,7 @@ fi
 set -e
 
 
-if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" ]]; then
+if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${BASH_SOURCE[0]}" ]]; then
     echo "Creating $ENV_FILE file - Not already exists or not in sync with config.yml ..."
     cat > "$ENV_FILE" <<EOF
 # =========================

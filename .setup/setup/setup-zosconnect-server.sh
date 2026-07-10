@@ -158,7 +158,11 @@ EOF
 # Deploy SSL/TLS configuration (RACF keyring)
 # =========================
 OVERRIDES_DIR="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides"
+# Resolve SSL source dir — works whether called from repo or via BANK_DIR
 SSL_SRC_DIR="${BANK_DIR}/.setup/setup/zosconnect-ssl"
+if [ ! -d "$SSL_SRC_DIR" ]; then
+    SSL_SRC_DIR="${SCRIPTS_DIR}/zosconnect-ssl"
+fi
 if [ -d "$SSL_SRC_DIR" ]; then
     print_info "${CYAN}[ZOSCONNECT]${NC} Deploying SSL configuration..."
     cp "$SSL_SRC_DIR/tls.xml"           "$OVERRIDES_DIR/tls.xml"
@@ -173,17 +177,15 @@ fi
 
 # =========================
 # Configure CORS for frontend server
+# cors-1.0 is not available in z/OS Connect — use zosconnect:cors element instead
 # =========================
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="CORS configuration for frontend server">
-    <featureManager>
-        <feature>cors-1.0</feature>
-    </featureManager>
 
-    <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports) -->
-    <cors domain="/api"
-          allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://${HOST_IP}:${FRONTEND_HTTP_PORT}, https://${HOST_IP}:${FRONTEND_HTTPS_PORT}"
+    <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports).
+         Uses zosconnect:cors — cors-1.0 feature is not available in z/OS Connect. -->
+    <zosconnect_cors allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://${HOST_IP}:${FRONTEND_HTTP_PORT}, https://${HOST_IP}:${FRONTEND_HTTPS_PORT}"
           allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
           allowedHeaders="*"
           allowCredentials="true"

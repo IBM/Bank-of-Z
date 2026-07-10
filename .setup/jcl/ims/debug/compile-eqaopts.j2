@@ -1,7 +1,7 @@
 //EQAOPTS JOB 5724-T07,MSGLEVEL=(1,1),MSGCLASS=A
 //PROC JCLLIB ORDER=(ASM.SASMSAM1)
 // SET GPFMLIB=EQAW.SEQASAMP
-// SET GPFLMOD=&SYSUID..IMSISO.LOADLIB
+// SET GPFLMOD={{ ims_hlq }}.IMSISO.LOADLIB
 //*
 //********************************************************************
 //*  This job assembles and links a copy of EQAOPTS.
@@ -145,7 +145,7 @@ EQAOPTS  RMODE ANY
 *        EQAXOPT  DISABLERLIM,YES                                  @C9A
 *        EQAXOPT  CEEREACTAFTERQDBG,NO                             @12A
 *        EQAXOPT  DLAYDBG,NO                                       @L3A
-         EQAXOPT  DLAYDBGDSN,'USR.&&USERID.DLAYDBG.EQAUOPTS'       @L3A
+         EQAXOPT  DLAYDBGDSN,'{{ ims_hlq }}.&&USERID.DLAYDBG.EQAUOPTS'     
 *        EQAXOPT  DLAYDBGTRC,2                                     @L3A
 *        EQAXOPT  DLAYDBGCND,ALL                                   @L4A
 *        EQAXOPT  DLAYDBGXRF,DSN,'EQAW.TRNUSRID.XREF'              @L5A

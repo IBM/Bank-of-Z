@@ -36,7 +36,7 @@
 //DELETE    EXEC PGM=IDCAMS,REGION=1M
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
- DELETE &SYSUID..DEBUG.EQATITBL
+ DELETE {{ ims_hlq }}.DEBUG.EQATITBL
  SET MAXCC=0
 /*
 //*********************************************************************
@@ -51,16 +51,16 @@
  /* DATA SETS                 */
  /*                           */
     DEFINE CLUSTER (RECORDS(999) -
-     NAME (&SYSUID..ZDEBUG.EQATITBL) -
+     NAME ({{ ims_hlq }}.ZDEBUG.EQATITBL) -
      SHAREOPTIONS(2 3) -
      LOG(NONE) -
      INDEXED)         -
     DATA -
      (RECSZ(200,200)   -
-     NAME (&SYSUID..ZDEBUG.EQATITBL.DATA) -
+     NAME ({{ ims_hlq }}.ZDEBUG.EQATITBL.DATA) -
      KEYS(11 0)  -
      FREESPACE(10 10) -
      BUFFERSPACE (20000)) -
    INDEX -
-     (NAME(&SYSUID..ZDEBUG.EQATITBL.INDX))
+     (NAME({{ ims_hlq }}.ZDEBUG.EQATITBL.INDX))
 /*

@@ -85,10 +85,26 @@ rm -rf "$SANDBOX_DIR/diagnostics"
 # =========================
 print_stage "STAGE 1: Create Debugger Artifacts for IMS"
 
-run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.jcl" "8"
-run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.jcl" "8"
-run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.jcl" "8"
-run_job_and_wait "$SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.jcl" "8"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${APP_BASE_NAME}.IMS" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.j2"  --outputFile "/tmp/create-imsiso-loadlib-$$.jcl"
+
+run_job_and_wait "/tmp/create-imsiso-loadlib-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${APP_BASE_NAME}.IMS" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.j2"  --outputFile "/tmp/create-imsiso-tables-$$.jcl"
+
+run_job_and_wait "/tmp/create-imsiso-tables-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${APP_BASE_NAME}.IMS" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.j2"  --outputFile "/tmp/compile-eqaopts-$$.jcl"
+
+run_job_and_wait "/tmp/compile-eqaopts-$$.jcl" "8"
+
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${APP_BASE_NAME}.IMS" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.j2"  --outputFile "/tmp/link-edit-imsiso-exit-$$.jcl"
+
+run_job_and_wait "/tmp/link-edit-imsiso-exit-$$.jcl" "8"
+
 # =========================
 # Stage 2: Create IMS instance with zconfig
 # =========================

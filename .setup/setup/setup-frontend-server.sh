@@ -22,7 +22,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-export PATH="$ZOAU_HOME/bin:$PATH"
+export PATH="$JAVA_HOME/bin:$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
 export WLP_USER_DIR="${SANDBOX_DIR}/frontend"
@@ -36,25 +36,27 @@ print_info "${CYAN}[FRONTEND]${NC} Creating Liberty server at: $WLP_USER_DIR"
 
 if [ -d "$WLP_USER_DIR" ]; then
     print_warning "Removing existing server at $WLP_USER_DIR"
+    # Stop any running server first so z/OS releases locks on workarea files,
+    # otherwise rm -rf returns RC=0 but leaves the directory skeleton behind,
+    # causing CWWKE0045E on the subsequent 'server create'.
+    set +e
+    "${LIBERTY_HOME}/bin/server" stop "${SERVER_NAME}" 2>/dev/null
+    sleep 3
+    set -e
     rm -rf "$WLP_USER_DIR"
 fi
 
-# Remove any stale server Liberty may have created under its own usr/ directory
-rm -rf "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
+# Remove any stale server Liberty may have created under its own default usr/ directory
+rm -rf "${LIBERTY_HOME}/usr/servers/${SERVER_NAME}"
 
-# Create the server using Liberty's server command (creates under FRONTEND_LIBERTY_HOME/usr by default)
-"${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+# Create the server. WLP_USER_DIR is exported so Liberty places it directly
+# under ${WLP_USER_DIR}/servers/${SERVER_NAME} — no mv needed.
+"${LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
 
-# Move server to our WLP_USER_DIR
-if [ -d "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
-    mv "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
-fi
-
-RC=$?
-if [ $RC -eq 0 ]; then
+if [ $? -eq 0 ]; then
     print_success "Frontend Liberty server created successfully at $WLP_USER_DIR"
 else
-    print_error "Failed to create Frontend Liberty server (RC=$RC)"
+    print_error "Failed to create Frontend Liberty server"
     exit 1
 fi
 

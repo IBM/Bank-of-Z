@@ -176,8 +176,14 @@ fi
 # the same Liberty instance as the API — no CORS, single origin, single port.
 # This overrides the Wazi Deploy-generated bank-frontend-vanilla.xml which
 # sets contextRoot="/bank-frontend-vanilla".
+#
+# IMPORTANT: Liberty resolves dropin conflicts alphabetically — last file wins.
+# "bank-frontend-vanilla.xml" (v) > "bank-frontend-root.xml" (r), so root.xml
+# would lose. We name it "zz-bank-frontend-root.xml" to sort after vanilla.xml.
 # =========================
-cat > "${OVERRIDES_DIR}/bank-frontend-root.xml" << 'EOF'
+# Write as EBCDIC to /tmp then iconv to ISO8859-1 — heredoc on z/OS produces EBCDIC bytes,
+# so we must convert before tagging; Liberty reads ISO8859-1-tagged files as ASCII/Latin-1.
+cat > /tmp/zz-bank-frontend-root.xml << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
     <!-- Override context root for frontend WAR — serve at / alongside /api -->
@@ -189,8 +195,12 @@ cat > "${OVERRIDES_DIR}/bank-frontend-root.xml" << 'EOF'
     </webApplication>
 </server>
 EOF
-chtag -t -c ISO8859-1 "${OVERRIDES_DIR}/bank-frontend-root.xml"
-print_success "Frontend WAR context root override deployed"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/zz-bank-frontend-root.xml > "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
+chtag -t -c ISO8859-1 "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
+rm -f /tmp/zz-bank-frontend-root.xml
+# Remove the old (losing) name if it exists from a previous run
+rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
+print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \

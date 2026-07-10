@@ -30,7 +30,7 @@ export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
 export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 export FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
-export HOST_IP=$(netstat -h 2>/dev/null | awk '/ OSA/ {print $1; exit}')
+export HOST_IP=$(netstat -h 2>/dev/null | awk '/IntfName:.*OSA/{found=1} found && /Address:/{print $2; exit}')
 
 # IMS environment variables
 export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}

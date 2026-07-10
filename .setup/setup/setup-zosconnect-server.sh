@@ -153,45 +153,44 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
 </server>
 EOF
 
-# Deploy API WAR file configuration
-# ==================# =========================
+# =========================
 # Deploy SSL/TLS configuration (RACF keyring)
+# Resolve SSL source dir — works whether called from repo or via BANK_DIR
 # =========================
 OVERRIDES_DIR="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides"
-# Resolve SSL source dir — works whether called from repo or via BANK_DIR
 SSL_SRC_DIR="${BANK_DIR}/.setup/setup/zosconnect-ssl"
 if [ ! -d "$SSL_SRC_DIR" ]; then
     SSL_SRC_DIR="${SCRIPTS_DIR}/zosconnect-ssl"
 fi
 if [ -d "$SSL_SRC_DIR" ]; then
     print_info "${CYAN}[ZOSCONNECT]${NC} Deploying SSL configuration..."
-    cp "$SSL_SRC_DIR/tls.xml"           "$OVERRIDES_DIR/tls.xml"
-    cp "$SSL_SRC_DIR/http-endpoint.xml" "$OVERRIDES_DIR/http-endpoint.xml"
-    # Tag as ASCII so Liberty reads them correctly
+    cp "$SSL_SRC_DIR/tls.xml" "$OVERRIDES_DIR/tls.xml"
     chtag -t -c ISO8859-1 "$OVERRIDES_DIR/tls.xml"
-    chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
     print_success "SSL configuration deployed"
 else
     print_warning "SSL config directory not found, skipping: $SSL_SRC_DIR"
 fi
 
 # =========================
-# Configure CORS for frontend server
-# cors-1.0 is not available in z/OS Connect — use zosconnect:cors element instead
+# Override frontend WAR context root to / so it serves at the root of
+# the same Liberty instance as the API — no CORS, single origin, single port.
+# This overrides the Wazi Deploy-generated bank-frontend-vanilla.xml which
+# sets contextRoot="/bank-frontend-vanilla".
 # =========================
-cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
+cat > "${OVERRIDES_DIR}/bank-frontend-root.xml" << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="CORS configuration for frontend server">
-
-    <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports).
-         Uses zosconnect:cors — cors-1.0 feature is not available in z/OS Connect. -->
-    <zosconnect_cors allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://${HOST_IP}:${FRONTEND_HTTP_PORT}, https://${HOST_IP}:${FRONTEND_HTTPS_PORT}"
-          allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
-          allowedHeaders="*"
-          allowCredentials="true"
-          maxAge="3600" />
+<server>
+    <!-- Override context root for frontend WAR — serve at / alongside /api -->
+    <webApplication id="bank-frontend-vanilla"
+                    location="${server.config.dir}/apps/bank-frontend-vanilla.war"
+                    name="bank-frontend-vanilla"
+                    contextRoot="/">
+        <classloader delegation="parentLast" />
+    </webApplication>
 </server>
 EOF
+chtag -t -c ISO8859-1 "${OVERRIDES_DIR}/bank-frontend-root.xml"
+print_success "Frontend WAR context root override deployed"
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \

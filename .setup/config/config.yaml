@@ -81,15 +81,16 @@ taz:
   hlq: "EQAW"
   steplib: "{{taz.hlq}}.SEQAMOD"
 
-# z/OS Connect (API exposure)
+# z/OS Connect (API exposure + frontend static files)
+# Single Liberty instance hosts both api.war (/api) and bank-frontend-vanilla.war (/)
 zosconnect:
   zosconnect_home: "/usr/lpp/IBM/zosconnect/bin"
   server_dir: "{{sandbox.path}}/zosconnect-server"
   server_name: "bankOfZServer"
   http_port: 9080
-  https_port: 9445
+  https_port: 9444
 
-# Frontend Liberty Server (separate from z/OS Connect)
+# Frontend Liberty Server — no longer used; frontend is hosted on z/OS Connect
 frontend:
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
   server_dir: "{{sandbox.path}}/frontend"

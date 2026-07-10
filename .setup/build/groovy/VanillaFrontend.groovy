@@ -139,7 +139,11 @@ try {
     def warFile = new File("${outputDirectory}/${warName}")
     
     // Change to temp directory and create WAR
-    def createWarCmd = "cd ${tempWarDir.absolutePath} && chtag -r assets/images/* && jar -cvf ${warFile.absolutePath} *"
+    // Tag text files as ISO8859-1 and binary files as binary so Liberty serves them correctly
+    def createWarCmd = "cd ${tempWarDir.absolutePath} && " +
+        "find . -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.yaml' -o -name '*.json' -o -name '*.xml' | xargs chtag -t -c ISO8859-1 2>/dev/null; " +
+        "find . -path './assets/images/*' | xargs chtag -b 2>/dev/null; " +
+        "jar -cvf ${warFile.absolutePath} *"
     def warProc = [shell, "-c", createWarCmd].execute(env, new File(workspace))
     warProc.waitFor()
     

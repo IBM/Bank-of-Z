@@ -21,14 +21,7 @@ exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-IMS]${NC} $line
 # =========================
 # Environment
 # =========================
-export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
-export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export ZCONFIG_HOME=$(get_section_value 'zconfig' 'zconfig_home')
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")
-export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
-export BOZ_IMS_HLQ=${BOZ_IMS_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
-
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -36,13 +29,13 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # Stop IBM BOZ regions
 # =========================
 set +e
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
 sleep 5
-jcan P "IMS2JMP1" 2>/dev/null
-jcan P "IMS2MPP1" 2>/dev/null
-jcan P "IMS2MPP2" 2>/dev/null
+jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
+jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
+jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
 sleep 5
 set -e
 # =========================
@@ -92,7 +85,11 @@ IMS_USER=$(printf '%s' "${USER:-${LOGNAME}}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
-zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}" ims-region.yaml -v
+zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
+              -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
+              -e ims_plex="${IMS_PLEX}" \
+              -e ims_sys_hlq="${IMS_SYS_HLQ}" -e db2_hlq="${DB2_HLQ}" \
+              -e db2_ssid="${DB2_SSID}"  ims-region.yaml -v
 
 RC=$?
 if [ "$RC" -eq 0 ]; then

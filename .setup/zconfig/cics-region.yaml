@@ -40,7 +40,7 @@ cics_region:
       region: 0M
     dfhrpl:
       top_data_sets:
-        - "{{ vars.eqaw_hlq }}.SEQAMOD"
+        - "{{ vars.debug_hlq }}.SEQAMOD"
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB

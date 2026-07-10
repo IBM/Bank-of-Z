@@ -21,22 +21,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-export ZOSCONNECT_HOME=$(get_section_value 'zosconnect' 'zosconnect_home')
 export ZOSCONNECT_HOME=$(echo "$ZOSCONNECT_HOME" | sed "s|~|$HOME|g")
-export CICS_USER=${CICS_USER:-$(get_section_value 'cics' 'user')}
-export CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')} #pragma: allowlist secret
-export JAVA_HOME=$(get_section_value 'zconfig' 'java_home')
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
-export FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
-
-# IMS environment variables
-export IMS_HOST=${IMS_HOST:-$(get_section_value 'ims' 'host')}
-export IMS_PORT=${IMS_PORT:-$(get_section_value 'ims' 'port')}
-export IMS_USER=${IMS_USER:-$(get_section_value 'ims' 'user')}
-export IMS_PASSWORD=${IMS_PASSWORD:-$(get_section_value 'ims' 'password')} #pragma: allowlist secret
-export IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
-
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 

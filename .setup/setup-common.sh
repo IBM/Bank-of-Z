@@ -24,16 +24,17 @@ source "$SCRIPTS_DIR/config/setenv.sh"
 #########################################################
 stage_stop_tasks() {
     set +e
+    print_stage "STAGE: Stop running tasks (if any)"
     # =========================
     # Stop IBM IMS regions
     # =========================
-    jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-    jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-    jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+    jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
     sleep 5
-    jcan P "IMS2JMP1" 2>/dev/null
-    jcan P "IMS2MPP1" 2>/dev/null
-    jcan P "IMS2MPP2" 2>/dev/null
+    jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
+    jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
+    jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
     
     # =========================
     # Stop IBM CICS regions
@@ -44,8 +45,8 @@ stage_stop_tasks() {
     # =========================
     # Stop IBM zconn servers
     # =========================
-    jcan P "BAQ${APP_NAME}"  2>/dev/null
-    jcan P  "FE${APP_NAME}"  2>/dev/null
+    jcan P "BAQ${APP_BASE_NAME}"  2>/dev/null
+    jcan P "FE${APP_BASE_NAME}"  2>/dev/null
     
     # =========================
     # Stop IMS1
@@ -56,7 +57,13 @@ stage_stop_tasks() {
     # Clean application datasets
     # ===========================
     sleep 5
-    drm "${APP_BASE_NAME}.${APP_VERSION}.*" 2>/dev/null
+    drm "${APP_BASE_NAME}.${APP_ZOS_VERSION}.*" 2>/dev/null
+    drm "${APP_BASE_NAME}.*" 2>/dev/null
+    rm -rf "${SANDBOX_DIR}/CICS${APP_SHORT_NAME}" 2>/dev/null
+    rm -rf "${SANDBOX_DIR}/frontend" 2>/dev/null
+    rm -rf "${SANDBOX_DIR}/jars" 2>/dev/null
+    rm -rf "${SANDBOX_DIR}/zosconnect-server" 2>/dev/null
+    rm -rf "${SANDBOX_DIR}/logs" 2>/dev/null
     set -e
 }
 

@@ -42,7 +42,7 @@ types:
       backup: "{{ hlq }}.BACK.LOADLIB"
       spec: "{{ bankz_pds_load_spec }}"
     is_load: true
-    force_lock: True
+    force_lock: true
     force: true
     use_native_copy: true
     cics_systems:
@@ -62,7 +62,7 @@ types:
       name: "{{ hlq }}.DBRM"
       backup: "{{ hlq }}.BACK.DBRM"
       spec: "{{ common_pds_binary_spec }}"
-    is_binary: True
+    is_binary: true
     force_lock: false
     use_native_copy: true
     db2_systems:
@@ -81,7 +81,7 @@ types:
      directory_backup: "{{ uss_root }}/bin/back/"
      dest_mode: 0777
      artifact_mode: 0755
-    is_binary: True
+    is_binary: true
     use_native_copy: true
   - pattern: "SH"
     uss: 
@@ -95,40 +95,40 @@ types:
        backup_dest: '{{frontend_root}}/backup/apps'
        mode: 0755
     mode: 0777
-    is_binary: True
+    is_binary: true
   - pattern: ^(?!.*-frontend).*\.WAR$
     uss:
        dest: '{{zos_connect_root}}/apps'
        backup_dest: '{{zos_connect_root}}/backup/apps'
        mode: 0755
     mode: 0777
-    is_binary: True
+    is_binary: true
   - pattern: .*\.IMSLOAD$
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.PGMLIB"
       backup: "{{ hlq }}.BACK.PGMLIB"
       spec: "{{ bankz_pds_load_spec }}"
-    is_load: True
-    aliases: True
-    force_lock: True
+    is_load: true
+    aliases: true
+    force_lock: true
     use_native_copy: true
   - pattern: .*\.PSBLOAD$
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.PSBLIB"
       backup: "{{ hlq }}.BACK.PSBLIB"
       spec: "{{ bankz_pds_load_spec }}"
-    is_load: True
-    is_ims_psb: True
-    force_lock: True
+    is_load: true
+    is_ims_psb: true
+    force_lock: true
     use_native_copy: true
   - pattern: .*\.DBDLOAD$
     pds:
       name: "{{ ims_hlq }}.{{ ims_datastore }}.DBDLIB"
       backup: "{{ hlq }}.BACK.DBDLIB"
       spec: "{{ bankz_pds_load_spec }}"
-    force_lock: True
-    is_load: True
-    is_ims_dbd: True
+    force_lock: true
+    is_load: true
+    is_ims_dbd: true
     use_native_copy: true
   - pattern: .*\.JAR$
     uss:
@@ -136,7 +136,7 @@ types:
       backup_dest: "{{ sandbox_path }}/jars/back"
       mode: 0755
     mode: 0777
-    is_binary: True
+    is_binary: true
 type_dbrm_temp:
   - type: "DBRM"
     pattern: .*.DBRM$
@@ -144,7 +144,7 @@ type_dbrm_temp:
       name: "{{ hlq }}.TMP.DBRM"
       backup: "{{ hlq }}.BACK.TMP.DBRM"
       spec: "{{ common_pds_binary_spec }}"
-    is_binary: True
+    is_binary: true
     force_lock: false
     use_native_copy: true
     db2_systems:

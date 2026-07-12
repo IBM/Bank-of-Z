@@ -121,47 +121,50 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config
-# Write EBCDIC heredoc to /tmp, iconv to ASCII in /tmp, then cp (byte-exact)
-# to destination. Using cp avoids _BPXK_AUTOCVT re-encoding the > redirect.
+# Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
 # =========================
-cat > /tmp/cics_ebcdic.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<server description="IPIC connection to CICS">
+PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+CICS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
+$PYTHON -c "
+import sys
+content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<server description=\"IPIC connection to CICS\">
     <featureManager>
         <feature>zosconnect:cics-1.0</feature>
     </featureManager>
-    <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="${CICS_IPIC_PORT}" sysid="ZC01" authDataRef="cicsCredentials" requestTimeout="300s" />
-    <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
+    <zosconnect_cicsIpicConnection id=\"${APP_BASE_NAME_LOWER}CicsConnection\" host=\"127.0.0.1\" port=\"${CICS_IPIC_PORT}\" sysid=\"ZC01\" authDataRef=\"cicsCredentials\" requestTimeout=\"300s\" />
+    <zosconnect_authData id=\"cicsCredentials\" user=\"${CICS_USER}\" password=\"${CICS_PASSWORD}\" />
 </server>
-EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/cics_ebcdic.xml > /tmp/cics.xml
-cp /tmp/cics.xml "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
-chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
-rm -f /tmp/cics_ebcdic.xml /tmp/cics.xml
+'''
+with open('${CICS_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "${CICS_DEST}"
 
 # =========================
 # Generate IMS connection config
 # =========================
-cat > /tmp/ims_ebcdic.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<server description="Connection to IMS">
+IMS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
+$PYTHON -c "
+content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<server description=\"Connection to IMS\">
     <featureManager>
         <feature>zosconnect:ims-1.0</feature>
     </featureManager>
 
-    <zosconnect_imsConnection id="imsConn" connectionFactoryRef="imsConnectionFactory" imsDatastoreName="${IMS_DATASTORE}"/>
+    <zosconnect_imsConnection id=\"imsConn\" connectionFactoryRef=\"imsConnectionFactory\" imsDatastoreName=\"${IMS_DATASTORE}\"/>
 
-    <connectionFactory id="imsConnectionFactory" containerAuthDataRef="IMSCredentials">
-        <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
+    <connectionFactory id=\"imsConnectionFactory\" containerAuthDataRef=\"IMSCredentials\">
+        <properties.gmoa hostName=\"${IMS_HOST}\" portNumber=\"${IMS_PORT}\" />
     </connectionFactory>
 
-    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
+    <authData id=\"IMSCredentials\" user=\"${IMS_USER}\" password=\"${IMS_PASSWORD}\" />
 </server>
-EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/ims_ebcdic.xml > /tmp/ims.xml
-cp /tmp/ims.xml "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
-chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
-rm -f /tmp/ims_ebcdic.xml /tmp/ims.xml
+'''
+with open('${IMS_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "${IMS_DEST}"
 
 # =========================
 # Deploy SSL/TLS configuration (RACF keyring)
@@ -188,16 +191,13 @@ fi
 # =========================
 HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
 HTTPS_PORT=${HTTPS_PORT:-9444}
-cat > /tmp/http_endpoint_ebcdic.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<server>
-    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
-</server>
-EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/http_endpoint_ebcdic.xml > /tmp/http-endpoint.xml
-cp /tmp/http-endpoint.xml "$OVERRIDES_DIR/http-endpoint.xml"
-chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
-rm -f /tmp/http_endpoint_ebcdic.xml /tmp/http-endpoint.xml
+HTTP_EP_DEST="$OVERRIDES_DIR/http-endpoint.xml"
+$PYTHON -c "
+content = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<server>\n    <httpEndpoint id=\"defaultHttpEndpoint\" host=\"*\" httpPort=\"9080\" httpsPort=\"${HTTPS_PORT}\"/>\n</server>\n'
+with open('${HTTP_EP_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "$HTTP_EP_DEST"
 print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 
 # =========================
@@ -224,10 +224,14 @@ cat > /tmp/zz-bank-frontend-root.xml << 'EOF'
     </webApplication>
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/zz-bank-frontend-root.xml > /tmp/zz-bank-frontend-root-ascii.xml
-cp /tmp/zz-bank-frontend-root-ascii.xml "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
-chtag -t -c ISO8859-1 "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
-rm -f /tmp/zz-bank-frontend-root.xml /tmp/zz-bank-frontend-root-ascii.xml
+ZZ_DEST="${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
+$PYTHON -c "
+content = open('/tmp/zz-bank-frontend-root.xml', 'rb').read().decode('cp1047')
+with open('${ZZ_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "${ZZ_DEST}"
+rm -f /tmp/zz-bank-frontend-root.xml
 # Remove the old (losing) name if it exists from a previous run
 rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
 print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"

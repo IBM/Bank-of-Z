@@ -69,15 +69,15 @@ fi
 
 # =========================
 # Configure server.xml
-# Heredoc on z/OS produces EBCDIC — write to /tmp then iconv to ISO8859-1.
-# Use single-quoted 'EOF' to prevent variable expansion inside the XML
-# (Liberty variable refs like ${frontend.http.port} must be preserved literally).
+# Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
+# Liberty variable refs (${frontend.http.port} etc.) must be preserved literally.
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Configuring server.xml..."
-
-cat > /tmp/frontend-server.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<server description="Bank of Z Frontend Server">
+PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+SERVER_XML_DEST="${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+$PYTHON -c "
+content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<server description=\"Bank of Z Frontend Server\">
 
     <!-- Enable features -->
     <featureManager>
@@ -88,54 +88,50 @@ cat > /tmp/frontend-server.xml << 'EOF'
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
-    <httpEndpoint id="defaultHttpEndpoint"
-                  httpPort="${frontend.http.port}"
-                  httpsPort="${frontend.https.port}"
-                  host="*" />
+    <httpEndpoint id=\"defaultHttpEndpoint\"
+                  httpPort=\"\${frontend.http.port}\"
+                  httpsPort=\"\${frontend.https.port}\"
+                  host=\"*\" />
 
     <!-- Application Configuration -->
-    <webApplication id="bank-frontend"
-                    location="${server.config.dir}/apps/bank-frontend-vanilla.war"
-                    name="bank-frontend"
-                    contextRoot="/">
-        <classloader delegation="parentLast" />
+    <webApplication id=\"bank-frontend\"
+                    location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\"
+                    name=\"bank-frontend\"
+                    contextRoot=\"/\">
+        <classloader delegation=\"parentLast\" />
     </webApplication>
 
     <!-- Logging Configuration -->
-    <logging traceSpecification="*=info"
-             maxFileSize="20"
-             maxFiles="10" />
+    <logging traceSpecification=\"*=info\"
+             maxFileSize=\"20\"
+             maxFiles=\"10\" />
 
     <!-- SSL Configuration using RACF keyring -->
-    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
-    <keyStore id="defaultKeyStore"
-              location="safkeyring://IBMUSER/BOZRING"
-              type="JCERACFKS"
-              password="password"/>
+    <ssl id=\"defaultSSLConfig\" keyStoreRef=\"defaultKeyStore\"/>
+    <keyStore id=\"defaultKeyStore\"
+              location=\"safkeyring://IBMUSER/BOZRING\"
+              type=\"JCERACFKS\"
+              password=\"password\"/>
 
 </server>
-EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/frontend-server.xml > /tmp/frontend-server-ascii.xml
-cp /tmp/frontend-server-ascii.xml "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
-chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
-rm -f /tmp/frontend-server.xml /tmp/frontend-server-ascii.xml
+'''
+with open('${SERVER_XML_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "${SERVER_XML_DEST}"
 
 # =========================
 # Create bootstrap.properties
-# Variable values must be expanded here (not Liberty vars), so use double-quoted EOF.
+# Use Python to write ASCII bytes — avoids _BPXK_AUTOCVT shell encoding.
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Creating bootstrap.properties..."
-
-cat > /tmp/bootstrap_ebcdic.properties << EOF
-# Frontend Liberty Server Bootstrap Properties
-frontend.http.port=${FRONTEND_HTTP_PORT}
-frontend.https.port=${FRONTEND_HTTPS_PORT}
-zosconnect.http.port=${ZOSCONNECT_HTTP_PORT}
-EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/bootstrap_ebcdic.properties > /tmp/bootstrap.properties
-cp /tmp/bootstrap.properties "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
-chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
-rm -f /tmp/bootstrap_ebcdic.properties /tmp/bootstrap.properties
+BOOTSTRAP_DEST="${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
+$PYTHON -c "
+content = '# Frontend Liberty Server Bootstrap Properties\nfrontend.http.port=${FRONTEND_HTTP_PORT}\nfrontend.https.port=${FRONTEND_HTTPS_PORT}\nzosconnect.http.port=${ZOSCONNECT_HTTP_PORT}\n'
+with open('${BOOTSTRAP_DEST}', 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+"
+chtag -t -c ISO8859-1 "${BOOTSTRAP_DEST}"
 
 # =========================
 # Configure RACF STARTED profile

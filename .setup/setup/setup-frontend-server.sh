@@ -115,9 +115,10 @@ cat > /tmp/frontend-server.xml << 'EOF'
 
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/frontend-server.xml > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/frontend-server.xml > /tmp/frontend-server-ascii.xml
+cp /tmp/frontend-server-ascii.xml "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
 chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
-rm -f /tmp/frontend-server.xml
+rm -f /tmp/frontend-server.xml /tmp/frontend-server-ascii.xml
 
 # =========================
 # Create bootstrap.properties
@@ -125,15 +126,16 @@ rm -f /tmp/frontend-server.xml
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Creating bootstrap.properties..."
 
-cat > /tmp/bootstrap.properties << EOF
+cat > /tmp/bootstrap_ebcdic.properties << EOF
 # Frontend Liberty Server Bootstrap Properties
 frontend.http.port=${FRONTEND_HTTP_PORT}
 frontend.https.port=${FRONTEND_HTTPS_PORT}
 zosconnect.http.port=${ZOSCONNECT_HTTP_PORT}
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/bootstrap.properties > "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/bootstrap_ebcdic.properties > /tmp/bootstrap.properties
+cp /tmp/bootstrap.properties "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
 chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
-rm -f /tmp/bootstrap.properties
+rm -f /tmp/bootstrap_ebcdic.properties /tmp/bootstrap.properties
 
 # =========================
 # Configure RACF STARTED profile

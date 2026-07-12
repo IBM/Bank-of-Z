@@ -121,10 +121,10 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config
-# Heredoc on z/OS produces EBCDIC — write to /tmp with variable substitution,
-# then iconv to ISO8859-1 so Liberty can parse it.
+# Write EBCDIC heredoc to /tmp, iconv to ASCII in /tmp, then cp (byte-exact)
+# to destination. Using cp avoids _BPXK_AUTOCVT re-encoding the > redirect.
 # =========================
-cat > /tmp/cics.xml << EOF
+cat > /tmp/cics_ebcdic.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="IPIC connection to CICS">
     <featureManager>
@@ -134,14 +134,15 @@ cat > /tmp/cics.xml << EOF
     <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/cics.xml > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/cics_ebcdic.xml > /tmp/cics.xml
+cp /tmp/cics.xml "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
 chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
-rm -f /tmp/cics.xml
+rm -f /tmp/cics_ebcdic.xml /tmp/cics.xml
 
 # =========================
 # Generate IMS connection config
 # =========================
-cat > /tmp/ims.xml << EOF
+cat > /tmp/ims_ebcdic.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Connection to IMS">
     <featureManager>
@@ -157,9 +158,10 @@ cat > /tmp/ims.xml << EOF
     <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/ims.xml > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/ims_ebcdic.xml > /tmp/ims.xml
+cp /tmp/ims.xml "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
 chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
-rm -f /tmp/ims.xml
+rm -f /tmp/ims_ebcdic.xml /tmp/ims.xml
 
 # =========================
 # Deploy SSL/TLS configuration (RACF keyring)
@@ -186,15 +188,16 @@ fi
 # =========================
 HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
 HTTPS_PORT=${HTTPS_PORT:-9444}
-cat > /tmp/http-endpoint.xml << EOF
+cat > /tmp/http_endpoint_ebcdic.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
     <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/http-endpoint.xml > "$OVERRIDES_DIR/http-endpoint.xml"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/http_endpoint_ebcdic.xml > /tmp/http-endpoint.xml
+cp /tmp/http-endpoint.xml "$OVERRIDES_DIR/http-endpoint.xml"
 chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
-rm -f /tmp/http-endpoint.xml
+rm -f /tmp/http_endpoint_ebcdic.xml /tmp/http-endpoint.xml
 print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 
 # =========================
@@ -221,9 +224,10 @@ cat > /tmp/zz-bank-frontend-root.xml << 'EOF'
     </webApplication>
 </server>
 EOF
-iconv -f IBM-1047 -t ISO8859-1 /tmp/zz-bank-frontend-root.xml > "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
+iconv -f IBM-1047 -t ISO8859-1 /tmp/zz-bank-frontend-root.xml > /tmp/zz-bank-frontend-root-ascii.xml
+cp /tmp/zz-bank-frontend-root-ascii.xml "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
 chtag -t -c ISO8859-1 "${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
-rm -f /tmp/zz-bank-frontend-root.xml
+rm -f /tmp/zz-bank-frontend-root.xml /tmp/zz-bank-frontend-root-ascii.xml
 # Remove the old (losing) name if it exists from a previous run
 rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
 print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"

@@ -210,28 +210,23 @@ print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 # "bank-frontend-vanilla.xml" (v) > "bank-frontend-root.xml" (r), so root.xml
 # would lose. We name it "zz-bank-frontend-root.xml" to sort after vanilla.xml.
 # =========================
-# Write as EBCDIC to /tmp then iconv to ISO8859-1 — heredoc on z/OS produces EBCDIC bytes,
-# so we must convert before tagging; Liberty reads ISO8859-1-tagged files as ASCII/Latin-1.
-cat > /tmp/zz-bank-frontend-root.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<server>
-    <!-- Override context root for frontend WAR — serve at / alongside /api -->
-    <webApplication id="bank-frontend-vanilla"
-                    location="${server.config.dir}/apps/bank-frontend-vanilla.war"
-                    name="bank-frontend-vanilla"
-                    contextRoot="/">
-        <classloader delegation="parentLast" />
-    </webApplication>
-</server>
-EOF
 ZZ_DEST="${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
 $PYTHON -c "
-content = open('/tmp/zz-bank-frontend-root.xml', 'rb').read().decode('cp1047')
+content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<server>
+    <!-- Override context root for frontend WAR - serve at / alongside /api -->
+    <webApplication id=\"bank-frontend-vanilla\"
+                    location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\"
+                    name=\"bank-frontend-vanilla\"
+                    contextRoot=\"/\">
+        <classloader delegation=\"parentLast\" />
+    </webApplication>
+</server>
+'''
 with open('${ZZ_DEST}', 'wb') as f:
     f.write(content.encode('iso-8859-1'))
 "
 chtag -t -c ISO8859-1 "${ZZ_DEST}"
-rm -f /tmp/zz-bank-frontend-root.xml
 # Remove the old (losing) name if it exists from a previous run
 rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
 print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"

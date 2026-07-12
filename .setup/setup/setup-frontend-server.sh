@@ -69,10 +69,13 @@ fi
 
 # =========================
 # Configure server.xml
+# Heredoc on z/OS produces EBCDIC — write to /tmp then iconv to ISO8859-1.
+# Use single-quoted 'EOF' to prevent variable expansion inside the XML
+# (Liberty variable refs like ${frontend.http.port} must be preserved literally).
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Configuring server.xml..."
 
-cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
+cat > /tmp/frontend-server.xml << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Bank of Z Frontend Server">
 
@@ -91,16 +94,16 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
                   host="*" />
 
     <!-- Application Configuration -->
-    <webApplication id="bank-frontend" 
-                    location="${server.config.dir}/apps/bank-frontend-vanilla.war" 
-                    name="bank-frontend" 
+    <webApplication id="bank-frontend"
+                    location="${server.config.dir}/apps/bank-frontend-vanilla.war"
+                    name="bank-frontend"
                     contextRoot="/">
         <classloader delegation="parentLast" />
     </webApplication>
 
     <!-- Logging Configuration -->
-    <logging traceSpecification="*=info" 
-             maxFileSize="20" 
+    <logging traceSpecification="*=info"
+             maxFileSize="20"
              maxFiles="10" />
 
     <!-- SSL Configuration using RACF keyring -->
@@ -112,18 +115,25 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
 
 </server>
 EOF
+iconv -f IBM-1047 -t ISO8859-1 /tmp/frontend-server.xml > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+rm -f /tmp/frontend-server.xml
 
 # =========================
 # Create bootstrap.properties
+# Variable values must be expanded here (not Liberty vars), so use double-quoted EOF.
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Creating bootstrap.properties..."
 
-cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties" << EOF
+cat > /tmp/bootstrap.properties << EOF
 # Frontend Liberty Server Bootstrap Properties
 frontend.http.port=${FRONTEND_HTTP_PORT}
 frontend.https.port=${FRONTEND_HTTPS_PORT}
 zosconnect.http.port=${ZOSCONNECT_HTTP_PORT}
 EOF
+iconv -f IBM-1047 -t ISO8859-1 /tmp/bootstrap.properties > "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
+chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${SERVER_NAME}/bootstrap.properties"
+rm -f /tmp/bootstrap.properties
 
 # =========================
 # Configure RACF STARTED profile

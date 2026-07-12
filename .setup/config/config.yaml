@@ -91,12 +91,13 @@ zosconnect:
   https_port: 9444
 
 # Frontend Liberty Server — no longer used; frontend is hosted on z/OS Connect
+# https_port is 9445 (not 9444) to avoid conflict with BAQBANKZ on 9444
 frontend:
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
   server_dir: "{{sandbox.path}}/frontend"
   server_name: "bankz-frontend"
   http_port: 9081
-  https_port: 9444
+  https_port: 9445
 
 # ZOAU installation directory
 zoau:

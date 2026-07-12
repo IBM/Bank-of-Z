@@ -121,8 +121,10 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config
+# Heredoc on z/OS produces EBCDIC — write to /tmp with variable substitution,
+# then iconv to ISO8859-1 so Liberty can parse it.
 # =========================
-cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml" << EOF
+cat > /tmp/cics.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="IPIC connection to CICS">
     <featureManager>
@@ -132,11 +134,14 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
 </server>
 EOF
+iconv -f IBM-1047 -t ISO8859-1 /tmp/cics.xml > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
+chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
+rm -f /tmp/cics.xml
 
 # =========================
 # Generate IMS connection config
 # =========================
-cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml" << EOF
+cat > /tmp/ims.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Connection to IMS">
     <featureManager>
@@ -152,6 +157,9 @@ cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overri
     <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
+iconv -f IBM-1047 -t ISO8859-1 /tmp/ims.xml > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
+chtag -t -c ISO8859-1 "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
+rm -f /tmp/ims.xml
 
 # =========================
 # Deploy SSL/TLS configuration (RACF keyring)
@@ -170,6 +178,24 @@ if [ -d "$SSL_SRC_DIR" ]; then
 else
     print_warning "SSL config directory not found, skipping: $SSL_SRC_DIR"
 fi
+
+# =========================
+# Override httpsPort to 9444 — server.xml uses 9443 by default.
+# Written via iconv so bytes are ASCII/ISO8859-1 as Liberty expects.
+# =========================
+HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
+HTTPS_PORT=${HTTPS_PORT:-9444}
+cat > /tmp/http-endpoint.xml << 'ENDOFFILE'
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="__HTTP_PORT__" httpsPort="__HTTPS_PORT__"/>
+</server>
+ENDOFFILE
+sed -i "s/__HTTP_PORT__/9080/g; s/__HTTPS_PORT__/${HTTPS_PORT}/g" /tmp/http-endpoint.xml
+iconv -f IBM-1047 -t ISO8859-1 /tmp/http-endpoint.xml > "$OVERRIDES_DIR/http-endpoint.xml"
+chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
+rm -f /tmp/http-endpoint.xml
+print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 
 # =========================
 # Override frontend WAR context root to / so it serves at the root of

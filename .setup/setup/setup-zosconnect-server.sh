@@ -181,17 +181,17 @@ fi
 
 # =========================
 # Override httpsPort to 9444 — server.xml uses 9443 by default.
-# Written via iconv so bytes are ASCII/ISO8859-1 as Liberty expects.
+# Use double-quoted heredoc so ${HTTPS_PORT} expands at write time.
+# Do NOT use sed -i — z/OS sed does not support the -i flag.
 # =========================
 HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
 HTTPS_PORT=${HTTPS_PORT:-9444}
-cat > /tmp/http-endpoint.xml << 'ENDOFFILE'
+cat > /tmp/http-endpoint.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
-    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="__HTTP_PORT__" httpsPort="__HTTPS_PORT__"/>
+    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
 </server>
-ENDOFFILE
-sed -i "s/__HTTP_PORT__/9080/g; s/__HTTPS_PORT__/${HTTPS_PORT}/g" /tmp/http-endpoint.xml
+EOF
 iconv -f IBM-1047 -t ISO8859-1 /tmp/http-endpoint.xml > "$OVERRIDES_DIR/http-endpoint.xml"
 chtag -t -c ISO8859-1 "$OVERRIDES_DIR/http-endpoint.xml"
 rm -f /tmp/http-endpoint.xml

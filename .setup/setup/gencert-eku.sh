@@ -216,7 +216,7 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" >/dev/null 2>&1
 # Copy new PKCS12 to dataset for RACDCERT IMPORT
 cp "$TMPDIR/boz-server.p12" "//'${userid}.BOZ.NEWCERT'"
 
-tsocmd "RACDCERT IMPORT(DSN('${userid}.BOZ.NEWCERT')) \
+tsocmd "RACDCERT IMPORT(INDSN('${userid}.BOZ.NEWCERT')) \
   ID($userid) \
   WITHLABEL('$label') \
   PASSWORD('bozserver')"

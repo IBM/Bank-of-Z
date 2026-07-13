@@ -101,7 +101,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //STDIN    DD   DUMMY
 //STDENV   DD   *
 _BPX_SHAREAS=YES
-JAVA_HOME=/usr/lpp/java/java21/current_64
+JAVA_HOME=${JAVA_HOME}
 WLP_USER_DIR=${SANDBOX_DIR}/zosconnect-server
 JVM_OPTIONS=-Xmx2048M
 //*
@@ -123,7 +123,7 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 # Generate CICS connection config
 # Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
 # =========================
-PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+PYTHON="${PYTHON_HOME:-}/bin/python3"
 CICS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
 $PYTHON -c "
 import sys

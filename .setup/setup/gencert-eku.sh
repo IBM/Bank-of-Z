@@ -22,9 +22,29 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 set -e
 
 userid=IBMUSER
-JAVA=/usr/lpp/java/java21/J21.0_64/bin/java
-JAVAC=/usr/lpp/java/java21/J21.0_64/bin/javac
-BCJAR=/usr/local/sandboxes/tools/gradle-9.5.1/lib/plugins/bcprov-jdk18on-1.84.jar
+
+# Resolve Java — prefer JAVA_HOME from setenv.sh/config.yaml, fall back to PATH
+if [ -n "${JAVA_HOME:-}" ]; then
+  JAVA="$JAVA_HOME/bin/java"
+  JAVAC="$JAVA_HOME/bin/javac"
+else
+  JAVA=$(command -v java 2>/dev/null) || { echo "[gencert-eku] FATAL: java not found (set java.java_home in config.yaml)" >&2; exit 1; }
+  JAVAC=$(command -v javac 2>/dev/null) || { echo "[gencert-eku] FATAL: javac not found (set java.java_home in config.yaml)" >&2; exit 1; }
+fi
+
+# Resolve Python — prefer PYTHON_HOME from setenv.sh/config.yaml, fall back to PATH
+if [ -n "${PYTHON_HOME:-}" ]; then
+  PYTHON="$PYTHON_HOME/bin/python3"
+else
+  PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found (set python.python_home in config.yaml)" >&2; exit 1; }
+fi
+
+# Resolve Bouncy Castle JAR — glob for any bcprov-*.jar under SANDBOX_DIR/tools
+BCJAR=$(ls "${SANDBOX_DIR:-/usr/local/sandboxes/bank-of-z}/tools"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
+if [ -z "$BCJAR" ]; then
+  echo "[gencert-eku] FATAL: bcprov-*.jar not found under \${SANDBOX_DIR}/tools" >&2
+  exit 1
+fi
 
 # -----------------------------------------------------------------------
 # Guard: verify IP and DNS can be determined before doing anything
@@ -49,7 +69,6 @@ echo "[gencert-eku]       Access control: chmod 600, not RDATALIB."
 # -----------------------------------------------------------------------
 # Randomise passwords via Python — tr/dev/urandom not reliable on z/OS USS
 # -----------------------------------------------------------------------
-PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
 CA_PASS=$($PYTHON -c "import secrets,string; print(secrets.token_urlsafe(18))")
 KS_PASS=$($PYTHON -c "import secrets,string; print(secrets.token_urlsafe(18))")
 
@@ -75,7 +94,6 @@ cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 # -----------------------------------------------------------------------
 # 2. Write GenCert.java via Python — avoids _BPXK_AUTOCVT EBCDIC corruption
 # -----------------------------------------------------------------------
-PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
 $PYTHON - "$TMPDIR/GenCert.java" << 'PYEOF'
 import sys
 src = r"""

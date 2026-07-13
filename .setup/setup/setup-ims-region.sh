@@ -101,7 +101,7 @@ if opercmd "D PROG,APF" 2>/dev/null | grep -q "${BOZ_IMS_HLQ}.IMSISO.LOADLIB"; t
     print_success "IMS ISO loadlib is APF-authorized"
 else
     print_info "${CYAN}[ZCONFIG-IMS]${NC} Adding IMS ISO loadlib to APF list..."
-    opercmd "SETPROG APF,ADD,LIBRARY=${BOZ_IMS_HLQ}.IMSISO.LOADLIB"
+    opercmd "SETPROG APF,ADD,LIBRARY=${BOZ_IMS_HLQ}.IMSISO.LOADLIB,SMS"
 fi
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \

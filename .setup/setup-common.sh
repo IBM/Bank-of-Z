@@ -467,7 +467,7 @@ print_usage() {
     echo "Usage: bash setup-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zConfig, DBB, wazi-deploy)"
+    echo "  validate-prereqs  Validate prerequisites (zconfig, DBB, wazi-deploy)"
     echo "  environment       Initialize workspace and infrastructure prerequisites"
     echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
     echo ""

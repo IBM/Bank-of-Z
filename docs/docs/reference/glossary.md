@@ -37,6 +37,7 @@ This glossary defines common terms and technologies used throughout the Bank of 
 | **Workflow** | A defined development process used to build, deploy, test, and validate application changes. Bank of Z supports VS Code and GRUB workflows. |
 | **zBuilder** | A build framework used with DBB to automate compilation, linking, and build orchestration for z/OS applications. |
 | **ZCodeScan** | A static analysis tool used to analyze source code quality and identify potential issues. |
+| **zconfig** | z/OS Middleware Configuration Tool is a command-line tool to configure and create artifacts for CICS® Transaction Server for z/OS (CICS TS), Db2® for z/OS (Db2), Information Management System (IMS), and z/OS Connect introducing configuration as code to z/OS middleware.
 | **z/OS Connect** | An API framework that enables REST-based access to z/OS applications and services. In Bank of Z, it provides the interface between the web application and the CICS and IMS transaction environments. |
 | **ZOAU** | IBM Z Open Automation Utilities. A collection of utilities and APIs used to automate z/OS administration and development tasks. |
 | **Zowe CLI** | A command-line interface used to interact with z/OS systems, services, datasets, USS files, and development workflows. |

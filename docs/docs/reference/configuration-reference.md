@@ -92,7 +92,7 @@ zbuilder:
   java_home: /usr/lpp/java/java21/current_64
 ```
 
-### zConfig Configuration
+### zconfig Configuration
 
 Defines settings for z/OS configuration tooling.
 

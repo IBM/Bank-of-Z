@@ -52,33 +52,28 @@ cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 # 2. Write and compile the Java cert-generation program
 # -----------------------------------------------------------------------
 cat > "$TMPDIR/GenCert.java" << 'JAVAEOF'
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.*;
+// Uses only bcprov (no bcpkix needed) via the low-level BC ASN.1 / X.509 API.
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.x500.*;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.*;
-import java.util.Date;
-import javax.net.ssl.KeyManagerFactory;
-import java.security.KeyStore;
+import java.util.*;
 
 public class GenCert {
     public static void main(String[] args) throws Exception {
         // args: caP12Path caPassword outP12Path outPassword ip dns notAfter
-        String caPath    = args[0];
-        String caPass    = args[1];
-        String outPath   = args[2];
-        String outPass   = args[3];
-        String ip        = args[4];
-        String dns       = args[5];
-        String notAfter  = args[6]; // yyyy-MM-dd
+        String caPath   = args[0];  String caPass  = args[1];
+        String outPath  = args[2];  String outPass = args[3];
+        String ip       = args[4];  String dns     = args[5];
+        String notAfter = args[6];  // yyyy-MM-dd
+
+        Security.addProvider(new BouncyCastleProvider());
 
         // Load CA PKCS12
         KeyStore caKs = KeyStore.getInstance("PKCS12");
@@ -89,49 +84,77 @@ public class GenCert {
         PrivateKey caKey = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
-        // Generate new RSA keypair for the server cert
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(2048, new SecureRandom());
+        // Generate new RSA 2048 keypair
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "BC");
+        kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair kp = kpg.generateKeyPair();
 
         // Dates
-        Date notBefore = new Date();
-        LocalDate exp = LocalDate.parse(notAfter);
-        Date notAfterDate = Date.from(exp.atStartOfDay(ZoneOffset.UTC).toInstant());
+        Date notBefore    = new Date();
+        Date notAfterDate = Date.from(
+            LocalDate.parse(notAfter).atStartOfDay(ZoneOffset.UTC).toInstant());
 
+        // Build TBSCertificate manually using BC ASN.1
         X500Name subject = new X500Name("CN=Bank of Z,OU=IBM BoZ,O=IBM,C=US");
-        X500Name issuer  = new X500Name(caCert.getSubjectX500Principal().getName());
+        X500Name issuer  = new X500Name(
+            caCert.getSubjectX500Principal().getName("RFC1779"));
 
-        JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
-            issuer,
-            BigInteger.valueOf(System.currentTimeMillis()),
-            notBefore,
-            notAfterDate,
-            subject,
-            kp.getPublic()
-        );
+        // SubjectPublicKeyInfo from the generated public key
+        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
+            kp.getPublic().getEncoded());
+
+        // Extensions
+        ExtensionsGenerator exts = new ExtensionsGenerator();
 
         // SAN: IP + DNS
-        GeneralName[] sans = new GeneralName[] {
-            new GeneralName(GeneralName.iPAddress,   ip),
-            new GeneralName(GeneralName.dNSName,     dns)
-        };
-        builder.addExtension(Extension.subjectAlternativeName, false,
-            new GeneralNames(sans));
+        GeneralNames san = new GeneralNames(new GeneralName[]{
+            new GeneralName(GeneralName.iPAddress, ip),
+            new GeneralName(GeneralName.dNSName,   dns)
+        });
+        exts.addExtension(Extension.subjectAlternativeName, false, san);
 
-        // Key Usage: digitalSignature + keyEncipherment
-        builder.addExtension(Extension.keyUsage, true,
+        // Key Usage: digitalSignature(0) | keyEncipherment(2)
+        exts.addExtension(Extension.keyUsage, true,
             new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
 
-        // Extended Key Usage: serverAuth (1.3.6.1.5.5.7.3.1)
-        builder.addExtension(Extension.extendedKeyUsage, false,
-            new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuthentication));
+        // Extended Key Usage: id-kp-serverAuthentication 1.3.6.1.5.5.7.3.1
+        exts.addExtension(Extension.extendedKeyUsage, false,
+            new ExtendedKeyUsage(
+                new KeyPurposeId[]{ KeyPurposeId.id_kp_serverAuthentication }));
 
-        // Sign with VSICA
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
-            .build(caKey);
-        X509Certificate cert = new JcaX509CertificateConverter()
-            .getCertificate(builder.build(signer));
+        // Build the TBS structure
+        V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
+        tbsGen.setSerialNumber(new ASN1Integer(BigInteger.valueOf(System.currentTimeMillis())));
+        tbsGen.setIssuer(issuer);
+        tbsGen.setSubject(subject);
+        tbsGen.setStartDate(new Time(notBefore));
+        tbsGen.setEndDate(new Time(notAfterDate));
+        tbsGen.setSubjectPublicKeyInfo(spki);
+        tbsGen.setExtensions(exts.generate());
+        tbsGen.setSignature(new AlgorithmIdentifier(
+            new ASN1ObjectIdentifier("1.2.840.113549.1.1.11"), // sha256WithRSAEncryption
+            DERNull.INSTANCE));
+        TBSCertificate tbs = tbsGen.generateTBSCertificate();
+
+        // Sign the TBS with VSICA's private key
+        Signature sig = Signature.getInstance("SHA256withRSA");
+        sig.initSign(caKey);
+        sig.update(tbs.getEncoded());
+        byte[] sigBytes = sig.sign();
+
+        // Assemble the full certificate
+        ASN1EncodableVector certVec = new ASN1EncodableVector();
+        certVec.add(tbs);
+        certVec.add(new AlgorithmIdentifier(
+            new ASN1ObjectIdentifier("1.2.840.113549.1.1.11"), DERNull.INSTANCE));
+        certVec.add(new DERBitString(sigBytes));
+        byte[] certDer = new DERSequence(certVec).getEncoded();
+
+        // Convert to JCA X509Certificate
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) cf.generateCertificate(
+            new ByteArrayInputStream(certDer));
+        cert.verify(caCert.getPublicKey()); // sanity check
 
         // Write output PKCS12
         KeyStore out = KeyStore.getInstance("PKCS12");
@@ -141,7 +164,6 @@ public class GenCert {
         try (OutputStream os = new FileOutputStream(outPath)) {
             out.store(os, outPass.toCharArray());
         }
-
         System.out.println("Generated cert with EKU serverAuth: " + outPath);
     }
 }

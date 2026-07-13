@@ -49,9 +49,13 @@ tsocmd "RACDCERT EXPORT(LABEL('VSICA')) CERTAUTH \
 cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 
 # -----------------------------------------------------------------------
-# 2. Write and compile the Java cert-generation program
+# 2. Write GenCert.java via Python — avoids _BPXK_AUTOCVT EBCDIC conversion
+#    that would corrupt a shell heredoc write on z/OS USS.
 # -----------------------------------------------------------------------
-cat > "$TMPDIR/GenCert.java" << 'JAVAEOF'
+PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+$PYTHON - "$TMPDIR/GenCert.java" << 'PYEOF'
+import sys
+src = r"""
 // Uses only bcprov (no bcpkix) via the low-level BC ASN.1 API.
 // Explicit single-class imports avoid the java.security.cert.Extension ambiguity.
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -93,10 +97,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 public class GenCert {
-    // id-kp-serverAuthentication OID — avoids KeyPurposeId version ambiguity
     static final ASN1ObjectIdentifier EKU_SERVER_AUTH =
         new ASN1ObjectIdentifier("1.3.6.1.5.5.7.3.1");
-    // sha256WithRSAEncryption OID
     static final ASN1ObjectIdentifier SHA256_WITH_RSA =
         new ASN1ObjectIdentifier("1.2.840.113549.1.1.11");
 
@@ -108,7 +110,6 @@ public class GenCert {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        // Load VSICA PKCS12
         KeyStore caKs = KeyStore.getInstance("PKCS12");
         try (InputStream in = new FileInputStream(caPath)) {
             caKs.load(in, caPass.toCharArray());
@@ -117,7 +118,6 @@ public class GenCert {
         PrivateKey caKey  = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
-        // Generate new RSA 2048 keypair
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "BC");
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair kp = kpg.generateKeyPair();
@@ -132,7 +132,6 @@ public class GenCert {
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
             kp.getPublic().getEncoded());
 
-        // Build extensions — use org.bouncycastle.asn1.x509.Extension explicitly
         ExtensionsGenerator exts = new ExtensionsGenerator();
         exts.addExtension(Extension.subjectAlternativeName, false,
             new GeneralNames(new GeneralName[]{
@@ -144,7 +143,6 @@ public class GenCert {
         exts.addExtension(Extension.extendedKeyUsage, false,
             new ExtendedKeyUsage(new ASN1ObjectIdentifier[]{ EKU_SERVER_AUTH }));
 
-        // Build TBS
         AlgorithmIdentifier sigAlg = new AlgorithmIdentifier(SHA256_WITH_RSA, DERNull.INSTANCE);
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
         tbsGen.setSerialNumber(new ASN1Integer(BigInteger.valueOf(System.currentTimeMillis())));
@@ -157,26 +155,22 @@ public class GenCert {
         tbsGen.setSignature(sigAlg);
         TBSCertificate tbs = tbsGen.generateTBSCertificate();
 
-        // Sign
         Signature sig = Signature.getInstance("SHA256withRSA");
         sig.initSign(caKey);
         sig.update(tbs.getEncoded());
         byte[] sigBytes = sig.sign();
 
-        // Assemble DER certificate
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(tbs);
         v.add(sigAlg);
         v.add(new DERBitString(sigBytes));
         byte[] certDer = new DERSequence(v).getEncoded();
 
-        // Verify and convert to JCA cert
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         X509Certificate cert = (X509Certificate) cf.generateCertificate(
             new ByteArrayInputStream(certDer));
         cert.verify(caCert.getPublicKey());
 
-        // Write PKCS12
         KeyStore out = KeyStore.getInstance("PKCS12");
         out.load(null, null);
         out.setKeyEntry("boz", kp.getPrivate(), outPass.toCharArray(),
@@ -187,7 +181,10 @@ public class GenCert {
         System.out.println("Generated cert with EKU serverAuth: " + outPath);
     }
 }
-JAVAEOF
+"""
+with open(sys.argv[1], 'wb') as f:
+    f.write(src.encode('iso-8859-1'))
+PYEOF
 
 echo "[gencert-eku] Compiling GenCert.java..."
 $JAVAC -cp "$BCJAR" "$TMPDIR/GenCert.java" -d "$TMPDIR"

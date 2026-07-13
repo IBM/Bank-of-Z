@@ -18,9 +18,9 @@ import jakarta.jms.JMSContext;
 import jakarta.jms.JMSProducer;
 
 import com.ibm.mq.constants.CMQC;
-import com.ibm.mq.jms.MQConnectionFactory;
-import com.ibm.mq.jms.MQQueue;
-import com.ibm.msg.client.wmq.WMQConstants;
+import com.ibm.mq.jakarta.jms.MQConnectionFactory;
+import com.ibm.mq.jakarta.jms.MQQueue;
+import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 
 public class TransferMoneyIn {
 

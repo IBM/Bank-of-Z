@@ -1,6 +1,11 @@
 #!/bin/sh
 # =============================================================================
 # Script  : gencert-eku.sh
+# Source setenv.sh to get SANDBOX_DIR and other environment variables.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/../config/setenv.sh" 2>/dev/null || true
+# =============================================================================
+# Script  : gencert-eku.sh (continued)
 # Summary : Generate a TLS server certificate with EKU serverAuth (OID
 #           1.3.6.1.5.5.7.3.1) signed by VSICA, for Safari/Apple ATS
 #           compliance.  RACDCERT GENCERT cannot add EKU, so this script

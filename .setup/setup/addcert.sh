@@ -55,11 +55,11 @@ dnsname=$(hostname 2>/dev/null)
 expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('VSICA'))" \
  | awk '/End Date:/ {gsub("/","-",$3); print $3}')
 
-# certificate & keyring
-# KEYUSAGE: HANDSHAKE (TLS key exchange) + DATAENCRYPT (TLS bulk encryption)
-# only — no CERTSIGN (would make this cert a CA) or DOCSIGN (irrelevant for TLS).
-# ALTNAME includes both the IP and DNS hostname so browsers doing name-based
-# verification (Safari, etc.) find a matching SAN.
+# Step 1: create the keyring and connect VSICA as the trust anchor.
+# The server cert is generated separately by gencert-eku.sh using Bouncy
+# Castle so it can include the EKU serverAuth extension that Safari requires.
+# RACDCERT GENCERT cannot add EKU, so we use it only as a placeholder here
+# and immediately replace it via gencert-eku.sh below.
 tsocmd "RACDCERT GENCERT \
  ID($userid) \
  SUBJECTSDN(CN('$cn') O('IBM') OU('$ou') C('US')) \
@@ -77,6 +77,19 @@ tsocmd "RACDCERT ID($userid) \
  CONNECT(LABEL('$label') RING($ring) DEFAULT)"
 rc=$?
 tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
+
+# Step 2: replace the placeholder cert with one that has EKU serverAuth
+# (required by Safari / Apple ATS).
+if test $rc -eq 0
+then
+  SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+  if bash "$SCRIPT_DIR/gencert-eku.sh"; then
+    echo "EKU cert generation succeeded"
+  else
+    echo "WARNING: gencert-eku.sh failed — falling back to RACDCERT cert (no EKU, Safari may reject)"
+    rc=0  # non-fatal: Liberty still works, Chrome/Firefox still work
+  fi
+fi
 
 # usage permit
 if test $rc -eq 0

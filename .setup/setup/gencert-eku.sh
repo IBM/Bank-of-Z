@@ -52,36 +52,69 @@ cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 # 2. Write and compile the Java cert-generation program
 # -----------------------------------------------------------------------
 cat > "$TMPDIR/GenCert.java" << 'JAVAEOF'
-// Uses only bcprov (no bcpkix needed) via the low-level BC ASN.1 / X.509 API.
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.x500.*;
-import org.bouncycastle.asn1.x509.*;
+// Uses only bcprov (no bcpkix) via the low-level BC ASN.1 API.
+// Explicit single-class imports avoid the java.security.cert.Extension ambiguity.
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.ExtensionsGenerator;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.x509.Time;
+import org.bouncycastle.asn1.x509.V3TBSCertificateGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.Signature;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.RSAKeyGenParameterSpec;
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 
 public class GenCert {
+    // id-kp-serverAuthentication OID — avoids KeyPurposeId version ambiguity
+    static final ASN1ObjectIdentifier EKU_SERVER_AUTH =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.3.1");
+    // sha256WithRSAEncryption OID
+    static final ASN1ObjectIdentifier SHA256_WITH_RSA =
+        new ASN1ObjectIdentifier("1.2.840.113549.1.1.11");
+
     public static void main(String[] args) throws Exception {
-        // args: caP12Path caPassword outP12Path outPassword ip dns notAfter
         String caPath   = args[0];  String caPass  = args[1];
         String outPath  = args[2];  String outPass = args[3];
         String ip       = args[4];  String dns     = args[5];
-        String notAfter = args[6];  // yyyy-MM-dd
+        String notAfter = args[6];
 
         Security.addProvider(new BouncyCastleProvider());
 
-        // Load CA PKCS12
+        // Load VSICA PKCS12
         KeyStore caKs = KeyStore.getInstance("PKCS12");
         try (InputStream in = new FileInputStream(caPath)) {
             caKs.load(in, caPass.toCharArray());
         }
         String caAlias = caKs.aliases().nextElement();
-        PrivateKey caKey = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
+        PrivateKey caKey  = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
         // Generate new RSA 2048 keypair
@@ -89,40 +122,30 @@ public class GenCert {
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair kp = kpg.generateKeyPair();
 
-        // Dates
         Date notBefore    = new Date();
         Date notAfterDate = Date.from(
             LocalDate.parse(notAfter).atStartOfDay(ZoneOffset.UTC).toInstant());
 
-        // Build TBSCertificate manually using BC ASN.1
         X500Name subject = new X500Name("CN=Bank of Z,OU=IBM BoZ,O=IBM,C=US");
         X500Name issuer  = new X500Name(
             caCert.getSubjectX500Principal().getName("RFC1779"));
-
-        // SubjectPublicKeyInfo from the generated public key
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
             kp.getPublic().getEncoded());
 
-        // Extensions
+        // Build extensions — use org.bouncycastle.asn1.x509.Extension explicitly
         ExtensionsGenerator exts = new ExtensionsGenerator();
-
-        // SAN: IP + DNS
-        GeneralNames san = new GeneralNames(new GeneralName[]{
-            new GeneralName(GeneralName.iPAddress, ip),
-            new GeneralName(GeneralName.dNSName,   dns)
-        });
-        exts.addExtension(Extension.subjectAlternativeName, false, san);
-
-        // Key Usage: digitalSignature(0) | keyEncipherment(2)
+        exts.addExtension(Extension.subjectAlternativeName, false,
+            new GeneralNames(new GeneralName[]{
+                new GeneralName(GeneralName.iPAddress, ip),
+                new GeneralName(GeneralName.dNSName,   dns)
+            }));
         exts.addExtension(Extension.keyUsage, true,
             new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
-
-        // Extended Key Usage: id-kp-serverAuthentication 1.3.6.1.5.5.7.3.1
         exts.addExtension(Extension.extendedKeyUsage, false,
-            new ExtendedKeyUsage(
-                new KeyPurposeId[]{ KeyPurposeId.id_kp_serverAuthentication }));
+            new ExtendedKeyUsage(new ASN1ObjectIdentifier[]{ EKU_SERVER_AUTH }));
 
-        // Build the TBS structure
+        // Build TBS
+        AlgorithmIdentifier sigAlg = new AlgorithmIdentifier(SHA256_WITH_RSA, DERNull.INSTANCE);
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
         tbsGen.setSerialNumber(new ASN1Integer(BigInteger.valueOf(System.currentTimeMillis())));
         tbsGen.setIssuer(issuer);
@@ -131,32 +154,29 @@ public class GenCert {
         tbsGen.setEndDate(new Time(notAfterDate));
         tbsGen.setSubjectPublicKeyInfo(spki);
         tbsGen.setExtensions(exts.generate());
-        tbsGen.setSignature(new AlgorithmIdentifier(
-            new ASN1ObjectIdentifier("1.2.840.113549.1.1.11"), // sha256WithRSAEncryption
-            DERNull.INSTANCE));
+        tbsGen.setSignature(sigAlg);
         TBSCertificate tbs = tbsGen.generateTBSCertificate();
 
-        // Sign the TBS with VSICA's private key
+        // Sign
         Signature sig = Signature.getInstance("SHA256withRSA");
         sig.initSign(caKey);
         sig.update(tbs.getEncoded());
         byte[] sigBytes = sig.sign();
 
-        // Assemble the full certificate
-        ASN1EncodableVector certVec = new ASN1EncodableVector();
-        certVec.add(tbs);
-        certVec.add(new AlgorithmIdentifier(
-            new ASN1ObjectIdentifier("1.2.840.113549.1.1.11"), DERNull.INSTANCE));
-        certVec.add(new DERBitString(sigBytes));
-        byte[] certDer = new DERSequence(certVec).getEncoded();
+        // Assemble DER certificate
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(tbs);
+        v.add(sigAlg);
+        v.add(new DERBitString(sigBytes));
+        byte[] certDer = new DERSequence(v).getEncoded();
 
-        // Convert to JCA X509Certificate
+        // Verify and convert to JCA cert
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         X509Certificate cert = (X509Certificate) cf.generateCertificate(
             new ByteArrayInputStream(certDer));
-        cert.verify(caCert.getPublicKey()); // sanity check
+        cert.verify(caCert.getPublicKey());
 
-        // Write output PKCS12
+        // Write PKCS12
         KeyStore out = KeyStore.getInstance("PKCS12");
         out.load(null, null);
         out.setKeyEntry("boz", kp.getPrivate(), outPass.toCharArray(),

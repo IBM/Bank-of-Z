@@ -1,13 +1,17 @@
 #!/bin/sh
 # =============================================================================
 # Script  : addcert.sh
-# Summary : Create RACF keyring and server certificate for Bank of Z Node
-#           frontend server. Run once per ZVDT image.
+# Summary : Create RACF keyring and server certificate for Bank of Z.
+#           Run once per ZVDT image (called by setup-common.sh).
 #
-# The Node.js server references the keyring via:
+# Liberty (z/OS Connect + frontend) uses the keyring directly:
 #   keystoreType="JCERACFKS"
 #   keystoreFile="safkeyring://IBMUSER/BOZRING"
-#   keystorePass="password"
+#
+# The Node.js Docker-path server needs PEM files on USS.  These are
+# exported at the end of this script into /u/ibmuser/boz-certs/.
+# The intermediate RACF datasets used for export are deleted immediately
+# after use so no copy of the private key persists in DASD.
 # =============================================================================
 
 ## CUSTOMIZE ##
@@ -47,19 +51,24 @@ tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" \
 ipaddr=$(netstat -h 2>/dev/null | awk '/ OSA/ {print $1}')       # IPv4
 test "$ipaddr" = "IntfName:" && ipaddr=$(netstat -h 2>/dev/null \
  | awk '/ OSA/ {f=1; next} f {print $2; exit}')                  # IPv6
+dnsname=$(hostname 2>/dev/null)
 expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('VSICA'))" \
  | awk '/End Date:/ {gsub("/","-",$3); print $3}')
 
 # certificate & keyring
+# KEYUSAGE: HANDSHAKE (TLS key exchange) + DATAENCRYPT (TLS bulk encryption)
+# only — no CERTSIGN (would make this cert a CA) or DOCSIGN (irrelevant for TLS).
+# ALTNAME includes both the IP and DNS hostname so browsers doing name-based
+# verification (Safari, etc.) find a matching SAN.
 tsocmd "RACDCERT GENCERT \
  ID($userid) \
  SUBJECTSDN(CN('$cn') O('IBM') OU('$ou') C('US')) \
  SIGNWITH(CERTAUTH LABEL('VSICA')) \
  NOTAFTER(DATE($expire)) \
- ALTNAME(IP($ipaddr)) \
+ ALTNAME(IP($ipaddr) DOMAIN('$dnsname')) \
  WITHLABEL('$label') \
  SIZE(2048) \
- KEYUSAGE(HANDSHAKE DATAENCRYPT DOCSIGN CERTSIGN) \
+ KEYUSAGE(HANDSHAKE DATAENCRYPT) \
  TRUST"
 tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
@@ -78,7 +87,9 @@ then
   tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH"
 fi
 
-# Export cert and key to PEM files on USS for Node.js to read
+# Export cert and key to PEM files on USS for the Node.js Docker-path server.
+# Liberty on z/OS uses safkeyring:// directly and does not need these files.
+# The intermediate RACF datasets are deleted immediately after use.
 if test $rc -eq 0
 then
   outdir="/u/$(echo $userid | tr '[:upper:]' '[:lower:]')/boz-certs"
@@ -87,26 +98,25 @@ then
   # Export the signed server cert as PEM
   tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
    DSN('$userid.BOZ.CERT') FORMAT(CERTB64)"
-  # Convert EBCDIC dataset to ASCII PEM file
   cp "//'${userid}.BOZ.CERT'" "$outdir/server.crt"
   iconv -f IBM-1047 -t ISO8859-1 "$outdir/server.crt" > "$outdir/server.crt.pem"
   mv "$outdir/server.crt.pem" "$outdir/server.crt"
+  tsocmd "DELETE ('$userid.BOZ.CERT')" >/dev/null 2>&1
 
-  # Export the private key as PEM
+  # Export the private key as PKCS12, extract to PEM, then delete the dataset
   tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
    DSN('$userid.BOZ.KEY') FORMAT(PKCS12DER) PASSWORD('password')"
-  # Convert PKCS12 to PEM key using openssl if available
   if command -v openssl >/dev/null 2>&1; then
     openssl pkcs12 -in "//'${userid}.BOZ.KEY'" -nocerts -nodes \
       -passin pass:password -out "$outdir/server.key" 2>/dev/null
   else
     cp "//'${userid}.BOZ.KEY'" "$outdir/server.key"
   fi
+  tsocmd "DELETE ('$userid.BOZ.KEY')" >/dev/null 2>&1
 
   chmod 600 "$outdir/server.key"
-  echo "Cert and key exported to $outdir"
-  echo "Start Node server with:"
-  echo "  SSL_CERT=$outdir/server.crt SSL_KEY=$outdir/server.key node server.js"
+  echo "Cert and key exported to $outdir (for Node.js Docker path only)"
+  echo "Liberty on z/OS uses safkeyring://IBMUSER/BOZRING directly."
 fi
 
 exit $rc

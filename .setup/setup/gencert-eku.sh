@@ -56,9 +56,10 @@ KS_PASS=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom 2>/dev/null | head -c 24 ||
 
 # -----------------------------------------------------------------------
 # Race-safe temp dir with restricted permissions so CA key is not world-readable
+# (mktemp not available on z/OS USS — use mkdir -m 700 with PID-based name)
 # -----------------------------------------------------------------------
-TMPDIR=$(mktemp -d /tmp/boz-cert-XXXXXX)
-chmod 700 "$TMPDIR"
+TMPDIR=/tmp/boz-cert-$$
+mkdir -m 700 -p "$TMPDIR"
 trap 'rm -rf "$TMPDIR"; tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1' EXIT
 
 # -----------------------------------------------------------------------

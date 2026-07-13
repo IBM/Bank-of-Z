@@ -125,7 +125,7 @@ print_usage() {
     echo "Usage: bash pipeline-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zConfig, DBB, wazi-deploy)"
+    echo "  validate-prereqs  Validate prerequisites (zconfig, DBB, wazi-deploy)"
     echo "  build             Build the Bank of Z baseline"
     echo "  deploy            Deploy the Bank of Z baseline"
     echo "  build-and-deploy  Build and deploy the Bank of Z updates"

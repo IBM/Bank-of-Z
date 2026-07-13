@@ -128,8 +128,10 @@ public class GenCert {
             LocalDate.parse(notAfter).atStartOfDay(ZoneOffset.UTC).toInstant());
 
         X500Name subject = new X500Name("CN=Bank of Z,OU=IBM BoZ,O=IBM,C=US");
-        X500Name issuer  = new X500Name(
-            caCert.getSubjectX500Principal().getName("RFC1779"));
+        // Build issuer directly from the CA cert's DER-encoded subject to ensure
+        // the chain validation in PKCS12KeyStore matches exactly.
+        X500Name issuer = X500Name.getInstance(
+            caCert.getSubjectX500Principal().getEncoded());
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
             kp.getPublic().getEncoded());
 

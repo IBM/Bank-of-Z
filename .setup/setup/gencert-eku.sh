@@ -202,26 +202,40 @@ $JAVA -cp "$TMPDIR:$BCJAR" GenCert \
   "$ipaddr" "$dnsname" "$expire"
 
 # -----------------------------------------------------------------------
-# 4. Copy the PKCS12 to a RACF-importable dataset and import it
+# 4. Install the PKCS12 as a file-based keystore for Liberty.
+#    RACF IMPORT doesn't accept standard PKCS12 format — Liberty can use
+#    a file-based keystore directly, which avoids the RACF import entirely.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Importing new cert into RACF..."
+echo "[gencert-eku] Installing PKCS12 keystore for Liberty..."
 
-# Delete the old BoZ cert from the ring and RACF first
-tsocmd "RACDCERT ID($userid) REMOVE(LABEL('$label') RING($ring))" \
-  >/dev/null 2>&1 || true
-tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" \
-  >/dev/null 2>&1 || true
-tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" >/dev/null 2>&1
+KEYSTORE_DIR="/u/$(echo $userid | tr '[:upper:]' '[:lower:]')/boz-certs"
+mkdir -p "$KEYSTORE_DIR"
+cp "$TMPDIR/boz-server.p12" "$KEYSTORE_DIR/boz-server.p12"
+chmod 600 "$KEYSTORE_DIR/boz-server.p12"
 
-# Copy new PKCS12 to dataset for RACDCERT IMPORT
-cp "$TMPDIR/boz-server.p12" "//'${userid}.BOZ.NEWCERT'"
+# Update Liberty TLS config to point at the file-based keystore instead of
+# the RACF keyring.  Overwrites the tls.xml dropin written by
+# setup-zosconnect-server.sh.
+OVERRIDES_DIR="${SANDBOX_DIR}/zosconnect-server/servers/bankzServer/configDropins/overrides"
+PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+TLS_DEST="${OVERRIDES_DIR}/tls.xml"
+$PYTHON - "$TLS_DEST" "$KEYSTORE_DIR/boz-server.p12" << 'TLSEOF'
+import sys
+dest, p12path = sys.argv[1], sys.argv[2]
+content = '''<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <!-- TLS config using file-based PKCS12 keystore (EKU serverAuth, Safari-compatible) -->
+    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore" trustStoreRef="defaultKeyStore"/>
+    <keyStore id="defaultKeyStore"
+              location="{p12}"
+              type="PKCS12"
+              password="bozserver"/>
+</server>
+'''.format(p12=p12path)
+with open(dest, 'wb') as f:
+    f.write(content.encode('iso-8859-1'))
+TLSEOF
+chtag -t -c ISO8859-1 "$TLS_DEST"
 
-tsocmd "RACDCERT IMPORT(INDSN('${userid}.BOZ.NEWCERT')) \
-  ID($userid) \
-  WITHLABEL('$label') \
-  PASSWORD('bozserver')"
-tsocmd "RACDCERT ID($userid) \
-  CONNECT(LABEL('$label') RING($ring) DEFAULT)"
-tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
-
-echo "[gencert-eku] Done — BoZ cert now has EKU serverAuth, Safari should trust it."
+echo "[gencert-eku] Done — tls.xml updated to use PKCS12 keystore with EKU serverAuth."
+echo "[gencert-eku] Restart BAQBANKZ to pick up the new certificate."

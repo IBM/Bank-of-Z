@@ -56,7 +56,7 @@ stage_stop_tasks() {
     # =========================
     # STOP IBM MQ queue managers
     # =========================
-    opercmd "{MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
+    opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 
     # ===========================
     # Clean application datasets
@@ -405,6 +405,7 @@ stage_setup_mq_queue_manager() {
     cd "$BANK_DIR"
 
     set -o pipefail
+    chmod +x .setup/setup/setup-mq-queue-manager.sh
     .setup/setup/setup-mq-queue-manager.sh &
     PID=$!
     # Wait for MQ setup to complete (ZOAU/ZOWE ISSUE)

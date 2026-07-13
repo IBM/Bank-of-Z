@@ -31,7 +31,7 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # Stop queue manager
 # =========================
 set +e
-opercmd "{MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
+opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 
 # =========================
 # TODO: any of this needed?
@@ -47,7 +47,7 @@ set -e
 # =========================
 print_stage "STAGE 1: Create MQ queue manager with zconfig"
 
-export PATH="$ZCS_HOME/bin:$PATH"
+export PATH="$ZCONFIG_ZCB_HOME/bin:$PATH"
 
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
     source "$ZCONFIG_HOME/bin/activate"
@@ -83,7 +83,7 @@ deactivate
 print_stage "STAGE 2: Start MQ queue manager"
 
 set +e
-opercmd "{MQ_CPF} START QMGR"  2>/dev/null
+opercmd "${MQ_CPF} START QMGR"  2>/dev/null
 set -e
 
 sleep 10

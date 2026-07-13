@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=./resource-schema.json
+
 resourceDefinitions:
   # FILE Definitions
   - file:
@@ -1166,7 +1167,9 @@ resourceDefinitions:
       name: BOZMQCON
       group: BANKZGRP
       description: "MQCONN for Bank of z"
-      mqname: "{{ vars.mq_name }}"
+# TODO: this should be a var, come back to
+#      mqname: "{{ vars.mq_name }}"
+      mqname: MQ21
       initqname: BOZ.CICS.INITQ
       resyncmember: YES
 
@@ -1179,5 +1182,7 @@ resourceDefinitions:
       qname: BOZ.CICS.INITQ
       status: ENABLED
       transaction: CKTI
+      #TODO: if I don't set this it fails saying this is a required parameter, but its not in the schema
+      monuserid: IBMUSER
 
   # CICS bridge / adapter definition are picked up via DFHLIST

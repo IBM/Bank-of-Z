@@ -390,9 +390,12 @@ application:
 
     # ----------------------------------------------------------
     # MQJavaBuilder task
-    # Compiles the MQ BoZ code.
+    # Compiles the MQ BoZ code via Gradle and packages
+    # the resulting JAR with deployType=MQ-JAR so Wazi Deploy
+    # copies it to the MQ Java classpath directory on USS.
+    # TODO: check that last bit...
     # ----------------------------------------------------------
-    - task: MQJavaBuilder
+    - task: MqJavaBuilder
       variables:
         # Path to the Gradle executable on z/OS USS
         - name: gradlePath

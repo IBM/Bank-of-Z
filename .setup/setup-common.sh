@@ -527,7 +527,8 @@ main_setup() {
 
     stage_setup_database
 
-    stage_setup_mq_queue_manager
+    # TODO: add this back in
+    # stage_setup_mq_queue_manager
 
     stage_setup_cics_region
 

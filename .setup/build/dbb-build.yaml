@@ -10,8 +10,8 @@
 # Include other build configuration files
 ###############################################################
 version: 1.0.0
-include: 
-  # IMPORTANT!  Copy and configure Languages.yaml and any other 
+include:
+  # IMPORTANT!  Copy and configure Languages.yaml and any other
   # language configuration files from #DBB_HOME/samples/languages
   # to your $DBB_BUILD directory before executing zBuilder.
   - file: languages/Languages.yaml
@@ -24,7 +24,7 @@ lifecycles:
 
   # build single programs from the command line
   - lifecycle: file
-    
+
     # define the list of tasks to execute during the build lifecycle
     tasks:
       - Start
@@ -37,7 +37,7 @@ lifecycles:
 
   # build all programs for the application
   - lifecycle: full
-    
+
     # define the list of tasks to execute during the build lifecycle
     tasks:
       - Start
@@ -48,6 +48,7 @@ lifecycles:
       - VanillaFrontend
       - ServerXmlPackager
       - ImsJavaBuilder
+      - MqJavaBuilder
       - zOSConnect
       - Package
       - Finish
@@ -72,7 +73,7 @@ lifecycles:
           hasArg: false
           description: "Enables the debug options on load modules."
 
-    
+
     # define the list of tasks to execute during the build lifecycle
     tasks:
       - Start
@@ -83,6 +84,7 @@ lifecycles:
       - VanillaFrontend
       - ServerXmlPackager
       - ImsJavaBuilder
+      - MqJavaBuilder
       - zOSConnect
       - Package
       - Finish
@@ -101,7 +103,7 @@ lifecycles:
           hasArg: false
           description: "Enables the debug options on load modules."
 
-    
+
     tasks:
       - Start
       - ScannerInit
@@ -111,13 +113,14 @@ lifecycles:
       - VanillaFrontend
       - ServerXmlPackager
       - ImsJavaBuilder
+      - MqJavaBuilder
       - zOSConnect
       - Package
       - Finish
 
   # build only changed programs on a topic branch which will be merged back into the main build branch
   - lifecycle: merge
- 
+
     # define the list of tasks to execute during the build lifecycle
     tasks:
       - Start
@@ -128,7 +131,7 @@ lifecycles:
       #- zOSConnect
       - Finish
 
-  # user build for a single program 
+  # user build for a single program
   - lifecycle: user
     variables:
       - name: userbuild
@@ -158,7 +161,7 @@ lifecycles:
       - task: UnitTest
         condition: ${STATUS} == 2 || ${STATUS} == 0 # Skip task on build error or PREVIEW
       - Finish
-  
+
   # Scan source files and existing load modules to collect dependency data for source and outputs without creating load modules.
   - lifecycle: metadata
     variables:
@@ -178,7 +181,7 @@ lifecycles:
           - name: pds
             value: ${HLQ}.LOAD
       - Finish
-      
+
 #########################################################################
 # Basic task configurations that can be referenced by multiple lifecycles
 #########################################################################
@@ -186,16 +189,16 @@ tasks:
 
   # basic build initialization
   - task: Start
-  
+
   # initialize metadata store
   - task: MetadataInit
 
   # initialize dependency scanners
   - task: ScannerInit
-  
+
   # create simple build list
   - task: FileAnalysis
-  
+
   # create full build list
   - task: FullAnalysis
 
@@ -231,6 +234,8 @@ tasks:
             copyMode: BINARY
           - deployType: IMS-JAR
             copyMode: BINARY
+          - deployType: MQ-JAR
+            copyMode: BINARY
 
   # build finialization
   - task: Finish
@@ -248,7 +253,11 @@ tasks:
   # Custom task for IMS Java build and JAR packaging
   - task: ImsJavaBuilder
     script: groovy/ImsJavaBuilder.groovy
-  
+
+  # Custom task for MQ Java build and JAR packaging
+  - task: MqJavaBuilder
+    script: groovy/MqJavaBuilder.groovy
+
   # default empty Languages stage
   # to be replaced by content of Languges.yaml
   - stage: Languages

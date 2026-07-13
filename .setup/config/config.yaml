@@ -204,6 +204,6 @@ db2:
 # MQ configuration
 mq:
   install_hlq: "MQCD94"
-  qmgr_hql: "CSQ.MQ21"
+  qmgr_hlq: "CSQ.MQ21"
   port: 1414
   cpf: "!MQ21"

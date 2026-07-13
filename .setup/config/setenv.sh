@@ -145,7 +145,7 @@ DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 
 # MQ
-MQ_CPF=$(get_section_value 'mq' 'short_name')
+MQ_CPF=$(get_section_value 'mq' 'cpf')
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

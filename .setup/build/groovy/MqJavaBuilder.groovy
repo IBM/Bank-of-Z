@@ -19,14 +19,14 @@ import com.ibm.dbb.metadata.BuildResult
 import com.ibm.dbb.task.TaskConstants
 
 /**
- * ImsJavaBuilder - DBB script to build IMS Java code and package the resulting
+ * MqJavaBuilder - DBB script to build MQ Java code and package the resulting
  * JAR into the DBB build package for deployment.
  *
  * This script mirrors VanillaFrontend.groovy and zOSConnect (buildOpenAPIv3):
- * 1. Detects whether any IMS Java source files changed (pipeline/impact builds)
+ * 1. Detects whether any MQ Java source files changed (pipeline/impact builds)
  * 2. Runs gradle clean jar, depositing the JAR into outputDirectory (the DBB
  *    package staging area) via -PoutputDir - same pattern as the api.war
- * 3. Registers the JAR in the build map with deployType=IMS-JAR so the Package
+ * 3. Registers the JAR in the build map with deployType=MQ-JAR so the Package
  *    task pulls it into the tar, and Wazi Deploy copies it to sandbox/jars
  *
  * The Gradle executable path is supplied via the 'gradlePath' config variable,
@@ -35,7 +35,7 @@ import com.ibm.dbb.task.TaskConstants
  * so the correct z/OS USS environment is in place when the build runs.
  */
 
-log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
+log.info("MqJavaBuilder: Starting MQ Java build for Bank-of-Z")
 
 // -------------------------------------------------------------------------
 // Context variables - same as VanillaFrontend
@@ -56,8 +56,8 @@ log.info("Output Directory: ${outputDirectory}")
 // Path to the Gradle executable (shared with zOSConnect task - required)
 def gradlePath = config.getVariable('gradlePath')
 if (!gradlePath) {
-    log.error("ImsJavaBuilder: 'gradlePath' configuration variable is required but not set.")
-    log.error("Add gradlePath to the ImsJavaBuilder task configuration in dbb-app.yaml.")
+    log.error("MqJavaBuilder: 'gradlePath' configuration variable is required but not set.")
+    log.error("Add gradlePath to the MqJavaBuilder task configuration in dbb-app.yaml.")
     return 8
 }
 
@@ -68,11 +68,11 @@ def shell = config.getVariable('shellEnvironment') ?: '/bin/sh'
 def gradleDebug = config.getBooleanVariable('gradleDebug', false)
 
 // Relative path (from workspace/appDirName) to the Gradle project directory
-def imsJavaRelativePath = config.getVariable('configSources') ?: 'src/base/ims/java'
-def imsJavaPath = "${workspace}/${appDirName}/${imsJavaRelativePath}"
+def mqJavaRelativePath = config.getVariable('configSources') ?: 'src/base/mq/java'
+def mqJavaPath = "${workspace}/${appDirName}/${mqJavaRelativePath}"
 
 // Log file - same naming convention as zOSConnect
-def logFile = new File("${logsDirectory}/${appDirName}.ImsJavaBuilder.log")
+def logFile = new File("${logsDirectory}/${appDirName}.MqJavaBuilder.log")
 
 // Log encoding - same as zOSConnect
 def logEncoding = context.getVariable(TaskConstants.LOG_ENCODING) ?: 'IBM-1047'
@@ -80,16 +80,16 @@ def logEncoding = context.getVariable(TaskConstants.LOG_ENCODING) ?: 'IBM-1047'
 log.info("Gradle executable: ${gradlePath}")
 log.info("Shell:             ${shell}")
 log.info("Gradle debug:      ${gradleDebug}")
-log.info("IMS Java path:     ${imsJavaPath}")
+log.info("MQ Java path:     ${mqJavaPath}")
 log.info("Log file:          ${logFile.absolutePath}")
 log.info("Log encoding:      ${logEncoding}")
 
 // -------------------------------------------------------------------------
 // Verify Gradle project directory exists
 // -------------------------------------------------------------------------
-def imsJavaDir = new File(imsJavaPath)
-if (!imsJavaDir.exists() || !imsJavaDir.isDirectory()) {
-    log.error("IMS Java directory not found at: ${imsJavaPath}")
+def mqJavaDir = new File(mqJavaPath)
+if (!mqJavaDir.exists() || !mqJavaDir.isDirectory()) {
+    log.error("MQ Java directory not found at: ${mqJavaPath}")
     context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }
@@ -106,31 +106,31 @@ if (lifecycle == 'pipeline' || lifecycle == 'impact') {
     def renamedFiles = context.getVariable(TaskConstants.RENAMED_FILES) ?: []
     def allFiles = changedFiles + deletedFiles + renamedFiles
 
-    log.info("> Checking ${allFiles.size()} changed files for IMS Java changes")
-    log.info("> Looking for files containing: '${imsJavaRelativePath}/'")
+    log.info("> Checking ${allFiles.size()} changed files for MQ Java changes")
+    log.info("> Looking for files containing: '${mqJavaRelativePath}/'")
 
     def isJavaChanged = false
     allFiles.each { file ->
         log.info("> Checking file: ${file}")
-        // Files contain paths like "Bank-of-Z/src/base/ims/java/nazare/jmp/controller/IMSBankHistory.java"
-        // Check if the path contains the IMS Java directory (with or without leading slash)
-        if (file.contains("/${imsJavaRelativePath}/") ||
-            file.contains("${imsJavaRelativePath}/") ||
-            file.endsWith("/${imsJavaRelativePath}") ||
-            file.endsWith("${imsJavaRelativePath}")) {
+        // Files contain paths like "Bank-of-Z/src/base/mq/java/*"
+        // Check if the path contains the MQ Java directory (with or without leading slash)
+        if (file.contains("/${mqJavaRelativePath}/") ||
+            file.contains("${mqJavaRelativePath}/") ||
+            file.endsWith("/${mqJavaRelativePath}") ||
+            file.endsWith("${mqJavaRelativePath}")) {
             isJavaChanged = true
-            log.info("> IMS Java file detected: ${file}")
+            log.info("> MQ Java file detected: ${file}")
         }
     }
 
     if (!isJavaChanged) {
-        log.info("> No IMS Java changes detected - skipping IMS Java build")
+        log.info("> No MQ Java changes detected - skipping MQ Java build")
         return 0
     }
 
-    println("> IMS Java changes detected - proceeding with build")
+    println("> MQ Java changes detected - proceeding with build")
 } else {
-    println("> Full build - proceeding with IMS Java build")
+    println("> Full build - proceeding with MQ Java build")
 }
 
 // -------------------------------------------------------------------------
@@ -144,7 +144,7 @@ try {
     // Build into a private temp dir then copy only the JAR across, so that
     // gradle clean does not wipe anything VanillaFrontend / ServerXmlPackager
     // already wrote into outputDirectory.
-    def gradleWorkDir = new File("${outputDirectory}/ims-java-build-temp")
+    def gradleWorkDir = new File("${outputDirectory}/mq-java-build-temp")
     if (gradleWorkDir.exists()) {
         log.info("Cleaning existing Gradle work dir: ${gradleWorkDir.absolutePath}")
         gradleWorkDir.deleteDir()
@@ -158,7 +158,7 @@ try {
     if (gradleDebug) optionsList << '--debug'
 
     log.info("Executing: ${shell} ${optionsList.join(' ')}")
-    log.info("Working directory: ${imsJavaPath}")
+    log.info("Working directory: ${mqJavaPath}")
     log.info("Gradle log file:   ${logFile.absolutePath}")
 
     if (logFile.exists()) logFile.delete()
@@ -166,7 +166,7 @@ try {
     UnixExec gradleExec = new UnixExec().command(shell)
     gradleExec.setOptions(optionsList)
     gradleExec.output(logFile.absolutePath).mergeErrors(true)
-    gradleExec.setWorkingDirectory(imsJavaPath)
+    gradleExec.setWorkingDirectory(mqJavaPath)
     gradleExec.setOutputEncoding(logEncoding)
 
     int gradleRc = gradleExec.execute()
@@ -221,7 +221,7 @@ try {
     }
 
     // build.gradle is the stable marker for this Gradle project
-    String relativeMarkerPath = "${imsJavaRelativePath}/build.gradle"
+    String relativeMarkerPath = "${mqJavaRelativePath}/build.gradle"
 
     if (buildGroup.buildMapExists(relativeMarkerPath)) {
         log.info("Deleting existing build map for ${relativeMarkerPath}")
@@ -229,22 +229,22 @@ try {
     }
 
     def buildMap = buildGroup.createBuildMap(relativeMarkerPath)
-    buildMap.addOutput(jarFile.absolutePath, "IMS-JAR", null, null)
-    log.info("Output registered: ${jarFile.absolutePath} with deployType=IMS-JAR")
+    buildMap.addOutput(jarFile.absolutePath, "MQ-JAR", null, null)
+    log.info("Output registered: ${jarFile.absolutePath} with deployType=MQ-JAR")
 
     // Add marker to BUILD_LIST - must be the same path used in createBuildMap()
     buildList.add(relativeMarkerPath)
     log.info("Added ${relativeMarkerPath} to BUILD_LIST (total files: ${buildList.size()})")
 
     log.info("=" * 80)
-    log.info("ImsJavaBuilder completed successfully")
+    log.info("MQJavaBuilder completed successfully")
     log.info("JAR:         ${jarFile.absolutePath}")
-    log.info("Deploy Type: IMS-JAR")
+    log.info("Deploy Type: MQ-JAR")
     log.info("Build tool:  Gradle")
     log.info("=" * 80)
 
 } catch (Exception e) {
-    log.error("ImsJavaBuilder failed: ${e.message}", e)
+    log.error("MqJavaBuilder failed: ${e.message}", e)
     context.setVariable(TaskConstants.STATUS, BuildResult.ERROR)
     return 8
 }

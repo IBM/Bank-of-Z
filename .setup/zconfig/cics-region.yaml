@@ -44,12 +44,11 @@ cics_region:
       top_data_sets:
         - "{{ vars.debug_hlq }}.SEQAMOD"
       data_sets:
-        - "{{ vars.mq_hlq }}.SCSQLOAD"
-        - "{{ vars.mq_hlq }}.SCSQAUTH"
-      data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
         - TCPIP.SEZATCP
+        - "{{ vars.mq_hlq }}.SCSQLOAD"
+        - "{{ vars.mq_hlq }}.SCSQAUTH"
     dds:
       - name: DFHTABLE
         dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"

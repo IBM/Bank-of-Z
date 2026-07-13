@@ -42,7 +42,7 @@ cics_region:
       region: 0M
     dfhrpl:
       top_data_sets:
-        - "{{ vars.eqaw_hlq }}.SEQAMOD"
+        - "{{ vars.debug_hlq }}.SEQAMOD"
       data_sets:
         - "{{ vars.mq_hlq }}.SCSQLOAD"
         - "{{ vars.mq_hlq }}.SCSQAUTH"

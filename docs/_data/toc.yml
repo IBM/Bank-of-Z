@@ -13,33 +13,47 @@
     url: /docs/architecture/application-components.html
   - title: Application Flow
     url: /docs/architecture/application-flow.html
+  - title: Build and Deployment Architecture
+    url: /docs/architecture/build-and-deployment.html
 - title: Installation and Setup
   url: /docs/installation-and-setup/
   children:
-  - title: Quick Start
-    url: /docs/installation-and-setup/quick-start.html
   - title: Prerequisites
     url: /docs/installation-and-setup/prerequisites.html
   - title: Environment Configuration
     url: /docs/installation-and-setup/environment-configuration.html
+  - title: Deploying Bank of Z
+    url: /docs/installation-and-setup/deploying.html
+  - title: Deploy Using Direct USS Access
+    url: /docs/installation-and-setup/deploy-direct.html
+  - title: Deploy Using Zowe CLI
+    url: /docs/installation-and-setup/deploy-zowe-cli.html
+  - title: Deploy Using GRUB
+    url: /docs/installation-and-setup/deploy-grub.html
+  - title: Local Tools
+    url: /docs/installation-and-setup/local-tools/
   - title: IDE Setup
-    url: /docs/installation-and-setup/ide-setup.html
-  - title: Build and Deploy
-    url: /docs/installation-and-setup/build-and-deploy.html
+    url: /docs/installation-and-setup/local-tools/ide-setup.html
+  - title: Zowe Profile Setup
+    url: /docs/installation-and-setup/local-tools/zowe-profile-setup.html
+  - title: Zowe CLI Setup
+    url: /docs/installation-and-setup/local-tools/zowe-cli-setup.html
+  - title: GRUB Setup
+    url: /docs/installation-and-setup/local-tools/grub-setup.html
   - title: Verification
     url: /docs/installation-and-setup/verification.html
 - title: Tutorials
   url: /docs/tutorials/
   children:
-  - title: Make Your First Change
-    url: /docs/tutorials/make-your-first-change.html
+  - title: Deploy Bank of Z
+    url: /docs/tutorials/deploy-bank-of-z.html
   - title: CICS Enhancement Scenario
     url: /docs/tutorials/cics-enhancement-scenario.html
 - title: Development Workflows
   url: /docs/development-workflows/
   children:
-  - title: VS Code Workflow
-    url: /docs/development-workflows/vscode-workflow.html
+  - title: Zowe CLI Workflow
+    url: /docs/development-workflows/zowe-cli-workflow.html
   - title: GRUB Workflow
     url: /docs/development-workflows/grub-workflow.html
   - title: Development Best Practices

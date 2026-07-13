@@ -14,7 +14,7 @@ version: 1.0.0
 #########################################################
 # Import language task configurations
 #########################################################
-include: 
+include:
   - file: languages/Transfer.yaml
   - file: languages/BMS.yaml
   - file: languages/Cobol.yaml

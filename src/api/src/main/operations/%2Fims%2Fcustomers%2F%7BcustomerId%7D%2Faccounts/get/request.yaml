@@ -15,5 +15,3 @@ mappings:
             required: false
             nullable: false
             template: "{{$pathParameters.customerId}}"
-
-# Made with Bob

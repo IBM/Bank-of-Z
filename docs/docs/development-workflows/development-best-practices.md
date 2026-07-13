@@ -45,7 +45,7 @@ Update relevant documentation when introducing new functionality, modifying conf
 
 Select the workflow that best supports your current task:
 
-Use the VS Code workflow when working with branch-based development and version-controlled changes.
+Use the Zowe CLI workflow when working with branch-based development and version-controlled changes.
 Use the GRUB workflow when you want to rapidly test local changes without committing them first.
 
 **Note:** Selecting the appropriate workflow can improve development efficiency and reduce turnaround time during testing.

@@ -47,9 +47,9 @@ A typical Bank of Z development workflow consists of the following activities:
 
 Bank of Z supports multiple development approaches.
 
-### VS Code Workflow
+### Zowe CLI Workflow
 
-A task-based workflow that integrates source code editing, Git operations, build run, and deployment activities within Visual Studio Code.
+A task-based workflow that uses Zowe CLI to clone your branch on z/OS USS and run the setup and pipeline scripts. Can be triggered from the command line or from a VS Code task.
 
 ### GRUB Workflow
 

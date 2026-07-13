@@ -47,12 +47,11 @@ echo "[gencert-eku] NOTE: Liberty will use file-based PKCS12, not the RACF keyri
 echo "[gencert-eku]       Access control: chmod 600, not RDATALIB."
 
 # -----------------------------------------------------------------------
-# Randomise passwords — generated once per run, never reused
+# Randomise passwords via Python — tr/dev/urandom not reliable on z/OS USS
 # -----------------------------------------------------------------------
-CA_PASS=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom 2>/dev/null | head -c 24 || \
-          awk 'BEGIN{srand(); for(i=0;i<24;i++) printf "%c", int(rand()*62)%62+48}')
-KS_PASS=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom 2>/dev/null | head -c 24 || \
-          awk 'BEGIN{srand(); for(i=0;i<24;i++) printf "%c", int(rand()*62)%62+48}')
+PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3.14
+CA_PASS=$($PYTHON -c "import secrets,string; print(secrets.token_urlsafe(18))")
+KS_PASS=$($PYTHON -c "import secrets,string; print(secrets.token_urlsafe(18))")
 
 # -----------------------------------------------------------------------
 # Race-safe temp dir with restricted permissions so CA key is not world-readable

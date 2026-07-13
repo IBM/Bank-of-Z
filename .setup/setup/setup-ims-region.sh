@@ -95,6 +95,15 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 
 run_job_and_wait "/tmp/create-imsiso-loadlib-$$.jcl" "8"
 
+# Check if IMS Control Region is running
+print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking IMS ISO loadlib authorization..."
+if opercmd "D PROG,APF" 2>/dev/null | grep -q "${BOZ_IMS_HLQ}.IMSISO.LOADLIB"; then
+    print_success "IMS ISO loadlib is APF-authorized"
+else
+    print_info "${CYAN}[ZCONFIG-IMS]${NC} Adding IMS ISO loadlib to APF list..."
+    opercmd "SETPROG APF,ADD,LIBRARY=${BOZ_IMS_HLQ}.IMSISO.LOADLIB"
+fi
+
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.j2"  --outputFile "/tmp/create-imsiso-tables-$$.jcl"
 

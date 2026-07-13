@@ -10,8 +10,8 @@ vars:
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
   eqaw_hlq: "EQAW.SEQAMOD"
-  mq_hlq: "MQCD94"         # TODO: need to put this somewhere else...
-  mq_name: "MQ21"          # TODO: need to put this somewhere else...
+  mq_install_hlq: "MQCD94"
+  mq_qmgr_name: "MQ21"
 
 cics_region:
   applid: "{{ vars.applid }}"

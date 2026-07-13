@@ -137,6 +137,8 @@ zconfig apply \
   -e db2_hlq="${DB2_HLQ}" \
   -e cics_hlq="${CICS_HLQ}" \
   -e cics_uss_dir="${CICS_USS_DIR}" \
+  -e mq_qmgr_name="${MQ_QMGR_NAME}" \
+  -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   cics-region.yaml
 
 RC=$?
@@ -177,7 +179,7 @@ run_job_and_wait "/tmp/plt-create-$$.jcl" "8"
 # =========================
 print_stage "STAGE 5: Start CICS region"
 
-jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART" 
+jsub "${APP_BASE_NAME}.CICS${APP_SHORT_NAME}.DFHSTART"
 sleep 10
 print_info "${CYAN}[ZCONFIG-CICS]${NC} CICS Region Job Started"
 sleep 10
@@ -198,10 +200,10 @@ if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PO
     print_info "${CYAN}[ZCONFIG-CICS]${NC} CICSBOZ already present in ${DTCN_PORTS}"
 else
     print_info "${CYAN}[ZCONFIG-INSTALL]${NC} Adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
-    
-  
+
+
     if netstat | grep -q "EQARMTD"
-    then 
+    then
       echo "EQARMTD is started";
     else
       echo "Starting Remote Debug Service (EQARMTD)"
@@ -215,9 +217,9 @@ else
     echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
     cp "${DTCN_PORTS_TMP}" "$DTCN_PORTS"
     chtag -r "$DTCN_PORTS"
-    opercmd "C EQAPROF"  
+    opercmd "C EQAPROF"
     sleep 5
-    opercmd "S EQAPROF" 
+    opercmd "S EQAPROF"
     sleep 5
 fi
 
@@ -226,3 +228,4 @@ fi
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 exit 0
+

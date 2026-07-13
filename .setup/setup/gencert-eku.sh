@@ -68,6 +68,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.ExtensionsGenerator;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
@@ -141,7 +142,7 @@ public class GenCert {
         exts.addExtension(Extension.keyUsage, true,
             new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
         exts.addExtension(Extension.extendedKeyUsage, false,
-            new ExtendedKeyUsage(new ASN1ObjectIdentifier[]{ EKU_SERVER_AUTH }));
+            new ExtendedKeyUsage(KeyPurposeId.getInstance(EKU_SERVER_AUTH)));
 
         AlgorithmIdentifier sigAlg = new AlgorithmIdentifier(SHA256_WITH_RSA, DERNull.INSTANCE);
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();

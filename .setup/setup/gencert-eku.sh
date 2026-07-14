@@ -21,9 +21,13 @@
 # Called by addcert.sh after the keyring scaffold is in place.
 # =============================================================================
 
-# Source setenv.sh to get SANDBOX_DIR when called standalone
+# Set SANDBOX_DIR when called standalone (setenv.sh requires bash; this script is sh)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-. "$SCRIPT_DIR/../config/setenv.sh" 2>/dev/null || true
+if [ -z "${SANDBOX_DIR:-}" ]; then
+  # Derive from the repo checkout location (.setup/setup → .setup → repo → sandbox)
+  SANDBOX_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+  export SANDBOX_DIR
+fi
 
 set -e
 
@@ -31,17 +35,28 @@ userid=IBMUSER
 ring=BOZRING
 label='BoZ'
 
-# Resolve Java
-if [ -n "${JAVA_HOME:-}" ]; then
-  JAVA="$JAVA_HOME/bin/java"
-  JAVAC="$JAVA_HOME/bin/javac"
-else
-  JAVA=$(command -v java 2>/dev/null) || { echo "[gencert-eku] FATAL: java not found" >&2; exit 1; }
-  JAVAC=$(command -v javac 2>/dev/null) || { echo "[gencert-eku] FATAL: javac not found" >&2; exit 1; }
+# Resolve Java — JAVA_HOME is exported by setenv.sh (sourced by setup-common.sh before
+# calling addcert.sh, which calls this script).  Fall back to a hardcoded known path if
+# not present (e.g. when run standalone).
+if [ -z "${JAVA_HOME:-}" ]; then
+  JAVA_HOME=/usr/local/sandboxes/tools/J21.0_64
+  export JAVA_HOME
+fi
+JAVA="$JAVA_HOME/bin/java"
+JAVAC="$JAVA_HOME/bin/javac"
+if [ ! -x "$JAVA" ]; then
+  echo "[gencert-eku] FATAL: java not found at $JAVA" >&2; exit 1
 fi
 
-# Resolve Python — prefer python3 from PATH (setenv.sh prepends PYTHON_HOME/bin)
-PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found on PATH" >&2; exit 1; }
+# Resolve Python — PYTHON_HOME is exported by setenv.sh; also on PATH via setenv.sh.
+# Fall back to known fixed path if not present.
+if [ -n "${PYTHON_HOME:-}" ] && [ -x "$PYTHON_HOME/bin/python3" ]; then
+  PYTHON="$PYTHON_HOME/bin/python3"
+elif [ -x /usr/lpp/IBM/cyp/v3r14/pyz/bin/python3 ]; then
+  PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3
+else
+  PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
+fi
 
 # Resolve Bouncy Castle JAR
 BCJAR=$(ls "${SANDBOX_DIR:-/usr/local/sandboxes/bank-of-z}/tools"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)

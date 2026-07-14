@@ -56,6 +56,14 @@ else
   PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
 fi
 
+# Ensure ZOAU tools (dcp, tsocmd, etc.) are on PATH
+if [ -n "${ZOAU_HOME:-}" ] && [ -x "$ZOAU_HOME/bin/dcp" ]; then
+  export PATH="$ZOAU_HOME/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoautil/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoautil/bin:$PATH"
+fi
+DCP=$(command -v dcp 2>/dev/null) || { echo "[gencert-eku] FATAL: dcp (ZOAU) not found on PATH" >&2; exit 1; }
+
 _TOOLS_DIR="${SANDBOX_DIR}/../tools"
 BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
 if [ -z "$BCJAR" ]; then
@@ -126,7 +134,7 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 echo "[gencert-eku] Exporting cert as PEM for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
   DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
-dcp "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
+$DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
 # dcp copies EBCDIC bytes — convert to ASCII so Java can parse it
 $PYTHON -c "
 raw = open('$TMPDIR/boz-orig.pem','rb').read()
@@ -321,7 +329,7 @@ tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') NEW CATALOG \
   RECFM(V,B) LRECL(1028) BLKSIZE(27998) TRACKS SPACE(5,5)"
 
 # dcp for binary copy (cp "//dataset" doesn't work reliably for DER)
-dcp -B "$TMPDIR/boz-new.der" "${userid}.BOZ.NEWCERT"
+$DCP -B "$TMPDIR/boz-new.der" "${userid}.BOZ.NEWCERT"
 
 tsocmd "RACDCERT ADD('${userid}.BOZ.NEWCERT') \
   ID($userid) \

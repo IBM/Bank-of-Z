@@ -266,7 +266,7 @@ queue_managers:
         qindxbld: 'WAIT'
         clcache: 'STATIC'
         exclmsg: '()'
-        splcap: 'DISABLED'
+        splcap: 'OFF'
         acelim: '0'
       arvp:
         unit: 'SYSDA'

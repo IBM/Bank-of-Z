@@ -34,12 +34,14 @@ set +e
 opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 
 # =========================
-# TODO: any of this needed?
 # Cleanup
 # =========================
-rm -rf "$SCRIPTS_DIR/logs"
-rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
-rm -rf "$SANDBOX_DIR/diagnostics"
+drm "${MQ_INSTALL_HLQ}.*"  2>/dev/null
+
+# TODO: any of this needed?
+#rm -rf "$SCRIPTS_DIR/logs"
+#rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
+#rm -rf "$SANDBOX_DIR/diagnostics"
 set -e
 
 # =========================

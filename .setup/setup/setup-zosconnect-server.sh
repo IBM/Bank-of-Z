@@ -123,7 +123,7 @@ rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
 # Generate CICS connection config
 # Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
 # =========================
-PYTHON="${PYTHON_HOME:-}/bin/python3"
+PYTHON=$(command -v python3 2>/dev/null) || { echo "[ZOSCONNECT] FATAL: python3 not found on PATH" >&2; exit 1; }
 CICS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
 $PYTHON -c "
 import sys

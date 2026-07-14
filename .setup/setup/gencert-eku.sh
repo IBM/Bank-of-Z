@@ -40,12 +40,8 @@ else
   JAVAC=$(command -v javac 2>/dev/null) || { echo "[gencert-eku] FATAL: javac not found" >&2; exit 1; }
 fi
 
-# Resolve Python
-if [ -n "${PYTHON_HOME:-}" ]; then
-  PYTHON="$PYTHON_HOME/bin/python3"
-else
-  PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
-fi
+# Resolve Python — prefer python3 from PATH (setenv.sh prepends PYTHON_HOME/bin)
+PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found on PATH" >&2; exit 1; }
 
 # Resolve Bouncy Castle JAR
 BCJAR=$(ls "${SANDBOX_DIR:-/usr/local/sandboxes/bank-of-z}/tools"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)

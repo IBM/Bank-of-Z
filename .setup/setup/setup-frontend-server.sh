@@ -73,7 +73,7 @@ fi
 # Liberty variable refs (${frontend.http.port} etc.) must be preserved literally.
 # =========================
 print_info "${CYAN}[FRONTEND]${NC} Configuring server.xml..."
-PYTHON="${PYTHON_HOME:-}/bin/python3"
+PYTHON=$(command -v python3 2>/dev/null) || { echo "[FRONTEND] FATAL: python3 not found on PATH" >&2; exit 1; }
 SERVER_XML_DEST="${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
 $PYTHON -c "
 content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>

@@ -8,7 +8,7 @@ vars:
 mq_zconfig_schema_version: '1.0.0'
 queue_managers:
 - name: '{{ vars.mq_qmgr_name }}'
-  # TODO: would be good to have LTS here.
+  # TODO: would be good to have LTS here. Need to get environment set up for that. But could use aliases for the moment?
   version: '9.4.5'
   language: 'E'
   license: 'MQ'
@@ -51,6 +51,28 @@ queue_managers:
         index:
           name: '{{ vars.mq_qmgr_hlq }}.BSDS01.INDEX'
           controlintervalsize: '1024'
+      bsds02:
+        type: 'vsam'
+        cluster:
+          name: '{{ vars.mq_qmgr_hlq }}.BSDS02'
+          volumes: '*'
+          shareoptions: '2 3'
+          unique: 'YES'
+          indexed: 'YES'
+          noreuse: 'YES'
+          keys: '4 0'
+          recordsize: '4089 4089'
+          freespace: '0 20'
+          space:
+            type: 'TRACK'
+            primary: '10'
+            secondary: '5'
+        data:
+          name: '{{ vars.mq_qmgr_hlq }}.BSDS02.DATA'
+          controlintervalsize: '4096'
+        index:
+          name: '{{ vars.mq_qmgr_hlq }}.BSDS02.INDEX'
+          controlintervalsize: '1024'
     recovery_logs:
       recovery_log_copy1:
       - type: 'vsam'
@@ -82,6 +104,37 @@ queue_managers:
             secondary: '0'
         data:
           name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY1.DS01.DATA'
+          controlintervalsize: '4096'
+      recovery_log_copy2:
+      - type: 'vsam'
+        cluster:
+          name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY2.DS02'
+          volumes: '*'
+          linear: 'YES'
+          unique: 'YES'
+          shareoptions: '2 3'
+          noreuse: 'YES'
+          space:
+            type: 'CYLINDER'
+            primary: '3'
+            secondary: '0'
+        data:
+          name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY2.DS02.DATA'
+          controlintervalsize: '4096'
+      - type: 'vsam'
+        cluster:
+          name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY2.DS01'
+          volumes: '*'
+          linear: 'YES'
+          unique: 'YES'
+          shareoptions: '2 3'
+          noreuse: 'YES'
+          space:
+            type: 'CYLINDER'
+            primary: '3'
+            secondary: '0'
+        data:
+          name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY2.DS01.DATA'
           controlintervalsize: '4096'
     pagesets:
     - id: '0'
@@ -222,8 +275,8 @@ queue_managers:
         priqty: '100'
         secqty: '50'
         blksize: '24576'
-        arcpfx1: 'ARCLOG1'
-        arcpfx2: ''
+        arcpfx1: '{{ vars.mq_qmgr_hlq }}.ARCLOG1'
+        arcpfx2: '{{ vars.mq_qmgr_hlq }}.ARCLOG2'
         tstamp: 'NO'
         arcretn: '0'
         arcwtor: 'YES'
@@ -237,9 +290,9 @@ queue_managers:
         outbuff: '400'
         maxrtu: '2'
         maxarch: '500'
-        twoactv: 'NO'
-        twoarch: 'NO'
-        twobsds: 'NO'
+        twoactv: 'YES' # TODO: back to single when we can
+        twoarch: 'YES'
+        twobsds: 'YES'
         offload: 'NO'
         maxcnoff: '31'
         wrthrsh: '20'

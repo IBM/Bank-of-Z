@@ -518,12 +518,14 @@ main_setup() {
     stage_setup_ims_database
     
     stage_setup_ims_bankz_regions
-    
-    stage_setup_certificates
 
     stage_setup_zosconnect_server
-    
+
     stage_setup_frontend_server
+
+    # Certificates run last so gencert-eku.sh overwrites the tls.xml
+    # that setup-zosconnect-server.sh writes with the RACF keyring version.
+    stage_setup_certificates
     
     # Summary
     print_stage "SETUP COMPLETE"

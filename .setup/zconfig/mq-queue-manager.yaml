@@ -16,10 +16,13 @@ queue_managers:
   dataset_hlq: '{{ vars.mq_qmgr_hlq }}'              # TODO: instructions are confusing. Why needed if prefix already applied below.
   mq_installation:
     hlq: '{{ vars.mq_install_hlq }}'                 # TODO: why?
+    #TODO: this list needs to true up with the docs
     scsqauth: '{{ vars.mq_install_hlq }}.SCSQAUTH'
     scsqanle: '{{ vars.mq_install_hlq }}.SCSQANLE'
     scsqproc: '{{ vars.mq_install_hlq }}.SCSQPROC'
     scsqlink: '{{ vars.mq_install_hlq }}.SCSQLINK'
+    scsqload: '{{ vars.mq_install_hlq }}.SCSQLOAD'
+    scsqmacs: '{{ vars.mq_install_hlq }}.SCSQMACS'
   mstr:
     storage:
       region: '0M'

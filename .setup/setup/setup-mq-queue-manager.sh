@@ -56,7 +56,7 @@ else
 fi
 
 #TODO:
-#cd "$SCRIPTS_DIR/../zconfig"
+cd "$SCRIPTS_DIR/../zconfig"
 #rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
 
 zconfig apply \

@@ -36,7 +36,7 @@ opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 # =========================
 # Cleanup
 # =========================
-drm "${MQ_INSTALL_HLQ}.*"  2>/dev/null
+drm "${MQ_QMGR_HLQ}.*"  2>/dev/null
 
 # TODO: any of this needed?
 #rm -rf "$SCRIPTS_DIR/logs"

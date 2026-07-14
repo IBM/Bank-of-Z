@@ -13,7 +13,7 @@
 #      TBSCertificate with EKU serverAuth + SANs + 397-day validity, and
 #      re-signs it with VSICA's key (exported as PKCS12DER, deleted after).
 #   4. dcp the new DER cert back to a RACF dataset.
-#   5. RACDCERT IMPORT FORMAT(CERTDER) — RACF matches the new cert to the
+#   5. RACDCERT ADD FORMAT(CERTDER) — RACF matches the new cert to the
 #      private key it already holds (same public key).
 #   6. Connect cert to BOZRING as DEFAULT.
 #   7. Liberty uses safkeyring://IBMUSER/BOZRING (JCERACFKS).
@@ -323,7 +323,7 @@ tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') NEW CATALOG \
 # dcp for binary copy (cp "//dataset" doesn't work reliably for DER)
 dcp -B "$TMPDIR/boz-new.der" "${userid}.BOZ.NEWCERT"
 
-tsocmd "RACDCERT IMPORT('${userid}.BOZ.NEWCERT') \
+tsocmd "RACDCERT ADD('${userid}.BOZ.NEWCERT') \
   ID($userid) \
   WITHLABEL('$label') \
   FORMAT(CERTDER) \

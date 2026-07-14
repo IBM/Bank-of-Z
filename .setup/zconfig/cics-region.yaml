@@ -47,8 +47,8 @@ cics_region:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
         - TCPIP.SEZATCP
-        - "{{ vars.mq_hlq }}.SCSQLOAD"
-        - "{{ vars.mq_hlq }}.SCSQAUTH"
+        - "{{ vars.mq_install_hlq }}.SCSQLOAD"
+        - "{{ vars.mq_install_hlq }}.SCSQAUTH"
     dds:
       - name: DFHTABLE
         dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
@@ -57,7 +57,7 @@ cics_region:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
         - "{{ vars.db2_hlq }}.SDSNEXIT"
       data_sets:
-        - "{{ vars.mq_hlq }}.SCSQAUTH"
+        - "{{ vars.mq_install_hlq }}.SCSQAUTH"
 
   sit_parameters:
     start: INITIAL

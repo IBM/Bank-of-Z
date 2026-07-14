@@ -14,6 +14,7 @@ queue_managers:
   license: 'MQ'
   cpf: '{{ vars.mq_cpf }}'
   dataset_hlq: '{{ vars.mq_qmgr_hlq }}'              # TODO: instructions are confusing. Why needed if prefix already applied below.
+  system_proclib: 'SYS1.PROCLIB'                     # TODO: variablise
   mq_installation:
     hlq: '{{ vars.mq_install_hlq }}'                 # TODO: why?
     #TODO: this list needs to true up with the docs

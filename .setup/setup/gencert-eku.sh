@@ -2,24 +2,29 @@
 # =============================================================================
 # Script  : gencert-eku.sh
 # Summary : Generate a TLS server certificate with EKU serverAuth (OID
-#           1.3.6.1.5.5.7.3.1) signed by VSICA, for Safari/Apple ATS
-#           compliance.  RACDCERT GENCERT cannot add EKU, so this script
-#           uses Bouncy Castle (already on image via Gradle) to build the
-#           cert and writes it as a file-based PKCS12 keystore for Liberty.
+#           1.3.6.1.5.5.7.3.1) signed by VSICA, with the private key
+#           remaining in the RACF keyring at all times.
 #
-# NOTE: Liberty uses a file-based PKCS12 keystore, not the RACF keyring.
-#       Access control is filesystem permissions (chmod 600), not RDATALIB.
-#       This is a deliberate trade-off: RACDCERT GENCERT cannot add EKU
-#       serverAuth, which Safari requires since macOS 10.15 / iOS 13.
+# Approach (re-sign existing RACF cert — private key never leaves RACF):
+#   1. RACDCERT GENCERT SIGNWITH(CERTAUTH LABEL('VSICA')) — RACF generates
+#      keypair and a VSICA-signed cert.  Private key stays in RACF.
+#   2. dcp export the cert as CERTB64 (PEM) to USS.
+#   3. Bouncy Castle reads the public key from the PEM, builds a new
+#      TBSCertificate with EKU serverAuth + SANs + 397-day validity, and
+#      re-signs it with VSICA's key (exported as PKCS12DER, deleted after).
+#   4. dcp the new DER cert back to a RACF dataset.
+#   5. RACDCERT IMPORT FORMAT(CERTDER) — RACF matches the new cert to the
+#      private key it already holds (same public key).
+#   6. Connect cert to BOZRING as DEFAULT.
+#   7. Liberty uses safkeyring://IBMUSER/BOZRING (JCERACFKS).
 #
-# Called by addcert.sh after the basic keyring scaffold is in place.
+# Called by addcert.sh after the keyring scaffold is in place.
 # =============================================================================
 
 # Derive SANDBOX_DIR from script location when not already in environment.
 # (setenv.sh requires bash; this script is sh — do not source it here.)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -z "${SANDBOX_DIR:-}" ]; then
-  # .setup/setup → .setup → Bank-of-Z → sandbox parent
   SANDBOX_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
   export SANDBOX_DIR
 fi
@@ -27,12 +32,11 @@ fi
 set -e
 
 userid=IBMUSER
+ring=BOZRING
+label='BoZ'
 
 # -----------------------------------------------------------------------
 # Resolve tools — fall back to known fixed paths when env vars not set.
-# Java: JAVA_HOME exported by setenv.sh; hardcoded fallback for standalone.
-# Python: PYTHON_HOME from setenv.sh; known fixed path as fallback.
-# bcprov JAR: tools/ is one level above SANDBOX_DIR (bank-of-z).
 # -----------------------------------------------------------------------
 if [ -z "${JAVA_HOME:-}" ]; then
   JAVA_HOME=/usr/local/sandboxes/tools/J21.0_64
@@ -55,12 +59,11 @@ fi
 _TOOLS_DIR="${SANDBOX_DIR}/../tools"
 BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
 if [ -z "$BCJAR" ]; then
-  echo "[gencert-eku] FATAL: bcprov-*.jar not found under $_TOOLS_DIR" >&2
-  exit 1
+  echo "[gencert-eku] FATAL: bcprov-*.jar not found under $_TOOLS_DIR" >&2; exit 1
 fi
 
 # -----------------------------------------------------------------------
-# Guard: verify IP and DNS can be determined before doing anything
+# Guard: verify IP and DNS can be determined
 # -----------------------------------------------------------------------
 ipaddr=$(netstat -h 2>/dev/null | awk '/ OSA/ {print $1}')
 test "$ipaddr" = "IntfName:" && ipaddr=$(netstat -h 2>/dev/null \
@@ -76,41 +79,72 @@ expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('VSICA'))" \
   | awk '/End Date:/ {gsub("/","-",$3); print $3}')
 
 echo "[gencert-eku] IP=$ipaddr  DNS=$dnsname  VSICA expire=$expire"
-echo "[gencert-eku] NOTE: Liberty will use file-based PKCS12, not the RACF keyring."
-echo "[gencert-eku]       Access control: chmod 600, not RDATALIB."
+echo "[gencert-eku] Private key stays in RACF keyring throughout."
 
-# -----------------------------------------------------------------------
-# Randomise passwords via Python — tr/dev/urandom not reliable on z/OS USS
-# -----------------------------------------------------------------------
+# Random passwords via Python
 CA_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
-KS_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
 
-# -----------------------------------------------------------------------
-# Race-safe temp dir with restricted permissions so CA key is not world-readable
-# (mktemp not available on z/OS USS — use mkdir -m 700 with PID-based name)
-# -----------------------------------------------------------------------
+# Race-safe temp dir
 TMPDIR=/tmp/boz-cert-$$
 mkdir -m 700 -p "$TMPDIR"
-trap 'rm -rf "$TMPDIR"; tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1 || true' EXIT
+trap 'rm -rf "$TMPDIR"
+  tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1 || true
+  tsocmd "DELETE (\047${userid}.BOZ.CERTB64\047)" >/dev/null 2>&1 || true
+  tsocmd "DELETE (\047${userid}.BOZ.NEWCERT\047)" >/dev/null 2>&1 || true' EXIT
 
 # -----------------------------------------------------------------------
-# 1. Export VSICA cert + private key to a temp PKCS12 dataset.
-#    The dataset is deleted in the EXIT trap above.
+# 1. Remove any existing cert so GENCERT can create a fresh one.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Exporting VSICA to temp PKCS12..."
+echo "[gencert-eku] Removing old cert from keyring..."
+tsocmd "RACDCERT ID($userid) \
+  REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
+tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
+tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" >/dev/null 2>&1 || true
+
+# -----------------------------------------------------------------------
+# 2. Generate keypair + cert in RACF, signed by VSICA.
+#    Private key is generated inside RACF and never leaves.
+# -----------------------------------------------------------------------
+echo "[gencert-eku] Generating keypair in RACF (SIGNWITH VSICA)..."
+tsocmd "RACDCERT GENCERT \
+  ID($userid) \
+  SUBJECTSDN(CN('Bank of Z') O('IBM') OU('IBM BoZ') C('US')) \
+  SIGNWITH(CERTAUTH LABEL('VSICA')) \
+  NOTAFTER(DATE($expire)) \
+  ALTNAME(IP($ipaddr) DOMAIN('$dnsname')) \
+  WITHLABEL('$label') \
+  SIZE(2048) \
+  KEYUSAGE(HANDSHAKE DATAENCRYPT) \
+  TRUST"
+tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
+
+# -----------------------------------------------------------------------
+# 3. Export the cert (public side only) as CERTB64 (PEM) to USS via dcp.
+#    dcp is used because cp "//dataset" fails for CERTB64/CERTDER exports
+#    on this RACF version — dcp handles the dataset-to-USS copy correctly.
+# -----------------------------------------------------------------------
+echo "[gencert-eku] Exporting cert as PEM for re-signing..."
+tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
+  DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
+dcp "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
+
+# -----------------------------------------------------------------------
+# 4. Export VSICA private key (PKCS12DER) so Bouncy Castle can re-sign.
+#    Dataset deleted in EXIT trap.
+# -----------------------------------------------------------------------
+echo "[gencert-eku] Exporting VSICA CA for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('VSICA')) CERTAUTH \
   DSN('${userid}.BOZ.CAKEY') FORMAT(PKCS12DER) PASSWORD('${CA_PASS}')"
-
-# Binary copy — no EBCDIC conversion
 cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 
 # -----------------------------------------------------------------------
-# 2. Write GenCert.java via Python — avoids _BPXK_AUTOCVT EBCDIC corruption
+# 5. Write ResignCert.java via Python (avoids _BPXK_AUTOCVT EBCDIC)
 # -----------------------------------------------------------------------
-$PYTHON - "$TMPDIR/GenCert.java" << 'PYEOF'
+$PYTHON - "$TMPDIR/ResignCert.java" << 'PYEOF'
 import sys
 src = r"""
-// Uses only bcprov (no bcpkix) via the low-level BC ASN.1 API.
+// Reads public key from an existing RACF-generated cert (PEM), re-signs it
+// with VSICA adding EKU serverAuth + SANs.  Private key never leaves RACF.
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -135,10 +169,9 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
@@ -146,56 +179,63 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Base64;
 import java.util.Date;
 
-public class GenCert {
+public class ResignCert {
     static final ASN1ObjectIdentifier EKU_SERVER_AUTH =
         new ASN1ObjectIdentifier("1.3.6.1.5.5.7.3.1");
     static final ASN1ObjectIdentifier SHA256_WITH_RSA =
         new ASN1ObjectIdentifier("1.2.840.113549.1.1.11");
-    // Apple ATS maximum validity: 397 days (since 2020-09-01)
     static final long MAX_VALIDITY_MS = 397L * 24 * 60 * 60 * 1000;
 
     public static void main(String[] args) throws Exception {
-        String caPath   = args[0];  String caPass  = args[1];
-        String outPath  = args[2];  String outPass = args[3];
-        String ip       = args[4];  String dns     = args[5];
+        // args: origPem caP12 caPass outDer ip dns notAfter
+        String origPem  = args[0];
+        String caP12    = args[1]; String caPass = args[2];
+        String outDer   = args[3];
+        String ip       = args[4]; String dns    = args[5];
         String notAfter = args[6];
 
         Security.addProvider(new BouncyCastleProvider());
 
+        // Load VSICA CA keystore
         KeyStore caKs = KeyStore.getInstance("PKCS12");
-        try (InputStream in = new FileInputStream(caPath)) {
+        try (InputStream in = new FileInputStream(caP12)) {
             caKs.load(in, caPass.toCharArray());
         }
-        String caAlias = caKs.aliases().nextElement();
-        PrivateKey caKey  = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
+        String caAlias  = caKs.aliases().nextElement();
+        PrivateKey caKey = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "BC");
-        kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
-        KeyPair kp = kpg.generateKeyPair();
+        // Parse the RACF-exported cert to get subject + public key
+        byte[] pemBytes = Files.readAllBytes(Paths.get(origPem));
+        String pemStr   = new String(pemBytes, "ISO-8859-1")
+            .replaceAll("-----[^\n]+-----", "").replaceAll("\\s", "");
+        byte[] derBytes = Base64.getDecoder().decode(pemStr);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509Certificate orig  = (X509Certificate) cf.generateCertificate(
+            new ByteArrayInputStream(derBytes));
+        System.out.println("Original subject : " + orig.getSubjectX500Principal());
+        System.out.println("Original key algo: " + orig.getPublicKey().getAlgorithm());
 
-        // 5-minute clock skew tolerance so slightly-behind clients don't fail
+        // Validity: 5-min skew tolerance; cap at 397 days (Apple ATS)
         Date notBefore    = new Date(System.currentTimeMillis() - 5 * 60 * 1000);
-
-        // Cap validity at 397 days — Apple ATS / Safari hard limit
         Date requestedEnd = Date.from(
             LocalDate.parse(notAfter).atStartOfDay(ZoneOffset.UTC).toInstant());
         Date cappedEnd    = new Date(notBefore.getTime() + MAX_VALIDITY_MS);
         Date notAfterDate = requestedEnd.before(cappedEnd) ? requestedEnd : cappedEnd;
         System.out.println("Validity: " + notBefore + " -> " + notAfterDate);
 
-        X500Name subject = new X500Name("CN=Bank of Z,OU=IBM BoZ,O=IBM,C=US");
-        // Build issuer from DER bytes to match PKCS12 chain validation exactly
-        X500Name issuer = X500Name.getInstance(
-            caCert.getSubjectX500Principal().getEncoded());
+        // Reuse subject + public key from original RACF-generated cert
+        X500Name subject = X500Name.getInstance(orig.getSubjectX500Principal().getEncoded());
+        X500Name issuer  = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
-            kp.getPublic().getEncoded());
+            orig.getPublicKey().getEncoded());
 
+        // Extensions: SANs, KeyUsage, EKU serverAuth
         ExtensionsGenerator exts = new ExtensionsGenerator();
         exts.addExtension(Extension.subjectAlternativeName, false,
             new GeneralNames(new GeneralName[]{
@@ -207,12 +247,10 @@ public class GenCert {
         exts.addExtension(Extension.extendedKeyUsage, false,
             new ExtendedKeyUsage(KeyPurposeId.getInstance(EKU_SERVER_AUTH)));
 
-        // Random 20-byte serial — RFC 5280 recommends >= 64 bits of entropy
-        BigInteger serial = new BigInteger(159, new SecureRandom());
-
-        AlgorithmIdentifier sigAlg = new AlgorithmIdentifier(SHA256_WITH_RSA, DERNull.INSTANCE);
+        AlgorithmIdentifier sigAlg =
+            new AlgorithmIdentifier(SHA256_WITH_RSA, DERNull.INSTANCE);
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
-        tbsGen.setSerialNumber(new ASN1Integer(serial));
+        tbsGen.setSerialNumber(new ASN1Integer(new BigInteger(159, new SecureRandom())));
         tbsGen.setIssuer(issuer);
         tbsGen.setSubject(subject);
         tbsGen.setStartDate(new Time(notBefore));
@@ -228,24 +266,20 @@ public class GenCert {
         byte[] sigBytes = sig.sign();
 
         ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(tbs);
-        v.add(sigAlg);
-        v.add(new DERBitString(sigBytes));
-        byte[] certDer = new DERSequence(v).getEncoded();
+        v.add(tbs); v.add(sigAlg); v.add(new DERBitString(sigBytes));
+        byte[] newDer = new DERSequence(v).getEncoded();
 
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        X509Certificate cert = (X509Certificate) cf.generateCertificate(
-            new ByteArrayInputStream(certDer));
-        cert.verify(caCert.getPublicKey());
+        // Verify chain before writing
+        X509Certificate newCert = (X509Certificate) cf.generateCertificate(
+            new ByteArrayInputStream(newDer));
+        newCert.verify(caCert.getPublicKey());
+        System.out.println("Signature verified against VSICA.");
+        System.out.println("EKU: " + newCert.getExtendedKeyUsage());
 
-        KeyStore out = KeyStore.getInstance("PKCS12");
-        out.load(null, null);
-        out.setKeyEntry("boz", kp.getPrivate(), outPass.toCharArray(),
-            new java.security.cert.Certificate[]{ cert, caCert });
-        try (OutputStream os = new FileOutputStream(outPath)) {
-            out.store(os, outPass.toCharArray());
+        try (FileOutputStream fos = new FileOutputStream(outDer)) {
+            fos.write(newDer);
         }
-        System.out.println("Generated cert with EKU serverAuth: " + outPath);
+        System.out.println("New cert DER written: " + outDer + " (" + newDer.length + " bytes)");
     }
 }
 """
@@ -253,69 +287,53 @@ with open(sys.argv[1], 'wb') as f:
     f.write(src.encode('iso-8859-1'))
 PYEOF
 
-echo "[gencert-eku] Compiling GenCert.java..."
-$JAVAC -cp "$BCJAR" "$TMPDIR/GenCert.java" -d "$TMPDIR"
+echo "[gencert-eku] Compiling ResignCert.java..."
+$JAVAC -cp "$BCJAR" "$TMPDIR/ResignCert.java" -d "$TMPDIR"
 
 # -----------------------------------------------------------------------
-# 3. Run it — produces a PKCS12 with the new server cert + key
+# 6. Run ResignCert — produces a DER cert with EKU, signed by VSICA,
+#    containing the SAME public key as the RACF-held private key.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Generating cert with EKU serverAuth..."
-$JAVA -cp "$TMPDIR:$BCJAR" GenCert \
+echo "[gencert-eku] Re-signing cert with EKU serverAuth..."
+$JAVA -cp "$TMPDIR:$BCJAR" ResignCert \
+  "$TMPDIR/boz-orig.pem" \
   "$TMPDIR/vsica.p12" "$CA_PASS" \
-  "$TMPDIR/boz-server.p12" "$KS_PASS" \
+  "$TMPDIR/boz-new.der" \
   "$ipaddr" "$dnsname" "$expire"
 
-# Verify the PKCS12 was actually written before proceeding
-test -s "$TMPDIR/boz-server.p12" || {
-  echo "[gencert-eku] FATAL: boz-server.p12 not produced" >&2; exit 1; }
+test -s "$TMPDIR/boz-new.der" || {
+  echo "[gencert-eku] FATAL: boz-new.der not produced" >&2; exit 1; }
 
 # -----------------------------------------------------------------------
-# 4. Install as file-based keystore for Liberty.
-#    The keystore password is written into tls.xml so Liberty can open it.
-#    Liberty obfuscates it in memory; the file is chmod 600.
+# 7. Copy new DER cert to RACF dataset and IMPORT it.
+#    RACF will match it to the private key already held for label '$label'
+#    because they share the same public key.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Installing PKCS12 keystore for Liberty..."
+echo "[gencert-eku] Importing re-signed cert into RACF..."
+# Pre-allocate with correct DCB for binary DER data
+tsocmd "DELETE ('${userid}.BOZ.NEWCERT')" >/dev/null 2>&1 || true
+tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') NEW CATALOG \
+  RECFM(V,B) LRECL(1028) BLKSIZE(27998) TRACKS SPACE(5,5)"
 
-KEYSTORE_DIR="/u/$(echo $userid | tr '[:upper:]' '[:lower:]')/boz-certs"
-mkdir -p "$KEYSTORE_DIR"
-cp "$TMPDIR/boz-server.p12" "$KEYSTORE_DIR/boz-server.p12"
-chmod 600 "$KEYSTORE_DIR/boz-server.p12"
+# dcp for binary copy (cp "//dataset" doesn't work reliably for DER)
+dcp -B "$TMPDIR/boz-new.der" "${userid}.BOZ.NEWCERT"
 
-OVERRIDES_DIR="${SANDBOX_DIR}/zosconnect-server/servers/bankzServer/configDropins/overrides"
-TLS_DEST="${OVERRIDES_DIR}/tls.xml"
+tsocmd "RACDCERT IMPORT('${userid}.BOZ.NEWCERT') \
+  ID($userid) \
+  WITHLABEL('$label') \
+  FORMAT(CERTDER) \
+  TRUST"
 
-# Write tls.xml with the per-run keystore password via Python (avoids AUTOCVT)
-$PYTHON - "$TLS_DEST" "$KEYSTORE_DIR/boz-server.p12" "$KS_PASS" << 'TLSEOF'
-import sys
-dest, p12path, ks_pass = sys.argv[1], sys.argv[2], sys.argv[3]
-content = '''<?xml version="1.0" encoding="UTF-8"?>
-<server>
-    <!--
-      TLS config: file-based PKCS12 keystore with EKU serverAuth (Safari-compatible).
-      NOTE: private key is stored on USS filesystem, not in the RACF keyring.
-      Access control: chmod 600 on the .p12 file.
-      The keystore password is regenerated on each setup-remote run.
-    -->
-    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore" trustStoreRef="defaultKeyStore"/>
-    <keyStore id="defaultKeyStore"
-              location="{p12}"
-              type="PKCS12"
-              password="{pw}"/>
-</server>
-'''.format(p12=p12path, pw=ks_pass)
-with open(dest, 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-TLSEOF
-chtag -t -c ISO8859-1 "$TLS_DEST"
+tsocmd "RACDCERT ID($userid) \
+  CONNECT(LABEL('$label') RING($ring) DEFAULT)"
 
-# Verify the dropin was written (non-empty)
-test -s "$TLS_DEST" || {
-  echo "[gencert-eku] FATAL: tls.xml not written to $TLS_DEST" >&2; exit 1; }
+tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 
 echo "[gencert-eku] Done."
-echo "[gencert-eku]   Keystore  : $KEYSTORE_DIR/boz-server.p12"
-echo "[gencert-eku]   TLS dropin: $TLS_DEST"
-echo "[gencert-eku]   Validity  : 397 days from now (Safari-compliant)"
-echo "[gencert-eku]   SANs      : IP=$ipaddr  DNS=$dnsname"
-echo "[gencert-eku]   EKU       : TLS Web Server Authentication"
+echo "[gencert-eku]   Cert label : $label  (in keyring IBMUSER/$ring)"
+echo "[gencert-eku]   Private key: stays in RACF — never written to USS filesystem"
+echo "[gencert-eku]   Validity   : 397 days (Safari/Apple ATS compliant)"
+echo "[gencert-eku]   SANs       : IP=$ipaddr  DNS=$dnsname"
+echo "[gencert-eku]   EKU        : TLS Web Server Authentication"
+echo "[gencert-eku]   Liberty    : uses safkeyring://IBMUSER/$ring (JCERACFKS)"
 echo "[gencert-eku] Restart BAQBANKZ to pick up the new certificate."

@@ -63,10 +63,11 @@ cd "$SCRIPTS_DIR/../zconfig"
 export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
 
 zconfig apply \
-  -e install_hlq="${MQ_INSTALL_HLQ}" \
-  -e qmgr_hlq="${MQ_QMGR_HLQ}" \
-  -e port="${MQ_PORT}" \
-  -e cpf="${MQ_CPF}" \
+  -e mq_qmgr_name="${MQ_QMGR_NAME}" \
+  -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
+  -e mq_qmgr_hlq="${MQ_QMGR_HLQ}" \
+  -e mq_port="${MQ_PORT}" \
+  -e mq_cpf="${MQ_CPF}" \
   mq-queue-manager.yaml
 
 RC=$?

@@ -445,6 +445,7 @@ queue_managers:
       xcfmname: ''
       passtkta: ''
       descr: ''
+    #TODO: tweak STGCLASS at some point to ensure we use the standard ones.
     queues:
       local:
       - name: '{{ vars.mq_qmgr_name }}.DEAD.QUEUE'
@@ -1350,7 +1351,6 @@ queue_managers:
         stgclass: 'DEFAULT'
       - name: 'SYSTEM.CHANNEL.INITQ'
         qsgdisp: 'QMGR'
-        psid: '3'
         cfstruct: ''
         cluster: ''
         clusnl: ''
@@ -1457,7 +1457,6 @@ queue_managers:
         stgclass: 'DEFAULT'
       - name: 'SYSTEM.CHLAUTH.DATA.QUEUE'
         qsgdisp: 'QMGR'
-        psid: '1'
         cfstruct: ''
         cluster: ''
         clusnl: ''
@@ -1511,7 +1510,6 @@ queue_managers:
         stgclass: 'DEFAULT'
       - name: 'SYSTEM.CLUSTER.COMMAND.QUEUE'
         qsgdisp: 'QMGR'
-        psid: '1'
         cfstruct: ''
         cluster: ''
         clusnl: ''
@@ -1724,7 +1722,6 @@ queue_managers:
         stgclass: 'DEFAULT'
       - name: 'SYSTEM.COMMAND.INPUT'
         qsgdisp: 'QMGR'
-        psid: '3'
         cfstruct: ''
         cluster: ''
         clusnl: ''
@@ -1831,7 +1828,6 @@ queue_managers:
         stgclass: 'DEFAULT'
       - name: 'SYSTEM.DURABLE.SUBSCRIBER.QUEUE'
         qsgdisp: 'QMGR'
-        psid: '2'
         cfstruct: ''
         cluster: ''
         clusnl: ''

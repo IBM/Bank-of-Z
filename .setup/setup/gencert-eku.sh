@@ -91,7 +91,7 @@ KS_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
 # -----------------------------------------------------------------------
 TMPDIR=/tmp/boz-cert-$$
 mkdir -m 700 -p "$TMPDIR"
-trap 'rm -rf "$TMPDIR"; tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1' EXIT
+trap 'rm -rf "$TMPDIR"; tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1 || true' EXIT
 
 # -----------------------------------------------------------------------
 # 1. Export VSICA cert + private key to a temp PKCS12 dataset.

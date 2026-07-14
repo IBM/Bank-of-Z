@@ -22,7 +22,7 @@ mappings:
             - COMM-LAST-NAME:
                 required: false
                 nullable: false
-                template: "{{$exists(body.lastName) ? $body.firstName : \"\"}}"
+                template: "{{$exists(body.lastName) ? $body.lastName : \"\"}}"
         - COMM-DOB:
             required: false
             nullable: false

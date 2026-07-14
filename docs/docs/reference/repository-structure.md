@@ -5,66 +5,74 @@ title: Repository Structure
 
 # Repository Structure
 
-The Bank of Z repository contains the application source, setup automation, build assets, deployment artifacts, and supporting documentation required to build and deploy the application.
+The Bank of Z repository contains the application source, setup automation, build assets, deployment configuration, and supporting documentation required to build and deploy the application.
 
-## Repository Overview
+## Top-Level Structure
 
-The following directories contain the primary Bank of Z assets:
+| Directory / File | Description |
+|-----------------|-------------|
+| `src/` | Application source code — COBOL, BMS, IMS, z/OS Connect APIs, and the web frontend |
+| `.setup/` | All automation for provisioning, building, and deploying Bank of Z |
+| `.vscode/` | VS Code task definitions for triggering setup and pipeline scripts |
+| `scripts/` | Utility scripts for downloading and installing IDE extensions |
+| `docs/` | Product documentation |
+| `zcodescan/` | ZCodeScan configuration for static analysis |
+| `dbb-app.yaml` | DBB application descriptor |
+| `zapp.yaml` | z/OS application manifest |
 
-| Directory | Description |
-|-----------|-------------|
-| `src` | Application source code and related artifacts. |
-| `.setup` | Setup automation, configuration files, build scripts, and deployment assets. |
-| `.vscode` | Visual Studio Code task definitions and workspace configuration. |
-| `docs` | Product documentation and setup guidance. |
-| `tests` | Test assets and automated testing resources, when available. |
+---
 
-## Application Source
-
-The application source is organized into the following primary areas:
-
-| Directory | Description |
-|------------|------------|
-| base | COBOL programs, BMS maps, copybooks, and core application assets |
-| webui | Browser-based user interface components |
-| zosconnect_artefacts | Projects used to build z/OS Connect APIs and deployment artifacts |
-| z/OS Connect application folders | JVM server components and application resources deployed with z/OS Connect |
-
-### BANKZ Source
-
-The BANKZ source repository contains the application source required to build and deploy Bank of Z.
+## Application Source (`src/`)
 
 | Directory | Description |
 |-----------|-------------|
-| `base` | COBOL programs, BMS map source, and copybooks that implement the core banking functions. |
-| `webui` | Browser-based user interface components. |
-| `zosconnect_artefacts` | Projects used to build z/OS Connect APIs and deployment artifacts. |
-| z/OS Connect application folders | JVM server components deployed with z/OS Connect. |
+| `src/base/cics/` | COBOL programs, BMS maps, and copybooks for the CICS transaction path |
+| `src/base/ims/` | COBOL programs and copybooks for the IMS transaction path |
+| `src/base/batch/` | Batch application components |
+| `src/api/` | z/OS Connect API project — Gradle-based build producing the API deployment artifact |
+| `src/frontend/` | Browser-based frontend — HTML, CSS, JavaScript, and a Node.js dev server |
 
-## Setup Assets
+---
 
-The `.setup` directory contains the automation used to provision, configure, build, and deploy Bank of Z.
+## Setup Automation (`.setup/`)
 
-Key assets include:
+### Orchestration Scripts
 
-| Asset | Description |
-|---------|-------------|
-| `config` | Environment-specific configuration files. |
-| `build` | Build framework assets, including zBuilder configuration. |
-| `deploy` | Deployment configuration and supporting artifacts. |
-| Setup scripts | Scripts used by the VS Code and GRUB workflows. |
+| Script | Runs on | Description |
+|--------|---------|-------------|
+| `setup-local.sh` | Local machine | Creates the USS workspace, clones the repository on USS, and invokes `setup-remote.sh` via Zowe CLI. Used by the Zowe CLI workflow. |
+| `setup-remote.sh` | z/OS USS | Chains the three setup stages in sequence. Used by both the Zowe CLI and GRUB workflows. |
+| `setup-common.sh` | z/OS USS | Implements the three setup stages: `validate-prereqs`, `environment`, and `install-bank-of-z`. |
+| `pipeline-local.sh` | Local machine | Uploads pipeline assets and invokes `pipeline-remote.sh` via Zowe CLI. Used by the Zowe CLI workflow for incremental builds. |
+| `pipeline-remote.sh` | z/OS USS | Runs the DBB build and Wazi Deploy on USS. Used by both workflows for incremental builds. |
 
-## Development Assets
+### Configuration and Assets
 
-The repository includes resources that support local development workflows.
+| Directory | Description |
+|-----------|-------------|
+| `.setup/config/` | `config.yaml` — environment configuration for all setup scripts |
+| `.setup/build/` | DBB build configuration: `datasets.yaml`, `dbb-build.yaml`, language scripts, and zosattributes |
+| `.setup/deploy/` | Wazi Deploy configuration and deployment method definitions |
+| `.setup/jcl/` | JCL assets including `Db2-grant.jcl` |
+| `.setup/zconfig/` | zconfig definitions for provisioning CICS and IMS regions |
+| `.setup/tasks/` | Individual task scripts for DBB build, Wazi Deploy, and ZCodeScan |
+| `.setup/setup/` | Individual setup stage scripts (Db2, CICS, IMS, z/OS Connect, frontend) |
+| `.setup/lib/` | Shared shell library functions used by the orchestration scripts |
 
-| Asset | Description |
-|---------|-------------|
-| `.vscode/tasks.json` | Task definitions used to execute setup and development workflows from Visual Studio Code. |
-| Git configuration | Supports branch-based development and collaboration workflows. |
+---
 
-## Documentation
+## IDE Extension Scripts (`scripts/`)
 
-Documentation is maintained alongside the application source and includes setup instructions, tutorials, architecture information, reference material, and troubleshooting guidance.
+| Script | Description |
+|--------|-------------|
+| `download-vsix.js` | Downloads all required IDE extension VSIX packages |
+| `install-bobide-vsix.js` | Installs downloaded VSIX packages into IBM Bob Premium Package for Z |
+| `install-vscode-vsix.js` | Installs downloaded VSIX packages into VS Code |
 
-See the [Tutorials](../tutorials/) for guided development scenarios and the [Architecture](../architecture/) for information about the Bank of Z solution design.
+See [`scripts/README.md`](../../../scripts/README.md) for usage instructions.
+
+---
+
+## Documentation (`docs/`)
+
+Documentation is maintained alongside the application source. See the [Architecture](../architecture/) section for information about the Bank of Z solution design, and [Installation and Setup](../installation-and-setup/) to deploy the application.

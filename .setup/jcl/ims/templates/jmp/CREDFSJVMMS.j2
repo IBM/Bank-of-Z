@@ -14,7 +14,7 @@
 ./        {{ 'ADD' if not reg.replace_member else 'REPL' }}    NAME=DFSJVMMS,LEVEL=00,SOURCE=0,LIST=ALL
 -Ddb2Hostname={{ db2.hostname }}
 -Ddb2Port={{ db2.port }}
--Ddb2Location={{ db2.localtion }}
+-Ddb2Location={{ db2.location }}
 -Ddb2Username={{ db2.sqlid }}
 -Ddb2Password={{ db2.password }}
 -Xoptionsfile={{ reg.dfs_optionsfilepath }}/dfsjvmpr.props

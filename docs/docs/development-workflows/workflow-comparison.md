@@ -5,13 +5,13 @@ title: Workflow Comparison
 
 # Workflow Comparison
 
-Bank of Z supports two development workflows: The **VS Code workflow** and the **GRUB workflow**. Both workflows prepare and update the Bank of Z environment, but they differ in how source changes are synchronized and how development activities are performed.
+Bank of Z supports two development workflows: the **Zowe CLI workflow** and the **GRUB workflow**. Both workflows prepare and update the Bank of Z environment, but they differ in how source changes are synchronized and how development activities are performed.
 
 Use the following comparison to determine which workflow best fits your development needs.
 
 ## Workflow Comparison
 
-| Feature | VS Code Workflow | GRUB Workflow |
+| Feature | Zowe CLI Workflow | GRUB Workflow |
 |----------|-----------------|---------------|
 | Source synchronization | Uses Git and Zowe CLI to clone a repository branch on z/OS USS | Synchronizes local changes directly to z/OS USS |
 | Commit required before testing | Yes | No |
@@ -20,12 +20,12 @@ Use the following comparison to determine which workflow best fits your developm
 | Development style | Branch-based and version-controlled | Rapid local iteration |
 | Change transfer | Repository clone and setup execution | Synchronization of changed files |
 | Collaboration | Well suited for shared branch-based development | Primarily focused on individual development and testing |
-| Setup execution | Initiated through a VS Code task | Initiated automatically after synchronization |
+| Setup execution | Initiated through a VS Code task or `setup-local.sh` | Initiated automatically after synchronization |
 | Best suited for | Feature development, team collaboration, and environments where SSH access is restricted | Fast testing, frequent code changes, and rapid development cycles |
 
 ## Choosing a Workflow
 
-### Use the VS Code Workflow When
+### Use the Zowe CLI Workflow When
 
 - You work in a branch-based development model
 - Changes should be committed and tracked through Git

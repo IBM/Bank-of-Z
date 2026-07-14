@@ -18,11 +18,6 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 # =========================
 # Environment
 # =========================
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export BOZ_IMS_HLQ=${BOZ_IMS_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
-export JAVA_CONF_PATH=${JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
-export DFS_IMS_SSID=${DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
-
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -33,20 +28,20 @@ rm -f /tmp/Ims-*
 # Stop IBM BOZ regions
 # =========================
 set +e
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
 sleep 5
-jcan P "IMS2JMP1" 2>/dev/null
-jcan P "IMS2MPP1" 2>/dev/null
-jcan P "IMS2MPP2" 2>/dev/null
+jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
+jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
+jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
 sleep 5
 set -e
 
 # JMP
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/dfsjvmpr.props.j2"\
-    --outputFile "$JAVA_CONF_PATH"
+    --outputFile "$IMS_JAVA_CONF_PATH"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=IMSJOB" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREWORKDS.j2"\
@@ -59,7 +54,7 @@ cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-reg-jmp-$$.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.PROCLIB(DFSJMP),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSJMP),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -70,34 +65,34 @@ run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/SIMLINK.j2"\
     --outputFile "/tmp/IMS-bankz-reg-simlink-$$.txt"
-cp "/tmp/IMS-bankz-reg-simlink-$$.txt" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(SIMLINK)'"
+cp "/tmp/IMS-bankz-reg-simlink-$$.txt" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(SIMLINK)'"
 
 
 MEMBER_EXISTS=False
 set +e
-if head "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(${DFS_IMS_SSID}JMP1)'" > /dev/null 2>&1; then
+if head "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(${IMS_DFS_IMS_SSID}JMP1)'" > /dev/null 2>&1; then
 MEMBER_EXISTS=True
 fi
 set -e
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=IMDOJMP" --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/IMDOJMP.j2"  --outputFile "/tmp/IMS-bankz-reg-dojmp-$$.txt"
 run_job_and_wait "/tmp/IMS-bankz-reg-dojmp-$$.txt" "4"
-cp "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(IMS2JMP1)'" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STARTJMP)'"
+cp "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(${IMS_DATASTORE}JMP1)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
      --extraVar "jobname=DFSJVMEV" --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMEV.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmev-$$.txt"
 run_job_and_wait "/tmp/IMS-bankz-reg-jvmev-$$.txt" "4"
-cp "//'${BOZ_IMS_HLQ}.PROCLIB(DFSJVMEV)'" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(DFSJVMEV)'"
+cp "//'${IMS_APP_HLQ}.PROCLIB(DFSJVMEV)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(DFSJVMEV)'"
 
 #python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 #    --extraVar "jobname=DFSJVMMS"  --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMMS.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmms-$$.txt"
 #run_job_and_wait "/tmp/IMS-bankz-reg-jvmms-$$.txt" "4"
-#cp "//'${BOZ_IMS_HLQ}.PROCLIB(DFSJVMMS)'" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(DFSJVMMS)'"
+#cp "//'${IMS_APP_HLQ}.PROCLIB(DFSJVMMS)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(DFSJVMMS)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DFSJVMAP"  --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMAP.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmap-$$.txt"
 run_job_and_wait "/tmp/IMS-bankz-reg-jvmap-$$.txt" "4"
-cp "//'${BOZ_IMS_HLQ}.PROCLIB(DFSJVMAP)'" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(DFSJVMAP)'"
+cp "//'${IMS_APP_HLQ}.PROCLIB(DFSJVMAP)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(DFSJVMAP)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=CHEKSPOC" --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/VERIFYSPOC.j2"  --outputFile "/tmp/IMS-bankz-reg-verif-$$.txt"
@@ -106,7 +101,7 @@ run_job_and_wait "/tmp/IMS-bankz-reg-verif-$$.txt" "4"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/STOPJMP.j2"\
     --outputFile "/tmp/IMS-bankz-reg-stopjmp-$$.txt"
-cp "/tmp/IMS-bankz-reg-stopjmp-$$.txt" "//'${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STOPJMP)'"
+cp "/tmp/IMS-bankz-reg-stopjmp-$$.txt" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/STARTJMP.j2"  --outputFile "/tmp/IMS-bankz-reg-stajmp-$$.txt"
@@ -131,7 +126,7 @@ cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-reg-mpr1-$$.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.PROCLIB(DFSMPR1),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSMPR1),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -145,7 +140,7 @@ cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-reg-mpr2-$$.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.PROCLIB(DFSMPR2),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSMPR2),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -159,7 +154,7 @@ cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-reg-stop1-$$.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.JOBS(STOPMPP1),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.JOBS(STOPMPP1),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -173,7 +168,7 @@ cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-reg-stop2-$$.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.JOBS(STOPMPP2),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.JOBS(STOPMPP2),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -187,7 +182,7 @@ cat > "/tmp/IMS-bankz-dfsintdc.jcl" <<EOF
 //COPYJOB JOB CLASS=A,MSGCLASS=A
 //STEP1 EXEC PGM=IKJEFT01
 //IN   DD PATH='/tmp/IMS-bankz-dfsintdc.txt'
-//OUT  DD DSN=${BOZ_IMS_HLQ}.PROCLIB(DFSINTDC),DISP=SHR
+//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSINTDC),DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //SYSTSIN DD *
  OCOPY INDD(IN) OUTDD(OUT) TEXT
@@ -198,11 +193,11 @@ run_job_and_wait "/tmp/IMS-bankz-dfsintdc.jcl"
 # =========================
 # Start IBM BOZ regions
 # =========================
-jsub "${BOZ_IMS_HLQ}.JOBS(IMS2MPP2)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP2)"  2>/dev/null
 sleep 5
-jsub "${BOZ_IMS_HLQ}.JOBS(IMS2MPP1)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP1)"  2>/dev/null
 sleep 5
-jsub "${BOZ_IMS_HLQ}.IMSJAVA.JOBS(STARTJMP)"  2>/dev/null
+jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)"  2>/dev/null
 sleep 5
 
 rm -f /tmp/IMS-*

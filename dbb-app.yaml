@@ -282,7 +282,7 @@ application:
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
         - name: javaHome
-          value: "/usr/local/sandboxes/tools/J17.0_64"
+          value: "/usr/local/sandboxes/tools/J21.0_64"
         - name: vanillaFrontendPath
           value: "src/frontend"
         - name: vanillaWarName

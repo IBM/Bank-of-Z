@@ -1,7 +1,7 @@
 vars:
   mq_qmgr_name: 'MQ21'
   mq_install_hlq: 'MQCD94'
-  mq_qmgr_hlq: 'MQCD94'
+  mq_qmgr_hlq: 'CSQ.{{ mq.qmgr_name }}'
   mq_port: '1414'
   mq_cpf: '!{{ vars.mq_qmgr_name }}'
 
@@ -13,6 +13,13 @@ queue_managers:
   language: 'E'
   license: 'MQ'
   cpf: '{{ vars.mq_cpf }}'
+  dataset_hlq: '{{ vars.mq_qmgr_hlq }}'              # TODO: instructions are confusing. Why needed if prefix already applied below.
+  mq_installation:
+    hlq: '{{ vars.mq_install_hlq }}'                 # TODO: why?
+    scsqauth: '{{ vars.mq_install_hlq }}.SCSQAUTH'
+    scsqanle: '{{ vars.mq_install_hlq }}.SCSQANLE'
+    scsqproc: '{{ vars.mq_install_hlq }}.SCSQPROC'
+    scsqlink: '{{ vars.mq_install_hlq }}.SCSQLINK'
   mstr:
     storage:
       region: '0M'
@@ -22,7 +29,7 @@ queue_managers:
         type: 'vsam'
         cluster:
           name: '{{ vars.mq_qmgr_hlq }}.BSDS01'
-          volumes: 'P5P222'
+          volumes: '*'
           shareoptions: '2 3'
           unique: 'YES'
           indexed: 'YES'
@@ -45,7 +52,7 @@ queue_managers:
       - type: 'vsam'
         cluster:
           name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY1.DS02'
-          volumes: 'P5P473'
+          volumes: '*'
           linear: 'YES'
           unique: 'YES'
           shareoptions: '2 3'
@@ -60,7 +67,7 @@ queue_managers:
       - type: 'vsam'
         cluster:
           name: '{{ vars.mq_qmgr_hlq }}.LOGCOPY1.DS01'
-          volumes: 'P5P471'
+          volumes: '*'
           linear: 'YES'
           unique: 'YES'
           shareoptions: '2 3'
@@ -80,7 +87,7 @@ queue_managers:
       cluster:
         name: '{{ vars.mq_qmgr_hlq }}.PAGE00'
         linear: 'YES'
-        volumes: 'P5P052'
+        volumes: '*'
         unique: 'YES'
         shareoptions: '2 3'
         noreuse: 'YES'
@@ -98,7 +105,7 @@ queue_managers:
       cluster:
         name: '{{ vars.mq_qmgr_hlq }}.PAGE01'
         linear: 'YES'
-        volumes: 'P5P492'
+        volumes: '*'
         unique: 'YES'
         shareoptions: '2 3'
         noreuse: 'YES'
@@ -116,7 +123,7 @@ queue_managers:
       cluster:
         name: '{{ vars.mq_qmgr_hlq }}.PAGE02'
         linear: 'YES'
-        volumes: 'P5P48E'
+        volumes: '*'
         unique: 'YES'
         shareoptions: '2 3'
         noreuse: 'YES'
@@ -134,7 +141,7 @@ queue_managers:
       cluster:
         name: '{{ vars.mq_qmgr_hlq }}.PAGE03'
         linear: 'YES'
-        volumes: 'P5P077'
+        volumes: '*'
         unique: 'YES'
         shareoptions: '2 3'
         noreuse: 'YES'
@@ -152,7 +159,7 @@ queue_managers:
       cluster:
         name: '{{ vars.mq_qmgr_hlq }}.PAGE04'
         linear: 'YES'
-        volumes: 'P5P066'
+        volumes: '*'
         unique: 'YES'
         shareoptions: '2 3'
         noreuse: 'YES'
@@ -211,7 +218,7 @@ queue_managers:
         priqty: '100'
         secqty: '50'
         blksize: '24576'
-        arcpfx1: '{{ vars.mq_qmgr_hlq }}.ARCLOG1'
+        arcpfx1: 'ARCLOG1'
         arcpfx2: ''
         tstamp: 'NO'
         arcretn: '0'

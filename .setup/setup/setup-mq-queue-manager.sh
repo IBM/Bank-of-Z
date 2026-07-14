@@ -59,6 +59,9 @@ fi
 cd "$SCRIPTS_DIR/../zconfig"
 #rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
 
+#TODO: need to have MQ and CICS zconfig in the same place.
+export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
+
 zconfig apply \
   -e install_hlq="${MQ_INSTALL_HLQ}" \
   -e qmgr_hlq="${MQ_QMGR_HLQ}" \

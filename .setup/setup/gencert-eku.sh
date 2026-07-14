@@ -127,6 +127,11 @@ echo "[gencert-eku] Exporting cert as PEM for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
   DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
 dcp "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
+# dcp copies EBCDIC bytes — convert to ASCII so Java can parse it
+$PYTHON -c "
+raw = open('$TMPDIR/boz-orig.pem','rb').read()
+open('$TMPDIR/boz-orig.pem','wb').write(raw.decode('cp1047').encode('iso-8859-1'))
+"
 
 # -----------------------------------------------------------------------
 # 4. Export VSICA private key (PKCS12DER) so Bouncy Castle can re-sign.

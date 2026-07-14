@@ -135,14 +135,7 @@ echo "[gencert-eku] Exporting cert as PEM for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
   DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
 $DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
-# dcp copies EBCDIC bytes — convert to ASCII so Java can parse it.
-# Written as a file-based script to avoid _BPXK_AUTOCVT corrupting the -c string.
-$PYTHON - "$TMPDIR/boz-orig.pem" << 'CONV_EOF'
-import sys
-path = sys.argv[1]
-raw = open(path, 'rb').read()
-open(path, 'wb').write(raw.decode('cp1047').encode('iso-8859-1'))
-CONV_EOF
+# Java (ResignCert) handles Cp1047/EBCDIC decoding directly — no conversion needed here.
 
 # -----------------------------------------------------------------------
 # 4. Export VSICA private key (PKCS12DER) so Bouncy Castle can re-sign.
@@ -226,10 +219,13 @@ public class ResignCert {
         PrivateKey caKey = (PrivateKey) caKs.getKey(caAlias, caPass.toCharArray());
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
-        // Parse the RACF-exported cert to get subject + public key
+        // Parse the RACF-exported cert.  dcp copies EBCDIC bytes (Cp1047)
+        // from the RACF dataset — try Cp1047 first, fall back to ISO-8859-1.
         byte[] pemBytes = Files.readAllBytes(Paths.get(origPem));
-        String pemStr   = new String(pemBytes, "ISO-8859-1")
-            .replaceAll("-----[^\n]+-----", "").replaceAll("\\s", "");
+        String decoded1047 = new String(pemBytes, "Cp1047");
+        String pemStr = decoded1047.contains("-----BEGIN") ? decoded1047
+                      : new String(pemBytes, "ISO-8859-1");
+        pemStr = pemStr.replaceAll("-----[^\n]+-----", "").replaceAll("\\s", "");
         byte[] derBytes = Base64.getDecoder().decode(pemStr);
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         X509Certificate orig  = (X509Certificate) cf.generateCertificate(

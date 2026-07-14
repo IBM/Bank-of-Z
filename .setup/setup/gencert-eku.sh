@@ -58,10 +58,11 @@ else
   PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
 fi
 
-# Resolve Bouncy Castle JAR
-BCJAR=$(ls "${SANDBOX_DIR:-/usr/local/sandboxes/bank-of-z}/tools"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
+# Resolve Bouncy Castle JAR — tools/ sits one level above SANDBOX_DIR (bank-of-z)
+_TOOLS_DIR="${SANDBOX_DIR:-/usr/local/sandboxes/bank-of-z}/../tools"
+BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
 if [ -z "$BCJAR" ]; then
-  echo "[gencert-eku] FATAL: bcprov-*.jar not found under \${SANDBOX_DIR}/tools" >&2
+  echo "[gencert-eku] FATAL: bcprov-*.jar not found under $_TOOLS_DIR" >&2
   exit 1
 fi
 

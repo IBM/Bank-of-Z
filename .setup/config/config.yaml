@@ -166,19 +166,22 @@ debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
 
-# z/OS Connect (API exposure)
+# z/OS Connect (API exposure + frontend static files)
+# Single Liberty instance hosts both api.war (/api) and bank-frontend-vanilla.war (/)
 zosconnect:
   zosconnect_home: "{{ global.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"
+  server_name: "bankOfZServer"
   http_port: "{{ global.zosconnect_http_port }}"
   https_port: "{{ global.zosconnect_https_port }}"
   task_user: "{{ global.zosconnect_task_user }}"
   sys_proclib: "{{ global.sys_proclib }}"
 
-# Frontend Liberty Server (separate from z/OS Connect)
+# Frontend Liberty Server — no longer used; frontend is hosted on z/OS Connect
 frontend:
   liberty_home: "{{ global.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"
+  server_name: "bankz-frontend"
   http_port: "{{ global.frontend_http_port }}"
   https_port: "{{ global.frontend_https_port }}"
   sys_proclib: "{{ global.sys_proclib }}"
@@ -221,6 +224,7 @@ ims:
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   asm_lib_hlq: "ASM.SASMMOD1"
+  ims_macro_lib: "IMSV15.SDFSMAC"
   dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
   dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
   dfs_recon3: "{{ ims.ims_hlq }}.RECON3"

@@ -34,6 +34,7 @@ if command -v chtag >/dev/null 2>&1; then
 fi
 set -e
 
+export PATH="/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH"
 
 if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${BASH_SOURCE[0]}" ]]; then
     print_warning "Creating $ENV_FILE file ..."

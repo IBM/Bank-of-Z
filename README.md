@@ -55,8 +55,7 @@ Then trust it in your OS:
 
 **macOS:**
 ```bash
-sudo security add-trusted-cert -d -r trustRoot \
-  -k /Library/Keychains/System.keychain /tmp/vsica_ca.pem
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$HOME/Downloads/vsica_ca.pem"
 ```
 
 **Windows** (run as Administrator):

@@ -32,11 +32,9 @@ stage_execute_pipeline() {
     print_info "  - Deploy build"
     echo ""
     
-    if [[ "$EXECUTION_MODE" != "grub" ]]; then
-        cd $SCRIPTS_DIR
-        git reset --hard
-        git pull
-    fi
+    cd $SCRIPTS_DIR
+    git fetch origin
+    git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
     
     # Execute the pipeline script on remote
     set -o pipefail

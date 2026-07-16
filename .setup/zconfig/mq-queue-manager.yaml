@@ -2831,7 +2831,7 @@ queue_managers:
         oteltrac: 'QMGR'
         otelpctl: 'QMGR'
         notrigger: 'YES'
-        noshare: 'YES'
+        share: 'YES'
         nohardenbo: 'YES'
         stgclass: 'DEFAULT'
       - name: 'BOZ.CICS.REPLYQ'

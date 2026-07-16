@@ -85,7 +85,7 @@ public class TransferMoneyIn {
 
     //Build up payload.
     //Program name that we want the DPL bridge to call.
-    m.writeBytes("DBCRFUN".getBytes(EBCDIC));
+    m.writeBytes("DBCRFUN ".getBytes(EBCDIC));
 
 //    03 COMM-ACCNO               PIC X(8).           account number
 //    03 COMM-AMT                 PIC S9(10)V99.      + for credit, - for debit
@@ -111,9 +111,9 @@ public class TransferMoneyIn {
     //Not used: COMM-FACILITY-NAME, COMM-NETWRK-ID
 
     //Hard coded for the moment.
-    m.writeBytes("01234567".getBytes(EBCDIC));      //Account number
+    m.writeBytes("00000008".getBytes(EBCDIC));      //Account number
     m.writeBytes("+000000009999".getBytes(EBCDIC)); //Amount. 99.99
-    m.writeBytes("000000".getBytes(EBCDIC));        //Sort code
+    m.writeBytes("987654".getBytes(EBCDIC));        //Sort code
     m.writeBytes("+000000000000".getBytes(EBCDIC)); //not used on request
     m.writeBytes("+000000000000".getBytes(EBCDIC)); //not used on request
     m.writeBytes("APPLID  ".getBytes(EBCDIC));
@@ -122,7 +122,7 @@ public class TransferMoneyIn {
     m.writeBytes("NETWORK ".getBytes(EBCDIC));
     m.writeInt(0);                                  //Facility type
     m.writeBytes("    ".getBytes(EBCDIC));          //Filler
-    m.writeBytes("Y".getBytes(EBCDIC));
+    m.writeBytes("N".getBytes(EBCDIC));
     m.writeBytes("0".getBytes(EBCDIC));
 
 

@@ -1179,9 +1179,10 @@ resourceDefinitions:
       group: BANKZGRP
       autostart: YES
       description: "MQMONITOR for Bank of z"
-      qname: BOZ.CICS.INITQ
+      qname: BOZ.CICS.REQUESTQ             # TODO: needed?
+      mondata: "Q=BOZ.CICS.REQUESTQ"
       status: ENABLED
-      transaction: CKTI
+      transaction: CKBR
       #TODO: if I don't set this it fails saying this is a required parameter, but its not in the schema
       monuserid: IBMUSER
 

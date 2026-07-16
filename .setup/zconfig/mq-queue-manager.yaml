@@ -2830,7 +2830,7 @@ queue_managers:
         capexpry: 'NOLIMIT'
         oteltrac: 'QMGR'
         otelpctl: 'QMGR'
-        notrigger: 'YES'
+        trigger: 'YES'
         share: 'YES'
         nohardenbo: 'YES'
         stgclass: 'DEFAULT'

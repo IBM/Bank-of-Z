@@ -76,7 +76,8 @@ stage_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     
-    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/pipeline.log; then
+    local GIT_SYNC="cd $BANK_DIR && git fetch origin && git reset --hard origin/$GIT_BRANCH"
+    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && $GIT_SYNC && bash $BANK_DIR/.setup/pipeline-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/pipeline.log; then
         # Check for errors in the log
         if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
             print_warning "Pipeline completed but some warnings were detected"

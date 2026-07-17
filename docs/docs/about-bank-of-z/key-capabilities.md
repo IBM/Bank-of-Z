@@ -6,7 +6,7 @@ title: Key Capabilities
 
 Bank of Z demonstrates a combination of banking functionality and modern IBM Z development practices.
 
-## Banking Operations
+## Banking operations
 The application supports common banking operations, including:
 - Account management
 - Customer management
@@ -14,10 +14,10 @@ The application supports common banking operations, including:
 - Funds transfers
 - Transaction history processing
 
-## Hybrid Transaction Processing
+## Hybrid transaction processing
 Bank of Z demonstrates a hybrid architecture that integrates both CICS and IMS Transaction Manager (IMS TM). The user interface determines whether a request is proccessed by the CICS or IMS based implementation while providing a consistent user experience.
 
-## Modern Development Workflows
+## Modern development workflows
 The project showcases modern IBM Z development practices, including:
 - Dependency Based Build (DBB)
 - Bob and zBuilder integration
@@ -26,7 +26,7 @@ The project showcases modern IBM Z development practices, including:
 - VS Code development workflows
 - GRUB development workflows
 
-## Enterprise Integration
+## Enterprise integration
 The application demonstrates integration across multiple IBM Z technologies, including:
 - z/OS Connect
 - CICS

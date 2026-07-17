@@ -5,25 +5,25 @@ title: IDE Setup
 
 # IDE Setup
 
-An IDE is required to browse, edit, and manage Bank of Z source code. For the best experience, and to follow along with all the tutorials, use IBM Bob Premium Package for Z. Alternatively, you can use Visual Studio Code.
+An IDE is required to browse, edit, and manage Bank of Z source code. For the best experience and to follow the tutorials in the documentation, use IBM Bob Premium Package for Z. Alternatively, you can use Visual Studio Code.
 
-IDE setup is independent of your chosen deployment mechanism — complete this before setting up your deployment tooling.
+IDE setup is independent of your chosen deployment workflow. Complete this setup before continuing your deployment tooling.
 
 ## Prerequisites
 
 Java 21 is required to run the IDE and its embedded tooling.
 
-Install IBM Semeru Runtime for Java 21 or later, then verify:
+Install IBM Semeru Runtime for Java 21 or later, and then verify the installation:
 
 ```bash
 java -version
 ```
 
-## Required Extensions
+## Required extensions
 
 Install the following extensions in your IDE.
 
-**Note:** If you are using IBM Bob Premium Package for Z and an extension is not available in the Open VSX Marketplace, use the VSIX download link and install manually.
+**Note:** If you are using IBM Bob Premium Package for Z and an extension is unavailable in the Open VSX Marketplace, download the VSIX package and install it manually.
 
 | Extension | Description | VS Code Marketplace | Open VSX | VSIX |
 |-----------|-------------|---------------------|----------|------|
@@ -36,20 +36,20 @@ Install the following extensions in your IDE.
 
 **Note:** For IBM MQ there is no IBM extension in the VS Code Marketplace. See the [IBM MQ Console extension](https://community.ibm.com/community/user/blogs/dorothy-quincy/2026/05/08/ibm-mq-console-extension) available from the `ibm-messaging` GitHub group.
 
-## Install Extensions from a Marketplace
+## Install extensions from a marketplace
 
 1. Open the **Extensions** view in your IDE.
 2. Search for the extension by name.
 3. Select **Install**.
 
-## Install VSIX Packages Manually
+## Install VSIX packages manually
 
 1. Download the VSIX file using the link in the table above.
 2. Open the **Extensions** view.
 3. Select **More Actions (…)** → **Install from VSIX…**
 4. Browse to the downloaded file and complete the installation.
 
-## Automated VSIX Download and Install
+## Automated VSIX download and install
 
 Bank of Z includes scripts to download and install all required VSIX packages in one step.
 
@@ -59,7 +59,7 @@ Bank of Z includes scripts to download and install all required VSIX packages in
 node scripts/download-vsix.js [output-directory]
 ```
 
-Default output directory is `./vsix-extensions`.
+The default output directory is `./vsix-extensions`.
 
 **Install into IBM Bob Premium Package for Z:**
 
@@ -79,16 +79,16 @@ node scripts/install-bobide-vsix.js [output-directory]
 node scripts/install-vscode-vsix.js [output-directory]
 ```
 
-For more information about these scripts, see [`scripts/README.md`](../../../../scripts/README.md).
+For more information, see [`scripts/README.md`](../../../../scripts/README.md).
 
-## Verify the IDE Configuration
+## Verify the IDE configuration
 
-After installation:
+After completing the installation:
 
 1. Launch the IDE.
 2. Confirm all required extensions are installed and enabled.
-3. Open the Bank of Z repository and confirm workspace tasks are available under **Terminal** → **Run Task**.
+3. Open the Bank of Z repository and confirm that the workspace tasks are available from **Terminal** → **Run Task**.
 
-## Next Step
+## Next steps
 
 Continue to [Zowe Profile Setup](zowe-profile-setup.html) to configure connectivity to your z/OS system.

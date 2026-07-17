@@ -16,7 +16,7 @@ By completing these tutorials, learn how to:
 - Use modern IBM Z development workflows and tooling
 - Verify application behavior after deployment
 
-## Available Tutorials
+## Available tutorials
 
 | Tutorial | Description |
 |-----------|-------------|

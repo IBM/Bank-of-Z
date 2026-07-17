@@ -5,13 +5,13 @@ title: Environment Configuration
 
 # Environment Configuration
 
-This section describes the configuration required before deploying Bank of Z. Complete these steps before following a getting-started tutorial.
+This section describes the configuration required before deploying Bank of Z. Complete these steps before starting one of the getting-started tutorials.
 
-Before starting, confirm that your z/OS environment meets all requirements described in [Prerequisites](prerequisites.md). In particular, the Db2 subsystem (DBD1) and required RACF definitions must be in place before the setup scripts can run successfully.
+Before you begin, ensure that your z/OS environment meets all requirements described in [Prerequisites](prerequisites.md). In particular, the Db2 subsystem (DBD1) and required RACF definitions must be in place before the setup scripts can run successfully.
 
-## Configure the Application
+## Configure the application
 
-Edit `.setup/config/config.yaml` in your clone of the repository. This file controls all paths and settings used by the setup scripts.
+Edit `.setup/config/config.yaml` in your local clone of the repository. This file controls all paths and settings used by the setup scripts.
 
 The fields you must update for your environment are:
 
@@ -66,14 +66,14 @@ db2:
   port: 8102
 ```
 
-All other fields use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not need to be changed unless your environment requires non-default values. For a complete field reference, see [Configuration Reference](../reference/configuration-reference.html).
+All other fields use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field reference, see [Configuration Reference](../reference/configuration-reference.html).
 
-## Db2 Grant (non-IBMUSER accounts only)
+## Grant Db2 permissions (non-IBMUSER accounts only)
 
-If you are not running as `IBMUSER`, your user ID must be granted permission to create Db2 database objects. Failure to do this will cause the `environment` phase to fail during Db2 table creation.
+If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects. Otherwise, the `environment` setup fails during Db2 table creation.
 
 1. Edit `.setup/jcl/Db2-grant.jcl` and replace `MYUSER` with your TSO user ID.
-2. Submit the job and verify it completes with a condition code of 0004 or better:
+2. Submit the job and verify that it completes with a condition code (CC) of 0004 or lower:
 
 ```bash
 JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
@@ -81,11 +81,11 @@ jls $JOBID        # CC must be 0004 max
 pjdd $JOBID SYSPRINT
 ```
 
-## ZCodeScan Configuration File
+## Create the ZCodeScan configuration File
 
-The static scan stage requires a ZCodeScan configuration file. This file must be created manually and encoded in **ISO8859-1** — it will not be read correctly if saved in IBM-1047 or UTF-8.
+The static scan stage requires a ZCodeScan configuration file. This file must be created manually and encoded in **ISO8859-1** because ZCodeScan cannot read files saved in IBM-1047 or UTF-8.
 
-Create `~/zcs_config_file.yml` (or the path specified in `config.yaml` under `zcodescan.config_file`):
+Create `~/zcs_config_file.yml` or the file specified by `zcodescan.config_file` in  `config.yaml`:
 
 ```yaml
 license_server:
@@ -95,11 +95,11 @@ license_server:
   verify: false
 ```
 
-> **Note:** The password is encrypted automatically after the first scan. You only need to supply it in plain text on first use.
+> **Note:** The password is automatically encrypted after the first scan. You only need to provide it in plain text the first use.
 
-## Next Step
+## Next steps
 
-Return to your chosen getting-started tutorial:
+Continue with one of the following getting-started tutorials:
 
 - [Deploy Using Direct USS Access](deploy-direct.html)
 - [Deploy Using Zowe CLI](deploy-zowe-cli.html)

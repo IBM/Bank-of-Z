@@ -7,7 +7,7 @@ title: Configuration Reference
 
 Bank of Z uses the `.setup/config/config.yaml` file to define environment-specific settings used during setup, build, and deployment. The configuration file uses YAML format and supports variable expansion to simplify configuration management.
 
-## Configuration File Overview
+## Configuration file overview
 
 The configuration file supports:
 
@@ -16,11 +16,11 @@ The configuration file supports:
 - Environment variable references using `${ENV_VAR}` syntax
 - Comments using the `#` character
 
-## Required Settings
+## Required settings
 
 The following settings are required for a successful setup.
 
-### Sandbox Configuration
+### Sandbox configuration
 
 The `sandbox` section defines the root directory on z/OS UNIX System Services (USS) where Bank of Z components are installed.
 
@@ -33,7 +33,7 @@ sandbox:
 |----------|-------------|
 | `path` | Absolute path to the Bank of Z workspace on USS. You need to have write access to this location. |
 
-### Application Configuration
+### Application configuration
 
 The `app` section defines application naming conventions used for datasets, resources, and deployment artifacts.
 
@@ -50,7 +50,7 @@ app:
 | `short_name` | Short application identifier used in resource names. Maximum 4 characters. |
 | `zos_version` | Version identifier used in dataset naming conventions. |
 
-### DBB Configuration
+### DBB configuration
 
 The `dbb` section identifies the IBM Dependency Based Build (DBB) installation and Java runtime.
 
@@ -65,11 +65,11 @@ dbb:
 | `dbb_home` | Location of the DBB installation on z/OS. |
 | `java_home` | Java runtime used by DBB. |
 
-## Optional Settings
+## Optional settings
 
 Depending on your environment and tooling requirements, additional configuration sections can be defined.
 
-### Repository Configuration
+### Repository configuration
 
 Defines repositories that are cloned during setup.
 
@@ -81,7 +81,7 @@ name: dbb
     target_dir: dbb
 ```
 
-### zBuilder Configuration
+### zBuilder configuration
 
 Defines where zBuilder source and deployment artifacts are located.
 
@@ -92,42 +92,27 @@ zbuilder:
   java_home: /usr/lpp/java/java21/current_64
 ```
 
-### zconfig Configuration
+### zconfig configuration
 
 Defines settings for z/OS configuration tooling.
 
-### ZCodeScan Configuration
+### ZCodeScan configuration
 
 Defines settings used for static code analysis.
 
-### Wazi Deploy Configuration
+### Wazi Deploy configuration
 
 Defines deployment automation settings used by Wazi Deploy.
 
-### TAZ Configuration
+### TAZ configuration
 
 Defines settings for automated unit testing and test execution.
 
-### CICS Configuration
+### CICS configuration
 
 Defines CICS connection information required for automation and deployment tasks.
 
-## Environment Configuration Files
-
-Depending on the deployment environment, Bank of Z uses additional configuration files.
-
-| File | Purpose |
-|--------|---------|
-| host_vars/ode.yml | Target environment settings |
-| inventories/ode | Deployment target inventory |
-| ims-dbdc.yml | IMS configuration settings |
-| db2.yml | Db2 configuration settings |
-| bank.yml | Application-specific settings |
-| zcee.yml | z/OS Connect configuration settings |
-
-Review and update these files with values appropriate for your environment before running setup, build, or deployment processes.
-
-## Variable Expansion
+## Variable expansion
 
 Configuration values can reference other configuration entries.
 
@@ -153,7 +138,7 @@ cics:
 
 **Note:** Using environment variables is recommended for sensitive information such as credentials.
 
-## Validation Rules
+## Validation rules
 
 The setup process validates configuration values before run.
 

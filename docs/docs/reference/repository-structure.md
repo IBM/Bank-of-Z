@@ -7,7 +7,7 @@ title: Repository Structure
 
 The Bank of Z repository contains the application source, setup automation, build assets, deployment configuration, and supporting documentation required to build and deploy the application.
 
-## Top-Level Structure
+## Top-level structure
 
 | Directory / File | Description |
 |-----------------|-------------|
@@ -22,7 +22,7 @@ The Bank of Z repository contains the application source, setup automation, buil
 
 ---
 
-## Application Source (`src/`)
+## Application source (`src/`)
 
 | Directory | Description |
 |-----------|-------------|
@@ -34,9 +34,9 @@ The Bank of Z repository contains the application source, setup automation, buil
 
 ---
 
-## Setup Automation (`.setup/`)
+## Setup automation (`.setup/`)
 
-### Orchestration Scripts
+### Orchestration scripts
 
 | Script | Runs on | Description |
 |--------|---------|-------------|
@@ -46,7 +46,7 @@ The Bank of Z repository contains the application source, setup automation, buil
 | `pipeline-local.sh` | Local machine | Uploads pipeline assets and invokes `pipeline-remote.sh` via Zowe CLI. Used by the Zowe CLI workflow for incremental builds. |
 | `pipeline-remote.sh` | z/OS USS | Runs the DBB build and Wazi Deploy on USS. Used by both workflows for incremental builds. |
 
-### Configuration and Assets
+### Configuration and assets
 
 | Directory | Description |
 |-----------|-------------|
@@ -61,7 +61,7 @@ The Bank of Z repository contains the application source, setup automation, buil
 
 ---
 
-## IDE Extension Scripts (`scripts/`)
+## IDE Extension scripts (`scripts/`)
 
 | Script | Description |
 |--------|-------------|

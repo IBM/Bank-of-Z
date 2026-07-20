@@ -38,7 +38,7 @@ The target z/OS environment must include the following platform components. Cont
 
 **Note:** A pre-existing Db2 subsystem with subsystem ID `DBD1` is required. The setup scripts create the required Db2 database objects within this subsystem but do not create the subsystem itself. IMS, CICS, and z/OS Connect runtime instances are provisioned automatically during deployment.
 
-## z/OS duild and deploy tooling
+## z/OS build and deploy tooling
 
 The following tools must be installed on z/OS USS. These are typically installed and maintained by a system administrator. The paths to each tool are configured in `.setup/config/config.yaml`.
 

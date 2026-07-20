@@ -197,7 +197,7 @@ content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </featureManager>
     <ssl id=\"defaultSSLConfig\" keyStoreRef=\"defaultKeyStore\"/>
     <keyStore id=\"defaultKeyStore\"
-              location=\"safkeyring://IBMUSER/BOZRING\"
+              location=\"safkeyring://${ZOS_ADMIN_USER}/BOZRING\"
               type=\"JCERACFKS\"
               password=\"password\"/>
 </server>
@@ -206,7 +206,7 @@ with open('${TLS_DEST}', 'wb') as f:
     f.write(content.encode('iso-8859-1'))
 "
 chtag -t -c ISO8859-1 "${TLS_DEST}"
-print_success "SSL configuration deployed (safkeyring://IBMUSER/BOZRING)"
+print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/BOZRING)"
 
 # =========================
 # Override httpsPort to 9444 — server.xml uses 9443 by default.

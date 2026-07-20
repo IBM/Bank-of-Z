@@ -31,7 +31,7 @@ fi
 
 set -e
 
-userid=IBMUSER
+userid=${ZOS_ADMIN_USER}
 ring=BOZRING
 label='BoZ'
 

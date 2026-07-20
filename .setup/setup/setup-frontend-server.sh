@@ -108,7 +108,7 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
     <!-- SSL Configuration using RACF keyring -->
     <ssl id=\"defaultSSLConfig\" keyStoreRef=\"defaultKeyStore\"/>
     <keyStore id=\"defaultKeyStore\"
-              location=\"safkeyring://IBMUSER/BOZRING\"
+              location=\"safkeyring://${ZOS_ADMIN_USER}/BOZRING\"
               type=\"JCERACFKS\"
               password=\"password\"/>
 

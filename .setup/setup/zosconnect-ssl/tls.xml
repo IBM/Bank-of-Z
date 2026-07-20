@@ -12,7 +12,7 @@
     </featureManager>
     <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
     <keyStore id="defaultKeyStore"
-              location="safkeyring://IBMUSER/BOZRING"
+              location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
               type="JCERACFKS"
               password="password"/>
 </server>

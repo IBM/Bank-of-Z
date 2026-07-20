@@ -16,7 +16,7 @@
 # =============================================================================
 
 ## CUSTOMIZE ##
-userid=IBMUSER
+userid=${ZOS_ADMIN_USER}
 ring=BOZRING
 
 ## FIXED ##

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # =============================================================================
 # Script  : addcert.sh
 # Summary : Create RACF keyring and server certificate for Bank of Z.

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # =============================================================================
 # Script  : gencert-eku.sh
 # Summary : Generate a TLS server certificate with EKU serverAuth (OID

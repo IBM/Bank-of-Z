@@ -69,12 +69,12 @@ fi
 
 # =========================
 # Configure server.xml
-# Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
-# Liberty variable refs (${frontend.http.port} etc.) must be preserved literally.
+# bash heredoc: variables expand (for ZOS_ADMIN_USER), Liberty variable refs
+# (${frontend.http.port} etc.) are dollar-escaped to prevent shell expansion.
 # =========================
 print_info "Configuring server.xml..."
 
-cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
+cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Bank of Z Frontend Server">
 
@@ -87,30 +87,30 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
-    <httpEndpoint id=\"defaultHttpEndpoint\"
-                  httpPort=\"\${frontend.http.port}\"
-                  httpsPort=\"\${frontend.https.port}\"
-                  host=\"*\" />
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpPort="\${frontend.http.port}"
+                  httpsPort="\${frontend.https.port}"
+                  host="*" />
 
     <!-- Application Configuration -->
-    <webApplication id=\"bank-frontend\"
-                    location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\"
-                    name=\"bank-frontend\"
-                    contextRoot=\"/\">
-        <classloader delegation=\"parentLast\" />
+    <webApplication id="bank-frontend"
+                    location="\${server.config.dir}/apps/bank-frontend-vanilla.war"
+                    name="bank-frontend"
+                    contextRoot="/">
+        <classloader delegation="parentLast" />
     </webApplication>
 
     <!-- Logging Configuration -->
-    <logging traceSpecification=\"*=info\"
-             maxFileSize=\"20\"
-             maxFiles=\"10\" />
+    <logging traceSpecification="*=info"
+             maxFileSize="20"
+             maxFiles="10" />
 
     <!-- SSL Configuration using RACF keyring -->
-    <ssl id=\"defaultSSLConfig\" keyStoreRef=\"defaultKeyStore\"/>
-    <keyStore id=\"defaultKeyStore\"
-              location=\"safkeyring://${ZOS_ADMIN_USER}/BOZRING\"
-              type=\"JCERACFKS\"
-              password=\"password\"/>
+    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
+    <keyStore id="defaultKeyStore"
+              location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
+              type="JCERACFKS"
+              password="password"/>
 
 </server>
 EOF

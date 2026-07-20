@@ -56,21 +56,132 @@
             font-weight: 700;
         }
 
-        .header-nav{
-    margin-left:auto;
-}
+        .header-nav {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.header-nav a{
-    color:#161616;
-    text-decoration:none;
-    font-size:1rem;
-    font-weight:500;
-    padding:0 12px;
-}
+        .header-nav a {
+            color: #161616;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0 12px;
+        }
 
-.header-nav a:hover{
-    color:#0F62FE;
-}
+        .header-nav a:hover {
+            color: #0F62FE;
+        }
+
+        /* Search */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f4f4f4;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            padding: 0 12px;
+            height: 36px;
+            gap: 8px;
+            transition: border-color 0.15s;
+        }
+
+        .search-box:focus-within {
+            border-color: #0f62fe;
+            background: #ffffff;
+        }
+
+        .search-box svg {
+            color: #525252;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.875rem;
+            color: #161616;
+            width: 220px;
+        }
+
+        .search-box input::placeholder {
+            color: #a8a8a8;
+        }
+
+        #search-results {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 420px;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 2000;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            display: block;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid #f4f4f4;
+            transition: background 0.11s;
+        }
+
+        .search-result-item:hover {
+            background: #e8f0fe;
+        }
+
+        .search-result-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0f62fe;
+            margin-bottom: 4px;
+        }
+
+        .search-result-snippet {
+            font-size: 0.8rem;
+            color: #525252;
+            line-height: 1.4;
+            
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-highlight {
+            background: #fef08a;
+            color: #161616;
+            font-weight: 600;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .search-result-snippet mark {
+            background: #fef08a;
+            color: #161616;
+            font-weight: 600;
+            padding: 0 2px;
+        }
+
+        .search-no-results {
+            padding: 16px;
+            font-size: 0.875rem;
+            color: #525252;
+        }
+
         
         /* Main Container */
         .container {
@@ -322,10 +433,10 @@
         }
 
         .content img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 2rem auto;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: auto;
         }
         
         .content table {
@@ -394,78 +505,91 @@
             .content h2 {
                 font-size: 1.5rem;
             }
-        }
-            /* Hero Banner */
-.hero-banner {
-    position: relative;
-    margin: -3rem -3rem 3rem -3rem;
-    overflow: hidden;
-}
-.hero-banner img {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    display: block;
-    filter: brightness(0.55);
-}
-.hero-overlay {
-    position: absolute;
-    left: 60px;
-    bottom: 60px;
-    color: white;
-    max-width: 700px;
-}
-.hero-overlay h1 {
-    color: white !important;
-    font-size: 4rem !important;
-    font-weight: 300 !important;
-    margin: 0 0 1rem 0 !important;
-    border: none !important;
-}
-.hero-overlay p {
-    color: white !important;
-    font-size: 1.25rem;
-    line-height: 1.6;
-    margin: 0;
-}
 
-.doc-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(320px, 1fr));
-    gap: 24px;
-    margin: 2rem 0;
-    width: 100%;
-}
-.doc-card {
-    display: block;
-    padding: 24px;
-    min-height: 180px;
-    border: 1px solid #e0e0e0;
-    background: #ffffff;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.2s ease;
-}
-.doc-card:hover {
-    border-left: 4px solid #0F62FE;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-.doc-card h3 {
-    margin: 0 0 12px 0;
-    font-size: 1.5rem;
-}
-.doc-card p {
-    margin: 0;
-    color: #525252;
-}
-@media (max-width: 900px) {
-    .doc-cards {
-        grid-template-columns: 1fr;
-    }
-}
+            .search-box input {
+                width: 140px;
+            }
+
+            #search-results {
+                width: calc(100vw - 2rem);
+                right: -12px;
+            }
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            position: relative;
+            margin: -3rem -3rem 3rem -3rem;
+            overflow: hidden;
+        }
+        .hero-banner img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.55);
+        }
+        .hero-overlay {
+            position: absolute;
+            left: 60px;
+            bottom: 60px;
+            color: white;
+            max-width: 700px;
+        }
+        .hero-overlay h1 {
+            color: white !important;
+            font-size: 4rem !important;
+            font-weight: 300 !important;
+            margin: 0 0 1rem 0 !important;
+            border: none !important;
+        }
+        .hero-overlay p {
+            color: white !important;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .doc-cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 2rem 0;
+            width: 100%;
+        }
+        .doc-card {
+            display: block;
+            padding: 24px;
+            min-height: 180px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+        }
+        .doc-card:hover {
+            border-left: 4px solid #0F62FE;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .doc-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.5rem;
+        }
+        .doc-card p {
+            margin: 0;
+            color: #525252;
+        }
+        @media (max-width: 900px) {
+            .doc-cards {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Search overlay (closes results when clicking outside) -->
+    
+
     <header class="header">
         <div class="header-content">
             <div class="site-title">
@@ -473,9 +597,18 @@
             </div>
 
             <nav class="header-nav">
-                <a href="{{ site.repository_url }}" target="_blank">
-                    GitHub
-                </a>
+                <!-- Search box -->
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 15L10.5 10.5M12 6.5C12 9.53757 9.53757 12 6.5 12C3.46243 12 1 9.53757 1 6.5C1 3.46243 3.46243 1 6.5 1C9.53757 1 12 3.46243 12 6.5Z" stroke="#525252" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search docs..." autocomplete="off" />
+                    </div>
+                    <div id="search-results"></div>
+                </div>
+
+                <a href="{{ site.repository_url }}" target="_blank">GitHub</a>
             </nav>
         </div>
     </header>
@@ -532,9 +665,7 @@
         section.classList.toggle('collapsed');
     }
     
-    // Auto-expand active section on page load
     document.addEventListener('DOMContentLoaded', function() {
-        // Expand sections containing active links
         const activeLinks = document.querySelectorAll('.toc-children a.active');
         activeLinks.forEach(link => {
             const section = link.closest('.toc-section');
@@ -544,5 +675,63 @@
         });
     });
     </script>
+
+    <script>
+    // Highlight search terms on page load if ?q= param present
+    document.addEventListener("DOMContentLoaded", function() {
+      var params = new URLSearchParams(window.location.search);
+      var q = params.get("q");
+      if (!q) return;
+      var words = q.trim().split(/\s+/).filter(Boolean);
+      if (words.length === 0) return;
+      var content = document.querySelector(".content");
+      if (!content) return;
+      function highlightNode(node) {
+        if (node.nodeType === 3) {
+          var text = node.nodeValue;
+          var lowerText = text.toLowerCase();
+          var changed = false;
+          var result = document.createDocumentFragment();
+          var last = 0;
+          // find all word matches
+          var matches = [];
+          words.forEach(function(word) {
+            var lower = word.toLowerCase();
+            var i = lowerText.indexOf(lower, 0);
+            while (i !== -1) {
+              matches.push({ start: i, end: i + word.length });
+              i = lowerText.indexOf(lower, i + 1);
+            }
+          });
+          matches.sort(function(a,b){ return a.start - b.start; });
+          matches.forEach(function(m) {
+            if (m.start < last) return;
+            if (m.start > last) result.appendChild(document.createTextNode(text.slice(last, m.start)));
+            var mark = document.createElement("mark");
+            mark.className = "search-highlight";
+            mark.textContent = text.slice(m.start, m.end);
+            result.appendChild(mark);
+            last = m.end;
+            changed = true;
+          });
+          if (changed) {
+            if (last < text.length) result.appendChild(document.createTextNode(text.slice(last)));
+            node.parentNode.replaceChild(result, node);
+          }
+        } else if (node.nodeType === 1     <!-- Lunr.js for full-text search -->    <!-- Lunr.js for full-text search --> !["SCRIPT","STYLE","MARK"].includes(node.tagName)) {
+          Array.from(node.childNodes).forEach(highlightNode);
+        }
+      }
+      highlightNode(content);
+      // scroll to first highlight
+      var first = content.querySelector(".search-highlight");
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    </script>
+
+    <!-- Lunr.js for full-text search -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script>window.searchBaseUrl = '{{ site.baseurl }}';</script>
+    <script src="{{ site.baseurl }}/assets/js/search.js"></script>
 </body>
 </html>

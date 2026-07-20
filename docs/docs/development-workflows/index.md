@@ -9,49 +9,49 @@ This section describes the development workflows supported by Bank of Z. These w
 
 Bank of Z supports modern Git-based development practices while leveraging enterprise z/OS technologies such as Db2, CICS, IMS, z/OS Connect, IBM Dependency Based Build (DBB), and Wazi Deploy.
 
-## Development Workflow
+## Development workflow
 
 A typical Bank of Z development workflow consists of the following activities:
 
-### 1. Make Changes
+### 1. Make changes
 
 - Modify application source code, configuration files, or deployment artifacts.
 - Common changes include updates to COBOL programs, BMS maps, copybooks, z/OS Connect APIs, and web application components.
 
-### 2. Commit Changes
+### 2. Commit changes
 
 - Review and commit changes to the source repository.
 - Use meaningful commit messages to document modifications and support traceability.
 
-### 3. Run the Pipeline
+### 3. Run the pipeline
 
 - Run the build pipeline using the supported development workflow.
 - The pipeline analyzes source changes, builds affected components, packages deployment artifacts, and prepares deployment plans.
 
-### 4. Review Results
+### 4. Review results
 
 - Review build logs, reports, and generated artifacts.
 - Address any build, dependency, or deployment issues identified during pipeline run.
 
-### 5. Deploy Changes
+### 5. Deploy changes
 
 - Deploy validated artifacts to the target environment.
 - Updated components are activated in the appropriate runtime environments, including CICS, Db2, IMS, and z/OS Connect.
 
-### 6. Validate Changes
+### 6. Validate changes
 
 - Verify that the deployed changes function as expected.
 - Run application tests and review runtime behavior before promoting changes to additional environments.
 
-## Supported Workflows
+## Supported workflows
 
 Bank of Z supports multiple development approaches.
 
-### Zowe CLI Workflow
+### Zowe CLI workflow
 
 A task-based workflow that uses Zowe CLI to clone your branch on z/OS USS and run the setup and pipeline scripts. Can be triggered from the command line or from a VS Code task.
 
-### GRUB Workflow
+### GRUB workflow
 
 A development workflow optimized for rapid iteration, allowing you to synchronize changes directly to the target environment and run build and deployment activities without requiring committed changes.
 

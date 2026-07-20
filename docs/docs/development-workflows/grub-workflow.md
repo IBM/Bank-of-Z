@@ -9,9 +9,9 @@ The GRUB workflow synchronizes local file changes directly to z/OS USS and autom
 
 Before using this workflow, complete [Deploy Using GRUB](../installation-and-setup/deploy-grub.md) to set up your environment.
 
-## Daily Development Cycle
+## Daily development cycle
 
-### 1. Make Changes
+### 1. Make changes
 
 Modify application source code in your local workspace. No commit required. Common changes include:
 
@@ -20,13 +20,13 @@ Modify application source code in your local workspace. No commit required. Comm
 - z/OS Connect API assets
 - Configuration files
 
-### 2. Trigger a GRUB Sync
+### 2. Trigger a GRUB sync
 
 Trigger a GRUB sync from your local machine. GRUB analyzes your local changes, creates patch files, and transfers only the modified files to USS.
 
 Refer to your GRUB documentation for the specific command or UI action for your installation.
 
-### 3. What Runs Automatically
+### 3. What runs automatically
 
 ```
 Local Machine                    z/OS USS
@@ -42,7 +42,7 @@ Transfers changed files ────────→ Patches applied to USS
 
 GRUB detects that it is running from within the Bank-of-Z repository and uses the synced files directly — no re-cloning occurs. This is what makes subsequent syncs significantly faster than a full setup.
 
-### 4. Validate Changes
+### 4. Validate changes
 
 Open the Bank of Z frontend to verify your changes are live:
 
@@ -52,7 +52,7 @@ http://<your-zos-host>:9080/bank-frontend-vanilla
 
 ---
 
-## How Stage Detection Works
+## How Stage detection works
 
 When `setup-remote.sh` runs on USS after a GRUB sync, it detects that it is executing from within the Bank-of-Z repository and uses that location directly:
 
@@ -70,7 +70,7 @@ This means your uncommitted local changes are used as-is, and no clone from GitH
 
 ---
 
-## Why Use GRUB
+## Why use GRUB
 
 | Feature | Benefit |
 |---------|---------|

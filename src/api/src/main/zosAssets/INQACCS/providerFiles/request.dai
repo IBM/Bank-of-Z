@@ -2,7 +2,7 @@
 <ns2:message xmlns:ns2="http://www.ibm.com/ims/Transaction" direction="0">
     <message id="1">
         <segment id="1">
-            <field name="INQACCS" originalName="INQACCS" included="Y" path="INQACCS" fileName="INQACCS.cpy" structureIndex="0" structSrcFileName="INQACCS_request_0.cpy" srcLine="01 INQACCS.">
+            <field name="INQACCS" originalName="INQACCS" included="Y" path="INQACCS" fileName="INQACCSZ.cpy" structureIndex="0" structSrcFileName="INQACCS_request_0.cpy" srcLine="01 INQACCS.">
                 <startPos>1</startPos>
                 <bytes>1967</bytes>
                 <maxBytes>0</maxBytes>

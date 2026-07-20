@@ -536,6 +536,24 @@ resourceDefinitions:
       executionset: FULLAPI
       jvm: "NO"
   - program:
+      name: INQACCS
+      group: BANKZGRP
+      description: BANK Online Inquire All Accounts
+      language: COBOL
+      reload: "NO"
+      resident: "NO"
+      usage: NORMAL
+      uselpacopy: "NO"
+      status: ENABLED
+      cedf: "YES"
+      datalocation: ANY
+      execkey: USER
+      concurrency: THREADSAFE
+      api: CICSAPI
+      dynamic: "NO"
+      executionset: FULLAPI
+      jvm: "NO"
+  - program:
       name: INQACCCU
       group: BANKZGRP
       description: BANK Online Inquire Account for Customer

@@ -51,7 +51,6 @@ The following tools must be installed on z/OS USS. These are typically installed
 | z/OS Middleware Configuration Tool (zconfig) | 0.6.0 | `zconfig.zconfig_home` |
 | Wazi Deploy | 3.0.7.3 | `wazideploy.wazideploy_home` |
 | ZCodeScan | 1.0.2 | `zcodescan.zcodescan_home` |
-| Ansible | 2.15 | — |
 | CICS TS Resource Builder | 1.0.6 | `zconfig.zcb_home` |
 | Git | Current supported version | Must be available in PATH on USS |
 

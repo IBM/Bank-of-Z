@@ -25,6 +25,18 @@ exec > >(while IFS= read -r line; do
 done) 2>&1
 
 # =========================
+# Helper: verify a config file was written successfully
+# =========================
+verify_file_written() {
+    local file="$1"
+    if [[ ! -s "$file" ]]; then
+        print_error "Failed to write config file: $file"
+        exit 1
+    fi
+    print_success "Verified: $file"
+}
+
+# =========================
 # Environment
 # =========================
 export ZOSCONNECT_HOME=$(echo "$ZOSCONNECT_HOME" | sed "s|~|$HOME|g")
@@ -142,6 +154,7 @@ cat > "${CICS_DEST}" << EOF
     <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
 </server>
 EOF
+verify_file_written "${CICS_DEST}"
 
 # =========================
 # Generate IMS connection config
@@ -163,6 +176,7 @@ cat > "${IMS_DEST}" << EOF
     <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
 EOF
+verify_file_written "${IMS_DEST}"
 
 # =========================
 # Deploy SSL/TLS configuration (RACF keyring with EKU cert).
@@ -190,6 +204,7 @@ cat > "${TLS_DEST}" << EOF
               password="password"/>
 </server>
 EOF
+verify_file_written "${TLS_DEST}"
 print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/BOZRING)"
 
 # =========================
@@ -205,6 +220,7 @@ cat > "${HTTP_EP_DEST}" << EOF
     <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
 </server>
 EOF
+verify_file_written "${HTTP_EP_DEST}"
 print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 
 # =========================
@@ -230,6 +246,7 @@ cat > "${ZZ_DEST}" << EOF
     </webApplication>
 </server>
 EOF
+verify_file_written "${ZZ_DEST}"
 # Remove the old (losing) name if it exists from a previous run
 rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
 print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"

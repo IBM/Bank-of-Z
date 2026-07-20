@@ -22,7 +22,7 @@ The project can be used to:
 
 Bank of Z is intended for educational, demonstration, and proof-of-concept purposes.
 
-## Introduction Video
+## Introduction video
 
 Watch the following overview to learn about the goals of Bank of Z, the IBM Z technologies it demonstrates, and the background behind its hybrid application architecture.
 

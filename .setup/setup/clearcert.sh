@@ -23,10 +23,10 @@ fi
 
 echo "[clearcert] Removing existing keyring and certificates for $userid/$ring..."
 
-# Ensure SERVAUTH class is active
-tsocmd "SETROPTS GENERIC(SERVAUTH)" \
+# Ensure RDATALIB class is active
+tsocmd "SETROPTS GENERIC(RDATALIB)" \
  >/dev/null 2>&1
-tsocmd "SETROPTS CLASSACT(SERVAUTH) RACLIST(SERVAUTH)" \
+tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
  >/dev/null 2>&1
 
 # Remove existing keyring — expected to fail on a clean system

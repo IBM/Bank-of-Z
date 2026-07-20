@@ -37,7 +37,8 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 
 # Step 2: Generate the server cert with EKU serverAuth via Bouncy Castle CSR
 # round-trip (gencert-eku.sh).  The private key is generated in RACF and never
-# leaves the keyring.
+# leaves the keyring. Note: gencert-eku.sh removes any existing cert with label
+# '$label' from the keyring before generating a fresh one.
 if test $rc -eq 0
 then
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

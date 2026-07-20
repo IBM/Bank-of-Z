@@ -34,7 +34,11 @@ rm -f /tmp/IMS-Db2-*
 rm -f /tmp/CICS-Db2-*
 rm -f /tmp/Db2-*
 
+
 # CICS
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-grant.j2"  --outputFile "/tmp/CICS-Db2-grant-$$.jcl"
+run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl" "8"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-drop.j2"  --outputFile "/tmp/CICS-Db2-drop-$$.jcl"
 run_job_and_wait "/tmp/CICS-Db2-drop-$$.jcl" "8"

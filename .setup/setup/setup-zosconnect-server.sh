@@ -130,60 +130,48 @@ rm -f "/tmp/BAQ${APP_SHORT_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config
-# Use Python to write ASCII bytes directly — avoids _BPXK_AUTOCVT shell encoding.
 # =========================
-PYTHON=$(command -v python3 2>/dev/null) || { echo "[ZOSCONNECT] FATAL: python3 not found on PATH" >&2; exit 1; }
 CICS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cics.xml"
-$PYTHON -c "
-import sys
-content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<server description=\"IPIC connection to CICS\">
+cat > "${CICS_DEST}" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="IPIC connection to CICS">
     <featureManager>
         <feature>zosconnect:cics-1.0</feature>
     </featureManager>
-    <zosconnect_cicsIpicConnection id=\"${APP_BASE_NAME_LOWER}CicsConnection\" host=\"127.0.0.1\" port=\"${CICS_IPIC_PORT}\" sysid=\"ZC01\" authDataRef=\"cicsCredentials\" requestTimeout=\"300s\" />
-    <zosconnect_authData id=\"cicsCredentials\" user=\"${CICS_USER}\" password=\"${CICS_PASSWORD}\" />
+    <zosconnect_cicsIpicConnection id="${APP_BASE_NAME_LOWER}CicsConnection" host="127.0.0.1" port="${CICS_IPIC_PORT}" sysid="ZC01" authDataRef="cicsCredentials" requestTimeout="300s" />
+    <zosconnect_authData id="cicsCredentials" user="${CICS_USER}" password="${CICS_PASSWORD}" />
 </server>
-'''
-with open('${CICS_DEST}', 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-"
-chtag -t -c ISO8859-1 "${CICS_DEST}"
+EOF
 
 # =========================
 # Generate IMS connection config
 # =========================
 IMS_DEST="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/ims.xml"
-$PYTHON -c "
-content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<server description=\"Connection to IMS\">
+cat > "${IMS_DEST}" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Connection to IMS">
     <featureManager>
         <feature>zosconnect:ims-1.0</feature>
     </featureManager>
 
-    <zosconnect_imsConnection id=\"imsConn\" connectionFactoryRef=\"imsConnectionFactory\" imsDatastoreName=\"${IMS_DATASTORE}\"/>
+    <zosconnect_imsConnection id="imsConn" connectionFactoryRef="imsConnectionFactory" imsDatastoreName="${IMS_DATASTORE}"/>
 
-    <connectionFactory id=\"imsConnectionFactory\" containerAuthDataRef=\"IMSCredentials\">
-        <properties.gmoa hostName=\"${IMS_HOST}\" portNumber=\"${IMS_PORT}\" />
+    <connectionFactory id="imsConnectionFactory" containerAuthDataRef="IMSCredentials">
+        <properties.gmoa hostName="${IMS_HOST}" portNumber="${IMS_PORT}" />
     </connectionFactory>
 
-    <authData id=\"IMSCredentials\" user=\"${IMS_USER}\" password=\"${IMS_PASSWORD}\" />
+    <authData id="IMSCredentials" user="${IMS_USER}" password="${IMS_PASSWORD}" />
 </server>
-'''
-with open('${IMS_DEST}', 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-"
-chtag -t -c ISO8859-1 "${IMS_DEST}"
+EOF
 
 # =========================
 # Deploy SSL/TLS configuration (RACF keyring with EKU cert).
-# Written via Python to avoid _BPXK_AUTOCVT EBCDIC corruption on cp.
 # =========================
 OVERRIDES_DIR="${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides"
 TLS_DEST="${OVERRIDES_DIR}/tls.xml"
-print_info "${CYAN}[ZOSCONNECT]${NC} Deploying SSL configuration (RACF keyring)..."
-$PYTHON -c "
-content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+print_info "Deploying SSL configuration (RACF keyring)..."
+cat > "${TLS_DEST}" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
 <server>
     <!--
       TLS config: RACF keyring with EKU serverAuth cert (Safari-compatible).
@@ -195,33 +183,28 @@ content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <feature>ssl-1.0</feature>
         <feature>transportSecurity-1.0</feature>
     </featureManager>
-    <ssl id=\"defaultSSLConfig\" keyStoreRef=\"defaultKeyStore\"/>
-    <keyStore id=\"defaultKeyStore\"
-              location=\"safkeyring://${ZOS_ADMIN_USER}/BOZRING\"
-              type=\"JCERACFKS\"
-              password=\"password\"/>
+    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
+    <keyStore id="defaultKeyStore"
+              location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
+              type="JCERACFKS"
+              password="password"/>
 </server>
-'''
-with open('${TLS_DEST}', 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-"
-chtag -t -c ISO8859-1 "${TLS_DEST}"
+EOF
 print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/BOZRING)"
 
 # =========================
-# Override httpsPort to 9444 — server.xml uses 9443 by default.
-# Use double-quoted heredoc so ${HTTPS_PORT} expands at write time.
-# Do NOT use sed -i — z/OS sed does not support the -i flag.
+# Override httpsPort: z/OS Connect server.xml defaults to 9443,
+# override with ${HTTPS_PORT} (configured as 9444 in config.yaml).
 # =========================
 HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
 HTTPS_PORT=${HTTPS_PORT:-9444}
 HTTP_EP_DEST="$OVERRIDES_DIR/http-endpoint.xml"
-$PYTHON -c "
-content = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<server>\n    <httpEndpoint id=\"defaultHttpEndpoint\" host=\"*\" httpPort=\"9080\" httpsPort=\"${HTTPS_PORT}\"/>\n</server>\n'
-with open('${HTTP_EP_DEST}', 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-"
-chtag -t -c ISO8859-1 "$HTTP_EP_DEST"
+cat > "${HTTP_EP_DEST}" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
+</server>
+EOF
 print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 
 # =========================
@@ -235,22 +218,18 @@ print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
 # would lose. We name it "zz-bank-frontend-root.xml" to sort after vanilla.xml.
 # =========================
 ZZ_DEST="${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
-$PYTHON -c "
-content = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+cat > "${ZZ_DEST}" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
 <server>
     <!-- Override context root for frontend WAR - serve at / alongside /api -->
-    <webApplication id=\"bank-frontend-vanilla\"
-                    location=\"\${server.config.dir}/apps/bank-frontend-vanilla.war\"
-                    name=\"bank-frontend-vanilla\"
-                    contextRoot=\"/\">
-        <classloader delegation=\"parentLast\" />
+    <webApplication id="bank-frontend-vanilla"
+                    location="\${server.config.dir}/apps/bank-frontend-vanilla.war"
+                    name="bank-frontend-vanilla"
+                    contextRoot="/">
+        <classloader delegation="parentLast" />
     </webApplication>
 </server>
-'''
-with open('${ZZ_DEST}', 'wb') as f:
-    f.write(content.encode('iso-8859-1'))
-"
-chtag -t -c ISO8859-1 "${ZZ_DEST}"
+EOF
 # Remove the old (losing) name if it exists from a previous run
 rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
 print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"

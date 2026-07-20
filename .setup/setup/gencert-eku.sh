@@ -336,16 +336,12 @@ tsocmd "RACDCERT ADD('${userid}.BOZ.NEWCERT') \
   FORMAT(CERTDER) \
   TRUST"
 
-tsocmd "RACDCERT ID($userid) \
-  CONNECT(LABEL('$label') RING($ring) DEFAULT)"
-
 tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 
 echo "[gencert-eku] Done."
-echo "[gencert-eku]   Cert label : $label  (in keyring IBMUSER/$ring)"
+echo "[gencert-eku]   Cert label : $label"
 echo "[gencert-eku]   Private key: stays in RACF — never written to USS filesystem"
 echo "[gencert-eku]   Validity   : 397 days (Safari/Apple ATS compliant)"
 echo "[gencert-eku]   SANs       : IP=$ipaddr  DNS=$dnsname"
 echo "[gencert-eku]   EKU        : TLS Web Server Authentication"
-echo "[gencert-eku]   Liberty    : uses safkeyring://IBMUSER/$ring (JCERACFKS)"
-echo "[gencert-eku] Restart BAQBANKZ to pick up the new certificate."
+echo "[gencert-eku]   Caller (addcert.sh) will connect cert to keyring $ring as DEFAULT."

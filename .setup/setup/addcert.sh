@@ -18,6 +18,7 @@
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
 ring=BOZRING
+label='BoZ'
 
 ## FIXED ##
 profile=$userid.$ring.LST
@@ -43,7 +44,16 @@ if test $rc -eq 0
 then
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   if bash "$SCRIPT_DIR/gencert-eku.sh"; then
-    echo "[addcert] EKU cert generation succeeded — cert in keyring $userid/$ring"
+    echo "[addcert] EKU cert generation succeeded — connecting cert to keyring..."
+    tsocmd "RACDCERT ID($userid) \
+      CONNECT(LABEL('$label') RING($ring) DEFAULT)"
+    rc=$?
+    tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
+    if test $rc -eq 0; then
+      echo "[addcert] Cert '$label' connected to keyring $userid/$ring as DEFAULT"
+    else
+      echo "[addcert] FATAL: failed to connect cert to keyring $userid/$ring" >&2
+    fi
   else
     echo "[addcert] FATAL: gencert-eku.sh failed — Liberty cannot start without a server cert" >&2
     rc=1

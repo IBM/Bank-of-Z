@@ -18,7 +18,7 @@ Before starting this tutorial, ensure that you have:
 - Successfully built and deployed Bank of Z
 - A working Bank of Z development environment
 
-## What you will learn
+## What You Will Learn
 
 By completing this tutorial, you will learn how to:
 
@@ -30,7 +30,7 @@ By completing this tutorial, you will learn how to:
 - Build and deploy updated CICS application components
 - Verify the enhancement using the Bank of Z web application
 
-## Part 1: Understand and plan the enhancement
+## Part 1: Understand and Plan the Enhancement
 
 Watch the following demonstration to learn how to analyze the existing application, identify the components affected by the enhancement, and generate an implementation plan.
 
@@ -48,7 +48,7 @@ The demonstration covers:
   Your browser does not support the video tag.
 </video>
 
-## Part 2: Implement and validate the enhancement
+## Part 2: Implement and Validate the Enhancement
 
 Watch the following demonstration to implement the planned enhancement, deploy the updated application, and verify the results.
 

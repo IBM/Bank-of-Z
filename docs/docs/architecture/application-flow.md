@@ -9,7 +9,7 @@ Bank of Z uses a hybrid architecture that combines a modern web interface with I
 
 The following diagram illustrates the flow of requests through the Bank of Z application.
 
-## Request processing flow
+## Request Processing Flow
 
 A typical request follows these steps:
 
@@ -22,24 +22,24 @@ A typical request follows these steps:
 7. The transaction result is returned through z/OS Connect to the Bank of Z UI.
 8. The Bank of Z UI displays the results.
 
-## Routing logic
+## Routing Logic
 
 Bank of Z routes requests to different transaction-processing environments based on the customer identifier.
 
 | Customer Identifier Pattern | Processing Environment |
 |----------------------------|------------------------|
 | `Cnnnn` | CICS |
-| `Innn` | IMS TM |
+| `Innnn` | IMS TM |
 
 For example, a customer with the identifier `C1234` is processed through the CICS application path, while a customer with the identifier `I1234` is processed through the IMS TM application path.
 
 This routing model demonstrates how multiple IBM Z transaction-processing technologies can be integrated into a single application while maintaining a consistent user experience.
 
-## Request flow diagram
+## Request Flow Diagram
 
 ![Request Flow Diagram](images/request-flow-diagram.jpg)
 
-## External integration
+## External Integration
 
 For selected operations, Bank of Z can exchange information with external systems through IBM MQ. This enables integration scenarios such as processing inbound money transfer requests from external banking applications.
 

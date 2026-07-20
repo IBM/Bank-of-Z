@@ -5,12 +5,12 @@ title: Deploy Using Direct USS Access
 
 # Deploy Using Direct USS Access
 
-Use this procedure to deploy Bank of Z by connecting directly to z/OS USS via SSH and running the setup scripts manually. This is the most transparent option because you run each command manually and can observe each stage of the deployment process.
+Use this procedure to deploy Bank of Z by connecting directly to z/OS USS via SSH and running the setup scripts manually. This is the most transparent option — you run each command yourself and can see exactly what happens at each stage.
 
-**Before you begin, ensure that you have:**
+**What you need before starting:**
 - SSH access to your z/OS system
-- Git installed on z/OS USS
-- A z/OS environment that meets the requirements described in [Prerequisites](prerequisites.html)
+- Git available on z/OS USS
+- Your z/OS environment meets the [Prerequisites](prerequisites.html)
 
 ---
 
@@ -22,9 +22,9 @@ ssh user@your-zos-host
 
 ---
 
-## 2. Clone the repository
+## 2. Clone the Repository
 
-Choose a working directory on USS. You will specify this path in the configuration file in the next step.
+Choose a working directory on USS. Note the path — you will set it in the config file in the next step.
 
 ```bash
 export BANK_OF_Z_WORK_DIR=/usr/local/sandboxes/bank-of-z
@@ -36,7 +36,7 @@ cd Bank-of-Z
 
 ---
 
-## 3. Edit the configuration file
+## 3. Edit the Configuration File
 
 Open the configuration file in your USS editor and update it for your environment:
 
@@ -44,43 +44,43 @@ Open the configuration file in your USS editor and update it for your environmen
 vi .setup/config/config.yaml
 ```
 
-For information about each configuration field, see [Environment Configuration](environment-configuration.html).
+See [Environment Configuration](environment-configuration.html) for a full description of every field and what to set.
 
 ---
 
-## 4. Validate prerequisites
+## 4. Validate Prerequisites
 
 ```bash
 .setup/setup-common.sh validate-prereqs
 ```
 
-Verifies that all required tools are installed at the required versions. Resolve any failures before continuing. For more information, see [Troubleshooting](../troubleshooting/index.html).
+Checks that all required tools are installed at the correct versions. Resolve any failures before continuing — see [Troubleshooting](../troubleshooting/index.html) for guidance.
 
 ---
 
-## 5. Provision middleware
+## 5. Provision Middleware
 
 ```bash
 .setup/setup-common.sh environment
 ```
 
-Provisions the complete application runtime, including Db2 tables, a CICS region, an IMS region and database, a z/OS Connect server, and the Liberty frontend server. Expect this to take several minutes.
+Provisions the full application runtime: Db2 tables, CICS region, IMS region and database, z/OS Connect server, and the frontend Liberty server. Expect this to take several minutes.
 
 ---
 
-## 6. Build and deploy
+## 6. Build and Deploy
 
 ```bash
 .setup/setup-common.sh install-bank-of-z
 ```
 
-Runs a complete DBB build, packages the outputs, deploys via Wazi Deploy, and populates Db2 and IMS with test data. The initial build and deployment typically take 15 to 20 minutes.
+Runs a full DBB build, packages the outputs, deploys via Wazi Deploy, and populates Db2 and IMS with test data. Expect this to take 15–20 minutes on first run.
 
-> **Note:** Warnings related to the YAML scanner and `chown` failures are expected and do not indicate a problem.
+> **Note:** Warnings about YAML scanner and `chown` failures in the build output are expected and do not indicate a problem.
 
 ---
 
-## 7. Verify the deployment
+## 7. Verify the Deployment
 
 Open the Bank of Z frontend in a browser:
 

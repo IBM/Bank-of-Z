@@ -167,7 +167,7 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
 
 1. Run setup of middleware systems
-   This sets up Db2 tables, a new CICS region and z/OS Connect instance via zConfig
+   This sets up Db2 tables, a new CICS region and z/OS Connect instance via zconfig
     ```bash
     .setup/setup-common.sh environment
     ```

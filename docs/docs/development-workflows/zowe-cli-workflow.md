@@ -9,9 +9,9 @@ The Zowe CLI workflow supports Git-based development by using `setup-local.sh` a
 
 Before using this workflow, complete [Deploy Using Zowe CLI](../installation-and-setup/deploy-zowe-cli.md) to set up your environment.
 
-## Daily development cycle
+## Daily Development Cycle
 
-### 1. Make changes
+### 1. Make Changes
 
 Modify application source code in your local workspace. Common changes include:
 
@@ -21,7 +21,7 @@ Modify application source code in your local workspace. Common changes include:
 - Web application components
 - Configuration files
 
-### 2. Commit and push
+### 2. Commit and Push
 
 Changes must be pushed to the remote repository before triggering a build — the script clones your branch from GitHub on USS, so unpushed commits will not be included.
 
@@ -31,7 +31,7 @@ git commit -m "Your change description"
 git push origin your-branch
 ```
 
-### 3. Run the setup or pipeline task
+### 3. Run the Setup or Pipeline Task
 
 **From the command line:**
 ```bash
@@ -64,7 +64,7 @@ The VS Code task is defined in `.vscode/tasks.json`:
 }
 ```
 
-### 4. What runs automatically
+### 4. What Runs Automatically
 
 ```
 Local Machine                         z/OS USS
@@ -81,7 +81,7 @@ setup-local.sh executes
 
 For incremental builds, `pipeline-local.sh` uploads pipeline assets and invokes `pipeline-remote.sh` on USS, which runs the DBB build and Wazi Deploy without re-provisioning middleware.
 
-### 5. Validate changes
+### 5. Validate Changes
 
 Open the Bank of Z frontend to verify your changes are live:
 
@@ -101,7 +101,7 @@ http://<your-zos-host>:9080/bank-frontend-vanilla
 
 ---
 
-## Working with branches
+## Working with Branches
 
 The script automatically detects your current local branch:
 

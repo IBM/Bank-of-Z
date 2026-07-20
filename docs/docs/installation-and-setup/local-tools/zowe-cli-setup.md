@@ -5,15 +5,13 @@ title: Zowe CLI Setup
 
 # Zowe CLI Setup
 
-Zowe CLI is used by the Bank of Z deployment scripts to communicate with z/OS USS. It creates workspace directories, clones the repository on USS, and runs remote setup commands. This is required for the [Zowe CLI deployment workflow](../deploy-zowe-cli.html).
+Zowe CLI is used by the Bank of Z deployment scripts to communicate with z/OS USS — creating workspace directories, cloning the repository on USS, and executing remote setup commands. This is required for the [Zowe CLI deployment workflow](../deploy-zowe-cli.html).
 
 ## Prerequisites
 
-- Zowe profile configured. See [Zowe Profile Setup](zowe-profile-setup.html)
-- Node.js `>=22.22.1 <23`, Verify the version:
- `node -v`
-- npm `>=10.9.4 <10.10.0`. Verify the version:
-`npm -v`
+- Zowe profile configured — see [Zowe Profile Setup](zowe-profile-setup.html)
+- Node.js `>=22.22.1 <23` — verify: `node -v`
+- npm `>=10.9.4 <10.10.0` — verify: `npm -v`
 
 ## Install Zowe CLI
 
@@ -27,15 +25,15 @@ Verify the installation:
 zowe --version
 ```
 
-## Install the IBM RSE API plug-in
+## Install the IBM RSE API Plugin
 
-The IBM RSE API plug-in is required for `setup-local.sh` to run USS commands and manage files on the target z/OS system.
+The IBM RSE API plugin is required for `setup-local.sh` to issue USS commands and manage files on the target z/OS system.
 
 ```bash
 zowe plugins install @ibm/rse-api-for-zowe-cli
 ```
 
-Verify that the plug-in is installed:
+Verify the plugin is installed:
 
 ```bash
 zowe plugins list
@@ -43,7 +41,7 @@ zowe plugins list
 
 ## Verify
 
-Verify that Zowe CLI can connect to your z/OS system using your configured profile:
+Confirm Zowe CLI can reach your z/OS system using your configured profile:
 
 ```bash
 zowe zosmf check status

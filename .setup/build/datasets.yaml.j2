@@ -5,6 +5,25 @@
 ####################################  
 version: 1.0.0
 variables:
+  # IDZ java library
+  - name: IGZXJNI2
+    value: {{ dbb.igzxjni2 }}
+
+  # Java home
+  - name: JAVA_HOME
+    value: {{ java.java_home }}
+
+  # Sandbox directory
+  - name: SANDBOX_DIR
+    value: {{ sandbox.path }}
+
+  # Gradle home
+  - name: GRADLE_HOME
+    value: {{ dbb.gradle_home }}
+
+  # z/OS connect http port
+  - name: ZOSCONNECT_HTTP_PORT
+    value: {{ zosconnect.http_port }}
 
   # z/OS macro library. Example: SYS1.MACLIB
   - name: MACLIB
@@ -28,11 +47,11 @@ variables:
 
   # Cobol Compiler Data Sets. Example: COBOL.V4R1M0.SIGYCOMP
   - name: SIGYCOMP
-    value: IGY.V6R5M0.SIGYCOMP
+    value: {{ dbb.igy_hlq }}.SIGYCOMP
 
   # PL/I Compiler Data Sets.  Example: PLI.V5R2M0.SIBMZCMP
   - name: IBMZPLI
-    value: PLI.V6R2M0.SIBMZCMP
+    value: "{{ dbb.pli_hlq }}.SIBMZCMP"
 
   # CICS Macro Library. Example: CICSTS.V3R2M0.CICS.SDFHMAC
   - name: SDFHMAC
@@ -92,17 +111,12 @@ variables:
 
   # Optional IDz Load Library. Example: FEL.V14R0M0.SFELLOAD
   - name: SFELLOAD
-    value: FEL.SFELLOAD
+    value: "{{ dbb.fel_hlq }}.SFELLOAD"
 
   # REXX Compiler Data Sets. Example: REXX.V1R4.SFANLMD
   #- name: SFANLMD
   #  value:
 
-  # PD Tools Common Component load library. Example : PDTCC.V1R8.SIPVMODA 
-  - name: PDTCCMOD
-    value: IPV.V1R9M0.SIPVMODA
-  
-  # 
   - name: MODGEN
     value: SYS1.MODGEN
 
@@ -116,5 +130,5 @@ variables:
 
   # IBM ADFz Common Components
   - name: SIPVMODA
-    value: IPV.SIPVMODA
+    value: "{{ dbb.ipv_hlq }}.SIPVMODA"
 

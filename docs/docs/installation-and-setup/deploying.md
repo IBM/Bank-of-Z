@@ -5,49 +5,49 @@ title: Deploying Bank of Z
 
 # Deploying Bank of Z
 
-Deploying Bank of Z provisions a complete application environment on z/OS, including CICS, IMS, z/OS Connect, a Liberty frontend server, and all application data. The process is fully automated once you have cloned the repository and configured it for your environment.
+Deploying Bank of Z provisions a complete application environment on z/OS — including CICS, IMS, z/OS Connect, a Liberty frontend server, and all application data. The process is fully automated once you have cloned the repository and configured it for your environment.
 
-## Choose a deployment workflow
+## Choose a Deployment Workflow
 
-Bank of Z supports three deployment workflows. All three run the same deployment stages and produce the same deployed environment.
+There are three documented workflows for deploying Bank of Z. All three run the same deployment stages and produce the same result.
 
 ### Direct USS
 
-Connect directly to z/OS by using SSH, clone the repository, and run the deployment scripts manually. This is the most straightforward option and requires no additional tooling beyond SSH and Git.
+SSH directly to z/OS, clone the repository, and run the deployment scripts manually. This is the most straightforward option and requires no additional tooling beyond SSH and Git.
 
 → [Deploy Using Direct USS Access](deploy-direct.html)
 
 ### Zowe CLI
 
-Clone the repository to your local machine, then use the provided Zowe CLI scripts to clone your current GitHub branch to z/OS USS and run the deployment scripts automatically. No SSH access to USS is required.
+Clone the repository to your local machine and use the provided Zowe CLI scripts to clone your current branch from GitHub onto z/OS and run the deployment scripts automatically. No SSH access to USS is required.
 
-> **Note:** The script clones your branch from GitHub on USS. Your branch must be pushed to the remote before running the script. Local commits that have not been pushed are not included.
+> **Note:** The script clones your branch from GitHub on USS. Your branch must be pushed to the remote before running the script — local commits that have not been pushed will not be included.
 
 → [Deploy Using Zowe CLI](deploy-zowe-cli.html)  
 → [Zowe CLI Setup](local-tools/zowe-cli-setup.html)
 
 ### GRUB
 
-Clone the repository to your local machine, then use GRUB to transfer your local branch directly to z/OS USS and run the deployment scripts automatically. No commit or push to a remote is required before deploying.
+Clone the repository to your local machine and use GRUB to push your local branch directly to z/OS USS, then run the deployment scripts automatically. No commit or push to a remote is required before deploying.
 
 → [Deploy Using GRUB](deploy-grub.html)  
 → [GRUB Setup](local-tools/grub-setup.html)
 
 ---
 
-## Deployment stages overview
+## What the Deployment Stages Do
 
-All three workflows run the same three stages, each stage is run as a subcommand of `.setup/setup-common.sh`.
+All three workflows run the same three stages, each invoked as a subcommand of `.setup/setup-common.sh`.
 
-### Stage 1: Validate prerequisites
+### Stage 1: Validate Prerequisites
 
 ```bash
 .setup/setup-common.sh validate-prereqs
 ```
 
-Verifies that all required tools are installed on z/OS USS at the versions specified in `config.yaml`. This includes DBB, ZOAU, zconfig, Wazi Deploy, Java, Git, and network connectivity to GitHub.
+Checks that all required tools are installed on z/OS USS at the versions specified in `config.yaml`. This includes DBB, ZOAU, zconfig, Wazi Deploy, Java, Git, and network connectivity to GitHub.
 
-### Stage 2: Provision middleware
+### Stage 2: Provision Middleware
 
 ```bash
 .setup/setup-common.sh environment
@@ -67,9 +67,9 @@ Provisions the complete application runtime from scratch. This stage is fully au
 10. Creates and starts a z/OS Connect server
 11. Creates and starts a frontend Liberty server
 
-> **Note:** This stage requires a pre-existing Db2 subsystem (`DBD1`). All other middleware, including CICS, IMS, z/OS Connect, and the frontend server, is provisioned automatically.
+> **Note:** This stage requires a pre-existing Db2 subsystem (`DBD1`). All other middleware — CICS, IMS, z/OS Connect, and the frontend server — is provisioned automatically.
 
-### Stage 3: Build and deploy
+### Stage 3: Build and Deploy
 
 ```bash
 .setup/setup-common.sh install-bank-of-z
@@ -77,10 +77,10 @@ Provisions the complete application runtime from scratch. This stage is fully au
 
 Builds the application from source and deploys the generated artifacts to the provisioned runtime:
 
-1. Runs a full DBB build for all application sources, including COBOL, PL/I, Assembler, BMS, Java, and z/OS Connect APIs.
+1. Runs a full DBB build across all application languages (COBOL, PL/I, Assembler, BMS, Java, z/OS Connect APIs)
 2. Packages the build outputs into a deployment archive
 3. Runs Wazi Deploy to deploy the archive to the CICS and IMS environments
 4. Populates Db2 with application test data
 5. Populates the IMS database with application test data
 
-The initial build and deployment typically take approximately 15 to 20 minutes.
+The full build and deploy takes approximately 15–20 minutes on first run.

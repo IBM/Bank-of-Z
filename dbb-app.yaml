@@ -160,8 +160,8 @@ application:
           value: |2
               INCLUDE  RESLIB(DFSLI000)
               INCLUDE  SYSLIB(${MEMBER})
-              INCLUDE '/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x'
-              INCLUDE '/usr/lpp/java/java21/J21.0_64/lib/j9vm/libjvm31.x'
+              INCLUDE '${IGZXJNI2}'
+              INCLUDE '${JAVA_HOME}/lib/j9vm/libjvm31.x'
               NAME     IBTRAN(R)
 
         # ----- Link-edit instream for IMS batch programs -----
@@ -267,7 +267,7 @@ application:
     - task: MetadataInit
       variables:
        - name: fileLocation # Location of file system metadata store.
-         value: /usr/local/sandboxes  # Default is the $HOME environment variable.
+         value: ${SANDBOX_DIR}  # Default is the $HOME environment variable.
 
     # ----------------------------------------------------------
     # Custom Groovy tasks for frontend and configuration packaging
@@ -282,11 +282,14 @@ application:
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
         - name: javaHome
-          value: "/usr/local/sandboxes/tools/J21.0_64"
+          value: "${JAVA_HOME}"
         - name: vanillaFrontendPath
           value: "src/frontend"
         - name: vanillaWarName
           value: "bank-frontend-vanilla.war"
+        - name: zosConnectHttpPort
+          value: "${ZOSCONNECT_HTTP_PORT}"
+   
 
     # ----------------------------------------------------------
     # ServerXmlPackager task
@@ -315,7 +318,7 @@ application:
       variables:
         # Path to the Gradle executable on z/OS USS (shared with zOSConnect)
         - name: gradlePath
-          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+          value: "${GRADLE_HOME}/bin/gradle"
         # Shell used to invoke Gradle (same as zOSConnect)
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
@@ -331,7 +334,7 @@ application:
         - name: gradleDebug
           value: true
         - name: gradlePath
-          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+          value: "${GRADLE_HOME}/bin/gradle"
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"
     # ----------------------------------------------------------

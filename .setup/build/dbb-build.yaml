@@ -14,8 +14,8 @@ include:
   # IMPORTANT!  Copy and configure Languages.yaml and any other 
   # language configuration files from #DBB_HOME/samples/languages
   # to your $DBB_BUILD directory before executing zBuilder.
-  - file: languages/Languages.yaml
   - file: datasets.yaml
+  - file: languages/Languages.yaml
 
 #########################################
 # Executable build lifecycles

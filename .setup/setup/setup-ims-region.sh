@@ -16,7 +16,11 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
-exec > >(while IFS= read -r line; do print_info "${CYAN}[ZCONFIG-IMS]${NC} $line"; done) 2>&1
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[ZCONFIG-IMS]${NC} %s\n" "${line}"
+done) 2>&1
 
 # =========================
 # Environment
@@ -52,11 +56,11 @@ fi
 # =========================
 cd "$SCRIPTS_DIR/../zconfig"
 
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking for existing IMS regions..."
+print_info "Checking for existing IMS regions..."
 if zconfig ls 2>/dev/null | grep -q "ims://${IMS_DATASTORE}"; then
-    print_info "${CYAN}[ZCONFIG-IMS]${NC} Found existing IMS region ims://${IMS_DATASTORE}, removing..."
+    print_info "Found existing IMS region ims://${IMS_DATASTORE}, removing..."
 else
-    print_info "${CYAN}[ZCONFIG-IMS]${NC} No existing IMS region found in zconfig, attempting cleanup anyway..."
+    print_info "No existing IMS region found in zconfig, attempting cleanup anyway..."
 fi
 
 # Always attempt to remove the IMS region to clean up any leftover datasets
@@ -81,16 +85,15 @@ print_stage "STAGE 1: Create IMS instance with zconfig"
 cd "$SCRIPTS_DIR/../zconfig"
 
 # Set IMS user to current user
-IMS_USER=$(printf '%s' "${USER:-${LOGNAME}}" | tr '[:lower:]' '[:upper:]')
+IMS_USER=$(printf '%s' "${IMS_USER}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
+print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
 zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \
               -e ims_sys_hlq="${IMS_SYS_HLQ}" -e db2_hlq="${DB2_HLQ}" \
               -e db2_ssid="${DB2_SSID}"  ims-region.yaml -v
-
 RC=$?
 if [ "$RC" -eq 0 ]; then
     print_success "ZConfig IMS region creation completed successfully!"
@@ -107,11 +110,11 @@ deactivate
 # =========================
 print_stage "STAGE 2: Verify IMS region"
 
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Waiting for IMS regions to start..."
+print_info "Waiting for IMS regions to start..."
 sleep 15
 
 # Check if IMS Control Region is running
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking IMS Control Region status..."
+print_info "Checking IMS Control Region status..."
 if opercmd "D A,${IMS_DATASTORE}" 2>/dev/null | grep -q "${IMS_DATASTORE}"; then
     print_success "IMS Control Region (${IMS_DATASTORE}) is running"
 else
@@ -119,7 +122,7 @@ else
 fi
 
 # Check if IMS Connect is running
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking IMS Connect status..."
+print_info "Checking IMS Connect status..."
 IMS_HWS_JOB="${IMS_DATASTORE}HWS"
 if opercmd "D A,${IMS_HWS_JOB}" 2>/dev/null | grep -q "${IMS_HWS_JOB}"; then
     print_success "IMS Connect (${IMS_HWS_JOB}) is running"
@@ -128,7 +131,7 @@ else
 fi
 
 # Check if port is listening
-print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking if IMS Connect port ${IMS_PORT} is listening..."
+print_info "Checking if IMS Connect port ${IMS_PORT} is listening..."
 if netstat -a 2>/dev/null | grep -q ":${IMS_PORT}.*LISTEN"; then
     print_success "IMS Connect is listening on port ${IMS_PORT}"
 else

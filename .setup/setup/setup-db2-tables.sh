@@ -15,6 +15,12 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[SETUP-DB2-TABLES]${NC} %s\n" "${line}"
+done) 2>&1
+
 # =========================
 # Environment
 # =========================
@@ -24,9 +30,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Create DB2 tables
 # =========================
-rm -f "/tmp/IMS-Db2-*"
-rm -f "/tmp/IMS-Db2-*"
-rm -f "/tmp/Db2-*"
+rm -f /tmp/IMS-Db2-*
+rm -f /tmp/CICS-Db2-*
+rm -f /tmp/Db2-*
 
 # CICS
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
@@ -44,4 +50,8 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-create.j2"  --outputFile "/tmp/IMS-Db2-create-$$.jcl"
 run_job_and_wait  "/tmp/IMS-Db2-create-$$.jcl"
 
-exit $?
+rm -f /tmp/IMS-Db2-*
+rm -f /tmp/CICS-Db2-*
+rm -f /tmp/Db2-*
+
+exit 0

@@ -11,7 +11,7 @@ Bank of Z is a self-contained sample hybrid banking application that demonstrate
 
 The application integrates technologies including CICS, IMS Transaction Manager (IMS TM), IMS DB, Db2 for z/OS, z/OS Connect, and IBM MQ, providing a realistic environment for learning, testing, and workflow validation.
 
-## Installation workflow
+## Installation Workflow
 
 The Bank of Z installation process consists of the following stages:
 

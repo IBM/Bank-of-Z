@@ -7,11 +7,11 @@ title: Commands Reference
 
 This section provides a quick reference for commonly used commands when setting up, configuring, and developing Bank of Z.
 
-## Zowe CLI commands
+## Zowe CLI Commands
 
 Use Zowe CLI to connect to z/OS systems and support the Zowe CLI workflow.
 
-### Verify installation
+### Verify Installation
 
 ```bash
 zowe --version
@@ -19,7 +19,7 @@ zowe --version
 
 Displays the installed Zowe CLI version.
 
-### Install the RSE API plug-in
+### Install the RSE API Plugin
 
 ```bash
 zowe plugins install @zowe/rse-api-for-zowe-cli
@@ -27,7 +27,7 @@ zowe plugins install @zowe/rse-api-for-zowe-cli
 
 Installs the RSE API plugin required by the Bank of Z setup workflow.
 
-### Create a z/OSMF profile
+### Create a z/OSMF Profile
 
 ```bash
 zowe profiles create zosmf-profile myprofile \
@@ -38,7 +38,7 @@ zowe profiles create zosmf-profile myprofile \
 
 Creates a z/OSMF connection profile.
 
-### Verify connectivity
+### Verify Connectivity
 
 ```bash
 zowe zosmf check status
@@ -46,7 +46,7 @@ zowe zosmf check status
 
 Verifies connectivity to the configured z/OSMF instance.
 
-### List available profiles
+### List Available Profiles
 
 ```bash
 zowe profiles list zosmf
@@ -54,7 +54,7 @@ zowe profiles list zosmf
 
 Displays configured z/OSMF profiles.
 
-### Set a default profile
+### Set a Default Profile
 
 ```bash
 zowe profiles set-default zosmf myprofile
@@ -62,11 +62,11 @@ zowe profiles set-default zosmf myprofile
 
 Sets the default z/OSMF profile.
 
-## Git commands
+## Git Commands
 
 Use Git to manage source code changes and collaborate with other contributors.
 
-### Clone a repository
+### Clone a Repository
 
 ```bash
 git clone <repository-url>
@@ -74,7 +74,7 @@ git clone <repository-url>
 
 Creates a local copy of a repository.
 
-### Create a branch
+### Create a Branch
 
 ```bash
 git checkout -b feature/my-change
@@ -82,7 +82,7 @@ git checkout -b feature/my-change
 
 Creates and switches to a new branch.
 
-### View status
+### View Status
 
 ```bash
 git status
@@ -90,7 +90,7 @@ git status
 
 Displays modified, staged, and untracked files.
 
-### Commit changes
+### Commit Changes
 
 ```bash
 git add .
@@ -99,7 +99,7 @@ git commit -m "Describe your change"
 
 Stages and commits local changes.
 
-### Push changes
+### Push Changes
 
 ```bash
 git push origin <branch-name>
@@ -107,7 +107,7 @@ git push origin <branch-name>
 
 Pushes committed changes to the remote repository.
 
-## Setup verification commands
+## Setup Verification Commands
 
 Use these commands to verify that required tools are installed and available.
 
@@ -143,11 +143,11 @@ java -version
 
 Displays the installed Java version.
 
-## USS Verification commands
+## USS Verification Commands
 
 Use these commands when validating the z/OS USS environment.
 
-### Verify git availability
+### Verify Git Availability
 
 ```bash
 which git
@@ -156,7 +156,7 @@ git --version
 
 Verifies that Git is installed and available in the USS environment.
 
-### Verify DBB installation
+### Verify DBB Installation
 
 ```bash
 ls $DBB_HOME/lib
@@ -164,7 +164,7 @@ ls $DBB_HOME/lib
 
 Verifies that the DBB installation path is accessible.
 
-### Verify Java configuration
+### Verify Java Configuration
 
 ```bash
 $JAVA_HOME/bin/java -version
@@ -172,7 +172,7 @@ $JAVA_HOME/bin/java -version
 
 Verifies that the configured Java runtime is available.
 
-## Workflow scripts
+## Workflow Scripts
 
 The following scripts are used by the Bank of Z automation workflows.
 
@@ -183,7 +183,7 @@ The following scripts are used by the Bank of Z automation workflows.
 | pipeline-local.sh | Initiates build and deployment processing |
 | pipeline-remote.sh | Runs build and deployment activities on z/OS USS |
 
-## Zowe CLI workflow commands
+## Zowe CLI Workflow Commands
 
 The Zowe CLI workflow is completed through a VS Code task or by running `setup-local.sh` directly.
 
@@ -195,7 +195,7 @@ Run the **Setup Bank of Z Environment** task from the Command Palette:
 
 For detailed workflow instructions, see [Zowe CLI Workflow](../development-workflows/zowe-cli-workflow.md).
 
-## GRUB workflow commands
+## GRUB Workflow Commands
 
 The GRUB workflow synchronizes local changes to USS and runs the Bank of Z setup process.
 

@@ -21,19 +21,25 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[SETUP-IMS-TABLES]${NC} %s\n" "${line}"
+done) 2>&1
+
 # =========================
 # Delele IMS tables
 # =========================
 set +e
-drm "BANKZ.${IMS_DATASTORE}.ACCOUNT.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.ACCTYPE.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.CUSTACCS.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/${IMS_DATASTORE}
-drm "BANKZ.${IMS_DATASTORE}.CUSTTYPE.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.HISTORY.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TSTAT.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TSTATTYP.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.ACCOUNT.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.ACCTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTACCS.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/${IMS_DATASTORE}
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.HISTORY.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TSTAT.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TSTATTYP.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TTYPE.DB" 2>/dev/null
 set -e
 
 # =========================

@@ -7,7 +7,7 @@ set -e
 # Runs on the remote z/OS USS system after the workspace has been cloned.
 # - Creates z/OS Connect server instance
 # - Configures RACF STARTED profile
-# - Generates server JCL proc in SYS1.PROCLIB
+# - Generates server JCL proc in ${ZOSCONNECT_SYS_PROCLIB}
 #
 # NOTE: Deployment of WAR files and configuration is handled by Wazi Deploy
 # =============================================================================
@@ -17,6 +17,12 @@ set -e
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
+
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[ZOSCONNECT]${NC} %s\n" "${line}"
+done) 2>&1
 
 # =========================
 # Environment
@@ -31,14 +37,17 @@ export WLP_USER_DIR="${SANDBOX_DIR}/zosconnect-server"
 # Create z/OS Connect server
 # =========================
 print_stage "Create z/OS Connect Server"
-print_info "${CYAN}[ZOSCONNECT]${NC} Creating z/OS Connect server at: $WLP_USER_DIR"
+print_info "Creating z/OS Connect server at: $WLP_USER_DIR"
 
 if [ -d "$WLP_USER_DIR" ]; then
     print_warning "Removing existing server at $WLP_USER_DIR"
+    chown -R ${ZOS_CURRENT_USER} "$WLP_USER_DIR" 2>/dev/null || true
     rm -rf "$WLP_USER_DIR"
+
 fi
 
-"${ZOSCONNECT_HOME}/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
+export SERVER_NAME="${APP_BASE_NAME_LOWER}Server" 
+"${ZOSCONNECT_HOME}/bin/zosconnect" create "${APP_BASE_NAME_LOWER}Server" --template=zosconnect:openApi3
 
 RC=$?
 if [ $RC -eq 0 ]; then
@@ -49,34 +58,51 @@ else
 fi
 
 # =========================
+# Cleanup
+# =========================
+if [ -d "$WLP_USER_DIR" ]; then
+    print_warning "Removing existing server at $WLP_USER_DIR"
+fi
+
+set +e
+opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null
+jcan P "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
+sleep 5
+mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
+set -e
+
+print_info "Generating JCL proc..."
+
+# =========================
 # Configure RACF STARTED profile
 # =========================
-print_info "${CYAN}[ZOSCONNECT]${NC} Configuring RACF STARTED profile..."
+print_info "Configuring RACF STARTED profile..."
 set +e
-opercmd "C BAQ${APP_BASE_NAME}" 2>/dev/null &
+opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null &
 sleep 5
-print_info "${CYAN}[ZOSCONNECT]${NC} Defining RACF STARTED class..."
-tsocmd "RDEFINE STARTED BAQ${APP_BASE_NAME}.* STDATA(USER(${ZOS_USER}) TRUSTED(YES))" 2>/dev/null
-print_info "${CYAN}[ZOSCONNECT]${NC} Refreshing RACF..."
+print_info "Defining RACF STARTED class..."
+tsocmd "RDEFINE STARTED BAQ${APP_SHORT_NAME}.* STDATA(USER(${ZOSCONNECT_TASK_USER}) TRUSTED(YES))" 2>/dev/null
+print_info "Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-print_info "${CYAN}[ZOSCONNECT]${NC} Removing old PROCLIB member..."
-mrm "SYS1.PROCLIB(BAQ${APP_BASE_NAME})" 2>/dev/null || true
+print_info "Removing old PROCLIB member..."
+mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
-print_info "${CYAN}[ZOSCONNECT]${NC} Generating JCL proc..."
+print_info "Generating JCL proc..."
 
 # =========================
 # Generate server JCL proc
 # =========================
 # Create JCL with each line padded to exactly 80 characters for FB80 dataset
-cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
-//BAQBANKZ  PROC PARMS='bankzServer --clean'
+rm -f "/tmp/BAQ${APP_SHORT_NAME}.jcl" 
+cat > "/tmp/BAQ${APP_SHORT_NAME}.jcl" << EOF
+//BAQ${APP_SHORT_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
 //*
 //* z/OS Connect Enterprise Edition 3.0.0
 //* Start the Liberty server
 //*
-// SET ZCONHOME='/usr/lpp/IBM/zosconnect'
+// SET ZCONHOME='${ZOSCONNECT_HOME}'
 //*
-//BAQBANKZ     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
+//BAQ${APP_SHORT_NAME}     EXEC PGM=BPXBATSL,REGION=0M,MEMLIMIT=4G,
 //    TIME=NOLIMIT,
 //    PARM='PGM &ZCONHOME./bin/zosconnect run &PARMS.'
 //STDOUT   DD   SYSOUT=*
@@ -84,7 +110,7 @@ cat > "/tmp/BAQ${APP_BASE_NAME}.jcl" << EOF
 //STDIN    DD   DUMMY
 //STDENV   DD   *
 _BPX_SHAREAS=YES
-JAVA_HOME=/usr/lpp/java/java21/current_64
+JAVA_HOME=${JAVA_HOME}
 WLP_USER_DIR=${SANDBOX_DIR}/zosconnect-server
 JVM_OPTIONS=-Xmx2048M
 //*
@@ -93,14 +119,14 @@ JVM_OPTIONS=-Xmx2048M
 EOF
 
 # Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_BASE_NAME}.jcl"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_SHORT_NAME}.jcl"
 
 # Copy to PROCLIB using dcp
-print_info "${CYAN}[ZOSCONNECT]${NC} Copying JCL to SYS1.PROCLIB..."
-dcp "/tmp/BAQ${APP_BASE_NAME}.jcl" "SYS1.PROCLIB(BAQ${APP_BASE_NAME})"
+print_info "Copying JCL to ${ZOSCONNECT_SYS_PROCLIB}..."
+dcp "/tmp/BAQ${APP_SHORT_NAME}.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})"
 
 # Clean up temp files
-rm -f "/tmp/BAQ${APP_BASE_NAME}.jcl"
+rm -f "/tmp/BAQ${APP_SHORT_NAME}.jcl"
 
 # =========================
 # Generate CICS connection config
@@ -159,11 +185,45 @@ EOF
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \
-   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp && mv /tmp/server.xml.tmp \
+   ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml > /tmp/server.xml.tmp
+cat /tmp/server.xml.tmp | sed "s/9080/${ZOSCONNECT_HTTP_PORT}/" | sed "s/9443/${ZOSCONNECT_HTTPS_PORT}/" > \
    ${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/server.xml
+rm -f /tmp/server.xml.tmp
 
-opercmd "S BAQ${APP_BASE_NAME}" 2>/dev/null &
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "proclib=${ZOSCONNECT_SYS_PROCLIB}" --extraVar "task_name=BAQ${APP_SHORT_NAME}" \
+    --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
+    --outputFile "/tmp/BAQ${APP_SHORT_NAME}J.jcl"
+dcp "/tmp/BAQ${APP_SHORT_NAME}J.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"
+
+if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+    opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null
+else
+    jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null
+fi
+
 sleep 5
 print_success "z/OS Connect server setup completed"
+print_info ""
+print_info "z/OS Connect Server Details:"
+print_info "  Server Name: ${SERVER_NAME}"
+print_info "  Server Directory: ${WLP_USER_DIR}/servers/${SERVER_NAME}"
+print_info "  HTTP Port: ${ZOSCONNECT_HTTP_PORT}"
+print_info "  HTTPS Port: ${ZOSCONNECT_HTTPS_PORT}"
+print_info "  Started Task: BAQ${APP_SHORT_NAME}"
+print_info "  PROCLIB Member: ${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})"
+print_info ""
+print_info "To access the server:"
+print_info "  http://localhost:${ZOSCONNECT_HTTP_PORT}/"
+print_info ""
+print_info "To manage the server:"
+if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+    print_info "  Start:  opercmd 'S BAQ${APP_SHORT_NAME}'"
+    print_info "  Stop:   opercmd 'C BAQ${APP_SHORT_NAME}'"
+else
+    print_info "  Start:  jsub '${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)'"
+    print_info "  Stop:   jcan P 'BAQ${APP_SHORT_NAME}'"
+fi
+print_info ""
 
 # Made with Bob

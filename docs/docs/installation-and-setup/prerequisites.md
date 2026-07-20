@@ -9,7 +9,7 @@ Before deploying Bank of Z, ensure that your z/OS environment meets the requirem
 
 For local workstation requirements — IDE, Zowe CLI, and GRUB — see [Local Tools Setup](local-tools/index.html). The tools you need depend on your chosen deployment workflow.
 
-## Supported desktop platforms
+## Supported Desktop Platforms
 
 Bank of Z supports development from the following desktop environments:
 
@@ -22,7 +22,7 @@ Bank of Z supports development from the following desktop environments:
 
 If you are using IBM Premium Bob for Z (Bob IDE), ensure that your workstation meets the supported operating system and system requirements documented in the [IBM Premium Bob for Z](https://bob.ibm.com/docs/ide) documentation.
 
-## z/OS platform requirements
+## z/OS Platform Requirements
 
 The target z/OS environment must include the following platform components. Contact your system administrator if any of these are not available.
 
@@ -38,7 +38,7 @@ The target z/OS environment must include the following platform components. Cont
 
 **Note:** A pre-existing Db2 subsystem with subsystem ID `DBD1` is required. The setup scripts create the required Db2 database objects within this subsystem but do not create the subsystem itself. IMS, CICS, and z/OS Connect runtime instances are provisioned automatically during deployment.
 
-## z/OS duild and deploy tooling
+## z/OS Build and Deploy Tooling
 
 The following tools must be installed on z/OS USS. These are typically installed and maintained by a system administrator. The paths to each tool are configured in `.setup/config/config.yaml`.
 
@@ -48,7 +48,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | IBM Python SDK | 3.14 | `python.python_home` |
 | IBM Dependency Based Build (DBB) | 3.0.5 | `dbb.dbb_home` |
 | Z Open Automation Utilities (ZOAU) | 1.4.1.0 | `zoau.zoau_home` |
-| z/OS Middleware Configuration Tool (zconfig) | 0.6.0 | `zconfig.zconfig_home` |
+| zconfig | 0.6.0 | `zconfig.zconfig_home` |
 | Wazi Deploy | 3.0.7.3 | `wazideploy.wazideploy_home` |
 | ZCodeScan | 1.0.2 | `zcodescan.zcodescan_home` |
 | Ansible | 2.15 | — |
@@ -57,7 +57,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 
 **Note:** Bank of Z uses zconfig to provision and configure CICS resources, IMS resources, and the z/OS Connect runtime during the environment setup phase.
 
-### USS access requirements
+### USS Access Requirements
 
 | Requirement | Details |
 |-------------|---------|
@@ -65,7 +65,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | Git available in PATH | Required for the setup scripts to clone the DBB accelerators repository from GitHub |
 | Network connectivity to github.com | The `environment` phase clones `https://github.com/IBM/dbb.git` from USS |
 
-## Access and security requirements
+## Access and Security Requirements
 
 Ensure that you have the following access before proceeding:
 
@@ -81,7 +81,7 @@ Appropriate security definitions must also be configured in RACF or an equivalen
 
 > **Note:** Access to z/OS environments, middleware, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding.
 
-## Verify prerequisites
+## Verify Prerequisites
 
 After your system administrator has confirmed the above are in place, run the prerequisite validation from USS to confirm the build and deploy tooling is correctly installed:
 
@@ -91,6 +91,6 @@ After your system administrator has confirmed the above are in place, run the pr
 
 This checks versions of DBB, ZOAU, zconfig, and Wazi Deploy, and verifies Git availability and network connectivity to GitHub. For a full description of each check, see [Deploy Using Direct USS Access](deploy-direct.html).
 
-## Next steps
+## Next Step
 
 Continue to [Environment Configuration](environment-configuration.md) to configure the application settings before deployment.

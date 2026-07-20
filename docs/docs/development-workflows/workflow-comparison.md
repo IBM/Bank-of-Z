@@ -9,7 +9,7 @@ Bank of Z supports two development workflows: the **Zowe CLI workflow** and the 
 
 Use the following comparison to determine which workflow best fits your development needs.
 
-## Workflow comparison
+## Workflow Comparison
 
 | Feature | Zowe CLI Workflow | GRUB Workflow |
 |----------|-----------------|---------------|
@@ -23,16 +23,16 @@ Use the following comparison to determine which workflow best fits your developm
 | Setup execution | Initiated through a VS Code task or `setup-local.sh` | Initiated automatically after synchronization |
 | Best suited for | Feature development, team collaboration, and environments where SSH access is restricted | Fast testing, frequent code changes, and rapid development cycles |
 
-## Choosing a workflow
+## Choosing a Workflow
 
-### Use the Zowe CLI workflow when
+### Use the Zowe CLI Workflow When
 
 - You work in a branch-based development model
 - Changes should be committed and tracked through Git
 - You want to use Zowe CLI and VS Code integration
 - SSH access to z/OS USS is limited or unavailable
 
-### Use the GRUB workflow when
+### Use the GRUB Workflow When
 
 - You need to test changes quickly without committing them
 - You want rapid feedback during development

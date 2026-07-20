@@ -7,9 +7,9 @@ title: Verification
 
 This section describes how to verify that the Bank of Z environment is successfully installed and configured.
 
-After completing the deployment, verify that the required platform components, application resources, and services are available and functioning correctly.
+After completing the build and deployment process, validate that the required platform components, application resources, and services are available and functioning as expected.
 
-## Verification checklist
+## Verification Checklist
 
 Verify the following components before proceeding with development activities:
 
@@ -20,7 +20,7 @@ Verify the following components before proceeding with development activities:
 - Runtime resources are active
 - Bank of Z services and APIs are operational
 
-## Verify development environment
+## Verify Development Environment
 
 Confirm that the required development tools are installed and accessible.
 
@@ -30,7 +30,7 @@ Confirm that the required development tools are installed and accessible.
 java --version
 ```
 
-### Verify git
+### Verify Git
 
 ```bash
 git --version
@@ -42,7 +42,7 @@ git --version
 zowe --version
 ```
 
-### Verify connectivity
+### Verify Connectivity
 
 ```bash
 zowe zosmf check status
@@ -50,11 +50,11 @@ zowe zosmf check status
 
 A successful response confirms that the workstation can communicate with the target z/OS environment.
 
-## Verify target environment
+## Verify Target Environment
 
 Confirm that the required IBM Z platform components are available.
 
-Verify that the following platform components are available:
+Verify access to:
 
 - z/OS 3.1 or later
 - CICS
@@ -66,11 +66,11 @@ Verify that the following platform components are available:
 
 If any required subsystem is unavailable, contact your system administrator before proceeding.
 
-## Verify application deployment
+## Verify Application Deployment
 
 Confirm that Bank of Z application resources have been deployed successfully.
 
-Verify that the following application resources have been deployed successfully:
+Depending on the deployment scenario, verify that:
 
 - Application load modules are available
 - Db2 tables and plans have been created
@@ -79,7 +79,7 @@ Verify that the following application resources have been deployed successfully:
 - z/OS Connect API artifacts have been deployed
 - Required configuration resources are available
 
-## Verify application access
+## Verify Application Access
 
 Confirm that the application can process requests successfully.
 
@@ -93,7 +93,7 @@ Typical validation activities include:
 
 Successful run confirms that the deployed components are communicating correctly.
 
-## Verification results
+## Verification Results
 
 A successful installation should provide:
 
@@ -104,6 +104,6 @@ A successful installation should provide:
 - Operational APIs and services
 - A functioning Bank of Z application environment
 
-## Next steps
+## Next Step
 
 After verification is complete, continue to the [Tutorials](../tutorials/) section to learn how to build, deploy, and enhance Bank of Z application components.

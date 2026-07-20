@@ -13,7 +13,7 @@ set -e  # Exit on error
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh"
-
+chmod +x $(find . -name "*.sh" -type f) 2>/dev/null || true
 
 #########################################################
 # STAGE: Execute Pipeline on Remote
@@ -33,23 +33,29 @@ stage_execute_pipeline() {
     
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
         cd $SCRIPTS_DIR
-        git reset --hard
         git pull
     fi
     
     # Execute the pipeline script on remote
     set -o pipefail
-    
-    chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
-    bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
-    PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        bash ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+        PID=$!
+        # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+        wait "$PID"
+        RC=$?
+    else
+        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy
+        RC=$?
+    fi
+    if [[ $RC -eq 0 ]]; then
         print_success "Remote pipeline completed successfully"
     else
         print_error "Failed to execute pipeline on remote system"
         exit 1
     fi
+
+
 }
 
 #########################################################

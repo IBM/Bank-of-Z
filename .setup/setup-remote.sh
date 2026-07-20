@@ -18,7 +18,7 @@ set -e  # Exit on error
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/config/setenv.sh" "$@"
-
+chmod +x $(find . -name "*.sh" -type f) 2>/dev/null || true
 
 #########################################################
 # STAGE: Execute Common Setup Phases
@@ -36,31 +36,53 @@ stage_execute_common_setup() {
     
     # Execute each phase of setup-common.sh
     print_info "Running: setup-common.sh"
-    
-    ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR" &
-    PID=$!
-    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR" &
+        PID=$!
+        # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+        wait "$PID"
+        RC=$?
+    else
+        ${SCRIPTS_DIR}/setup-common.sh validate-prereqs "$BANK_OF_Z_WORK_DIR"
+        RC=$?
+    fi
+    if [[ $RC -eq 0 ]]; then
         print_success "validate-prereqs completed successfully"
     else
         print_error "Failed to execute validate-prereqs"
         exit 1
     fi
     
-    ${SCRIPTS_DIR}/setup-common.sh environment "$BANK_OF_Z_WORK_DIR" &
-    PID=$!
-    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        ${SCRIPTS_DIR}/setup-common.sh environment "$BANK_OF_Z_WORK_DIR" &
+        PID=$!
+        # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+        wait "$PID"
+        RC=$?
+    else
+       ${SCRIPTS_DIR}/setup-common.sh environment "$BANK_OF_Z_WORK_DIR"
+        RC=$?
+    fi
+    if [[ $RC -eq 0 ]]; then
         print_success "environment completed successfully"
     else
         print_error "Failed to execute environment"
         exit 1
     fi
     
-    ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z "$BANK_OF_Z_WORK_DIR" &
-    PID=$!
-    # Wait for phase to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if [[ "$EXECUTION_MODE" != "grub" ]]; then
+        ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z "$BANK_OF_Z_WORK_DIR" &
+        PID=$!
+        # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
+        wait "$PID"
+        RC=$?
+    else
+        ${SCRIPTS_DIR}/setup-common.sh install-bank-of-z "$BANK_OF_Z_WORK_DIR"
+        RC=$?
+    fi
+    
+    if [[ $RC -eq 0 ]]; then
         print_success "install-bank-of-z completed successfully"
     else
         print_error "Failed to execute install-bank-of-z"
@@ -85,12 +107,18 @@ main() {
     # Load configuration
     load_config
     
+    # Detect Execution Mode
+    detect_bank_of_z_location
+    
     # Execute stages
     stage_execute_common_setup
     
     # Summary
     print_stage "ORCHESTRATION COMPLETE"
     print_success "Remote environment setup completed successfully!"
+    
+    # Purge all ended jobs
+    opercmd '$POJQ,JM=*' 2>&1 > /dev/null || true
     
     echo ""
     echo "Next steps:"

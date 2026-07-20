@@ -19,7 +19,7 @@ excludes_artifacts:
 
 # variables that can be overridden via extra vars
 application: "{{ application if application is defined else '' }}"
-hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else 'BANKZ.V0R1M0' }}"
+hlq: "{{ extra_vars.hlq if extra_vars.hlq is defined else app.app_hlq }}"
 uss_root: "{{ extra_vars.uss_root if extra_vars.uss_root is defined else '/tmp/wazi-deploy/int' }}"
 deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home is defined else '/var/wazi-deploy-config-sample' }}"
 
@@ -29,7 +29,7 @@ deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home i
 #################################################################################
 
 # CICS
-default_cics_user: "IBMUSER"
+default_cics_user: "{{ cics.user }}"
 default_cics_password: ""
 default_cics_context: "CICSBOZ"
 default_cmci_host: "127.0.0.1"
@@ -47,7 +47,7 @@ default_cmci_key: ""
 default_db2_sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
 default_pkg_jobcard: "BINDPKG JOB 'WD-PKGBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
 default_plan_jobcard: "BINDPLA JOB 'WD-PLANBIND',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
-default_db2_sqlid: "IBMUSER"
+default_db2_sqlid: "{{ db2.sqlid }}"
 default_db2_package: "{{ db2.package }}"
 default_db2_plan: "{{ db2.plan }}"
 default_db2_qualifier: "BANKZ"
@@ -59,16 +59,16 @@ db2_bind_plan_template: "db2_bind_plan.jcl.j2"
 
 # z/OS Connect
 zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
-zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQBANKZ' }}"
+zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQ' + app.short_name }}"
 cics_host: "{{ extra_vars.cics_host if extra_vars.cics_host is defined else 'localhost' }}"
 cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '2006' }}"
-cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else 'IBMUSER' }}"
+cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else default_cics_user }}"
 cics_password: "{{ extra_vars.cics_password if extra_vars.cics_password is defined else '' }}" #pragma: allowlist secret
 
 # Frontend Liberty Server (separate from z/OS Connect)
 frontend_root: "{{ extra_vars.frontend_root if extra_vars.frontend_root is defined else sandbox_path + '/frontend' }}"
-frontend_server_name: "{{ extra_vars.frontend_server_name if extra_vars.frontend_server_name is defined else 'bankz-frontend' }}"
-frontend_job_name: "{{ extra_vars.frontend_job_name if extra_vars.frontend_job_name is defined else 'FEBANKZ' }}"
+frontend_server_name: "{{ extra_vars.frontend_server_name if extra_vars.frontend_server_name is defined else (app.base_name | lower) ~ '-frontend' }}"
+frontend_job_name: "{{ extra_vars.frontend_job_name if extra_vars.frontend_job_name is defined else 'FE' + app.short_name }}"
 frontend_http_port: "{{ extra_vars.frontend_http_port if extra_vars.frontend_http_port is defined else '9081' }}"
 
 template_name_zosconnect_config:
@@ -76,7 +76,6 @@ template_name_zosconnect_config:
   dest: '{{zos_connect_root}}/configDropins/overrides/{{api_name}}.xml'
   mode: 0755
   delegate: false
-
 
 # System commands for z/OS Connect server management
 system_command_start_server:
@@ -97,18 +96,11 @@ system_command_refresh_apps:
   wait_time_s: 3
   wait: true
 
-# System commands for Frontend Liberty server management
-system_command_start_frontend:
-  cmd: 'S {{frontend_job_name}}'
-  verbose: false
-  wait_time_s: 5
-  wait: true
-
-system_command_stop_frontend:
-  cmd: 'C {{frontend_job_name}}'
-  verbose: false
+system_command_refresh_fronted:
+  cmd: 'MODIFY {{frontend_job_name}},REFRESH,APPS'
+  verbose: true
   wait_time_s: 3
-  wait: true
+
 
 # load shared configuration
 include_global_config:
@@ -123,7 +115,7 @@ default_ims_host: "127.0.0.1"
 default_ims_port: 9977
 default_ims_user: "deb"
 default_ims_password: ""
-default_ims_hlq: "BANKZ" 
+default_ims_hlq: "{{ app.app_hlq }}"
 default_ims_datastore: "{{ ims.datastore }}"
 default_steplib_hlq: "{{ ims.ims_sys_hlq }}"
 default_ims_plex: "{{ ims.dfs_imsplex }}"
@@ -139,7 +131,7 @@ ims_steplib_hlq: "{{ extra_vars.ims_steplib_hlq if extra_vars.ims_steplib_hlq is
 ims_plex: "{{ extra_vars.ims_plex if extra_vars.ims_plex is defined else default_ims_plex}}"
 ims_route: "{{ extra_vars.ims_route if extra_vars.ims_route is defined else default_ims_route}}"
 
-# Sandbox path — used by types_pattern_mapping.yml to locate the IMS JAR deployment directory
+# Sandbox path - used by types_pattern_mapping.yml to locate the IMS JAR deployment directory
 sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined else '/usr/local/sandboxes/bank-of-z' }}"
 
 # Variables for ims_acb_gen building block
@@ -183,14 +175,40 @@ ims_catalog_populate_default:
           save_acb: UNCOND
           clean_staging_dataset: true
 
-# Variables for ims_update_maclib building block
+# Variables for ims_olcutl building block
+ims_olcutl_job:
+  jobcard: "OLCUTL  JOB 'WD-OLCUTL',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
+  max_rc: 4
+  joblib: "{{ ims_hlq }}.{{ ims_datastore }}.PROCLIB"
+     
+ims_olcutl_cat:
+  procname: "OLCUTL"
+  lstype:
+   - type: "MODBLKS"
+     params:
+       - "SOUT='*'"
+       - "TYPE=MODBLKS"
+       - "IN=S"
+       - "OUT=U"
+  jobcard: "{{ims_olcutl_job.jobcard}}"
+  joblib: "{{ims_olcutl_job.joblib}}"
+  max_rc: "{{ims_olcutl_job.max_rc}}"
+
+# Variables for ims_catpop jcl building block
+jcl_ims_catpop:
+  src: "{{script_dir}}/../deploy/ims_catpop.jcl.j2"
+  dest: "{{working_folder}}/ims_catpop.jcl"
+  use_template: True
+  max_rc: 4
+
+# Variables for ims_update_maclib jcl building block
 jcl_ims_maclib:
   src: "{{script_dir}}/../deploy/ims_maclib.jcl.j2"
   dest: "{{working_folder}}/ims_maclib.jcl"
   use_template: True
   max_rc: 8
 
-# Variables for ims_ims_spoc building block
+# Variables for ims_ims_spoc jcl building block
 jcl_ims_spoc:
   src: "{{script_dir}}/../deploy/ims_spoc.jcl.j2"
   dest: "{{working_folder}}/ims_spoclib.jcl"

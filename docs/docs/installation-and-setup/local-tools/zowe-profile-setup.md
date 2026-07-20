@@ -5,16 +5,16 @@ title: Zowe Profile Setup
 
 # Zowe Profile Setup
 
-A Zowe profile stores the connection details that IDE extensions, such as Zowe Explorer and IBM Z Open Debug, and Zowe CLI use to communicate with your z/OS system. Configure this once. Both your IDE and the Zowe CLI deployment tooling use the same profile.
+A Zowe profile provides the connection details that IDE extensions (Zowe Explorer, IBM Z Open Debug) and Zowe CLI use to communicate with your z/OS system. Configure this once and it is shared by both your IDE and the Zowe CLI deployment tooling.
 
-## Create the profile
+## Create the Profile
 
 Create `~/.zowe/zowe.config.json` with the following content. Update the fields marked below for your environment:
 
-- `host` — Host name or IP address of your z/OS system.
-- `account` — Your TSO account number.
-- `logonProcedure` — Your TSO logon procedure.
-- `Ports` — Update these values if your environment uses non-default ports.
+- `host` — hostname or IP address of your z/OS system
+- `account` — your TSO account number
+- `logonProcedure` — your TSO logon procedure
+- Ports — update if your environment uses non-default values
 
 ```json
 {
@@ -80,22 +80,22 @@ Create `~/.zowe/zowe.config.json` with the following content. Update the fields 
 }
 ```
 
-For more information about profile types and configuration options, see the [IBM Z Open Editor documentation](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html).
+For further guidance on profile types and configuration options, see the [IBM Z Open Editor documentation](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html).
 
-## Verify connectivity
+## Verify Connectivity
 
-To verify that your profile is correctly configured, try connecting to your z/OS system using the Zowe Explorer view in your IDE, or if installed, by using the Zowe CLI:
+To verify that your profile is correctly configured, try connecting to your z/OS system using the Zowe Explorer view in your IDE, or using the Zowe CLI if it is installed:
 
 ```bash
 zowe zosmf check status
 zowe rse check status
 ```
 
-If the connection fails, verify that the host, ports, and credentials are correct and that the corresponding services are running on z/OS.
+If the connection fails, check that the host, ports, and credentials are correct and that the corresponding services are running on z/OS.
 
-## Next steps
+## Next Step
 
-Choose your deployment workflow and follow the appropriate setup guide:
+Choose your deployment mechanism and follow the appropriate setup guide:
 
 - [Zowe CLI Setup](zowe-cli-setup.html) — deploy using Zowe CLI
 - [GRUB Setup](grub-setup.html) — deploy using GRUB

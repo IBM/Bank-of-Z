@@ -9,7 +9,7 @@ title: Home
         <h1>Bank of Z</h1>
         <p>
             Modern IBM Z development, build, deployment,
-            and modernization practices
+            and modernization practices.
         </p>
     </div>
 </div>
@@ -20,7 +20,8 @@ Welcome to the Bank of Z documentation. Use this guide to explore the applicatio
 The documentation includes installation guidance, development workflows, architecture information, tutorials, reference material, and troubleshooting resources.
 
 ![Sample Online Banking Application](docs/about-bank-of-z/images/architecture-diagram.png)
-## What you can learn
+
+## What You Can Learn
 
 Bank of Z provides guided scenarios that demonstrate common IBM Z development and modernization activities, including:
 
@@ -32,13 +33,13 @@ Bank of Z provides guided scenarios that demonstrate common IBM Z development an
 - Investigate application performance issues
 - Explore hybrid application architectures
 
-## Documentation sections
+## Documentation Sections
 
 <div class="doc-cards">
 
 <a class="doc-card" href="docs/about-bank-of-z/">
 <h3>About Bank of Z</h3>
-<p>Learn about Bank of Z, its purpose, capabilities, architecture overview, and key concepts.</p>
+<p>Learn about Bank of Z, its purpose, capabilities, architecture overview, and key concepts</p>
 </a>
 
 <a class="doc-card" href="docs/installation-and-setup/">
@@ -46,8 +47,8 @@ Bank of Z provides guided scenarios that demonstrate common IBM Z development an
 <p>Install, configure, and verify your development environment.</p>
 </a>
 
-<a class="doc-card" href="docs/tutorials/deploy-bank-of-z.html">
-<h3>Deploy Bank of Z</h3>
+<a class="doc-card" href="docs/installation-and-setup/quick-start.html">
+<h3>Quick Start</h3>
 <p>Begin with a guided walkthrough to install and validate your Bank of Z environment.</p>
 </a>
 
@@ -83,4 +84,4 @@ Bank of Z provides guided scenarios that demonstrate common IBM Z development an
 
 ---
 
-Last updated: {{ 'now' | date: "%B %d, %Y" }}test
+Last updated: {{ 'now' | date: "%B %d, %Y" }}

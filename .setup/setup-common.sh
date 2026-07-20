@@ -328,16 +328,28 @@ stage_populate_ims_database() {
 stage_setup_certificates() {
     print_stage "STAGE: Setup RACF certificates and keyring"
 
+    if [ ! -f "$BANK_DIR/.setup/setup/clearcert.sh" ]; then
+        print_error "Certificate script not found: $BANK_DIR/.setup/setup/clearcert.sh"
+        exit 1
+    fi
+
     if [ ! -f "$BANK_DIR/.setup/setup/addcert.sh" ]; then
         print_error "Certificate script not found: $BANK_DIR/.setup/setup/addcert.sh"
         exit 1
     fi
 
-    print_info "Running Bank of Z certificate setup script..."
-    print_info "Executing: bash $BANK_DIR/.setup/setup/addcert.sh"
     cd "$BANK_DIR"
-
     set -o pipefail
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/clearcert.sh"
+    if bash .setup/setup/clearcert.sh; then
+        print_success "RACF keyring teardown completed"
+    else
+        print_error "Failed to clear existing RACF certificates"
+        exit 1
+    fi
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/addcert.sh"
     if bash .setup/setup/addcert.sh; then
         print_success "RACF keyring and certificates created successfully"
     else

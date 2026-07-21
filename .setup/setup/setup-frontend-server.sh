@@ -116,6 +116,10 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
          keyStoreRef="defaultKeyStore"
          sslProtocol="TLSv1.2,TLSv1.3"
          enabledCiphers="-TLS_RSA_*"/>
+    <!-- For JCERACFKS (SAF keyring) keystores, Liberty requires the password
+         attribute to be present but ignores its value — "password" is the
+         conventional placeholder. The keyring itself is protected by RACF, not
+         by this field. See: https://www.ibm.com/docs/en/was-liberty/zos?topic=SSEQTP_liberty/com.ibm.websphere.liberty.autogen.zos.doc/ae/rwlp_config_keyStore.html -->
     <keyStore id="defaultKeyStore"
               location="safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING}"
               type="JCERACFKS"

@@ -206,7 +206,7 @@ cat > "${TLS_DEST}" << EOF
     <!-- For JCERACFKS (SAF keyring) keystores, Liberty requires the password
          attribute to be present but ignores its value — "password" is the
          conventional placeholder. The keyring itself is protected by RACF, not
-         by this field. See: https://www.ibm.com/docs/en/was-liberty/zos?topic=SSEQTP_liberty/com.ibm.websphere.liberty.autogen.zos.doc/ae/rwlp_config_keyStore.html -->
+         by this field. -->
     <keyStore id="defaultKeyStore"
               location="safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING}"
               type="JCERACFKS"

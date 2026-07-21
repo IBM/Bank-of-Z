@@ -217,7 +217,14 @@ HTTP_EP_DEST="$OVERRIDES_DIR/http-endpoint.xml"
 cat > "${HTTP_EP_DEST}" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
-    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="${HTTPS_PORT}"/>
+    <!-- onError="FAIL" stops the server if the port cannot be opened -->
+    <!-- portOpenRetries="10" helps at IPL when ports may not be immediately available -->
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+                  httpPort="9080"
+                  httpsPort="${HTTPS_PORT}"
+                  onError="FAIL"
+                  portOpenRetries="10"/>
 </server>
 EOF
 verify_file_written "${HTTP_EP_DEST}"

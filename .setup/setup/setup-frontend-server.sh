@@ -87,10 +87,14 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
+    <!-- onError="FAIL" stops the server if the port cannot be opened -->
+    <!-- portOpenRetries="10" helps at IPL when ports may not be immediately available -->
     <httpEndpoint id="defaultHttpEndpoint"
                   httpPort="\${frontend.http.port}"
                   httpsPort="\${frontend.https.port}"
-                  host="*" />
+                  host="*"
+                  onError="FAIL"
+                  portOpenRetries="10" />
 
     <!-- Application Configuration -->
     <webApplication id="bank-frontend"

@@ -1,0 +1,9 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQACCS:
+        required: false
+        nullable: false
+        mappings: []

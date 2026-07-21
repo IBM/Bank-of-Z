@@ -1,0 +1,44 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accounts:
+        required: true
+        nullable: false
+        foreach:
+          input: "$zosAssetResponse.commarea.INQACCS.\"ACCOUNT-DETAILS\""
+          mappings:
+          - accountId:
+              required: true
+              nullable: false
+              template: "{{$item.\"COMM-ACCNO\"}}"
+          - accountType:
+              required: true
+              nullable: false
+              template: "{{$item.\"COMM-ACC-TYPE\" = 'ISA     ' ? 'SAVINGS'\
+                \ : $item.\"COMM-ACC-TYPE\" = 'MORTGAGE' ? 'LOAN' : 'CURRENT'}}"
+          - currency:
+              required: true
+              nullable: false
+              template: "GBP"
+          - accountNumber:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-ACCNO\"}}"
+          - sortCode:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-SCODE\"}}"
+          - status:
+              required: true
+              nullable: false
+              template: "ACTIVE"
+          - customerId:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-CUSTNO\"}}"
+    - totalCount:
+        required: false
+        nullable: false
+        expression: "$count($zosAssetResponse.commarea.INQACCS.\"ACCOUNT-DETAILS\")"

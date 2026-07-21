@@ -247,7 +247,7 @@ cat > "${HTTP_EP_DEST}" << EOF
     <!-- portOpenRetries="10" helps at IPL when ports may not be immediately available -->
     <httpEndpoint id="defaultHttpEndpoint"
                   host="*"
-                  httpPort="9080"
+                  httpPort="${ZOSCONNECT_HTTP_PORT}"
                   httpsPort="${HTTPS_PORT}"
                   onError="FAIL"
                   portOpenRetries="10"/>

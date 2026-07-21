@@ -191,7 +191,24 @@ public class ResignCert {
         new ASN1ObjectIdentifier("1.3.6.1.5.5.7.3.1");
     static final ASN1ObjectIdentifier SHA256_WITH_RSA =
         new ASN1ObjectIdentifier("1.2.840.113549.1.1.11");
-    static final long MAX_VALIDITY_MS = 397L * 24 * 60 * 60 * 1000;
+
+    // CA/Browser Forum maximum validity periods (CAB Forum ballot SC-081):
+    //   Until 2027-03-14 : 200 days (effective 2026-03-15)
+    //   2027-03-15 onward: 100 days
+    //   2029-03-15 onward:  47 days
+    // Update cutoff dates/limits below when the schedule changes.
+    static final long DAYS_200 = 200L * 24 * 60 * 60 * 1000;
+    static final long DAYS_100 = 100L * 24 * 60 * 60 * 1000;
+    static final long DAYS_47  =  47L * 24 * 60 * 60 * 1000;
+    static final LocalDate CUTOFF_100 = LocalDate.of(2027, 3, 15);
+    static final LocalDate CUTOFF_47  = LocalDate.of(2029, 3, 15);
+
+    static long maxValidityMs() {
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        if (!today.isBefore(CUTOFF_47))  return DAYS_47;
+        if (!today.isBefore(CUTOFF_100)) return DAYS_100;
+        return DAYS_200;
+    }
 
     public static void main(String[] args) throws Exception {
         // args: origPem caP12 caPass outDer ip dns notAfter
@@ -226,11 +243,11 @@ public class ResignCert {
         System.out.println("Original subject : " + orig.getSubjectX500Principal());
         System.out.println("Original key algo: " + orig.getPublicKey().getAlgorithm());
 
-        // Validity: 5-min skew tolerance; cap at 397 days (Apple ATS)
+        // Validity: 5-min skew tolerance; cap at CAB Forum limit for today's date
         Date notBefore    = new Date(System.currentTimeMillis() - 5 * 60 * 1000);
         Date requestedEnd = Date.from(
             LocalDate.parse(notAfter).atStartOfDay(ZoneOffset.UTC).toInstant());
-        Date cappedEnd    = new Date(notBefore.getTime() + MAX_VALIDITY_MS);
+        Date cappedEnd    = new Date(notBefore.getTime() + maxValidityMs());
         Date notAfterDate = requestedEnd.before(cappedEnd) ? requestedEnd : cappedEnd;
         System.out.println("Validity: " + notBefore + " -> " + notAfterDate);
 

@@ -133,6 +133,7 @@ CICS_HLQ=${CICS_HLQ:-$(get_section_value 'cics' 'cics_hlq')}
 CICS_USS_DIR=${CICS_USS_DIR:-$(get_section_value 'cics' 'uss_dir')}
 CICS_SEC=${CICS_SEC:-$(get_section_value 'cics' 'cics_sec')}
 CICS_SYS_PROCLIB=$(get_section_value 'cics' 'sys_proclib')
+CICS_HOST=${CICS_HOST:-$(get_section_value 'cics' 'host')}
 
 # IMS
 IMS_DISABLED=${IMS_DISABLED:-$(get_section_value 'ims' 'disabled')}

@@ -29,7 +29,7 @@ if [ -z "${SANDBOX_DIR:-}" ]; then
   export SANDBOX_DIR
 fi
 
-set -e
+set -e  # Exit immediately on any non-zero return code
 
 userid=${ZOS_ADMIN_USER}
 ca_label=${ZOS_CA_LABEL}

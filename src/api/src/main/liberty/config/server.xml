@@ -2,4 +2,19 @@
   <featureManager>
     <feature>zosconnect:zosConnect-3.0</feature>
   </featureManager>
+
+  <!-- HTTP Endpoint Configuration -->
+  <httpEndpoint id="defaultHttpEndpoint"
+                host="*"
+                httpPort="${zosconnect.http.port}"
+                httpsPort="${zosconnect.https.port}" />
+
+  <!-- config requires updateTrigger="mbean" for REFRESH command support -->
+  <config updateTrigger="mbean"/>
+
+  <!-- applicationMonitor requires updateTrigger="mbean" for REFRESH command support -->
+  <applicationMonitor updateTrigger="mbean" dropinsEnabled="false"/>
+  
+  <!-- Automatic expansion of WAR files is required for z/OS Connect native servers -->
+  <applicationManager autoExpand="true" />
 </server>

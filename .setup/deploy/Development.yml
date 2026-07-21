@@ -33,8 +33,8 @@ default_cics_user: "{{ cics.user }}"
 default_cics_password: ""
 default_cics_context: "CICSBOZ"
 default_cmci_host: "127.0.0.1"
-default_cmci_port: 27100
-default_cmci_scheme: "http"
+default_cmci_port: 22500
+default_cmci_scheme: "https"
 default_csd_group: "BANKZGRP"
 default_cics_cmci_action: "NEWCOPY"
 default_env_cics_sdfhload: "{{default_cics_context}}.CICS.SDFHLOAD"

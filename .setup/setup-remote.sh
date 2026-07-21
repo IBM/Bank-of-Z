@@ -13,6 +13,9 @@
 
 set -e  # Exit on error
 
+pip install pyyaml
+pip install jinja2
+
 # =========================
 # Source library scripts
 # =========================

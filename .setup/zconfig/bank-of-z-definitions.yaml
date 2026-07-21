@@ -1093,10 +1093,10 @@ resourceDefinitions:
 
   # DB2CONN Definition
   - db2conn:
-      name: DBD1
+      name: DBC1
       group: BANKZGRP
       connecterror: SQLCODE
-      db2id: DBD1
+      db2id: DBC1
       msgqueue1: CSMT
       plan: BANKZPLN
 

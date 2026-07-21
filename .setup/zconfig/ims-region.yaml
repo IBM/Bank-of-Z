@@ -490,11 +490,11 @@ ims:
     - member_name: DFSJVMEV
       config:
         libpath:
-        - /usr/lpp/java/java21/J21.0_64/lib
-        - /usr/lpp/java/java21/J21.0_64/lib/j9vm
-        - /usr/lpp/java/java21/J21.0_64/lib/default
-        - /usr/lpp/java/java21/J21.0_64/bin/j9vm
-        - /usr/lpp/java/java21/J21.0_64/bin/
+        - /u/ibmuser/tools/J21.0_64/lib
+        - /u/ibmuser/tools/J21.0_64/lib/j9vm
+        - /u/ibmuser/tools/J21.0_64/lib/default
+        - /u/ibmuser/tools/J21.0_64/bin/j9vm
+        - /u/ibmuser/tools/J21.0_64/bin/
         - /usr/lpp/ims/imsjava/lib
         - /usr/lpp/db2d10/jdbc/lib
     - member_name: DFSJVMMS

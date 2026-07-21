@@ -169,15 +169,11 @@ EOF
 cat > "${WLP_USER_DIR}/servers/${APP_BASE_NAME_LOWER}Server/configDropins/overrides/cors.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="CORS configuration for frontend server">
-    <featureManager>
-        <feature>cors-1.0</feature>
-    </featureManager>
-
     <!-- Allow requests from frontend Liberty server on port ${FRONTEND_HTTP_PORT} -->
     <cors domain="/api"
           allowedOrigins="http://localhost:${FRONTEND_HTTP_PORT}, http://127.0.0.1:${FRONTEND_HTTP_PORT}, http://*:${FRONTEND_HTTP_PORT}"
           allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
-          allowedHeaders="*"
+          allowedHeaders="accept, content-type, authorization"
           allowCredentials="true"
           maxAge="3600" />
 </server>

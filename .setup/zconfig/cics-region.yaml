@@ -3,7 +3,7 @@ vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
   region_hlq: "BANKZ"
-  java_home: "/usr/lpp/java/java21/current_64"
+  java_home: "/u/ibmuser/tools/J21.0_64"
   region_uss_dir: "/usr/local/sandboxes/bank-of-z"
   cmci_port: "27100"
   cics_hlq: "CICSTS63"
@@ -41,15 +41,15 @@ cics_region:
     job_parameters:
       region: 0M
     dfhrpl:
-      top_data_sets:
-        - "{{ vars.debug_hlq }}.SEQAMOD"
+      # top_data_sets:
+      #   - "{{ vars.debug_hlq }}.SEQAMOD" # Not yet APF Authed I dont think
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
-        - "{{ vars.tcpip_hlq }}.SEZATCP"
-    dds:
-      - name: DFHTABLE
-        dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
+        # - "{{ vars.tcpip_hlq }}.SEZATCP"
+    # dds:
+    #   - name: DFHTABLE
+    #     dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -61,6 +61,7 @@ cics_region:
     gmtext: SMSS Region provisioned with zconfig
     gmtran: CESL
     sec: "{{ vars.cics_sec }}"
+    keyring: IBMUSER/HSS_KEYRING
     db2conn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
@@ -74,14 +75,14 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
-    pltpi: "SI"
+    # pltpi: "SI"
 
   extensions:
     cics_cmci:
       provider: JVMSERVER
       port: "{{ vars.cmci_port }}"
       authentication: "NO"
-      ssl: "NO"
+      ssl: "YES"
 
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:

@@ -117,6 +117,10 @@ JVMLOG=//DD:JVMLOG
 -Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
 _BPXK_DISABLE_SHLIB=YES
 -Dcom.ibm.tools.attach.enable=no
+-Dcom.ibm.ws.zos.core.angelRequired=true
+-Dcom.ibm.ws.zos.core.angelRequiredServices=SAFCRED,PRODMGR,ZOSAIO
+-Dcom.ibm.ws.zos.core.angelName=CICSTS63
+-Dcom.ibm.ws.zos.core.angelWaitTime=30
 EOF
 
 print_success "JVM profile file created successfully!"
@@ -173,7 +177,7 @@ zconfig apply \
   -e sysid="${APP_SHORT_NAME}" \
   -e region_hlq="${APP_HLQ}" \
   -e region_uss_dir="$SANDBOX_DIR" \
-  -e java_home="/usr/lpp/java/java21/current_64" \
+  -e java_home="${JAVA_HOME}" \
   -e cmci_port="$CICS_CMCI_PORT" \
   -e debug_hlq="$DEBUG_HLQ" \
   -e db2_hlq="${DB2_HLQ}" \

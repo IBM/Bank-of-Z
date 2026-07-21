@@ -121,6 +121,22 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
               type="JCERACFKS"
               password="password"/>
 
+    <!-- Hide Liberty welcome page
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-httpdispatcher -->
+    <httpDispatcher enableWelcomePage="false"/>
+
+    <!-- Disable config polling to avoid idle CPU usage
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-config -->
+    <config updateTrigger="disabled"/>
+
+    <!-- Disable dropins and polling to avoid idle CPU usage
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-applicationmonitor -->
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+
+    <!-- Security hardening: remove X-Powered-By header
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-webcontainer -->
+    <webContainer disableXPoweredBy="true"/>
+
 </server>
 EOF
 

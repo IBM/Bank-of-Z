@@ -60,7 +60,7 @@ global:
   cics_sec: "YES"
 
   # IMS
-  ims_disabled: "false"
+  ims_disabled: "true"
   ims_sys_hlq: "IMSV15"
   ims_java_home: "/usr/lpp/ims/imsjava"
   ims_datastore: "IMS2"

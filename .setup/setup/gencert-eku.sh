@@ -92,9 +92,10 @@ echo "[gencert-eku] Private key stays in RACF keyring throughout."
 # Random passwords via Python
 CA_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
 
-# Race-safe temp dir
+# Race-safe temp dir — chmod after mkdir to guarantee 700 regardless of umask
 TMPDIR=${TMPDIR:-/tmp}/boz-cert-$$
-mkdir -m 700 -p "$TMPDIR"
+mkdir -p "$TMPDIR"
+chmod 700 "$TMPDIR"
 trap 'rm -rf "$TMPDIR"
   tsocmd "DELETE (\047${userid}.BOZ.CAKEY\047)" >/dev/null 2>&1 || true
   tsocmd "DELETE (\047${userid}.BOZ.CERTB64\047)" >/dev/null 2>&1 || true

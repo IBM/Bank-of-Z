@@ -37,7 +37,8 @@ tsocmd "RACDCERT ID($userid) \
 tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
 tsocmd "RACDCERT ID($userid) DELRING($ring)" \
  >/dev/null 2>&1
-tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" \
+# Only DIGTRING changed — DELRING/DELETE do not modify DIGTCERT
+tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH" \
  >/dev/null 2>&1
 
 # Remove RDATALIB profile — expected to fail on a clean system

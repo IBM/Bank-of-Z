@@ -1,0 +1,29 @@
+source_system:
+  hosts:
+    zos:
+      ansible_host: {{ system_info.publicIP }}
+      ansible_port: {{ system_info.ports.p22 }}
+      ansible_user: ibmuser
+      ansible_password: {{ system_info.password }}
+      ansible_connection: ssh
+      ansible_shell_type: sh
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ControlMaster=no -o ControlPath=none"
+
+{% raw %}
+      home_dir: "/u/{{ ansible_user }}"
+      pyz: "{{ home_dir }}/tools/python/usr/lpp/IBM/cyp/v3r14/pyz"
+      zoau: "{{ home_dir }}/tools/zoautil"
+      ansible_python_interpreter: "{{ home_dir }}/tools/python/usr/lpp/IBM/cyp/v3r14/pyz/bin/python"
+
+      environment_vars:
+        _BPXK_AUTOCVT: 'ON'
+        ZOAU_HOME: '{{ zoau }}'
+        LIBPATH: '{{ zoau }}/lib:{{ zoau }}/lib/3.12:{{ pyz }}/lib:/lib:/usr/lib:.'
+        PATH: '{{ zoau }}/bin:{{ pyz }}/bin:/bin:/var/bin'
+        _CEE_RUNOPTS: FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)
+        _TAG_REDIR_ERR: txt
+        _TAG_REDIR_IN: txt
+        _TAG_REDIR_OUT: txt
+        LANG: C
+        TMPDIR: "{{ home_dir }}/tmp"
+{% endraw %}

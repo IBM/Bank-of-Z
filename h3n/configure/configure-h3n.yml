@@ -1,0 +1,125 @@
+---
+- name: Configure h3n instance and additional installs
+  hosts: all
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    home_dir: "/u/{{ ansible_user | lower }}"
+    remote_upload_dir: "{{ home_dir }}/pax"
+    python_version: v3r14
+    python_home: "{{ home_dir }}/tools/python/usr/lpp/IBM/cyp/{{ python_version }}/pyz"
+    zoau_home: "{{ home_dir }}/tools/zoautil"
+
+  tasks:
+    - name: Create tmp directory
+      ansible.builtin.raw: mkdir -p {{ home_dir }}/tmp
+
+    - name: Configure VTAM application list
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.configure_vtmlst
+      vars:
+        vtam_node_id: IBMUSER
+        vtam_applid_pattern: CICS*
+
+    - name: Set box permissions
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.set_permissions
+
+    - name: Install zti 3270 emulator
+      ansible.builtin.shell:
+        cmd: |
+          set -e
+          export PATH={{ pyz }}/bin:$PATH
+          export LIBPATH={{ pyz }}/lib:$LIBPATH
+          {{ pyz }}/bin/pip install tnz
+          {{ pyz }}/bin/pip list
+      register: response
+      changed_when: response.rc == 0
+
+    - name: Setup .bashrc
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.create_bashrc
+      vars:
+        zoau: "{{ zoau_home }}"
+        zopen: "{{ home_dir }}/tools/zopen"
+        java_home: "{{ home_dir }}/tools/J21.0_64"
+        pyz: "{{ python_home }}"
+        go_install_dir: "{{ home_dir }}/go/go"
+        cics_rb_install_dir: "{{ home_dir }}/tools/cics-resource-builder"
+
+    - name: Update the TSO logon panel
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.change_tso_logon_panel
+      vars:
+        enable_default_tso: false
+
+    - name: Mount CICS filesystems and configure CICS security
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_cics
+
+    - name: Configure and start Liberty angel process
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_liberty_angel
+
+    - name: Install zopen tools
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_zopen_tools
+      vars:
+        zopen_install_dir: "{{ home_dir }}/tools/zopen"
+        zopen_etc: "{{ home_dir }}/tools/zopen/etc"
+
+    - name: Install CICS TS Resource Builder
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_resource_builder
+      vars:
+        rb_version: 1.0.6
+        rb_install_dir: "{{ home_dir }}/tools/cics-resource-builder"
+        zopen: "{{ home_dir }}/tools/zopen"
+
+    - name: Install Java
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_java
+      vars:
+        java_version: 21
+        user_dir: /u/ibmuser
+        java: /u/ibmuser/tools/J21.0_64
+
+    - name: Install Gradle
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_gradle
+      vars:
+        gradle_install_dir: "{{ home_dir }}/tools/gradle"
+        java_home: /u/ibmuser/tools/J21.0_64
+        zopen_dir: "{{ home_dir }}/tools/zopen"
+
+    - name: Install ZConfig
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_zconfig
+      vars:
+        zconfig_install_dir: "{{ home_dir }}/tools"
+        github_pat: "{{ lookup('env', 'GITHUB_PAT') }}"
+
+    - name: Install Wazi Deploy
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_wazideploy
+      vars:
+        wazideploy_install_dir: "{{ home_dir }}/tools"
+
+    - name: Install DBB
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_dbb
+      vars:
+        dbb_install_dir: "{{ home_dir }}/tools"
+
+    - name: Check if COBOL is already mounted
+      ansible.builtin.shell:
+        cmd: ls /usr/lpp/IBM/cobol/V6R4M0
+      register: cobol_mount_check
+      ignore_errors: true
+
+    - name: Mount COBOL
+      ansible.builtin.shell:
+        cmd: echo '/usr/sbin/mount -t ZFS -f IGY.V6R4M0.ZFS /usr/lpp/IBM/cobol/V6R4M0' | su
+      become: false
+      when: cobol_mount_check.stdout == ""

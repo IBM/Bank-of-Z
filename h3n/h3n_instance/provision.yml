@@ -1,0 +1,50 @@
+- name: Provision a h3n instance for builds
+  gather_facts: false
+
+  hosts: all
+
+  vars_files:
+    - h3n_vars.yml
+
+  tasks:
+  - name: Get API token
+    ibm.h3n_bootstrap.h3n_authenticate:
+      api_url: '{{ h3n_api_url }}'
+      username: '{{ h3n_user }}'
+      password: '{{ h3n_pass }}'
+    register: authenticated
+
+  - name: Provision system
+    ibm.h3n_bootstrap.h3n_provision_system:
+      token: '{{ authenticated.token }}'
+      note: '{{ h3n_system_name }}'
+      dataCenter: '{{ h3n_datacentre }}'
+      pool: '{{ h3n_pool }}'
+      image: '{{ h3n_image }}'
+      flavor: '{{ h3n_flavour }}'
+      waitForSystem: false
+      waitForZos: false
+    register: system
+
+  - name: Wait for system to be up
+    ibm.h3n_bootstrap.h3n_wait_systemup:
+      systemUuid: "{{ system.systemUuid }}"
+      token: '{{ authenticated.token }}'
+      expireSeconds: 1200
+    register: system_info
+
+  - name: Create h3n bootstrap hosts file
+    ansible.builtin.template:
+      src: files/h3n_host.yaml.j2
+      dest: '../bootstrap/host.yaml'
+
+  - name: Create h3n configure hosts file
+    ansible.builtin.template:
+      src: files/h3n_host_configure.yaml.j2
+      dest: '../configure/host.yaml'
+
+  - name: Start Db2 Subsystem
+    ibm.h3n_bootstrap.h3n_start_zos_subsystem:
+      token: "{{ authenticated.token }}"
+      systemUuid: "{{ system.systemUuid }}"
+      subId: "Db2v12"

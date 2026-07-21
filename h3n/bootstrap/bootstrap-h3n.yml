@@ -1,0 +1,43 @@
+---
+- name: Install Python on z/OS
+  hosts: all
+  gather_facts: false
+
+  vars:
+    home_dir: "/u/{{ ansible_user | lower }}"
+    remote_upload_dir: "{{ home_dir }}/pax"
+    python_install_dir: "{{ home_dir }}/tools/python"
+    zoau_install_dir: "{{ home_dir }}/tools/zoautil"
+
+    zoau_version: 1.4.1.1
+    python_version: v3r14
+
+  tasks:
+    - name: Setup Python 3.14
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_python
+
+    - name: Setup ZOAU
+      ansible.builtin.include_role:
+        name: ibm.h3n_bootstrap.install_zoau
+      vars:
+        python_home: "{{ python_install_dir }}/usr/lpp/IBM/cyp/{{ python_version }}/pyz"
+
+    - name: Create .profile with Python and ZOAU environment
+      ansible.builtin.raw: |
+        cat > {{ home_dir }}/.profile << 'EOF'
+        # Python and ZOAU environment setup
+        export PYTHON_HOME={{ python_install_dir }}/usr/lpp/IBM/cyp/{{ python_version }}/pyz
+        export ZOAU_HOME={{ zoau_install_dir }}
+        export PATH=$ZOAU_HOME/bin:$PYTHON_HOME/bin:$PATH
+        export LIBPATH=$ZOAU_HOME/lib:$PYTHON_HOME/lib:$LIBPATH
+        export _BPXK_AUTOCVT=ON
+        export _CEE_RUNOPTS="FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+        export _TAG_REDIR_ERR=txt
+        export _TAG_REDIR_IN=txt
+        export _TAG_REDIR_OUT=txt
+        exec /usr/lpp/IBM/foz/v1r1/bin/bash
+        EOF
+
+    - name: Set encoding on .profile
+      ansible.builtin.raw: chtag -tc IBM-1047 ~/.profile

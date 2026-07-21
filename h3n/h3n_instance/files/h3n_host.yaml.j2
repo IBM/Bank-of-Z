@@ -1,0 +1,11 @@
+source_system:
+  hosts:
+    zos:
+      ansible_host: {{ system_info.publicIP }}
+      ansible_port: {{ system_info.ports.p22 }}
+      ansible_user: ibmuser
+      ansible_password: {{ system_info.password }}
+      port_443: {{ system_info.ports.p443 }}
+      ansible_connection: ssh
+      ansible_shell_type: sh
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ControlMaster=no -o ControlPath=none"

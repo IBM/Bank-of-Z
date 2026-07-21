@@ -1,0 +1,45 @@
+- name: Stop the system
+  gather_facts: false
+  hosts: all
+
+  vars_files:
+    - h3n_vars.yml
+
+  tasks:
+  - name: Get token
+    ibm.h3n_bootstrap.h3n_authenticate:
+      api_url: '{{ h3n_api_url }}'
+      username: '{{ h3n_user }}'
+      password: '{{ h3n_pass }}'
+    register: authenticated
+
+  - name: Get systemuuid
+    ibm.h3n_bootstrap.h3n_get_systemuuid:
+      note: '{{ h3n_system_name }}'
+      token: '{{ authenticated.token }}'
+      pool: '{{ h3n_pool }}'
+    register: system
+    ignore_errors: true
+
+  - name: Fail if system lookup failed for any other reason than just no h3n system running
+    ansible.builtin.fail:
+      msg: "System lookup failed: {{ system.msg }}"
+    when:
+      - system.failed
+      - "'Unable to locate provisioned system' not in system.msg | default('')"
+      - "'is not up' not in system.msg | default('')"
+
+  - name: Deprovision system
+    ibm.h3n_bootstrap.h3n_deprovision_system:
+      token: "{{ authenticated.token }}"
+      systemUuid: "{{ system.systemUuid }}"
+    register: deprovision
+    when: system is succeeded
+
+  - name: Wait for zOS to Stop
+    ibm.h3n_bootstrap.h3n_wait_zos_stop:
+      token: "{{ authenticated.token }}"
+      systemUuid: "{{ system.systemUuid }}"
+      expireSeconds: 300
+    ignore_errors: true
+    when: system is succeeded

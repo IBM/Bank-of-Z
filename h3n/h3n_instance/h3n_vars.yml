@@ -1,0 +1,6 @@
+---
+h3n_api_url: https://tivlp89.pok.stglabs.ibm.com/mae
+h3n_datacentre: h3ngfsc1
+h3n_pool: zsfw-cics
+h3n_image: zos-full-31-2509
+h3n_flavour: medium

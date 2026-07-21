@@ -29,3 +29,7 @@ scripts/update-frontend-file-zos.sh
 **/.taz-edt/
 **/datasets.yaml
 .gradle/
+h3n/.venv/
+h3n/.env
+h3n/bootstrap/host.yaml
+h3n/configure/host.yaml

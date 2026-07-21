@@ -1,0 +1,17 @@
+services:
+  h3n-provisioning:
+    image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.81
+    container_name: H3N-provisioning
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/root/h3n
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      - ~/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro
+      - /Users/andrew/Documents/dev/h3n_bootstrap:/root/h3n_bootstrap # Temp while PRs arent merged
+    env_file:
+      - .env
+    working_dir: /root/h3n
+    command: bash
+
+# Made with Bob

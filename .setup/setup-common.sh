@@ -526,8 +526,8 @@ main_setup() {
 
     stage_setup_frontend_server
 
-    # Certificates run last so gencert-eku.sh overwrites the tls.xml
-    # that setup-zosconnect-server.sh writes with the RACF keyring version.
+    # Certificates run last so addcert.sh + gencert-eku.sh regenerate the
+    # RACF keyring cert after the server config is in place.
     stage_setup_certificates
     
     # Summary

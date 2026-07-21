@@ -151,7 +151,7 @@ try {
     }
     
     // Step 5: Create WAR file using jar command
-    log.info("Step 4: Creating WAR file")
+    log.info("Step 5: Creating WAR file")
     def warFile = new File("${outputDirectory}/${warName}")
     
     // Change to temp directory and create WAR

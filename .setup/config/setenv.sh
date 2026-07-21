@@ -77,7 +77,7 @@ DBB_REPO_URL=$(get_section_value 'repositories' 'dbb_url')
 # ZOAU
 ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 
-# ZBuuilder
+# ZBuilder
 ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
 
@@ -117,7 +117,7 @@ ZOSCONNECT_SERVER_FOLDER="${ZOSCONNECT_SERVER_FOLDER:-$(get_section_value 'zosco
 ZOSCONNECT_SYS_PROCLIB=$(get_section_value 'zosconnect' 'sys_proclib')
 ZOSCONNECT_TASK_USER=$(get_section_value 'zosconnect' 'task_user')
 
-# Fronted
+# Frontend
 FRONTEND_LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
 FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')

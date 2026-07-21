@@ -72,18 +72,12 @@ fi
 # =========================
 # Cleanup
 # =========================
-if [ -d "$WLP_USER_DIR" ]; then
-    print_warning "Removing existing server at $WLP_USER_DIR"
-fi
-
 set +e
 opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null
 jcan P "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 sleep 5
 mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
-
-print_info "Generating JCL proc..."
 
 # =========================
 # Configure RACF STARTED profile
@@ -235,10 +229,8 @@ print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/${ZOS_
 
 # =========================
 # Override httpsPort: z/OS Connect server.xml defaults to 9443,
-# override with ${HTTPS_PORT} (configured as 9444 in config.yaml).
+# override with ${ZOSCONNECT_HTTPS_PORT} (configured in config.yaml).
 # =========================
-HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
-HTTPS_PORT=${HTTPS_PORT:-9444}
 HTTP_EP_DEST="$OVERRIDES_DIR/http-endpoint.xml"
 cat > "${HTTP_EP_DEST}" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -248,13 +240,13 @@ cat > "${HTTP_EP_DEST}" << EOF
     <httpEndpoint id="defaultHttpEndpoint"
                   host="*"
                   httpPort="${ZOSCONNECT_HTTP_PORT}"
-                  httpsPort="${HTTPS_PORT}"
+                  httpsPort="${ZOSCONNECT_HTTPS_PORT}"
                   onError="FAIL"
                   portOpenRetries="10"/>
 </server>
 EOF
 verify_file_written "${HTTP_EP_DEST}"
-print_success "HTTPS port override deployed (httpsPort=${HTTPS_PORT})"
+print_success "HTTPS port override deployed (httpsPort=${ZOSCONNECT_HTTPS_PORT})"
 
 # =========================
 # Override frontend WAR context root to / so it serves at the root of
@@ -315,7 +307,7 @@ print_info "  Started Task: BAQ${APP_SHORT_NAME}"
 print_info "  PROCLIB Member: ${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})"
 print_info ""
 print_info "To access the server:"
-print_info "  http://localhost:${ZOSCONNECT_HTTP_PORT}/"
+print_info "  https://localhost:${ZOSCONNECT_HTTPS_PORT}/"
 print_info ""
 print_info "To manage the server:"
 if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then

@@ -53,18 +53,17 @@ sleep 2
 
 # Create the server using Liberty's server command (creates under FRONTEND_LIBERTY_HOME/usr by default)
 "${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+RC=$?
+if [ $RC -eq 0 ]; then
+    print_success "Frontend Liberty server created successfully"
+else
+    print_error "Failed to create Frontend Liberty server (RC=$RC)"
+    exit 1
+fi
 
 # Move server to our WLP_USER_DIR
 if [ -d "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
     mv "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
-fi
-
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "Frontend Liberty server created successfully at $WLP_USER_DIR"
-else
-    print_error "Failed to create Frontend Liberty server (RC=$RC)"
-    exit 1
 fi
 
 # =========================

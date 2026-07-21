@@ -197,7 +197,12 @@ cat > "${TLS_DEST}" << EOF
         <feature>ssl-1.0</feature>
         <feature>transportSecurity-1.0</feature>
     </featureManager>
-    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
+    <!-- sslProtocol: restrict to TLS 1.2+ only -->
+    <!-- enabledCiphers: allow only strong AEAD ciphers, remove weak RSA key exchange -->
+    <ssl id="defaultSSLConfig"
+         keyStoreRef="defaultKeyStore"
+         sslProtocol="TLSv1.2,TLSv1.3"
+         enabledCiphers="-TLS_RSA_*"/>
     <keyStore id="defaultKeyStore"
               location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
               type="JCERACFKS"

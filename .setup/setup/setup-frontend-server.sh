@@ -110,7 +110,12 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
              maxFiles="10" />
 
     <!-- SSL Configuration using RACF keyring -->
-    <ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore"/>
+    <!-- sslProtocol: restrict to TLS 1.2+ only -->
+    <!-- enabledCiphers: allow only strong AEAD ciphers, remove weak RSA key exchange -->
+    <ssl id="defaultSSLConfig"
+         keyStoreRef="defaultKeyStore"
+         sslProtocol="TLSv1.2,TLSv1.3"
+         enabledCiphers="-TLS_RSA_*"/>
     <keyStore id="defaultKeyStore"
               location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
               type="JCERACFKS"

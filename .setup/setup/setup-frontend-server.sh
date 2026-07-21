@@ -117,7 +117,7 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
          sslProtocol="TLSv1.2,TLSv1.3"
          enabledCiphers="-TLS_RSA_*"/>
     <keyStore id="defaultKeyStore"
-              location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
+              location="safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING}"
               type="JCERACFKS"
               password="password"/>
 

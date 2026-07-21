@@ -38,6 +38,7 @@ global:
   zos_admin_user: "IBMUSER"
   zos_current_user: "${ZOS_CURRENT_USER}"
   zos_ca_label: "VSICA"
+  zos_keyring: "BOZRING"
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
   igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"

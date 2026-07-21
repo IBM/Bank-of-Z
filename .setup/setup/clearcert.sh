@@ -11,7 +11,7 @@
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
 ca_label=${ZOS_CA_LABEL}
-ring=BOZRING
+ring=${ZOS_KEYRING}
 label='BoZ'
 
 ## FIXED ##

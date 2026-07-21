@@ -15,8 +15,8 @@
 #   4. dcp the new DER cert back to a RACF dataset.
 #   5. RACDCERT ADD FORMAT(CERTDER) — RACF matches the new cert to the
 #      private key it already holds (same public key).
-#   6. Connect cert to BOZRING as DEFAULT.
-#   7. Liberty uses safkeyring://IBMUSER/BOZRING (JCERACFKS).
+#   6. Connect cert to ${ZOS_KEYRING} as DEFAULT.
+#   7. Liberty uses safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING} (JCERACFKS).
 #
 # Called by addcert.sh after the keyring scaffold is in place.
 # =============================================================================
@@ -33,7 +33,7 @@ set -e  # Exit immediately on any non-zero return code
 
 userid=${ZOS_ADMIN_USER}
 ca_label=${ZOS_CA_LABEL}
-ring=BOZRING
+ring=${ZOS_KEYRING}
 label='BoZ'
 
 # -----------------------------------------------------------------------

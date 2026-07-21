@@ -204,7 +204,7 @@ cat > "${TLS_DEST}" << EOF
          sslProtocol="TLSv1.2,TLSv1.3"
          enabledCiphers="-TLS_RSA_*"/>
     <keyStore id="defaultKeyStore"
-              location="safkeyring://${ZOS_ADMIN_USER}/BOZRING"
+              location="safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING}"
               type="JCERACFKS"
               password="password"/>
 
@@ -227,7 +227,7 @@ cat > "${TLS_DEST}" << EOF
 </server>
 EOF
 verify_file_written "${TLS_DEST}"
-print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/BOZRING)"
+print_success "SSL configuration deployed (safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING})"
 
 # =========================
 # Override httpsPort: z/OS Connect server.xml defaults to 9443,

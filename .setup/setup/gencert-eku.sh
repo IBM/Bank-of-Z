@@ -36,11 +36,11 @@ ring=BOZRING
 label='BoZ'
 
 # -----------------------------------------------------------------------
-# Resolve tools — fall back to known fixed paths when env vars not set.
+# Resolve tools — JAVA_HOME and PYTHON_HOME must be set by the environment
+# (sourced from config.yaml via setenv.sh).
 # -----------------------------------------------------------------------
 if [ -z "${JAVA_HOME:-}" ]; then
-  JAVA_HOME=/usr/local/sandboxes/tools/J21.0_64
-  export JAVA_HOME
+  echo "[gencert-eku] FATAL: JAVA_HOME is not set" >&2; exit 1
 fi
 JAVA="$JAVA_HOME/bin/java"
 JAVAC="$JAVA_HOME/bin/javac"

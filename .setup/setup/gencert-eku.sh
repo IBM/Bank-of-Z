@@ -59,8 +59,8 @@ fi
 # Ensure ZOAU tools (dcp, tsocmd, etc.) are on PATH
 if [ -n "${ZOAU_HOME:-}" ] && [ -x "$ZOAU_HOME/bin/dcp" ]; then
   export PATH="$ZOAU_HOME/bin:$PATH"
-elif [ -x /usr/lpp/IBM/zoautil/bin/dcp ]; then
-  export PATH="/usr/lpp/IBM/zoautil/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoau/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoau/bin:$PATH"
 fi
 DCP=$(command -v dcp 2>/dev/null) || { echo "[gencert-eku] FATAL: dcp (ZOAU) not found on PATH" >&2; exit 1; }
 

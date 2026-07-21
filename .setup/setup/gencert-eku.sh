@@ -57,11 +57,15 @@ else
   PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
 fi
 
-# Ensure ZOAU tools (dcp, tsocmd, etc.) are on PATH
+# Ensure ZOAU tools (dcp, tsocmd, etc.) are on PATH.
+# Primary: use $ZOAU_HOME (set from config.yaml, default /usr/lpp/IBM/zoau for ZOAU 1.3+).
+# Fallback: /usr/lpp/IBM/zoautil is the pre-1.3 install path used on some ZVDT images.
 if [ -n "${ZOAU_HOME:-}" ] && [ -x "$ZOAU_HOME/bin/dcp" ]; then
   export PATH="$ZOAU_HOME/bin:$PATH"
 elif [ -x /usr/lpp/IBM/zoau/bin/dcp ]; then
   export PATH="/usr/lpp/IBM/zoau/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoautil/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoautil/bin:$PATH"
 fi
 DCP=$(command -v dcp 2>/dev/null) || { echo "[gencert-eku] FATAL: dcp (ZOAU) not found on PATH" >&2; exit 1; }
 

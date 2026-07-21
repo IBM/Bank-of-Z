@@ -39,7 +39,8 @@ tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
  CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
 rc=$?
-tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
+# Only DIGTRING changed — CONNECT modifies ring membership, not the cert itself
+tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
 
 # Step 2: Generate the server cert with EKU serverAuth via Bouncy Castle CSR
 # round-trip (gencert-eku.sh).  The private key is generated in RACF and never
@@ -53,7 +54,8 @@ then
     tsocmd "RACDCERT ID($userid) \
       CONNECT(LABEL('$label') RING($ring) DEFAULT)"
     rc=$?
-    tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
+    # Only DIGTRING changed — CONNECT modifies ring membership, not the cert itself
+    tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
     if test $rc -eq 0; then
       echo "[addcert] Cert '$label' connected to keyring $userid/$ring as DEFAULT"
     else

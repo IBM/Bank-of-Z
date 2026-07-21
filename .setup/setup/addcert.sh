@@ -17,6 +17,7 @@
 
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
+ca_label=${ZOS_CA_LABEL}
 ring=BOZRING
 label='BoZ'
 
@@ -28,11 +29,15 @@ if [[ -z "$userid" ]]; then
   echo "[addcert] FATAL: ZOS_ADMIN_USER is not set" >&2
   exit 1
 fi
+if [[ -z "$ca_label" ]]; then
+  echo "[addcert] FATAL: ZOS_CA_LABEL is not set" >&2
+  exit 1
+fi
 
 # Step 1: Create the keyring and connect VSICA as the trust anchor.
 tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
- CONNECT(CERTAUTH LABEL('VSICA') RING($ring) USAGE(CERTAUTH))"
+ CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
 rc=$?
 tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 

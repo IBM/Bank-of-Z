@@ -6,7 +6,7 @@
 #           remaining in the RACF keyring at all times.
 #
 # Approach (re-sign existing RACF cert — private key never leaves RACF):
-#   1. RACDCERT GENCERT SIGNWITH(CERTAUTH LABEL('VSICA')) — RACF generates
+#   1. RACDCERT GENCERT SIGNWITH(CERTAUTH LABEL('$ca_label')) — RACF generates
 #      keypair and a VSICA-signed cert.  Private key stays in RACF.
 #   2. dcp export the cert as CERTB64 (PEM) to USS.
 #   3. Bouncy Castle reads the public key from the PEM, builds a new
@@ -32,6 +32,7 @@ fi
 set -e
 
 userid=${ZOS_ADMIN_USER}
+ca_label=${ZOS_CA_LABEL}
 ring=BOZRING
 label='BoZ'
 
@@ -83,7 +84,7 @@ if [ -z "$ipaddr" ] || [ -z "$dnsname" ]; then
   exit 1
 fi
 
-expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('VSICA'))" \
+expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('$ca_label'))" \
   | awk '/End Date:/ {gsub("/","-",$3); print $3}')
 
 echo "[gencert-eku] IP=$ipaddr  DNS=$dnsname  VSICA expire=$expire"
@@ -109,7 +110,7 @@ echo "[gencert-eku] Generating keypair in RACF (SIGNWITH VSICA)..."
 tsocmd "RACDCERT GENCERT \
   ID($userid) \
   SUBJECTSDN(CN('Bank of Z') O('IBM') OU('IBM BoZ') C('US')) \
-  SIGNWITH(CERTAUTH LABEL('VSICA')) \
+  SIGNWITH(CERTAUTH LABEL('$ca_label')) \
   NOTAFTER(DATE($expire)) \
   ALTNAME(IP($ipaddr) DOMAIN('$dnsname')) \
   WITHLABEL('$label') \
@@ -134,7 +135,7 @@ $DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
 #    Dataset deleted in EXIT trap.
 # -----------------------------------------------------------------------
 echo "[gencert-eku] Exporting VSICA CA for re-signing..."
-tsocmd "RACDCERT EXPORT(LABEL('VSICA')) CERTAUTH \
+tsocmd "RACDCERT EXPORT(LABEL('$ca_label')) CERTAUTH \
   DSN('${userid}.BOZ.CAKEY') FORMAT(PKCS12DER) PASSWORD('${CA_PASS}')"
 cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
 

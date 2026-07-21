@@ -39,7 +39,7 @@ global:
   tcpip_hlq: "EZA"
   igzxjni2: "/usr/lpp/IBM/cobol/V6R4M0/lib/igzxjni2.x"
   igy_hlq: "IGY.V6R5M0"
-  fel_hlq: "FEL"
+  fel_hlq: "FEL.V16R0M0"
   ipv_hlq: "IPV.V1R9M0"
   pli_hlq: "IBMZ.V6R2M0"
   debug_hlq: "EQAW"
@@ -61,7 +61,7 @@ global:
 
   # IMS
   ims_disabled: "true"
-  ims_sys_hlq: "IMSV15"
+  ims_sys_hlq: "DFS.V15R3M0"
   ims_java_home: "/usr/lpp/ims/ims15/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"

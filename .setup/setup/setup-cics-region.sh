@@ -57,10 +57,10 @@ export DEFINITION_FILE="$SCRIPTS_DIR/../zconfig/bank-of-z-definitions.yaml"
 export BACKUP_FILE="${DEFINITION_FILE}.back"
 export DEBUG_FILE="$SCRIPTS_DIR/../zconfig/debug-definitions.yaml"
 export DEBUG_BACKUP="${DEBUG_FILE}.back"
+export YAML_ENCODING=$(chtag -p "$DEFINITION_FILE" | awk '{print $2}')
+chtag -tc ISO8859-1 "$DEFINITION_FILE"
+chtag -tc ISO8859-1 "$DEBUG_FILE"
 if [[ "$APP_HLQ" != "BANKZ" ]]; then
-    export YAML_ENCODING=$(chtag -p "$DEFINITION_FILE" | awk '{print $2}')
-    chtag -tc ISO8859-1 "$DEFINITION_FILE"
-    chtag -tc ISO8859-1 "$DEBUG_FILE"
     mv "$DEFINITION_FILE" "$BACKUP_FILE"
     mv "$DEBUG_FILE" "$DEBUG_BACKUP"
     cat "$BACKUP_FILE" | sed "s/BANKZ.${APP_ZOS_VERSION}/${APP_HLQ}.${APP_ZOS_VERSION}/" > "$DEFINITION_FILE"

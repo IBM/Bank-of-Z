@@ -332,9 +332,9 @@ test -s "$TMPDIR/boz-new.der" || {
 #    because they share the same public key.
 # -----------------------------------------------------------------------
 echo "[gencert-eku] Importing re-signed cert into RACF..."
-# Pre-allocate with correct DCB for binary DER data
-tsocmd "DELETE ('${userid}.BOZ.NEWCERT')" >/dev/null 2>&1 || true
-tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') NEW CATALOG \
+# ALLOC MOD creates the dataset if absent or reuses it if present — no DELETE needed
+# since dcp -B overwrites (does not append) existing content.
+tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') MOD CATALOG \
   RECFM(V,B) LRECL(1028) BLKSIZE(27998) TRACKS SPACE(5,5)"
 
 # dcp for binary copy (cp "//dataset" doesn't work reliably for DER)

@@ -102,16 +102,7 @@ trap 'rm -rf "$TMPDIR"
   tsocmd "DELETE (\047${userid}.BOZ.NEWCERT\047)" >/dev/null 2>&1 || true' EXIT
 
 # -----------------------------------------------------------------------
-# 1. Remove any existing cert so GENCERT can create a fresh one.
-# -----------------------------------------------------------------------
-echo "[gencert-eku] Removing old cert from keyring..."
-tsocmd "RACDCERT ID($userid) \
-  REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
-tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
-tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" >/dev/null 2>&1 || true
-
-# -----------------------------------------------------------------------
-# 2. Generate keypair + cert in RACF, signed by VSICA.
+# 1. Generate keypair + cert in RACF, signed by VSICA.
 #    Private key is generated inside RACF and never leaves.
 # -----------------------------------------------------------------------
 echo "[gencert-eku] Generating keypair in RACF (SIGNWITH VSICA)..."

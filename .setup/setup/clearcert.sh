@@ -11,6 +11,7 @@
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
 ring=BOZRING
+label='BoZ'
 
 ## FIXED ##
 profile=$userid.$ring.LST
@@ -29,7 +30,10 @@ tsocmd "SETROPTS GENERIC(RDATALIB)" \
 tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
  >/dev/null 2>&1
 
-# Remove existing keyring — expected to fail on a clean system
+# Remove existing cert label and keyring — expected to fail on a clean system
+tsocmd "RACDCERT ID($userid) \
+  REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
+tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
 tsocmd "RACDCERT ID($userid) DELRING($ring)" \
  >/dev/null 2>&1
 tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH" \

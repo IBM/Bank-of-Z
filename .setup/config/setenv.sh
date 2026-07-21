@@ -107,7 +107,7 @@ SCAN_ENCODING=${SCAN_ENCODING:-$(get_section_value 'zcodescan' 'src_encoding')}
 SCAN_CONFIG_FILE=${SCAN_CONFIG_FILE:-$(get_section_value 'zcodescan' 'config_file')}
 SCAN_MAX_RC=${SCAN_MAX_RC:-$(get_section_value 'zcodescan' 'max_rc')}
 
-# z/OS connect
+# z/OS Connect
 ZOSCONNECT_HOME=$(get_section_value 'zosconnect' 'zosconnect_home')
 ZOSCONNECT_HTTP_PORT=$(get_section_value 'zosconnect' 'http_port')
 ZOSCONNECT_HTTPS_PORT=$(get_section_value 'zosconnect' 'https_port')
@@ -147,7 +147,7 @@ IMS_JAVA_CONF_PATH=${IMS_JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_pa
 IMS_DFS_IMS_SSID=${IMS_DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
 
 
-# ZConfig
+# zconfig
 ZCONFIG_ZCB_HOME=$(get_section_value 'zconfig' 'zcb_home')
 ZCONFIG_HOME="${ZCONFIG_HOME:-$(get_section_value 'zconfig' 'zconfig_home')}"
 

@@ -55,14 +55,14 @@ global:
   frontend_task_user: "{{ global.zos_admin_user}}"
 
   # CICS
-  cics_hlq: "CICSTS63"
-  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_hlq: "DFH.V6R3M0"
+  cics_uss_dir: "/usr/lpp/cicsts/dfh630"
   cics_sec: "YES"
 
   # IMS
   ims_disabled: "true"
   ims_sys_hlq: "IMSV15"
-  ims_java_home: "/usr/lpp/ims/imsjava"
+  ims_java_home: "/usr/lpp/ims/ims15/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
 

@@ -37,6 +37,16 @@ fi
 rm -f /tmp/Db2-* 2>/dev/null || true
 
 # =========================
+# RACF
+# =========================
+set +e
+tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
+tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
+tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
+tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
+set -e
+
+# =========================
 # Generate and submit the grant JCL
 # =========================
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile "$CONFIG_FILE" \

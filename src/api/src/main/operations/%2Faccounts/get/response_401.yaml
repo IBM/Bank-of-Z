@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "UNAUTHORIZED"
+    - message:
+        required: true
+        nullable: false
+        template: "Authentication credentials are missing or invalid"

@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "ERROR_CODE"
+    - message:
+        required: true
+        nullable: false
+        template: "Error message"

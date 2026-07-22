@@ -15,11 +15,15 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[POPULATE-IMS-TABLES]${NC} %s\n" "${line}"
+done) 2>&1
+
 # =========================
 # Environment
 # =========================
-export ZOAU_HOME=${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}
-export BOZ_IMS_HLQ=${BOZ_IMS_HLQ:-$(get_section_value 'ims' 'ims_hlq')}
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
@@ -29,10 +33,10 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 for file in ${SANDBOX_DIR}/${REPO_NAME}/src/base/ims/LoadData/*.data; do
     name=$(basename $file .data)
     set +e
-    drm ${BOZ_IMS_HLQ}.${name}.INPUT 2>/dev/null
+    drm ${IMS_APP_HLQ}.${name}.INPUT 2>/dev/null
     set -e
-    dtouch -tbasic -s24000 -rfb -l200 ${BOZ_IMS_HLQ}.${name}.INPUT
-    cp "$file" "//'${BOZ_IMS_HLQ}.${name}.INPUT'"
+    dtouch -tbasic -s24000 -rfb -l200 ${IMS_APP_HLQ}.${name}.INPUT
+    cp "$file" "//'${IMS_APP_HLQ}.${name}.INPUT'"
 done
 
 # LOAD

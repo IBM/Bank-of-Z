@@ -13,3 +13,5 @@ The video below demonstrates a complete first-time deployment of Bank of Z using
 </video>
 
 To deploy Bank of Z yourself, see [Deploying Bank of Z](../installation-and-setup/deploying.html).
+
+**Tip:** Once Bank of Z has been deployed successfully, use the incremental build and deploy workflow (`pipeline-remote.sh`) during day-to-day development instead of performing a full deployment after every code change.

@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "BAD_REQUEST"
+    - message:
+        required: true
+        nullable: false
+        template: "Invalid request parameters"

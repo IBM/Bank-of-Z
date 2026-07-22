@@ -329,42 +329,101 @@ activities:
 
   - name: IMS_ACB_MANAGEMENT
     description: |
-      This activity is dedicated to the deployment of IMS with Management ACBs
+        This activity is dedicated to the deployment of IMS with Management ACBs
     actions:
-        - name: IMS_ACBGEN
+          - name: IMS_ACBGEN
+            description: |
+              This action is applicable when we add or modify artifacts.
+            steps:
+            - name: ACBGEN
+              description: |
+                This step build the ACBs
+              properties:
+              - key: "template"
+                value: "ims_acb_gen"
+              retry:
+                max_attempt: 2
+                interval: 1
+    types:
+        - name: 'PSBLOAD'
+        - name: 'DBDLOAD'
+    is_artifact: True
+    tags:
+      - ims_acb_management
+      - ims
+      
+
+  - name: IMS_OLCUTL_MANAGEMENT
+    description: |
+      This activity is dedicated to the deployment of IMS artifacts to the active lib
+    actions:
+        - name: IMS_OLCUTL
           description: |
             This action is applicable when we add or modify artifacts.
           steps:
-          - name: ACBGEN
+          - name: IMS_OLCUTL
             description: |
-              This step build the ACBs
+              This step builds the execute the OLCUTL procedure
             properties:
             - key: "template"
-              value: "ims_acb_gen"
-            retry:
-              max_attempt: 2
-              interval: 1
+              value: "ims_olcutl"
+            - key: "var_ims_olcutl"
+              value: "ims_olcutl_cat"
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
       - name: 'PSBLOAD'
       - name: 'DBDLOAD'
+      - name: 'IMSLOAD'
     is_artifact: True
     tags:
-    - ims_acb_management
+    - ims_oclutl_management
+    - ims
+    - never
 
   - name: IMS_CATALOG_MANAGEMENT
     description: |
       This activity is dedicated to the deployment of IMS with Catalog Management ACBs
     actions:
-        - name: IMS_CATALOG
+          - name: IMS_CATALOG
+            description: |
+              This action is applicable when we add or modify artifacts.
+            steps:
+            - name: IMS_CATALOG
+              description: |
+                This step activates all new IMS artifacts
+              properties:
+              - key: "template"
+                value: "ims_catalog_populate"
+              when:
+                - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
+    types:
+        - name: 'PSBLOAD'
+        - name: 'DBDLOAD'
+    is_artifact: True
+    tags:
+      - ims_catalog_management
+      - ims
+
+  - name: IMS_JCL_POPULATE_MANAGEMENT
+    description: |
+      This activity is dedicated to the deployment of IMS with Management ACBs
+    actions:
+        - name: CAT_POPULATE
           description: |
             This action is applicable when we add or modify artifacts.
           steps:
-          - name: IMS_CATALOG
+          - name: CAT_POPULATE
             description: |
-              This step activates all new IMS artifacts
+              This step build the ACBs and populate catalogue
             properties:
-            - key: "template"
-              value: "ims_catalog_populate"
+              - key: template
+                value: job_submit
+              - key: var_job_submit
+                value: jcl_ims_catpop
+            retry:
+              max_attempt: 2
+              interval: 1
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
@@ -372,7 +431,9 @@ activities:
       - name: 'DBDLOAD'
     is_artifact: True
     tags:
-    - ims_catalog_management
+    - ims_jcl_catpop_management
+    - ims
+    - never
 
   - name: IMS_MACLIB_MANAGEMENT
     description: |
@@ -398,6 +459,7 @@ activities:
     is_artifact: True
     tags:
     - ims_maclib_management
+    - ims
 
   - name: IMS_SPOC_MANAGEMENT
     description: |
@@ -424,6 +486,7 @@ activities:
     is_artifact: True
     tags:
     - ims_spoc_management
+    - ims
 
   - name: 'Deploy IMS JAR'
     description: 'Copy the IMS Java JMP JAR to the USS classpath directory'
@@ -459,12 +522,16 @@ activities:
   - name: 'Deploy Config Files'
     description: 'Process and deploy z/OS Connect configuration files with variable substitution'
     actions:
-        - name: 'Process Templates'
+        - name: 'Process z/OS Connect config files'
           steps:
-          - name: TEMPLATE
+          - name: ZOS_CONNECT_CONFIG
             properties:
+            - key: "template"
+              value: "template"
             - key: "var_template_name"
               value: "template_name_zosconnect_config"
+            - key: "path_filter"
+              value: '^(?!.*-frontend).*\.war$'
             loop:
                loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
                loop_var: "api_name"
@@ -478,9 +545,9 @@ activities:
     - deploy
 
   - name: 'Refresh z/OS Connect'
-    description: 'Refresh z/OS Connect config and applications'
+    description: 'Refresh z/OS Connect config and application'
     actions:
-        - name: SYSTEM_COMMAND
+        - name: REFRESH_ZOS_CONNECT
           steps:
           - name: 'Refresh z/OS Config'
             properties:
@@ -488,12 +555,16 @@ activities:
               value: 'system_command'
             - key: 'var_system_command'
               value: 'system_command_refresh_config'
+            - key: "path_filter"
+              value: '^(?!.*-frontend).*\.war$'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
-          - name: 'Refresh z/OS Applications'
+          - name: 'Refresh z/OS Application'
             properties:
             - key: 'template'
               value: 'system_command'
+            - key: "path_filter"
+              value: '^(?!.*-frontend).*\.war$'
             - key: 'var_system_command'
               value: 'system_command_refresh_apps'
             when:
@@ -503,6 +574,28 @@ activities:
     is_artifact: True
     tags:
     - zosconnect_refresh
+    - deploy
+    
+  - name: 'Refresh Fronted'
+    description: 'Refresh Fronted application'
+    actions:
+        - name: REFRESH_FRONTED
+          steps:
+          - name: 'Refresh Fronted'
+            properties:
+            - key: 'template'
+              value: 'system_command'
+            - key: "path_filter"
+              value: '.*-frontend.*\.war$'
+            - key: 'var_system_command'
+              value: 'system_command_refresh_fronted'
+            when:
+              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
+    types:
+       - name: 'war'
+    is_artifact: True
+    tags:
+    - fronted_refresh
     - deploy
 
 # Made with Bob

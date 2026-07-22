@@ -16,9 +16,10 @@ By completing these tutorials, learn how to:
 - Use modern IBM Z development workflows and tooling
 - Verify application behavior after deployment
 
-## Available Tutorials
+## Available tutorials
 
 | Tutorial | Description |
 |-----------|-------------|
 | [**Deploy Bank of Z**](deploy-bank-of-z.html) | Watch a complete first-time deployment of Bank of Z. |
 | [**CICS Enhancement Scenario**](cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application component. |
+| [**CICS Debugging Scenario**](debug-cics-transaction.html) | Debug a CICS transaction in VS Code IDE. |

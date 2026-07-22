@@ -519,6 +519,34 @@ activities:
     - zosconnect_copy
     - deploy
 
+  - name: 'Deploy Frontend WAR'
+    description: 'Copy the frontend WAR file to the Frontend Liberty server apps directory'
+    actions:
+        - name: 'Copy to USS'
+          steps:
+          - name: USS_ARCHIVE
+            properties:
+            - key: "path_filter"
+              value: '.*-frontend.*\.war$'
+            - key: "var_uss_archive"
+              value: "uss_archive_frontend"
+          - name: USS_COPY
+            properties:
+            - key: "path_filter"
+              value: '.*-frontend.*\.war$'
+            - key: "var_uss_copy"
+              value: "uss_copy_frontend"
+          - name: USS_RESTORE
+            plan_tags:
+            - restore
+            - never
+    types:
+       - name: 'war'
+    is_artifact: True
+    tags:
+    - frontend_copy
+    - deploy
+
   - name: 'Deploy Config Files'
     description: 'Process and deploy z/OS Connect configuration files with variable substitution'
     actions:
@@ -576,26 +604,26 @@ activities:
     - zosconnect_refresh
     - deploy
     
-  - name: 'Refresh Fronted'
-    description: 'Refresh Fronted application'
+  - name: 'Refresh Frontend'
+    description: 'Refresh Frontend Liberty application'
     actions:
-        - name: REFRESH_FRONTED
+        - name: REFRESH_FRONTEND
           steps:
-          - name: 'Refresh Fronted'
+          - name: 'Refresh Frontend'
             properties:
             - key: 'template'
               value: 'system_command'
             - key: "path_filter"
               value: '.*-frontend.*\.war$'
             - key: 'var_system_command'
-              value: 'system_command_refresh_fronted'
+              value: 'system_command_refresh_frontend'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
        - name: 'war'
     is_artifact: True
     tags:
-    - fronted_refresh
+    - frontend_refresh
     - deploy
 
 # Made with Bob

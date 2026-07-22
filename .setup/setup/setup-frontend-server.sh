@@ -221,6 +221,11 @@ dcp "/tmp/FE${APP_SHORT_NAME}J.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}
 # =========================
 print_info "Creating apps directory..."
 mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/apps"
+# Ensure the apps dir is group-writable so Wazi Deploy (running as ${FRONTEND_TASK_USER})
+# can copy WARs into it at deploy time.
+chmod 775 "${WLP_USER_DIR}/servers/${SERVER_NAME}/apps"
+mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/backup/apps"
+chmod 775 "${WLP_USER_DIR}/servers/${SERVER_NAME}/backup/apps"
 
 # =========================
 # Start the server

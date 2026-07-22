@@ -28,6 +28,7 @@ done) 2>&1
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
+export BOZ_IMS_HLQ="${IMS_APP_HLQ}"
 
 # =========================
 # Stop IBM BOZ regions

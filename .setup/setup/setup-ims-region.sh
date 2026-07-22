@@ -89,7 +89,7 @@ zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \
               -e ims_sys_hlq="${IMS_SYS_HLQ}" -e db2_hlq="${DB2_HLQ}" \
-              -e db2_ssid="${DB2_SSID}"  ims-region.yaml -v
+              -e db2_ssid="${DB2_SSID}"  ims-region.yaml
 
 RC=$?
 if [ "$RC" -eq 0 ]; then

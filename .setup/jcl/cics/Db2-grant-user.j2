@@ -26,5 +26,9 @@
 
   GRANT CREATE IN COLLECTION {{ db2.package }} TO {{ db2_user }};
   GRANT PACKADM ON COLLECTION {{ db2.package }} TO {{ db2_user }};
+  
+  GRANT DBADM ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
+  GRANT CREATEIN ON SCHEMA {{ ims.db2_database }} TO {{ db2_user }};
+  GRANT CREATETAB ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
 
 /*

@@ -30,9 +30,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Populate DB2 tables
 # =========================
-rm -f /tmp/IMS-Db2-*
-rm -f /tmp/CICS-Db2-*
-rm -f /tmp/Db2-*
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
+rm -f /tmp/Db2-* 2>/dev/null || true
 
 # CICS
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
@@ -43,7 +43,7 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 run_job_and_wait "/tmp/CICS-Db2-insert-$$.jcl"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-grant.j2"  --outputFile "/tmp/CICS-Db2-grant-$$.jcl"
-run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
+run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl" "8"
 
 # IMS
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
@@ -53,8 +53,8 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DB2BINST" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-insert.j2"  --outputFile "/tmp/IMS-Db2-insert-$$.jcl"
 run_job_and_wait "/tmp/IMS-Db2-insert-$$.jcl"
 
-rm -f /tmp/IMS-Db2-*
-rm -f /tmp/CICS-Db2-*
-rm -f /tmp/Db2-*
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
+rm -f /tmp/Db2-* 2>/dev/null || true
 
 exit $?

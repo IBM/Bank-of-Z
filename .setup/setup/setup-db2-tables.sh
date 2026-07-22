@@ -30,9 +30,9 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Create DB2 tables
 # =========================
-rm -f /tmp/IMS-Db2-*
-rm -f /tmp/CICS-Db2-*
-rm -f /tmp/Db2-*
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
+rm -f /tmp/Db2-* 2>/dev/null || true
 
 
 # CICS

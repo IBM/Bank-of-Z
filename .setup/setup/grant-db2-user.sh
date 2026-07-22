@@ -34,7 +34,7 @@ if [[ -z "$MYUSER" ]]; then
     exit 1
 fi
 
-rm -f /tmp/Db2-*
+rm -f /tmp/Db2-* 2>/dev/null || true
 
 # =========================
 # Generate and submit the grant JCL

@@ -167,6 +167,7 @@ EOF
 fi
 
 set -a
+chmod 777 "$ENV_FILE" 2>/dev/null || true
 source "$ENV_FILE"
 set +a
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH

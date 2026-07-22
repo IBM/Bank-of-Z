@@ -353,7 +353,9 @@
                 // The API returns arrays of all customer accounts
                 // Find the balance for the specific account we deposited to
                 let balanceDisplay = 'N/A';
-                if (Array.isArray(result.availableBalance) && result.availableBalance.length > 0) {
+                if (typeof result.availableBalance === 'number') {
+                    balanceDisplay = result.availableBalance.toFixed(2);
+                } else if (Array.isArray(result.availableBalance) && result.availableBalance.length > 0) {
                     // If accountId is in the array format, parse it
                     const accountIds = result.accountId ? result.accountId.replace(/[\[\]]/g, '').split(',') : [];
                     const accountIndex = accountIds.findIndex(id => id.trim() === accountId.toString());

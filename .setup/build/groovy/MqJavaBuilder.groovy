@@ -29,16 +29,15 @@ import com.ibm.dbb.task.TaskConstants
  * 3. Registers the JAR in the build map with deployType=MQ-JAR so the Package
  *    task pulls it into the tar, and Wazi Deploy copies it to sandbox/jars
  *
- * The Gradle executable path is supplied via the 'gradlePath' config variable,
- * shared with the zOSConnect task so it is never hardcoded in this script.
- * Gradle is invoked via the 'shellEnvironment' shell (same pattern as zOSConnect)
- * so the correct z/OS USS environment is in place when the build runs.
+ * The Gradle executable path is supplied via the 'gradlePath' config variable.
+ * Gradle is invoked via the 'shellEnvironment' shell so the correct z/OS USS
+ environment is in place when the build runs.
  */
 
 log.info("MqJavaBuilder: Starting MQ Java build for Bank-of-Z")
 
 // -------------------------------------------------------------------------
-// Context variables - same as VanillaFrontend
+// Context variables
 // -------------------------------------------------------------------------
 def workspace       = context.getVariable(TaskConstants.WORKSPACE)
 def appDirName      = context.getVariable(TaskConstants.APP_DIR_NAME)
@@ -53,7 +52,7 @@ log.info("Output Directory: ${outputDirectory}")
 // Config variables - supplied in dbb-app.yaml task block
 // -------------------------------------------------------------------------
 
-// Path to the Gradle executable (shared with zOSConnect task - required)
+// Path to the Gradle executable - required
 def gradlePath = config.getVariable('gradlePath')
 if (!gradlePath) {
     log.error("MqJavaBuilder: 'gradlePath' configuration variable is required but not set.")
@@ -61,20 +60,20 @@ if (!gradlePath) {
     return 8
 }
 
-// Shell to use when invoking Gradle (same as zOSConnect / VanillaFrontend)
+// Shell to use when invoking Gradle
 def shell = config.getVariable('shellEnvironment') ?: '/bin/sh'
 
-// Optional debug flag - appends --debug to Gradle invocation (same as zOSConnect gradleDebug)
+// Optional debug flag - appends --debug to Gradle invocation
 def gradleDebug = config.getBooleanVariable('gradleDebug', false)
 
 // Relative path (from workspace/appDirName) to the Gradle project directory
 def mqJavaRelativePath = config.getVariable('configSources') ?: 'src/base/mq/java'
 def mqJavaPath = "${workspace}/${appDirName}/${mqJavaRelativePath}"
 
-// Log file - same naming convention as zOSConnect
+// Log file
 def logFile = new File("${logsDirectory}/${appDirName}.MqJavaBuilder.log")
 
-// Log encoding - same as zOSConnect
+// Log encoding
 def logEncoding = context.getVariable(TaskConstants.LOG_ENCODING) ?: 'IBM-1047'
 
 log.info("Gradle executable: ${gradlePath}")
@@ -152,8 +151,7 @@ try {
     gradleWorkDir.mkdirs()
 
     // Build the options list: [gradlePath, clean, jar, -PoutputDir=..., (--debug)]
-    // Shell is set as the command and gradle invocation is passed as options,
-    // exactly as zOSConnect does with UnixExec
+    // Shell is set as the command and gradle invocation is passed as options
     List<String> optionsList = [gradlePath.toString(), 'clean', 'jar', "-PoutputDir=${gradleWorkDir.absolutePath}".toString()]
     if (gradleDebug) optionsList << '--debug'
 
@@ -207,7 +205,7 @@ try {
     log.info("JAR in output directory: ${jarFile.absolutePath} (${jarFile.length()} bytes)")
 
     // -------------------------------------------------------------------------
-    // Register JAR in build map - same pattern as VanillaFrontend for its WAR
+    // Register JAR in build map
     // -------------------------------------------------------------------------
     log.info("=" * 80)
     log.info("Registering JAR in build map")

@@ -148,8 +148,8 @@ DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
 MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
 MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')
-MQ_PORT=$(get_section_value 'mq' 'port')
 MQ_CPF=$(get_section_value 'mq' 'cpf')
+MQ_PROCLIB=$(get_section_value 'mq' 'proclib')
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

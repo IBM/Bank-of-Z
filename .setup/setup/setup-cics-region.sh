@@ -106,6 +106,12 @@ resourceOverrides:
         group: BANKZGRP
       overrides:
         port: $CICS_IPIC_PORT
+  - mqconn:
+    - selector:
+        name: BOZMQCON
+        group: BANKZGRP
+      overrides:
+        mqname: $MQ_QMGR_NAME
 EOF
 
 print_success "Overrides file created successfully!"
@@ -228,4 +234,3 @@ fi
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 exit 0
-

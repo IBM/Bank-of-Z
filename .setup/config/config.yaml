@@ -206,5 +206,5 @@ mq:
   qmgr_name: "MQ21"
   install_hlq: "MQCD94"
   qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
-  port: 1414
   cpf: "!{{ mq.qmgr_name }}"
+  proclib: "SYS1.PROCLIB"

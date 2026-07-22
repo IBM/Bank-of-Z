@@ -38,10 +38,6 @@ opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 # =========================
 drm "${MQ_QMGR_HLQ}.*"  2>/dev/null
 
-# TODO: any of this needed?
-#rm -rf "$SCRIPTS_DIR/logs"
-#rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
-#rm -rf "$SANDBOX_DIR/diagnostics"
 set -e
 
 # =========================
@@ -57,9 +53,7 @@ else
     print_warning "zconfig virtual environment not found at $ZCONFIG_HOME/bin/activate"
 fi
 
-#TODO:
 cd "$SCRIPTS_DIR/../zconfig"
-#rm -rf "$SANDBOX_DIR/CICS${APP_BASE_NAME}"
 
 #TODO: need to have MQ and CICS zconfig in the same place.
 export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
@@ -68,8 +62,8 @@ zconfig apply \
   -e mq_qmgr_name="${MQ_QMGR_NAME}" \
   -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   -e mq_qmgr_hlq="${MQ_QMGR_HLQ}" \
-  -e mq_port="${MQ_PORT}" \
   -e mq_cpf="${MQ_CPF}" \
+  -e mq_proclib="${MQ_PROCLIB}" \
   mq-queue-manager.yaml
 
 RC=$?
@@ -78,9 +72,7 @@ if [ "$RC" -eq 0 ]; then
 else
     print_error "ZConfig failed with return code: $RC"
     print_error "Check logs in: $SCRIPTS_DIR/logs"
-    #TODO: need correct zconfig
-    exit 0
-    #exit 1
+    exit 1
 fi
 
 deactivate
@@ -95,7 +87,7 @@ opercmd "${MQ_CPF} START QMGR"  2>/dev/null
 set -e
 
 sleep 10
-print_info "${CYAN}[ZCONFIG-INSTALL]${NC} MQ Queue Manager Started"
+print_info "${CYAN}[ZCONFIG-INSTALL]${NC} MQ queue manager Started"
 sleep 10
 
 exit 0

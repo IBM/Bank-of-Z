@@ -1167,23 +1167,21 @@ resourceDefinitions:
       name: BOZMQCON
       group: BANKZGRP
       description: "MQCONN for Bank of z"
-# TODO: this should be a var, come back to
-#      mqname: "{{ vars.mq_name }}"
-      mqname: MQ21
+      #Set from overrides
+      mqname: ????
       initqname: BOZ.CICS.INITQ
       resyncmember: YES
 
-  # MQMONITOR Definitions
+  MQMONITOR Definitions
   - mqmonitor:
-      name: BOZMQMON
-      group: BANKZGRP
-      autostart: YES
-      description: "MQMONITOR for Bank of z"
-      qname: BOZ.CICS.REQUESTQ             # TODO: needed?
-      mondata: "Q=BOZ.CICS.REQUESTQ"
-      status: ENABLED
-      transaction: CKBR
-      #TODO: if I don't set this it fails saying this is a required parameter, but its not in the schema
-      monuserid: IBMUSER
+     name: BOZMQMON
+     group: BANKZGRP
+     autostart: YES
+     description: "MQMONITOR for Bank of z"
+     qname: BOZ.CICS.REQUESTQ
+     mondata: "Q=BOZ.CICS.REQUESTQ"
+     status: ENABLED
+     transaction: CKBR
+     monuserid: IBMUSER
 
   # CICS bridge / adapter definition are picked up via DFHLIST

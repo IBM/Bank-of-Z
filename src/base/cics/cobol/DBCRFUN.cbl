@@ -201,8 +201,6 @@
            MOVE 'N' TO COMM-SUCCESS
            MOVE '0' TO COMM-FAIL-CODE
 
-           DISPLAY 'At stage 1'.
-
       *
       *    Set up some Abend handling
       *
@@ -212,8 +210,6 @@
 
            MOVE SORTCODE TO COMM-SORTC.
            MOVE SORTCODE TO DESIRED-SORT-CODE.
-
-           DISPLAY 'At stage 2'.
 
       *
       *    Determine what kind of ACCOUNT datastore we should
@@ -226,14 +222,12 @@
       *
             PERFORM UPDATE-ACCOUNT-DB2.
 
-           DISPLAY 'At stage 3'.
       *
       *    The COMMAREA values have now been set so all we need to do
       *    is finish
       *
 
            PERFORM GET-ME-OUT-OF-HERE.
-           DISPLAY 'At stage 4'.
 
        A999.
            EXIT.
@@ -241,13 +235,11 @@
 
        UPDATE-ACCOUNT-DB2 SECTION.
        UAD010.
-           DISPLAY 'At stage 5'.
 
            MOVE COMM-ACCNO TO DESIRED-ACC-NO.
            MOVE DESIRED-SORT-CODE TO HV-ACCOUNT-SORTCODE.
            MOVE DESIRED-ACC-NO TO HV-ACCOUNT-ACC-NO.
 
-           DISPLAY 'At stage 6'.
 
       *
       *    Retrieve the account information
@@ -282,8 +274,6 @@
                       ACCOUNT_NUMBER = :HV-ACCOUNT-ACC-NO)
            END-EXEC.
 
-           DISPLAY 'At stage 7'.
-
       *
       *    Check that select was successful. If it wasn't then deal with
       *    it
@@ -308,8 +298,6 @@
 
            END-IF.
 
-           DISPLAY 'At stage 9'.
-
 
       *
       *    Is the amount being requested a debit or a credit?
@@ -327,7 +315,7 @@
       *       request is denied so remove the record LOCK and
       *       and finish.
       *
-              DISPLAY 'COMM-AMT IS negative'
+      D       DISPLAY 'COMM-AMT IS negative'
 
 
       *
@@ -364,8 +352,6 @@
               END-IF
 
            END-IF.
-
-           DISPLAY 'At stage 10'.
 
 
       *

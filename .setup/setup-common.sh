@@ -54,7 +54,7 @@ stage_stop_tasks() {
     jcan P "IMS1*" 2>/dev/null
 
     # =========================
-    # STOP IBM MQ queue managers
+    # Stop IBM MQ queue managers
     # =========================
     opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null
 
@@ -392,8 +392,6 @@ stage_setup_frontend_server() {
 stage_setup_mq_queue_manager() {
     print_stage "STAGE: Create MQ queue manager using zconfig"
 
-    # Verify script exists
-    # TODO: create the script!
     if [ ! -f "$BANK_DIR/.setup/setup/setup-mq-queue-manager.sh" ]; then
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-mq-queue-manager.sh"
         exit 1
@@ -406,10 +404,8 @@ stage_setup_mq_queue_manager() {
 
     set -o pipefail
     chmod +x .setup/setup/setup-mq-queue-manager.sh
-    .setup/setup/setup-mq-queue-manager.sh &
-    PID=$!
-    # Wait for MQ setup to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+
+    if bash .setup/setup/setup-mq-queue-manager.sh; then
         print_success "MQ queue manager setup completed successfully"
     else
         print_error "Failed to setup MQ queue manager"

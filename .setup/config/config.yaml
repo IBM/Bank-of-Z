@@ -180,7 +180,7 @@ zosconnect:
   task_user: "{{ global.zosconnect_task_user }}"
   sys_proclib: "{{ global.sys_proclib }}"
 
-# Frontend Liberty Server - no longer used; frontend is hosted on z/OS Connect
+# Frontend Liberty Server (separate from z/OS Connect)
 frontend:
   liberty_home: "{{ global.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"

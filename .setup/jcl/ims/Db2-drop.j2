@@ -12,7 +12,7 @@
 //SYSUDUMP DD  SYSOUT=*
 //SYSTSIN  DD  *
   DSN SYSTEM({{ db2.ssid }})
-  RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
+  RUN PROGRAM(DSNTEP2) PLAN({{ db2.dsntep }}) -
        LIB('{{ db2.runlib }}')
   END
 //SYSIN    DD  *

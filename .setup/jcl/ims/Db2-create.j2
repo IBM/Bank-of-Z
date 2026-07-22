@@ -1,7 +1,7 @@
 {{ db2.jobcard }}
 //*********************************************************************
 //*                                                                   *
-//* CREATE DB2 DATABASE - {{ ims.db2_database }}                          *
+//* CREATE DB2 DATABASE - {{ ims.db2_database }}                      *
 //*                                                                   *
 //*********************************************************************
 //CREATEDB EXEC PGM=IKJEFT01,DYNAMNBR=20
@@ -12,7 +12,7 @@
 //SYSUDUMP DD  SYSOUT=*
 //SYSTSIN  DD  *
   DSN SYSTEM({{ db2.ssid }})
-  RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
+  RUN PROGRAM(DSNTEP2) PLAN({{ db2.dsntep }}) -
        LIB('{{ db2.runlib }}')
   END
 /*
@@ -21,6 +21,7 @@ SET CURRENT SQLID = '{{ db2.sqlid }}';
 
 CREATE DATABASE {{ ims.db2_database }}
 CCSID EBCDIC;
+
 
 CREATE TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}"
 (
@@ -31,10 +32,12 @@ CREATE TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}"
 	"REFTXID" BIGINT NOT NULL,
 	"ACCID" BIGINT NOT NULL,
 	"BALANCE" DECIMAL(15,2) NOT NULL
-)
+)   
 	AUDIT NONE
 	DATA CAPTURE NONE;
 
 GRANT ALL ON {{ ims.db2_database }}.{{ ims.db2_table}} TO PUBLIC;
+
+COMMIT;
 
 /*

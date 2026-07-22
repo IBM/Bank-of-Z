@@ -3,130 +3,100 @@
 //BIND    EXEC PGM=IKJEFT01
 //STEPLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNEXIT
 //         DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
-//DBRMLIB  DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(BANKDATA)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(CREACC)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(CRECUST)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(DBCRFUN)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(DELACC)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(DELCUS)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(INQACC)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(INQACCS)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(INQACCCU)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(INQCUST)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(UPDACC)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(UPDCUST)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(XFRFUN)
-//     DD DISP=SHR,DSN=BANKZ.V0R1M0.DBRM(BNKSTMT)
+//DBRMLIB  DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(BANKDATA)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(CREACC)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(CRECUST)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(DBCRFUN)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(DELACC)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(DELCUS)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(INQACC)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(INQACCCU)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(INQCUST)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(UPDACC)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(UPDCUST)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(XFRFUN)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(BNKSTMT)
 //SYSPRINT DD  SYSOUT=*
 //SYSTSPRT DD  SYSOUT=*
 //SYSUDUMP DD  SYSOUT=*
 //SYSTSIN DD *
  DSN SYSTEM({{ db2.ssid }})
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(BANKDATA) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(CREACC) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(CRECUST) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(DBCRFUN) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(DELACC) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(DELCUS) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(INQACC) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(INQACCS) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(INQACCCU) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(INQCUST) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(UPDACC) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(UPDCUST) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(XFRFUN) -
  ACTION(REPLACE)
 
- BIND PACKAGE({{ db2.package }}) OWNER(IBMUSER) -
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
  QUALIFIER(BANKZ) -
  MEMBER(BNKSTMT) -
  ACTION(REPLACE)
 
  BIND PLAN({{ db2.plan }}) -
- OWNER(IBMUSER) -
+ OWNER({{ db2.sqlid }}) -
  ISOLATION(UR) -
  PKLIST( -
  NULLID.*,{{ db2.package }}.* )
 
  END
-/*
-//GRANT EXEC PGM=IKJEFT01,REGION=0M
-//STEPLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNEXIT
-//         DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
-//SYSUDUMP DD SYSOUT=*
-//SYSPRINT DD SYSOUT=*
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- DSN SYSTEM({{ db2.ssid }})
- RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
- LIB('{{ db2.ssid }}.RUNLIB.LOAD')
- END
-/*
-//SYSIN DD *
- SET CURRENT SQLID = 'IBMUSER';
-
- GRANT EXECUTE ON PLAN {{ db2.plan }} TO CICSUSER;
-
- GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.ACCOUNT TO CICSUSER;
-
- GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.PROCTRAN TO CICSUSER;
-
- GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.CONTROL TO CICSUSER;
-
- GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.CUSTOMER TO CICSUSER;
 /*

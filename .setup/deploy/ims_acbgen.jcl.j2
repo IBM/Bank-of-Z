@@ -1,0 +1,27 @@
+{% set dbds = wd_step.artifacts | selectattr('type', 'equalto', 'DBDLOAD') | list %}
+{% set psbs = wd_step.artifacts | selectattr('type', 'equalto', 'PSBLOAD') | list %}
+//ACBGEN JOB 'WD-ACBGEN',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID
+//*********************************************************************
+//G      EXEC  PGM=DFSRRC00,PARM='UPB',REGION=4M
+//SYSPRINT  DD  SYSOUT=*
+//SYSABEND  DD  SYSOUT=*
+//STEPLIB   DD  DISP=SHR,
+//      DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//DFSRESLB  DD  DISP=SHR,
+//      DSN={{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL
+//IMS       DD DISP=SHR,
+//      DSN={{ ims_hlq }}.{{ ims_datastore }}.PSBLIB
+//         DD DISP=SHR,
+//      DSN={{ ims_hlq }}.{{ ims_datastore }}.DBDLIB
+//IMSACB  DD DISP=SHR,
+//      DSN={{ ims_hlq }}.{{ ims_datastore }}.ACBLIB
+//SYSUT3   DD  UNIT=SYSDA,SPACE=(256,(100,100)),DCB=KEYLEN=8
+//SYSUT4   DD  UNIT=SYSDA,SPACE=(256,(100,100)),DCB=KEYLEN=8
+//SYSIN    DD  *
+{% for item in psbs %}
+     BUILD   PSB=({{ item.name }})
+{% endfor %}
+{% for item in dbds %}
+     BUILD   DBD=({{ item.name }})
+{% endfor %}
+/*EOF

@@ -141,13 +141,9 @@ submit_jcl() {
 run_job_and_wait() {
   local JCLFILE="$1"
   local MAXRC="${2:-4}"
-  local TMPJCL="/tmp/$(basename "$JCLFILE").$$"
 
-  sed "s/IBMUSER/${ZOS_USER}/g" "$JCLFILE" > "$TMPJCL"
-  echo "==> Submitting $JCLFILE via jsub ..."
-
-  OUT=$(jsub -f "$TMPJCL")
-  rm -f "$TMPJCL"
+  print_info "Submitting $JCLFILE via jsub ..."
+  OUT=$(jsub -f "$JCLFILE")
 
   JOBID=$(echo "$OUT" | awk '{
     for (i=1; i<=NF; i++) {
@@ -155,15 +151,15 @@ run_job_and_wait() {
     }
   }')
 
-  [ -z "$JOBID" ] && { echo "ERROR: no JOBID returned by jsub"; return 8; }
+  [ -z "$JOBID" ] && { print_error "no JOBID returned by jsub"; return 8; }
 
-  echo "==> Waiting for job $JOBID..."
+  print_info "Waiting for job $JOBID..."
 
   while :; do
     LINE=$(jls "$JOBID" 2>/dev/null | grep "$JOBID" | tail -1 || true)
-    [ -n "$LINE" ] && echo "$LINE"
+    [ -n "$LINE" ] && print_info "$LINE"
 
-    echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break 
+    print_info "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break 
 
     sleep 3
   done
@@ -186,8 +182,8 @@ run_job_and_wait() {
         ;;
     esac
   fi
-  echo "ERROR: Job failed: $JOBID"
-  echo "===== JESYSMSG ====="
+  print_error "Job failed: $JOBID"
+  print_info "===== JESYSMSG ====="
   pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
 return 8
 }
@@ -230,7 +226,7 @@ load_config() {
 
     print_success "Configuration loaded successfully"
 
-    echo "  Workspace: $BANK_OF_Z_WORK_DIR"
+    print_info "Workspace: $BANK_OF_Z_WORK_DIR"
 }
 
 

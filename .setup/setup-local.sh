@@ -148,12 +148,12 @@ stage_execute_common_setup() {
     set -o pipefail
     if zowe rse-api-for-zowe-cli issue unix-shell "export BANK_OF_Z_WORK_DIR=$BANK_OF_Z_WORK_DIR && bash  $BANK_OF_Z_WORK_DIR/Bank-of-Z/.setup/setup-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
-        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/remote-setup.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
+        if grep -q "install-bank-of-z completed successfully" /tmp/remote-setup.log > /dev/null; then
+            print_success "Remote setup completed successfully"
+        else
             print_error "Setup completed but some warnings were detected"
             print_info "Review /tmp/remote-setup.log for details"
             exit 1
-        else
-            print_success "Remote setup completed successfully"
         fi
     else
         print_error "Failed to execute setup on remote system"

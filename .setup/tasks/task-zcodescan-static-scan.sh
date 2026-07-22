@@ -19,6 +19,13 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[ZCODESCAN]${NC} %s\n" "${line}"
+done) 2>&1
+
+
 # =========================
 # Environment
 # =========================
@@ -58,7 +65,7 @@ finalize_results() {
         tar cf "$LOG_TAR" -C "$LOG_DIR" . 2>/dev/null || true
     fi
 
-    print_result "${GREEN}[ZCODESCAN][LOG-PATH]${NC} $LOG_TAR"
+    print_result "[LOG-PATH] $LOG_TAR"
 
     rm -f "$TMP_LOG" 2>/dev/null || true
 
@@ -70,27 +77,27 @@ trap finalize_results EXIT
 # =========================
 # Step 1: DBB preview (get source list)
 # =========================
-print_info "${CYAN}[ZCODESCAN]${NC} Running DBB in preview mode to get the list of sources to scan"
+print_info "Running DBB in preview mode to get the list of sources to scan"
 
 bash "$SCRIPTS_DIR/../tasks/task-dbb-build.sh" preview 2>&1 | tee "$TMP_LOG" | while read -r line
 do
     case "$line" in
         ">"*)
-            print_info "${CYAN}[ZCODESCAN]${NC} ${line#> }"
+            print_info "${line#> }"
             ;;
         *)
-            print_info "${CYAN}[ZCODESCAN]${NC} $line"
+            print_info "$line"
             ;;
     esac
 done
 
 if grep -q "ERROR" "$TMP_LOG"; then
-    print_error "${RED}[ZCODESCAN]${NC} DBB build failed"
+    print_error "DBB build failed"
     exit 1
 fi
 
 if grep -q "Total files processed : 0$" "$TMP_LOG"; then
-    print_info "${CYAN}[ZCODESCAN]${NC} DBB build list is empty - nothing to scan"
+    print_info "DBB build list is empty - nothing to scan"
     exit 0
 fi
 
@@ -108,7 +115,7 @@ rm -rf "$LOG_DIR"
 rm -f ./*.log
 mkdir -p "$LOG_DIR"
 
-print_info "${CYAN}[ZCODESCAN]${NC} Starting ZCodeScan analysis ..."
+print_info "Starting ZCodeScan analysis ..."
 
 PYTHONUNBUFFERED=1 zcodescan \
   -sfl "$BUILD_LIST" \
@@ -121,10 +128,10 @@ PYTHONUNBUFFERED=1 zcodescan \
 do
     case "$line" in
         ">"*)
-            print_info "${CYAN}[ZCODESCAN]${NC} ${line#> }"
+            print_info "${line#> }"
             ;;
         *)
-            print_info "${CYAN}[ZCODESCAN]${NC} $line"
+            print_info "$line"
             ;;
     esac
 done
@@ -156,17 +163,17 @@ deactivate
 rc=$(sed -n 's/.*RC=\(-\?[0-9][0-9]*\).*/\1/p' "$TMP_LOG" | tail -1)
 
 if [ -z "$rc" ]; then
-    print_error "${RED}[ZCODESCAN]${NC} RC not found in log"
+    print_error "RC not found in log"
     exit 1
 fi
 
 if [ "$rc" -eq 255 ] || [ "$rc" -lt 0 ] 2>/dev/null; then
-    print_error "${RED}[ZCODESCAN]${NC} RC=$rc (error)"
+    print_error "RC=$rc (error)"
     exit 1
 fi
 
 if [ "$rc" -gt $SCAN_MAX_RC ]; then
-    print_error "${RED}[ZCODESCAN]${NC} RC=$rc - Max RC=$SCAN_MAX_RC"
+    print_error "RC=$rc - Max RC=$SCAN_MAX_RC"
     exit 1
 fi
 

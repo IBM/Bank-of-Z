@@ -4,45 +4,137 @@
 #########################################################
 version: "1.0.0"
 
-# Git repositories to clone
-repositories:
-  dbb_url: "https://github.com/IBM/dbb.git"
+# Global properties
+# - Shared by middleware/tools 
+# - Subject to change with middleware/tools updates
+global:
 
-# Java Home
-java:
-  java_home: "/usr/local/sandboxes/tools/J21.0_64"
-  
-# Python Home
-python:
+  # Sandbox
+  sandbox_root: "/usr/local/sandboxes"
+
+  # Application
+  app_base_name: "BANKZ"
+  app_hlq: "{{ global.app_base_name }}"
+  app_short_name: "BOZ" # Maximum 3 characters
+  app_version: "0"
+  app_release: "1"
+  app_modification: "0"
+
+  # Tools
+  java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
+  zoau_home: "/usr/lpp/IBM/zoautil"
+  zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
+  zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
+  dbb_home: "{{ global.sandbox_root }}/tools/dbb"
+  gradle_home:  "{{ global.sandbox_root }}/tools/gradle-9.5.1"
+  zcodescan_home: "/global/opt/pyenv/akf"
+  wazideploy_home: "/global/opt/pyenv/gdp"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect"
+  liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
-# Application metadata
+
+  # z/OS System
+  zos_admin_user: "IBMUSER"
+  zos_current_user: "${ZOS_CURRENT_USER}"
+  sys_proclib: "SYS1.PROCLIB"
+  tcpip_hlq: "TCPIP"
+  igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
+  igy_hlq: "IGY.V6R5M0"
+  fel_hlq: "FEL"
+  ipv_hlq: "IPV"
+  pli_hlq: "PLI.V6R2M0"
+  debug_hlq: "EQAW"
+  
+  # GUI
+  zosconnect_http_port: 9080
+  zosconnect_https_port: 9443
+  zosconnect_task_user: "{{ global.zos_admin_user }}"
+
+  # Frontend
+  frontend_http_port: 9081
+  frontend_https_port: 9444
+  frontend_task_user: "{{ global.zos_admin_user}}"
+
+
+  # CICS
+  cics_hlq: "CICSTS63"
+  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_sec: "YES"
+  
+  # IMS
+  ims_disabled: "false"
+  ims_sys_hlq: "IMSV15"
+  ims_java_home: "/usr/lpp/ims/imsjava"
+  ims_datastore: "IMS2"
+  ims_dfsplex: "PLEX2"
+  
+  # DB2
+  db2_hlq: "DB2V13"
+  db2_dsntep: "DSNTEP13"
+  db2_ssid: "DBD1"
+  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
+  db2_sqlid: "{{ global.zos_current_user }}"
+  db2_java_home: "/usr/lpp/db2d10"
+  db2_grants:
+  - "CICSUSER"
+
+
+# Application properties
 app:
-  base_name: "BANKZ"
-  short_name: "BOZ"
-  version: "0"
-  release: "1"
-  modification: "0"
+  base_name: "{{ global.app_base_name }}"
+  short_name: "{{ global.app_short_name }}"
+  app_hlq: "{{ global.app_hlq }}"
+  version: "{{ global.app_version }}"
+  release: "{{ global.app_release }}"
+  modification: "{{ global.app_modification }}"
   zos_version: "V{{app.version}}R{{app.release}}M{{app.modification}}"
   full_version: "{{app.version}}.{{app.release}}.{{app.modification}}"
   description: "Bank of Z a modern IBM Z development, build, deployment, and modernization practices"
 
 # Sandbox root directory (USS)
 sandbox:
-  path: "/usr/local/sandboxes/bank-of-z"
+  root: "{{ global.sandbox_root }}"
+  path: "{{ sandbox.root }}/bank-of-z"
+
+# Zowe CLI configuration
+zowe:
+  rse_profile: "bankz"
+
+# Git repositories to clone
+repositories:
+  dbb_url: "https://github.com/IBM/dbb.git"
+
+# Java Home
+java:
+  java_home: "{{ global.java_home }}"
+  
+# Python Home
+python:
+  python_home: "{{ global.python_home }}"
+
+# ZOAU installation directory
+zoau:
+  zoau_home: "{{ global.zoau_home }}"
 
 # Z configuration tools
 zconfig:
-  zconfig_home: "/usr/local/sandboxes/tools/zconfig"
-  zcb_home: "/usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6"
+  zconfig_home: "{{ global.zconfig_home }}"
+  zcb_home: "{{ global.zcb_home }}"
 
 # DBB (Dependency Based Build)
 dbb:
-  dbb_home: "/usr/local/sandboxes/tools/dbb"
+  dbb_home: "{{ global.dbb_home }}"
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
   dbb_log_dir: "{{sandbox.path}}/logs/dbb"
+  gradle_home:  "{{ global.gradle_home }}"
+  igzxjni2: "{{ global.igzxjni2 }}"
+  igy_hlq: "{{ global.igy_hlq }}"
+  fel_hlq: "{{ global.fel_hlq }}"
+  ipv_hlq: "{{ global.ipv_hlq }}"
+  pli_hlq: "{{ global.pli_hlq }}"
 
 # zBuilder framework configuration
 zbuilder:
@@ -51,7 +143,7 @@ zbuilder:
 
 # ZCodeScan (static analysis)
 zcodescan:
-  zcodescan_home: "/global/opt/pyenv/akf"
+  zcodescan_home: "{{ global.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
   output_dir: "{{sandbox.path}}/zcodescan"
@@ -62,7 +154,7 @@ zcodescan:
 
 # Wazi Deploy (deployment automation)
 wazideploy:
-  wazideploy_home: "/global/opt/pyenv/gdp"
+  wazideploy_home: "{{ global.wazideploy_home }}"
   deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
@@ -71,52 +163,51 @@ wazideploy:
 
 # Debug
 debug:
-  hlq: "EQAW"
+  debug_hlq: "{{ global.debug_hlq }}"
+  tcpip_hlq: "{{ global.tcpip_hlq }}"
 
 # z/OS Connect (API exposure)
 zosconnect:
-  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin"
+  zosconnect_home: "{{ global.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"
-  server_name: "bankOfZServer"
-  http_port: 9080
-  https_port: 9443
+  http_port: "{{ global.zosconnect_http_port }}"
+  https_port: "{{ global.zosconnect_https_port }}"
+  task_user: "{{ global.zosconnect_task_user }}"
+  sys_proclib: "{{ global.sys_proclib }}"
 
 # Frontend Liberty Server (separate from z/OS Connect)
 frontend:
-  liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
+  liberty_home: "{{ global.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"
-  server_name: "bankz-frontend"
-  http_port: 9081
-  https_port: 9444
-
-# ZOAU installation directory
-zoau:
-  zoau_home: "/usr/lpp/IBM/zoautil"
-
-# Zowe CLI configuration
-zowe:
-  rse_profile: "bankz"
+  http_port: "{{ global.frontend_http_port }}"
+  https_port: "{{ global.frontend_https_port }}"
+  sys_proclib: "{{ global.sys_proclib }}"
+  task_user: "{{ global.frontend_task_user }}"
 
 # CICS attributes
 cics:
-  cics_hlq: "CICSTS63"
-  uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_hlq: "{{ global.cics_hlq }}"
+  uss_dir: "{{ global.cics_uss_dir }}"
+  cics_sec: "{{ global.cics_sec }}"
   host: "localhost"
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
   cmci_port: 27100
   ipic_port: 4320
   debug_port: 27103
+  sys_proclib: "{{ global.sys_proclib }}"
 
 # IMS attributes
 ims:
+  disabled: "{{ global.ims_disabled }}"
+  ims_sys_hlq: "{{ global.ims_sys_hlq }}"
+  ims_java_home: "{{ global.ims_java_home }}"
+  datastore: "{{ global.ims_datastore }}"
   host: "localhost"
   port: 9977
   user: "${IMS_USER}"
   password: "${IMS_PASSWORD}"
-  datastore: "IMS2"
-  ims_sys_hlq: "IMSV15"
-  ims_hlq: "{{app.base_name}}.{{ims.datastore}}"
+  ims_hlq: "{{app.app_hlq}}.{{ims.datastore}}"
   ims_home: "/usr/lpp/ims/ims15"
   dfs_ds_volume_1: "{{ ims.ims_sys_hlq }}"
   ims_connect:
@@ -144,12 +235,9 @@ ims:
   dfs_proclib: "{{ ims.ims_hlq }}.PROCLIB"
   dfs_joblib: "{{ ims.ims_hlq }}.JOBS"
   java_conf_path: "${HOME}/dfsjvmpr.props"
-  ims_java_home: "/usr/lpp/ims/imsjava"
-  cobol_java_home: "/usr/lpp/IBM/cobol/igyv6r5"
-  db2_java_home: "/usr/lpp/db2d10"
-  dfs_ims_userid: "${ZOS_USER}"
+  dfs_ims_userid: "${IMS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
-  dfs_imsplex: "PLEX2"
+  dfs_imsplex: "{{ global.ims_dfsplex }}"
   regions:
   - with_db2: yes
     use_pseudo_wfi: no
@@ -186,17 +274,17 @@ ims:
 
 # DB2 configuration
 db2:
-  db2_hlq: "DB2V13"
+  db2_hlq: "{{ global.db2_hlq }}"
+  dsntep: "{{ global.db2_dsntep }}"
+  ssid: "{{ global.db2_ssid }}"
+  runlib: "{{ global.db2_runlib }}"
   hostname: "localhost"
-  sqlid: "${ZOS_USER}"
-  ssid: "DBD1"
+  sqlid: "{{ global.db2_sqlid}}"
   package: "BANKZPACK"
   plan: "BANKZPLN"
-  port: 8102
-  password: "${ZOS_USER_PASSWORD}"
   location: "{{ db2.ssid }}LOC"
   sdsnexit: "{{ db2.db2_hlq }}.SDSNEXIT"
   sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
-  jobcard: "//{{jobname if jobname is defined else '{{ app.short_name }}JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  runlib: "{{ db2.ssid }}.RUNLIB.LOAD"
+  jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  db2_java_home: "{{ global.db2_java_home }}"

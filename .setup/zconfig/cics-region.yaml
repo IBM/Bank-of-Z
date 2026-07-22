@@ -10,6 +10,8 @@ vars:
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
   eqaw_hlq: "EQAW.SEQAMOD"
+  tcpip_hlq: "TCPIP"
+  cics_sec: "YES"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -44,7 +46,7 @@ cics_region:
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
-        - TCPIP.SEZATCP
+        - "{{ vars.tcpip_hlq }}.SEZATCP"
     dds:
       - name: DFHTABLE
         dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
@@ -58,7 +60,7 @@ cics_region:
     grplist: DFHLIST,BANKZLST
     gmtext: SMSS Region provisioned with zconfig
     gmtran: CESL
-    sec: "YES"
+    sec: "{{ vars.cics_sec }}"
     db2conn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"

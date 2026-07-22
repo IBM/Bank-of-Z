@@ -1,0 +1,34 @@
+//DB2GRANT JOB 'DB2',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
+//          MSGLEVEL=(1,1),REGION=4M
+//DB2GRANT EXEC PGM=IKJEFT01,REGION=0M
+//STEPLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNEXIT
+//         DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
+//SYSUDUMP DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SYSTSPRT DD SYSOUT=*
+//SYSTSIN DD *
+ DSN SYSTEM({{ db2.ssid }})
+ RUN PROGRAM(DSNTEP2) PLAN({{ db2.dsntep }}) -
+ LIB('{{ db2.runlib }}') PARMS('/ALIGN(MID)')
+ END
+/*
+//SYSIN DD *
+
+  GRANT CREATEDBA TO {{ db2_user }};
+  GRANT CREATESG TO {{ db2_user }};
+
+  GRANT USE OF BUFFERPOOL BP0 TO {{ db2_user }};
+  GRANT USE OF BUFFERPOOL BP1 TO {{ db2_user }};
+
+  GRANT BINDADD TO {{ db2_user }};
+
+  GRANT CREATEIN ON SCHEMA BANKZ TO {{ db2_user }};
+
+  GRANT CREATE IN COLLECTION {{ db2.package }} TO {{ db2_user }};
+  GRANT PACKADM ON COLLECTION {{ db2.package }} TO {{ db2_user }};
+  
+  GRANT DBADM ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
+  GRANT CREATEIN ON SCHEMA {{ ims.db2_database }} TO {{ db2_user }};
+  GRANT CREATETAB ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
+
+/*

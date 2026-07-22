@@ -15,6 +15,12 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[IMS-REGIONS]${NC} %s\n" "${line}"
+done) 2>&1
+
 # =========================
 # Environment
 # =========================
@@ -83,11 +89,6 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
      --extraVar "jobname=DFSJVMEV" --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMEV.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmev-$$.txt"
 run_job_and_wait "/tmp/IMS-bankz-reg-jvmev-$$.txt" "4"
 cp "//'${IMS_APP_HLQ}.PROCLIB(DFSJVMEV)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(DFSJVMEV)'"
-
-#python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-#    --extraVar "jobname=DFSJVMMS"  --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMMS.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmms-$$.txt"
-#run_job_and_wait "/tmp/IMS-bankz-reg-jvmms-$$.txt" "4"
-#cp "//'${IMS_APP_HLQ}.PROCLIB(DFSJVMMS)'" "//'${IMS_APP_HLQ}.IMSJAVA.JOBS(DFSJVMMS)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DFSJVMAP"  --extraVar "member_exists=${MEMBER_EXISTS}"  --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/CREDFSJVMAP.j2"  --outputFile "/tmp/IMS-bankz-reg-jvmap-$$.txt"

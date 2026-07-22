@@ -89,10 +89,7 @@ stage_deploy_bank_of_z() {
     cd "$BANK_DIR"
     
     set -o pipefail
-    ${BANK_DIR}/.setup/tasks/task-wazi-deploy.sh&
-    PID=$!
-    # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if ${BANK_DIR}/.setup/tasks/task-wazi-deploy.sh; then
         print_success "Bank of Z application deploy completed successfully"
     else
         print_error "Failed to deploy Bank of Z"

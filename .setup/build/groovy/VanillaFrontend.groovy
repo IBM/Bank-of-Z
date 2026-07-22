@@ -36,6 +36,7 @@ log.info("Output Directory: ${outputDirectory}")
 // Get vanilla frontend path from config variable (relative to workspace/appDirName)
 def vanillaFrontendRelativePath = config.getVariable('vanillaFrontendPath') ?: 'src/frontend'
 def vanillaFrontendPath = "${workspace}/${appDirName}/${vanillaFrontendRelativePath}"
+def zosConnectHttpPort = config.getVariable('zosConnectHttpPort') ?: '9080'
 
 log.info("Vanilla frontend relative path: ${vanillaFrontendRelativePath}")
 log.info("Vanilla frontend directory: ${vanillaFrontendPath}")
@@ -134,7 +135,22 @@ try {
         }
     }
     
-    // Step 4: Create WAR file using jar command
+    // Step 4: Change the z/OS Connect hard coded port
+    log.info("Step 4: Change the z/OS Connect hard coded port")
+    def modifyFiles = [ 'config.js' ]
+    modifyFiles.each { filename ->
+        def fileToModify = new File(tempWarDir, filename)
+        if (fileToModify.exists()) {
+            def content = fileToModify.getText('UTF-8')
+            // Replace only standalone occurrences of 9080 (word boundaries)
+            content = content.replaceAll(/\b9080\b/, zosConnectHttpPort.toString())
+            fileToModify.setText(content, 'UTF-8')
+            log.info("Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
+            println("> Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
+        }
+    }
+    
+    // Step 5: Create WAR file using jar command
     log.info("Step 4: Creating WAR file")
     def warFile = new File("${outputDirectory}/${warName}")
     
@@ -152,13 +168,13 @@ try {
     
     log.info("WAR file created: ${warFile.absolutePath}")
     
-    // Step 5: Clean up temp directory
+    // Step 6: Clean up temp directory
     log.info("Step 5: Cleaning up temporary directory")
     def cleanupCmd = "rm -rf ${tempWarDir.absolutePath}"
     def cleanupProc = [shell, "-c", cleanupCmd].execute(env, new File(workspace))
     cleanupProc.waitFor()
     
-    // Step 6: Register WAR in build map for packaging
+    // Step 7: Register WAR in build map for packaging
     log.info("Step 6: Registering WAR in build map for packaging")
     
     // Get BuildGroup from context

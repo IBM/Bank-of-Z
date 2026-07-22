@@ -31,6 +31,19 @@ The build produces:
 - z/OS Connect API artifacts
 - A Wazi Deploy deployment archive that packages all generated artifacts
 
+## Full and incremental builds
+
+Bank of Z supports both full and incremental build workflows to support different stages of development.
+
+A full build compiles all application components, packages the complete application, and prepares it for deployment. This workflow is typically used during the initial installation or when changes to the runtime infrastructure or environment configuration require a complete redeployment.
+
+An incremental build rebuilds and deploys only the application components affected by source code changes. This workflow is intended for day-to-day development activities, such as implementing enhancements or fixing defects, and avoids rebuilding the entire application or reprovisioning the existing runtime environment.
+
+After the initial deployment, you can perform an incremental build and deploy using the
+`pipeline-remote.sh script`. The build process automatically identifies modified source files, rebuilds the impacted components, packages the updated artifacts, and deploys them to the existing runtime environment.
+
+**Note**: An incremental build requires an existing Bank of Z environment that has already been deployed successfully. Use a full build and deployment when setting up a new environment or when infrastructure changes require a complete redeployment.
+
 ## CICS deployment
 
 After the build completes, Wazi Deploy installs the generated artifacts into the CICS runtime provisioned by zconfig. The z/OS Connect APIs are configured to route requests to the CICS transaction-processing environment.

@@ -9,6 +9,17 @@ The Zowe CLI workflow supports Git-based development by using `setup-local.sh` a
 
 Before using this workflow, complete [Deploy Using Zowe CLI](../installation-and-setup/deploy-zowe-cli.md) to set up your environment.
 
+## Full and incremental build and deploy
+
+Bank of Z supports both full and incremental build workflows. Use a full build when setting up a new environment or when infrastructure changes require a complete redeployment.
+After the initial deployment, most day-to-day development can be completed using an incremental build and deploy, which rebuilds and deploys only the application components affected by your changes.
+
+Run:
+
+```bash
+pipeline-remote.sh
+```
+
 ## Daily development cycle
 
 ### 1. Make changes

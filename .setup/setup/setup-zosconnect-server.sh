@@ -198,7 +198,7 @@ cat > "${TLS_DEST}" << EOF
          sslProtocol="TLSv1.2,TLSv1.3"
          enabledCiphers="-TLS_RSA_*"/>
     <!-- For JCERACFKS (SAF keyring) keystores, Liberty requires the password
-         attribute to be present but ignores its value — "password" is the
+         attribute to be present but ignores its value - "password" is the
          conventional placeholder. The keyring itself is protected by RACF, not
          by this field. -->
     <keyStore id="defaultKeyStore"

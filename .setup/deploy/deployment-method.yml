@@ -519,34 +519,6 @@ activities:
     - zosconnect_copy
     - deploy
 
-  - name: 'Deploy Frontend WAR'
-    description: 'Copy the frontend WAR file to the Frontend Liberty server apps directory'
-    actions:
-        - name: 'Copy to USS'
-          steps:
-          - name: USS_ARCHIVE
-            properties:
-            - key: "path_filter"
-              value: '.*-frontend.*\.war$'
-            - key: "var_uss_archive"
-              value: "uss_archive_frontend"
-          - name: USS_COPY
-            properties:
-            - key: "path_filter"
-              value: '.*-frontend.*\.war$'
-            - key: "var_uss_copy"
-              value: "uss_copy_frontend"
-          - name: USS_RESTORE
-            plan_tags:
-            - restore
-            - never
-    types:
-       - name: 'war'
-    is_artifact: True
-    tags:
-    - frontend_copy
-    - deploy
-
   - name: 'Deploy Config Files'
     description: 'Process and deploy z/OS Connect configuration files with variable substitution'
     actions:

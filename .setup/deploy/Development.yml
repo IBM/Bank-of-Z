@@ -101,15 +101,6 @@ system_command_refresh_frontend:
   verbose: true
   wait_time_s: 3
 
-uss_copy_frontend:
-  src_data_set: "{{ current_step_artifact.name }}"
-  dest: "{{frontend_root}}/servers/{{frontend_server_name}}/apps/{{ current_step_artifact.name }}"
-
-uss_archive_frontend:
-  src: "{{frontend_root}}/servers/{{frontend_server_name}}/apps/{{ current_step_artifact.name }}"
-  dest: "{{frontend_root}}/servers/{{frontend_server_name}}/backup/apps/{{ current_step_artifact.name }}"
-
-
 # load shared configuration
 include_global_config:
   files_list:

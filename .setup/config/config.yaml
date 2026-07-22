@@ -75,6 +75,7 @@ global:
   db2_ssid: "DBD1"
   db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
+  db2_java_home: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
 
@@ -234,7 +235,6 @@ ims:
   dfs_proclib: "{{ ims.ims_hlq }}.PROCLIB"
   dfs_joblib: "{{ ims.ims_hlq }}.JOBS"
   java_conf_path: "${HOME}/dfsjvmpr.props"
-  db2_java_home: "/usr/lpp/db2d10"
   dfs_ims_userid: "${IMS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
   dfs_imsplex: "{{ global.ims_dfsplex }}"
@@ -287,3 +287,4 @@ db2:
   sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  db2_java_home: "{{ global.db2_java_home }}"

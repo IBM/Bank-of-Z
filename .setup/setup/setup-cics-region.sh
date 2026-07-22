@@ -173,7 +173,7 @@ zconfig apply \
   -e sysid="${APP_SHORT_NAME}" \
   -e region_hlq="${APP_HLQ}" \
   -e region_uss_dir="$SANDBOX_DIR" \
-  -e java_home="/usr/lpp/java/java21/current_64" \
+  -e java_home="$JAVA_HOME" \
   -e cmci_port="$CICS_CMCI_PORT" \
   -e debug_hlq="$DEBUG_HLQ" \
   -e db2_hlq="${DB2_HLQ}" \

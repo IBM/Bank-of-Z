@@ -145,7 +145,7 @@ IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
 IMS_PLEX=${IMS_PLEX:-$(get_section_value 'ims' 'dfs_imsplex')}
 IMS_JAVA_CONF_PATH=${IMS_JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
 IMS_DFS_IMS_SSID=${IMS_DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
-
+IMS_JAVA_HOME="${IMS_JAVA_HOME:-$(get_section_value 'ims' 'ims_java_home')}"
 
 # zconfig
 ZCONFIG_ZCB_HOME=$(get_section_value 'zconfig' 'zcb_home')
@@ -158,6 +158,7 @@ DEBUG_TCPIP_HQL=$(get_section_value 'debug' 'tcpip_hlq')
 # Db2
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
+DB2_JAVA_HOME="${DB2_JAVA_HOME:-$(get_section_value 'db2' 'db2_java_home')}"
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

@@ -7,6 +7,9 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
+  java_home: "/usr/lpp/java/java21/current_64"
+  ims_java_home: "/usr/lpp/ims/imsjava"
+  db2_java_home: "/usr/lpp/db2d10"
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
@@ -490,13 +493,13 @@ ims:
     - member_name: DFSJVMEV
       config:
         libpath:
-        - /usr/lpp/java/java21/J21.0_64/lib
-        - /usr/lpp/java/java21/J21.0_64/lib/j9vm
-        - /usr/lpp/java/java21/J21.0_64/lib/default
-        - /usr/lpp/java/java21/J21.0_64/bin/j9vm
-        - /usr/lpp/java/java21/J21.0_64/bin/
-        - /usr/lpp/ims/imsjava/lib
-        - /usr/lpp/db2d10/jdbc/lib
+        - "{{ vars.java_home }}/lib"
+        - "{{ vars.java_home }}/lib/j9vm"
+        - "{{ vars.java_home }}/lib/default"
+        - "{{ vars.java_home }}/bin/j9vm"
+        - "{{ vars.java_home }}/bin/"
+        - "{{ vars.ims_java_home }}/lib"
+        - "{{ vars.db2_java_home }}/jdbc/lib"
     - member_name: DFSJVMMS
       config:
         jvm_options:

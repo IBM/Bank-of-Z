@@ -84,3 +84,14 @@ Builds the application from source and deploys the generated artifacts to the pr
 5. Populates the IMS database with application test data
 
 The initial build and deployment typically take approximately 15 to 20 minutes.
+
+## Incremental builds
+
+After the initial deployment is complete, most day-to-day development can be performed using an incremental build and deploy instead of rebuilding the entire environment.
+
+The incremental workflow rebuilds and deploys only the application components affected by your source code changes, reducing build time while preserving the existing runtime environment.
+
+For more information, see:
+
+- [Zowe CLI Workflow](zowe-cli-workflow.md)
+- [GRUB Workflow](grub-workflow.md)

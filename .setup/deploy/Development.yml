@@ -149,7 +149,7 @@ ims_acb_gen_default:
 
 ims_catalog_populate_default:
      acb_lib:
-       - "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIB"
+       - "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
      mode: "UPDATE"
      online_batch: true
      dfsdf_member: "000"

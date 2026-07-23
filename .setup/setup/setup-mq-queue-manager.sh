@@ -64,6 +64,8 @@ zconfig apply \
   -e mq_qmgr_hlq="${MQ_QMGR_HLQ}" \
   -e mq_cpf="${MQ_CPF}" \
   -e mq_proclib="${MQ_PROCLIB}" \
+  -e mq_otma_group="${MQ_OTMA_GROUP}" \
+  -e mq_otma_ims="${MQ_OTMA_IMS}" \
   mq-queue-manager.yaml
 
 RC=$?

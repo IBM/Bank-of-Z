@@ -150,6 +150,8 @@ MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
 MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')
 MQ_CPF=$(get_section_value 'mq' 'cpf')
 MQ_PROCLIB=$(get_section_value 'mq' 'proclib')
+MQ_OTMA_GROUP=$(get_section_value 'mq' 'otma_group')
+MQ_OTMA_IMS=$(get_section_value 'mq' 'otma_ims')
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

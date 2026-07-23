@@ -32,9 +32,9 @@ import com.ibm.msg.client.jakarta.wmq.WMQConstants;
  *
  * java TransferMoneyInCICS qmgr accountNumber amount
  *
- * qmgr: queue manager name, e.g. MQ21
+ * qmgr:          queue manager name, e.g. MQ21
  * accountNumber: eight digit account number, e.g 00000008
- * amount: amount of money to be transferred in if positive, out if negative, e.g 99.99
+ * amount:        amount of money to be transferred in if positive, out if negative, e.g 99.99 or -99.99
  *
  * Before running you need to have set up STEPLIB and native library path.
  * E.g:
@@ -142,10 +142,10 @@ public class TransferMoneyInCICS {
 
       //Check COMM-SUCCESS.
       if(getStringFromBytes(replyBytes, 90, 1).equals("Y")) {
-        System.out.println("Transfer succedded. Available balance: " + zonedDecimalToString(replyBytes, 26) + ", actual balance: " + zonedDecimalToString(replyBytes, 38));
+        System.out.printf("Transfer succeeded. Available balance: %s, actual balance: %s%n", zonedDecimalToString(replyBytes, 26), zonedDecimalToString(replyBytes, 38));
       }
       else {
-        System.out.println("Transfer failed. Error code: " +  getStringFromBytes(replyBytes, 91, 1));
+        System.out.printf("Transfer failed. Error code: %s%n",  getStringFromBytes(replyBytes, 91, 1));
       }
     }
     else {

@@ -41,6 +41,8 @@ rm -f /tmp/Db2-* 2>/dev/null || true
 # =========================
 set +e
 tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
+tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
+tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
@@ -56,6 +58,7 @@ run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
 RC=$?
 
 rm -f /tmp/Db2-*
+rm -f "$SCRIPTS_DIR/../config/.env"
 
 # =========================
 # Result

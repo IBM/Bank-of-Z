@@ -1172,7 +1172,7 @@ resourceDefinitions:
       initqname: BOZ.CICS.INITQ
       resyncmember: YES
 
-  MQMONITOR Definitions
+  # MQMONITOR Definitions
   - mqmonitor:
      name: BOZMQMON
      group: BANKZGRP

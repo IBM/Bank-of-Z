@@ -144,12 +144,6 @@ resourceOverrides:
         group: EQA
       overrides:
         portnumber: $CICS_DEBUG_PORT
-  - ipconn:
-    - selector:
-        name: ZOSCONN
-        group: BANKZGRP
-      overrides:
-        port: $CICS_IPIC_PORT
 EOF
 
 print_success "Overrides file created successfully!"

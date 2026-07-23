@@ -1132,19 +1132,6 @@ resourceDefinitions:
       maxpersist: "NO"
       backlog: 0
 
-  - ipconn:
-      name: ZOSCONN
-      group: BANKZGRP
-      host: 127.0.0.1
-      port: 1234
-      tcpipservice: ZOSEE
-
-  # JVM Server Definition
-  - jvmserver:
-      name: ZOSCNJVM
-      group: BANKZGRP
-      jvmprofile: zosconn
-
   # DB2CONN Definition
   - db2conn:
       name: "{{ vars.db2_ssid }}"

@@ -122,9 +122,9 @@ try {
     
     log.info("Frontend files copied successfully")
     
-    // Step 3: Remove unnecessary files (package.json, server.js, README, .gitignore, node_modules if any)
+    // Step 3: Remove unnecessary files (README, .gitignore)
     log.info("Step 3: Cleaning up unnecessary files")
-    def cleanupFiles = ['package.json', 'server.js', 'README.md', '.gitignore', 'node_modules']
+    def cleanupFiles = ['README.md', '.gitignore']
     cleanupFiles.each { filename ->
         def fileToRemove = new File(tempWarDir, filename)
         if (fileToRemove.exists()) {

@@ -22,6 +22,10 @@ tags:
   - name: Transactions
     description: Transaction history endpoints
 
+servers:
+  - url: /api
+    description: z/OS Connect API base path
+
 security:
   - OAuth2:
       - accounts

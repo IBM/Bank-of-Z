@@ -134,8 +134,6 @@ public class TransferMoneyInCICS {
     BytesMessage replyMessage = (BytesMessage)consumer.receive(5_000);
 
     if(replyMessage != null) {
-      System.out.println(replyMessage);
-
       //Parse it. All offsets from the start of the COBOL copybook.
       byte[] replyBytes = new byte[(int)replyMessage.getBodyLength()];
       replyMessage.readBytes(replyBytes);

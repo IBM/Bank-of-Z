@@ -446,7 +446,7 @@ queue_managers:
       xcfmname: ''
       passtkta: ''
       descr: ''
-   - name: 'IMSBRDG'
+    - name: 'IMSBRDG'
       qsgdisp: 'QMGR'
       psid: '3'
       xcfgname: '{{ vars.mq_otma_group }}'

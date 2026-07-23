@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./cics_region_0.6.0.schema.json
+# yaml-language-server: $schema=./cics_region_0.7.0.schema.json
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
@@ -12,6 +12,7 @@ vars:
   eqaw_hlq: "EQAW.SEQAMOD"
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
+  db2_ssid: "DBD1"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -47,9 +48,6 @@ cics_region:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
         - "{{ vars.tcpip_hlq }}.SEZATCP"
-    dds:
-      - name: DFHTABLE
-        dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -74,7 +72,11 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
-    pltpi: "SI"
+
+  startup_programs:
+    third_phase:
+      - EZACIC20
+      - EQA0CPLT
 
   extensions:
     cics_cmci:
@@ -85,5 +87,4 @@ cics_region:
 
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
-    - "EYUSMSSJ.jvmprofile"
- 
+    - path: "EYUSMSSJ.jvmprofile"

@@ -1,3 +1,33 @@
+# Bank of Z - z/OS Containers Branch
+
+> [!NOTE]
+> **This branch is a work in progress.** Container support for Bank of Z is under active development and is not yet ready for general use.
+
+## Containers on z/OS (Branch: `zos-containers`)
+
+The aim of this branch is to use containers during the build and deployment of the Bank-of-Z application on z/OS. Containers are provided through the IBM z/OS Container Platform (zOSCP), which bundles a version of [podman](https://podman.io/) that runs in Unix System Services (USS). This branch will use podman to pull or build container images, and to run containers.
+
+Using containers on z/OS offers several advantages over traditional installation methods:
+
+- **Simplified installation** — each image bundles a product with its dependencies and configuration, eliminating manual install and configuration steps.
+- **Consistency** — versioned, immutable images provide the same application environment across development, test, and production LPARs.
+- **Dependency isolation** — runtimes are self-contained, avoiding conflicts with other products on the same USS filesystem.
+- **Faster onboarding** — pull a pre-built image from a registry rather than following multi-step installation procedures.
+- **Easy version control** — pin a specific product version by image tag, and roll back simply by changing it.
+
+### Current state
+
+| File | Status | Description |
+|------|--------|-------------|
+| `.setup/config/config.yaml` | ✅ Updated | New `zoscp.images` section defines the container images to pull, including the registry URL, credentials variable name, and image tag for IBM Java and IBM z/OS Connect |
+| `validate-install.sh` | ✅ Updated | Checks that IBM z/OS Container Platform is installed and that podman is configured |
+| `setup-zoscp-images.sh` | ✅ New | Pulls an IBM Java image and an IBM z/OS Connect image from an image registry using podman |
+
+### What's still pending
+
+- Integrate containers into the build pipeline
+- Integrate containers into the deployment pipeline
+
 # Bank of Z
 
 Bank of Z is a hybrid banking application that demonstrates modern IBM Z development practices. It routes transactions through CICS or IMS depending on customer ID, with z/OS Connect as the API gateway between the browser-based UI and the z/OS transactional applications.

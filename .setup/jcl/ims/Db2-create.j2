@@ -21,7 +21,7 @@ SET CURRENT SQLID = '{{ db2.sqlid }}';
 
 CREATE DATABASE {{ ims.db2_database }}
 CCSID EBCDIC;
-
+CREATE TABLESPACE "{{ ims.db2_table}}" IN "{{ ims.db2_database }}";
 
 CREATE TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}"
 (
@@ -33,6 +33,7 @@ CREATE TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}"
 	"ACCID" BIGINT NOT NULL,
 	"BALANCE" DECIMAL(15,2) NOT NULL
 )   
+    IN {{ ims.db2_database }}.{{ ims.db2_table}}
 	AUDIT NONE
 	DATA CAPTURE NONE;
 

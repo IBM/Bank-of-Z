@@ -77,6 +77,34 @@ version_compare() {
 }
 
 # =========================
+# Validation: IBM z/OS Container Platform
+# =========================
+print_info "${CYAN}[VALIDATE]${NC} ========================================="
+print_info "${CYAN}[VALIDATE]${NC} Checking IBM z/OS Container Platform"
+print_info "${CYAN}[VALIDATE]${NC} ========================================="
+
+ZOSCP_PODMAN="/usr/lpp/IBM/zoscp/bin/podman"
+
+if [ -f "$ZOSCP_PODMAN" ]; then
+    print_success "${GREEN}[VALIDATE]${NC} IBM z/OS Container Platform podman found: $ZOSCP_PODMAN"
+    VALIDATION_PASSED=$((VALIDATION_PASSED + 1))
+
+    "$ZOSCP_PODMAN" images >/dev/null 2>&1
+    PODMAN_RC=$?
+    if [ $PODMAN_RC -eq 0 ]; then
+        print_success "${GREEN}[VALIDATE]${NC} podman images check PASSED"
+        VALIDATION_PASSED=$((VALIDATION_PASSED + 1))
+    else
+        print_error "${RED}[VALIDATE]${NC} podman does not appear to be configured correctly (rc=$PODMAN_RC)"
+        VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
+    fi
+else
+    print_error "${RED}[VALIDATE]${NC} IBM z/OS Container Platform podman not found"
+    print_error "${RED}[VALIDATE]${NC} Expected location: $ZOSCP_PODMAN"
+    VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
+fi
+
+# =========================
 # Validation: DBB Runtime
 # =========================
 print_info "========================================="

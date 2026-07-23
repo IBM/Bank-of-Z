@@ -199,17 +199,11 @@ export SPACES=$((8-${#APP_SHORT_NAME} - 1))
 export MIDDLE=$(printf '%s,%*s' ${APP_SHORT_NAME} $SPACES "")
 
 rm -f "/tmp/tcpip-create*"
-rm -f "/tmp/plt-create*"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "cics_hlq=${APP_HLQ}.CICS${APP_SHORT_NAME}" --extraVar "applid_line=${LEFT}${MIDDLE}${RIGHT}" \
     --extraVar "tcpip_hlq=${DEBUG_TCPIP_HQL}" \
     --templateFile "$SCRIPTS_DIR/../jcl/cics/tcpip-create.j2"  --outputFile "/tmp/tcpip-create-$$.jcl"
 run_job_and_wait "/tmp/tcpip-create-$$.jcl"
-
-drm "${APP_HLQ}.CICS${APP_SHORT_NAME}.TABLES.SOURCE" 2> /dev/null || true 
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "cics_hlq=${APP_HLQ}.CICS${APP_SHORT_NAME}" --templateFile "$SCRIPTS_DIR/../jcl/cics/plt-create.j2"  --outputFile "/tmp/plt-create-$$.jcl"
-run_job_and_wait "/tmp/plt-create-$$.jcl"
 
 opercmd "S EQARMTD"
 

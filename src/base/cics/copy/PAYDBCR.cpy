@@ -16,5 +16,6 @@
                05 COMM-NETWRK-ID        PIC X(8).
                05 COMM-FACILTYPE        PIC S9(8) COMP.
                05 FILLER                PIC X(4).
+               05 COMM-DESCRIPTION      PIC X(40).
           03 COMM-SUCCESS             PIC X.
           03 COMM-FAIL-CODE           PIC X.

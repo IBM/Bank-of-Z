@@ -1,0 +1,61 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - transactions:
+        required: true
+        nullable: false
+        foreach:
+          input: "$exists($zosAssetResponse.commarea.\"INQTRANL-COMMAREA\".\"INQTRANL-TRANSACTIONS\"\
+            ) ? [$filter($zosAssetResponse.commarea.\"INQTRANL-COMMAREA\".\"INQTRANL-TRANSACTIONS\"\
+            , function($v) { $number($v.\"INQTRANL-TRAN-SORTCODE\") > 0 and $number($v.\"\
+            INQTRANL-TRAN-ACCNO\") > 0 })] : []"
+          mappings:
+          - transactionId:
+              required: true
+              nullable: false
+              template: "{{$item.\"INQTRANL-TRAN-ID\"}}"
+          - accountId:
+              required: true
+              nullable: false
+              template: "{{$item.\"INQTRANL-TRAN-SORTCODE\"}}-{{$item.\"INQTRANL-TRAN-ACCNO\"\
+                }}"
+          - amount:
+              required: true
+              nullable: false
+              expression: "$abs($item.\"INQTRANL-TRAN-AMOUNT\")"
+          - currency:
+              required: true
+              nullable: false
+              template: "GBP"
+          - creditDebitIndicator:
+              required: true
+              nullable: false
+              expression: "$item.\"INQTRANL-TRAN-AMOUNT\" >= 0 ? 'CREDIT' : 'DEBIT'"
+          - status:
+              required: true
+              nullable: false
+              template: "BOOKED"
+          - bookingDateTime:
+              required: true
+              nullable: false
+              template: "{{$item.\"INQTRANL-TRAN-DATE-GRP\".\"INQTRANL-TRAN-DATE-YYYY\"\
+                }}-{{$item.\"INQTRANL-TRAN-DATE-GRP\".\"INQTRANL-TRAN-DATE-MM\"}}-{{$item.\"\
+                INQTRANL-TRAN-DATE-GRP\".\"INQTRANL-TRAN-DATE-DD\"}}"
+          - transactionInformation:
+              required: false
+              nullable: false
+              template: "{{$item.\"INQTRANL-TRAN-DESC\"}}"
+    - totalCount:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.\"INQTRANL-COMMAREA\".\"INQTRANL-TOTAL-COUNT\""
+    - limit:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.\"INQTRANL-COMMAREA\".\"INQTRANL-LIMIT\""
+    - offset:
+        required: false
+        nullable: false
+        expression: "$zosAssetResponse.commarea.\"INQTRANL-COMMAREA\".\"INQTRANL-OFFSET\""

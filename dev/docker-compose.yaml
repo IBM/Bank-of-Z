@@ -29,8 +29,6 @@ services:
 
   frontend:
     image: nginx:alpine
-    environment:
-      - API_BASE_URL=http://zosConnect:9080
     ports:
       - "3001:80"
     volumes:

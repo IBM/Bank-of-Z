@@ -12,7 +12,7 @@ Docker Compose setup for running Bank of Z locally. Starts a z/OS Connect Design
 ```
 dev/
 ├── docker-compose.yaml       # Compose services: zosConnect + frontend
-├── nginx.frontend.conf       # nginx config template (API_BASE_URL injected at startup)
+├── nginx.frontend.conf       # nginx reverse-proxy config for the frontend
 └── README.md                 # This file
 ```
 
@@ -44,28 +44,20 @@ IMS_PORT=
 IMS_DATASTORE=
 ```
 
-### API Base URL
-
-The frontend nginx container rewrites `config.js` at startup to point at the backend. The default in `docker-compose.yaml` is:
+## How API URL routing works
 
 ```
-API_BASE_URL=http://zosConnect:9080
+Browser → localhost:3001/api/customers/1234
+         ↓ nginx proxy_pass (URI unchanged)
+         zosConnect:9080/api/customers/1234   ← zosConnect serves at /api/*
 ```
 
-Override it in a `dev/.env` file to point at a different backend:
+[`nginx.frontend.conf`](nginx.frontend.conf) proxies all `/api/` requests to the `zosConnect` container on port 9080, **keeping the `/api` prefix** (no trailing slash on `proxy_pass`). `config.js` uses the relative path `/api` as the base URL when served from port 3001.
 
-```
-API_BASE_URL=https://my-zosconnect-host:9080
-```
+### Designer "Test API" button
 
-## How API URL injection works
+The z/OS Connect Designer uses the `servers.url` field from the OpenAPI spec to build test request URLs. With `servers: [{url: /api}]`, clicking "Test API" sends requests to `https://localhost:9443/api/customers/1234`, which matches where zosConnect serves the API.
 
-[`nginx.frontend.conf`](nginx.frontend.conf) is mounted as an nginx template. The `nginx:alpine` entrypoint runs `envsubst` on all files in `/etc/nginx/templates/` before starting nginx, substituting `${API_BASE_URL}` with the environment variable value.
+### Production (Liberty, port 9081)
 
-The nginx `sub_filter` directive then rewrites the `baseUrl` value in `config.js` responses on the fly:
-
-```nginx
-sub_filter "baseUrl: '/api'" "baseUrl: '${API_BASE_URL}'";
-```
-
-This means `src/frontend/config.js` is never modified — the substitution happens at the HTTP response layer. When the frontend is deployed to Liberty (WAR), nginx is not involved and `config.js` is served unchanged with `baseUrl: '/api'`.
+`config.js` detects port 9081 and constructs an absolute URL (`http://<hostname>:9080/api`), bypassing nginx entirely. No changes needed for production deployments.

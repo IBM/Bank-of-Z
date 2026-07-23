@@ -1147,10 +1147,10 @@ resourceDefinitions:
 
   # DB2CONN Definition
   - db2conn:
-      name: DBD1
+      name: "{{ vars.db2_ssid }}"
       group: BANKZGRP
       connecterror: SQLCODE
-      db2id: DBD1
+      db2id: "{{ vars.db2_ssid }}"
       msgqueue1: CSMT
       plan: BANKZPLN
 

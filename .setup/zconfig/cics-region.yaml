@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./cics_region_0.6.0.schema.json
+# yaml-language-server: $schema=./cics_region_0.7.0.schema.json
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
@@ -12,6 +12,7 @@ vars:
   eqaw_hlq: "EQAW.SEQAMOD"
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
+  db2_ssid: "DBD1"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -85,5 +86,4 @@ cics_region:
 
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
-    - "EYUSMSSJ.jvmprofile"
- 
+    - path: "EYUSMSSJ.jvmprofile"

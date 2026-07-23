@@ -181,6 +181,7 @@ zconfig apply \
   -e cics_uss_dir="${CICS_USS_DIR}" \
   -e tcpip_hlq="${DEBUG_TCPIP_HQL}" \
   -e cics_sec="${CICS_SEC}" \
+  -e db2_ssid="${DB2_SSID}" \
   cics-region.yaml
 
 RC=$?

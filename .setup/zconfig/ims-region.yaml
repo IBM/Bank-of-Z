@@ -7,7 +7,7 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
-  java_home: "/usr/lpp/java/java21/current_64"
+  java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_home: "/usr/lpp/ims/imsjava"
   db2_java_home: "/usr/lpp/db2d10"
 ims:

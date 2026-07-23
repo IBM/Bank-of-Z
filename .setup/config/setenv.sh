@@ -163,6 +163,16 @@ DB2_JAVA_HOME="${DB2_JAVA_HOME:-$(get_section_value 'db2' 'db2_java_home')}"
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')
 RSE_PROFILE_ARG="--rse-profile $(get_section_value 'zowe' 'rse_profile')"
+
+# IBM z/OS Container Platform — per-image config
+ZOSCP_ZOSCONNECT_IMAGE=$(get_section_value 'zoscp.images.zosconnect' 'image')
+ZOSCP_ZOSCONNECT_REGISTRY=$(get_section_value 'zoscp.images.zosconnect' 'registry')
+ZOSCP_ZOSCONNECT_REGISTRY_USERNAME=$(get_section_value 'zoscp.images.zosconnect' 'registry_username')
+ZOSCP_ZOSCONNECT_API_KEY_VAR=$(get_section_value 'zoscp.images.zosconnect' 'api_key_var')
+ZOSCP_JAVA_IMAGE=$(get_section_value 'zoscp.images.java' 'image')
+ZOSCP_JAVA_REGISTRY=$(get_section_value 'zoscp.images.java' 'registry')
+ZOSCP_JAVA_REGISTRY_USERNAME=$(get_section_value 'zoscp.images.java' 'registry_username')
+ZOSCP_JAVA_API_KEY_VAR=$(get_section_value 'zoscp.images.java' 'api_key_var')
 EOF
 fi
 

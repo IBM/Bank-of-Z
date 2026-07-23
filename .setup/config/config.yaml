@@ -288,3 +288,21 @@ db2:
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   db2_java_home: "{{ global.db2_java_home }}"
+
+# IBM z/OS Container Platform
+zoscp:
+  # Per-image configuration. Each image may specify its own registry, username,
+  # and the name of the secret variable to load from $HOME/.profile.bankz.
+  # Add the corresponding REGISTRY_API_KEY_<NAME> entries to ~/.profile.bankz.
+  images:
+    zosconnect:
+      image: "icr.io/zosconnectunlimited/ibm-zcon-server:3.0.105"
+      registry: "icr.io/zosconnectunlimited"
+      registry_username: "iamapikey"
+      # Variable name to read from $HOME/.profile.bankz (chmod 600, not in git)
+      api_key_var: "REGISTRY_API_KEY_ZOSCONNECT"
+    java:
+      image: "icr.io/zoscp/ibm-semeru-runtimes-21:certified-jdk-zos"
+      registry: "icr.io/zoscp"
+      registry_username: "iamapikey"
+      api_key_var: "REGISTRY_API_KEY_JAVA"

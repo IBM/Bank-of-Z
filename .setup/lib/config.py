@@ -79,10 +79,17 @@ def render_config(data):
 
 
 def get_value(config, section, key):
-    section_data = config.get(section)
-    if not isinstance(section_data, dict):
+    # Support dotted paths like 'zoscp.images.zosconnect'
+    node = config
+    for part in section.split("."):
+        if not isinstance(node, dict):
+            return ""
+        node = node.get(part)
+        if node is None:
+            return ""
+    if not isinstance(node, dict):
         return ""
-    value = section_data.get(key, "")
+    value = node.get(key, "")
     if value is None:
         return ""
     return value

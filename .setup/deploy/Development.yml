@@ -136,7 +136,7 @@ sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined 
 
 # Variables for ims_acb_gen building block
 ims_acb_gen_default:
-   acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIB"
+   acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
    command_input: "BUILD"
    steplib :
      - "{{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL"
@@ -149,7 +149,7 @@ ims_acb_gen_default:
 
 ims_catalog_populate_default:
      acb_lib:
-       - "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIB"
+       - "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
      mode: "UPDATE"
      online_batch: true
      dfsdf_member: "000"

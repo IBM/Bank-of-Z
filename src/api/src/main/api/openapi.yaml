@@ -556,7 +556,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "ACC987654321" #pragma: allowlist secret
+            example: "987654-3000" #pragma: allowlist secret
         - name: fromDate
           in: query
           description: Start date for transaction history (ISO 8601 format)

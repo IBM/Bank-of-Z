@@ -1,0 +1,36 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - INQTRAND-COMMAREA:
+        required: false
+        nullable: false
+        mappings:
+        - INQTRAND-EYE:
+            required: false
+            nullable: false
+            template: "ITRD"
+        - INQTRAND-SORTCODE:
+            required: false
+            nullable: false
+            expression: "$number($substringBefore($pathParameters.accountId, '-'))"
+        - INQTRAND-ACCNO:
+            required: false
+            nullable: false
+            expression: "$number($substringAfter($pathParameters.accountId, '-'))"
+        - INQTRAND-DATE:
+            required: false
+            nullable: false
+            expression: "$number($substringBefore($substringAfter($substringAfter($pathParameters.transactionId,\
+              \ '-'), '-'), '-'))"
+        - INQTRAND-TIME:
+            required: false
+            nullable: false
+            expression: "$number($substringBefore($substringAfter($substringAfter($substringAfter($pathParameters.transactionId,\
+              \ '-'), '-'), '-'), '-'))"
+        - INQTRAND-REF:
+            required: false
+            nullable: false
+            expression: "$number($substringAfter($substringAfter($substringAfter($substringAfter($pathParameters.transactionId,\
+              \ '-'), '-'), '-'), '-'))"

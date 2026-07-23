@@ -1573,6 +1573,8 @@
       *
       *    Writes details of the successful transfer to the
       *    PROCTRAN (Processed Transaction) datastore.
+      *    This writes TWO records: one for FROM account (negative)
+      *    and one for TO account (positive).
       *
            INITIALIZE HOST-PROCTRAN-ROW.
            INITIALIZE WS-EIBTASKN12.
@@ -1600,11 +1602,14 @@
            MOVE WS-ORIG-DATE TO WS-ORIG-DATE-GRP-X.
            MOVE WS-ORIG-DATE-GRP-X TO HV-PROCTRAN-DATE.
 
-           SET PROC-TY-TRANSFER IN PROCTRAN-AREA TO TRUE
+           SET PROC-TY-TRANSFER IN PROCTRAN-AREA TO TRUE.
 
            MOVE PROC-TRAN-TYPE IN PROCTRAN-AREA TO HV-PROCTRAN-TYPE.
 
-           MOVE COMM-AMT TO HV-PROCTRAN-AMOUNT.
+      *
+      *    Make the amount negative for the FROM account (debit)
+      *
+           COMPUTE HV-PROCTRAN-AMOUNT = COMM-AMT * -1.
 
            SET PROC-TRAN-DESC-XFR-FLAG IN PROCTRAN-AREA TO TRUE.
            MOVE COMM-TSCODE
@@ -1613,6 +1618,9 @@
              TO PROC-TRAN-DESC-XFR-ACCOUNT IN PROCTRAN-AREA.
            MOVE PROC-TRAN-DESC IN PROCTRAN-AREA TO HV-PROCTRAN-DESC.
 
+      *
+      *    Write transaction record for FROM account (negative amount)
+      *
            EXEC SQL
                 INSERT INTO PROCTRAN
                 (
@@ -1641,7 +1649,7 @@
            END-EXEC.
 
       *
-      *    Check the SQLCODE
+      *    Check the SQLCODE for FROM account transaction
       *
            IF SQLCODE NOT = 0
 
@@ -1715,6 +1723,143 @@
 
               EXEC CICS ABEND
                  ABCODE('WPCD')
+              END-EXEC
+
+           END-IF.
+
+      *
+      *    Now write transaction record for TO account (positive amount)
+      *    Save the date and time from the first transaction
+      *
+           MOVE HV-PROCTRAN-DATE TO WS-ORIG-DATE-GRP-X.
+           MOVE HV-PROCTRAN-TIME TO WS-TIME-NOW.
+
+           INITIALIZE HOST-PROCTRAN-ROW.
+
+           MOVE 'PRTR' TO HV-PROCTRAN-EYECATCHER.
+           MOVE COMM-TSCODE TO HV-PROCTRAN-SORT-CODE.
+           MOVE COMM-TACCNO TO HV-PROCTRAN-ACC-NUMBER.
+           MOVE WS-EIBTASKN12 TO HV-PROCTRAN-REF.
+           MOVE WS-ORIG-DATE-GRP-X TO HV-PROCTRAN-DATE.
+           MOVE WS-TIME-NOW TO HV-PROCTRAN-TIME.
+
+           SET PROC-TY-TRANSFER IN PROCTRAN-AREA TO TRUE.
+           MOVE PROC-TRAN-TYPE IN PROCTRAN-AREA TO HV-PROCTRAN-TYPE.
+
+      *
+      *    Keep the amount positive for the TO account (credit)
+      *
+           MOVE COMM-AMT TO HV-PROCTRAN-AMOUNT.
+
+           SET PROC-TRAN-DESC-XFR-FLAG IN PROCTRAN-AREA TO TRUE.
+           MOVE COMM-FSCODE
+             TO PROC-TRAN-DESC-XFR-SORTCODE IN PROCTRAN-AREA.
+           MOVE COMM-FACCNO
+             TO PROC-TRAN-DESC-XFR-ACCOUNT IN PROCTRAN-AREA.
+           MOVE PROC-TRAN-DESC IN PROCTRAN-AREA TO HV-PROCTRAN-DESC.
+
+           EXEC SQL
+                INSERT INTO PROCTRAN
+                (
+                PROCTRAN_EYECATCHER,
+                PROCTRAN_SORTCODE,
+                PROCTRAN_NUMBER,
+                PROCTRAN_DATE,
+                PROCTRAN_TIME,
+                PROCTRAN_REF,
+                PROCTRAN_TYPE,
+                PROCTRAN_DESC,
+                PROCTRAN_AMOUNT
+                )
+                VALUES
+                (
+                :HV-PROCTRAN-EYECATCHER,
+                :HV-PROCTRAN-SORT-CODE,
+                :HV-PROCTRAN-ACC-NUMBER,
+                :HV-PROCTRAN-DATE,
+                :HV-PROCTRAN-TIME,
+                :HV-PROCTRAN-REF,
+                :HV-PROCTRAN-TYPE,
+                :HV-PROCTRAN-DESC,
+                :HV-PROCTRAN-AMOUNT
+                )
+           END-EXEC.
+
+      *
+      *    Check the SQLCODE for TO account transaction
+      *
+           IF SQLCODE NOT = 0
+
+              MOVE SQLCODE TO WS-SQLCODE-DISP
+      *
+      *       Preserve the RESP and RESP2, then set up the
+      *       standard ABEND info before getting the applid,
+      *       date/time etc. and linking to the Abend Handler
+      *       program.
+      *
+              INITIALIZE ABNDINFO-REC
+              MOVE EIBRESP    TO ABND-RESPCODE
+              MOVE EIBRESP2   TO ABND-RESP2CODE
+      *
+      *       Get supplemental information
+      *
+              EXEC CICS ASSIGN APPLID(ABND-APPLID)
+              END-EXEC
+
+              MOVE EIBTASKN   TO ABND-TASKNO-KEY
+              MOVE EIBTRNID   TO ABND-TRANID
+
+              PERFORM POPULATE-TIME-DATE
+
+              MOVE WS-ORIG-DATE TO ABND-DATE
+              STRING WS-TIME-NOW-GRP-HH DELIMITED BY SIZE,
+                     ':' DELIMITED BY SIZE,
+                     WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
+                     ':' DELIMITED BY SIZE,
+                     WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
+                     INTO ABND-TIME
+              END-STRING
+
+              MOVE WS-U-TIME   TO ABND-UTIME-KEY
+              MOVE 'WPCT'      TO ABND-CODE
+
+              EXEC CICS ASSIGN PROGRAM(ABND-PROGRAM)
+              END-EXEC
+
+              MOVE WS-SQLCODE-DISP TO ABND-SQLCODE
+
+              STRING 'WTPD010 - Unable to WRITE TO account to PROCTRAN'
+                    DELIMITED BY SIZE,
+                    ' DB2 datastore. Data='
+                    DELIMITED BY SIZE,
+                    HOST-PROCTRAN-ROW
+                    DELIMITED BY SIZE,
+                    '.Data inconsistency, data UPDATED on ACCOUNT file'
+                    DELIMITED BY SIZE,
+                    ' EIBRESP=' DELIMITED BY SIZE,
+                    ABND-RESPCODE DELIMITED BY SIZE,
+                    ' RESP2=' DELIMITED BY SIZE,
+                    ABND-RESP2CODE DELIMITED BY SIZE
+                    INTO ABND-FREEFORM
+              END-STRING
+
+              EXEC CICS LINK PROGRAM(WS-ABEND-PGM)
+                        COMMAREA(ABNDINFO-REC)
+              END-EXEC
+
+              DISPLAY 'UNABLE TO WRITE TO ACCOUNT TO PROCTRAN DB2'
+              ' DATASTORE SQLCODE=' SQLCODE
+              'WITH THE FOLLOWING DATA:' HOST-PROCTRAN-ROW
+              DISPLAY 'DATA INCONSISTENCY, DATA UPDATED ON ACCOUNT'
+
+      *
+      *       Check if SQLCODE indicates that Storm Drain processing
+      *       is applicable in a workload if activated
+      *
+              PERFORM CHECK-FOR-STORM-DRAIN-DB2
+
+              EXEC CICS ABEND
+                 ABCODE('WPCT')
               END-EXEC
 
            END-IF.

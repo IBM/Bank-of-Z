@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Account Transactions - Bank of Z</title>
+
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <div class="cds--content landing-page">
+        <!-- Banner -->
+        <div class="cds--white landing-page__banner">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="account-transactions.html">Account Transactions</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>Account Transactions</h1>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="cds--row">
+            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
+                <div class="search-section">
+                    <h3>Search Transactions</h3>
+                    <cds-form id="search-form">
+                        <div class="cds--row">
+                            <div class="cds--col-md-4 cds--col-lg-4">
+                                <cds-text-input
+                                    id="accountId"
+                                    label="Account ID"
+                                    placeholder="e.g., 987654-3000 or 3000"
+                                    helper-text="Enter full account ID (sortCode-accountNumber) or just account number"
+                                    required>
+                                </cds-text-input>
+                            </div>
+                            <div class="cds--col-md-4 cds--col-lg-4">
+                                <cds-date-picker>
+                                    <cds-date-picker-input 
+                                        id="fromDate"
+                                        kind="single" 
+                                        label-text="From Date"
+                                        placeholder="yyyy-mm-dd">
+                                    </cds-date-picker-input>
+                                </cds-date-picker>
+                            </div>
+                            <div class="cds--col-md-4 cds--col-lg-4">
+                                <cds-date-picker>
+                                    <cds-date-picker-input 
+                                        id="toDate"
+                                        kind="single" 
+                                        label-text="To Date"
+                                        placeholder="yyyy-mm-dd">
+                                    </cds-date-picker-input>
+                                </cds-date-picker>
+                            </div>
+                        </div>
+                        <br>
+                        <cds-button id="search-btn">Search Transactions</cds-button>
+                    </cds-form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Table Section -->
+        <div id="transactions-section" class="cds--row" style="display: none;">
+            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
+                <br>
+                <h3>Transaction History</h3>
+                <div id="account-info"></div>
+                <br>
+                <div id="transactions-table"></div>
+                <br>
+                <!-- Pagination Controls -->
+                <div id="pagination-controls" style="display: none;">
+                    <cds-button id="prev-btn" kind="secondary" disabled>Previous</cds-button>
+                    <span id="page-info" style="margin: 0 20px;"></span>
+                    <cds-button id="next-btn" kind="secondary">Next</cds-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/date-picker.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatCurrency, formatDate } from './js/utils.js';
+
+        let currentAccountId = null;
+        let currentOffset = 0;
+        let currentLimit = 50;
+        let totalCount = 0;
+        let currentFilters = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+
+            // Check for account ID in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const accountId = urlParams.get('accountId');
+            if (accountId) {
+                document.getElementById('accountId').value = accountId;
+                searchTransactions();
+            }
+
+            // Handle search
+            document.getElementById('search-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                currentOffset = 0; // Reset pagination
+                await searchTransactions();
+            });
+
+            // Handle Enter key in account ID field
+            document.getElementById('accountId').addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    currentOffset = 0;
+                    await searchTransactions();
+                }
+            });
+
+            // Pagination handlers
+            document.getElementById('prev-btn').addEventListener('click', async () => {
+                if (currentOffset > 0) {
+                    currentOffset = Math.max(0, currentOffset - currentLimit);
+                    await loadTransactions();
+                }
+            });
+
+            document.getElementById('next-btn').addEventListener('click', async () => {
+                if (currentOffset + currentLimit < totalCount) {
+                    currentOffset += currentLimit;
+                    await loadTransactions();
+                }
+            });
+        });
+
+        async function searchTransactions() {
+            const accountId = document.getElementById('accountId').value.trim();
+
+            if (!accountId) {
+                showErrorModal('Validation Error', 'Please enter an account ID');
+                return;
+            }
+
+            currentAccountId = accountId;
+            
+            // Get date filters and convert to YYYY-MM-DD format
+            const fromDateValue = document.getElementById('fromDate').value;
+            const toDateValue = document.getElementById('toDate').value;
+
+            currentFilters = {
+                fromDate: fromDateValue ? convertToISODate(fromDateValue) : undefined,
+                toDate: toDateValue ? convertToISODate(toDateValue) : undefined
+            };
+
+            await loadTransactions();
+        }
+
+        // Convert date from MM/DD/YYYY to YYYY-MM-DD format
+        function convertToISODate(dateString) {
+            if (!dateString) return undefined;
+            
+            // Check if already in YYYY-MM-DD format
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                return dateString;
+            }
+            
+            // Handle MM/DD/YYYY format
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+                const [month, day, year] = dateString.split('/');
+                return `${year}-${month}-${day}`;
+            }
+            
+            // Try to parse as Date object
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            return dateString;
+        }
+
+        async function loadTransactions() {
+            showLoadingModal('Loading transactions...');
+
+            try {
+                // First, get account details
+                const account = await api.accounts.getAccount(currentAccountId);
+                displayAccountInfo(account);
+
+                // Construct the proper accountId format (sortCode-accountNumber)
+                // If currentAccountId doesn't contain a hyphen, it might be just the account number
+                let fullAccountId = currentAccountId;
+                if (account.sortCode && account.accountNumber && !currentAccountId.includes('-')) {
+                    // Remove any hyphens from sortCode and construct the ID
+                    const sortCode = account.sortCode.replace(/-/g, '');
+                    fullAccountId = `${sortCode}-${account.accountNumber}`;
+                } else if (account.accountId) {
+                    // Use the accountId from the account object if available
+                    fullAccountId = account.accountId;
+                }
+
+                // Then get transactions using the properly formatted accountId
+                const response = await api.accounts.getAccountTransactions(fullAccountId, {
+                    ...currentFilters,
+                    limit: currentLimit,
+                    offset: currentOffset
+                });
+
+                hideLoadingModal();
+
+                totalCount = response.totalCount || 0;
+                displayTransactions(response.transactions || []);
+                updatePaginationControls();
+
+                document.getElementById('transactions-section').style.display = 'block';
+            } catch (error) {
+                hideLoadingModal();
+                showErrorModal('Error', error.message || 'Failed to load transactions');
+            }
+        }
+
+        function displayAccountInfo(account) {
+            const infoHTML = `
+                <div class="cds--data-table-container">
+                    <table class="cds--data-table">
+                        <tbody>
+                            <tr>
+                                <th>Account ID</th>
+                                <td>${account.accountId}</td>
+                                <th>Account Number</th>
+                                <td>${account.accountNumber || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Account Type</th>
+                                <td>${account.accountType}</td>
+                                <th>Currency</th>
+                                <td>${account.currency}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            document.getElementById('account-info').innerHTML = infoHTML;
+        }
+
+        function displayTransactions(transactions) {
+            if (!transactions || transactions.length === 0) {
+                document.getElementById('transactions-table').innerHTML = '<p>No transactions found for this account</p>';
+                document.getElementById('pagination-controls').style.display = 'none';
+                return;
+            }
+
+            let tableHTML = `
+                <div class="cds--data-table-container">
+                    <table class="cds--data-table cds--data-table--zebra">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            transactions.forEach(transaction => {
+                const amount = transaction.amount || 0;
+                const isCredit = transaction.creditDebitIndicator === 'CREDIT';
+                const amountClass = isCredit ? 'credit-amount' : 'debit-amount';
+                const amountPrefix = isCredit ? '+' : '-';
+                
+                // Default transaction type based on credit/debit indicator if not provided
+                const transactionType = transaction.transactionType ||
+                    (isCredit ? 'Credit' : 'Debit');
+                
+                tableHTML += `
+                    <tr>
+                        <td>${formatDate(transaction.bookingDateTime)}</td>
+                        <td>${transaction.transactionInformation || 'N/A'}</td>
+                        <td>${transactionType}</td>
+                        <td class="${amountClass}">${amountPrefix}${formatCurrency(Math.abs(amount), transaction.currency)}</td>
+                        <td>${transaction.status || 'N/A'}</td>
+                        <td>
+                            <a href="transaction-details.html?accountId=${currentAccountId}&transactionId=${transaction.transactionId}">View Details</a>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('transactions-table').innerHTML = tableHTML;
+        }
+
+        function updatePaginationControls() {
+            const pageInfo = document.getElementById('page-info');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const paginationControls = document.getElementById('pagination-controls');
+
+            if (totalCount > currentLimit) {
+                paginationControls.style.display = 'block';
+                
+                const currentPage = Math.floor(currentOffset / currentLimit) + 1;
+                const totalPages = Math.ceil(totalCount / currentLimit);
+                const startItem = currentOffset + 1;
+                const endItem = Math.min(currentOffset + currentLimit, totalCount);
+
+                pageInfo.textContent = `Showing ${startItem}-${endItem} of ${totalCount} transactions (Page ${currentPage} of ${totalPages})`;
+
+                // Update button states
+                if (currentOffset === 0) {
+                    prevBtn.setAttribute('disabled', '');
+                } else {
+                    prevBtn.removeAttribute('disabled');
+                }
+
+                if (currentOffset + currentLimit >= totalCount) {
+                    nextBtn.setAttribute('disabled', '');
+                } else {
+                    nextBtn.removeAttribute('disabled');
+                }
+            } else {
+                paginationControls.style.display = 'none';
+            }
+        }
+    </script>
+
+    <style>
+        .credit-amount {
+            color: #24a148;
+            font-weight: 600;
+        }
+        
+        .debit-amount {
+            color: #da1e28;
+            font-weight: 600;
+        }
+        
+        .search-section {
+            padding: 20px;
+            background: var(--cds-layer);
+            margin-bottom: 20px;
+        }
+        
+        #pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+    </style>
+</body>
+
+</html>

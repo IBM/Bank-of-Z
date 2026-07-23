@@ -1,11 +1,11 @@
 ---
 version: 1.0
 type: "cicsCommarea-1.0"
-description: "Debit/Credit Function CICS Program"
+description: "Inquire Transaction Detail - Query single transaction by composite key"
 providerProperties:
   transidUsage: "EIB_ONLY"
-  transid: "OMEN"
+  transid: "ITRD"
   language: "COBOL"
-  program: "DBCRFUN"
+  program: "INQTRAND"
   connectionRef: "bankzCicsConnection"
   ccsid: "037"

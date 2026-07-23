@@ -110,11 +110,9 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
 
     <!-- SSL Configuration using RACF keyring -->
     <!-- sslProtocol: restrict to TLS 1.2+ only -->
-    <!-- enabledCiphers: allow only strong AEAD ciphers, remove weak RSA key exchange -->
     <ssl id="defaultSSLConfig"
          keyStoreRef="defaultKeyStore"
-         sslProtocol="TLSv1.2,TLSv1.3"
-         enabledCiphers="-TLS_RSA_*"/>
+         sslProtocol="TLSv1.2,TLSv1.3"/>
     <!-- For JCERACFKS (SAF keyring) keystores, Liberty requires the password
          attribute to be present but ignores its value - "password" is the
          conventional placeholder. The keyring itself is protected by RACF, not

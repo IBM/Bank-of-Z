@@ -212,9 +212,10 @@ cat > "${TLS_DEST}" << EOF
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-config -->
     <config updateTrigger="disabled"/>
 
-    <!-- Disable dropins and polling to avoid idle CPU usage
+    <!-- updateTrigger="mbean": Liberty only rescans apps when explicitly triggered
+         (e.g. after Wazi Deploy drops new WARs) - no idle polling overhead.
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-applicationmonitor -->
-    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <applicationMonitor dropinsEnabled="false" updateTrigger="mbean"/>
 
     <!-- Security hardening: remove X-Powered-By header
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-webcontainer -->

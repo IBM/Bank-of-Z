@@ -218,6 +218,21 @@ print_success "Deployment completed successfully"
 print_success "BankZ deployment completed successfully"
 
 # =========================
+# Restart z/OS Connect server to pick up newly deployed WARs.
+# applicationMonitor updateTrigger="mbean" means Liberty will not hot-reload
+# files on its own - an explicit restart is the reliable way to load new WARs.
+# =========================
+print_info "Restarting BAQ${APP_SHORT_NAME} to load newly deployed WARs..."
+opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+sleep 8
+if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+    opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+else
+    jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
+fi
+print_success "BAQ${APP_SHORT_NAME} restart issued - server will be ready in ~20 seconds"
+
+# =========================
 # Cleanup
 # =========================
 print_info "Cleaning up package file"

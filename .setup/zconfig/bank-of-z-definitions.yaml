@@ -1168,7 +1168,7 @@ resourceDefinitions:
       group: BANKZGRP
       description: "MQCONN for Bank of z"
       #Set from overrides
-      mqname: xxxx
+      mqname: XXXX
       initqname: BOZ.CICS.INITQ
       resyncmember: YES
 

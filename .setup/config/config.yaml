@@ -209,4 +209,4 @@ mq:
   cpf: "!{{ mq.qmgr_name }}"
   proclib: "SYS1.PROCLIB"
   otma_group: "IMSXCFGN"
-  otma_ims: "{{ ims.datastore }}""
+  otma_ims: "{{ ims.datastore }}"

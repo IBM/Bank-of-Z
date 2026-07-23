@@ -1,43 +1,45 @@
-{{ db2.jobcard }}
-//*********************************************************************
-//*                                                                   *
-//* CREATE DB2 DATABASE - {{ ims.db2_database }}                      *
-//*                                                                   *
-//*********************************************************************
-//CREATEDB EXEC PGM=IKJEFT01,DYNAMNBR=20
-//STEPLIB  DD  DISP=SHR,DSN={{ db2.sdsnexit }}
-//         DD  DISP=SHR,DSN={{ db2.sdsnload }}
+//DB2CREAT JOB 'DB2',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
+//          MSGLEVEL=(1,1),REGION=4M
+//JOBLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
+//GRANT   EXEC PGM=IKJEFT01,DYNAMNBR=20
 //SYSTSPRT DD  SYSOUT=*
 //SYSPRINT DD  SYSOUT=*
 //SYSUDUMP DD  SYSOUT=*
 //SYSTSIN  DD  *
   DSN SYSTEM({{ db2.ssid }})
-  RUN PROGRAM(DSNTEP2) PLAN({{ db2.dsntep }}) -
-       LIB('{{ db2.runlib }}')
+  RUN PROGRAM(DSNTEP2)  PLAN({{ db2.dsntep }}) -
+       LIB('{{ db2.runlib }}') PARMS('/ALIGN(MID)')
   END
 /*
 //SYSIN    DD  *
+
 SET CURRENT SQLID = '{{ db2.sqlid }}';
 
 CREATE DATABASE {{ ims.db2_database }}
-CCSID EBCDIC;
-CREATE TABLESPACE "{{ ims.db2_table}}" IN "{{ ims.db2_database }}";
+       CCSID EBCDIC
+       BUFFERPOOL BP1
+       INDEXBP BP0;
 
-CREATE TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}"
+CREATE TABLESPACE {{ ims.db2_table }} IN {{ ims.db2_database }} ;
+
+CREATE TABLE {{ ims.db2_database }}.{{ ims.db2_table }}
 (
-	"TXID" BIGINT UNIQUE NOT NULL,
-	"TIMESTMP" TIMESTAMP NOT NULL,
-	"TRANSTYP" CHAR(1) NOT NULL,
-	"AMOUNT" DECIMAL(15,2) NOT NULL,
-	"REFTXID" BIGINT NOT NULL,
-	"ACCID" BIGINT NOT NULL,
-	"BALANCE" DECIMAL(15,2) NOT NULL
-)   
-    IN {{ ims.db2_database }}.{{ ims.db2_table}}
-	AUDIT NONE
-	DATA CAPTURE NONE;
+    TXID          BIGINT UNIQUE NOT NULL,
+    TIMESTMP      TIMESTAMP NOT NULL,
+    TRANSTYP      CHAR(1) NOT NULL,
+    AMOUNT        DECIMAL(15,2) NOT NULL,
+    REFTXID       BIGINT NOT NULL,
+    ACCID         BIGINT NOT NULL,
+    BALANCE       DECIMAL(15,2) NOT NULL
+)
+IN {{ ims.db2_database }}.{{ ims.db2_table }}   NOT VOLATILE
+CARDINALITY  AUDIT NONE  DATA CAPTURE NONE;
 
-GRANT ALL ON {{ ims.db2_database }}.{{ ims.db2_table}} TO PUBLIC;
+CREATE UNIQUE INDEX {{ ims.db2_database }}.TXIDINDX
+  ON {{ ims.db2_database }}.{{ ims.db2_table }}(TXID)
+  ;
+  
+GRANT ALL ON {{ ims.db2_database }}.{{ ims.db2_table }} TO PUBLIC;
 
 COMMIT;
 

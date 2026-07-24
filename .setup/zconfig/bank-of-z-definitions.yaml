@@ -140,6 +140,42 @@ resourceDefinitions:
       executionset: FULLAPI
       jvm: "NO"
   - program:
+      name: INQTRANL
+      group: BANKZGRP
+      description: Inquire Transaction List for Account
+      language: COBOL
+      reload: "NO"
+      resident: "NO"
+      usage: NORMAL
+      uselpacopy: "NO"
+      status: ENABLED
+      cedf: "YES"
+      datalocation: ANY
+      execkey: USER
+      concurrency: THREADSAFE
+      api: CICSAPI
+      dynamic: "NO"
+      executionset: FULLAPI
+      jvm: "NO"
+  - program:
+      name: INQTRAND
+      group: BANKZGRP
+      description: Inquire Transaction Detail
+      language: COBOL
+      reload: "NO"
+      resident: "NO"
+      usage: NORMAL
+      uselpacopy: "NO"
+      status: ENABLED
+      cedf: "YES"
+      datalocation: ANY
+      execkey: USER
+      concurrency: THREADSAFE
+      api: CICSAPI
+      dynamic: "NO"
+      executionset: FULLAPI
+      jvm: "NO"
+  - program:
       name: BNK1B2B
       group: BANKZGRP
       description: BANK Online Bank to Bank Transfer
@@ -1096,25 +1132,12 @@ resourceDefinitions:
       maxpersist: "NO"
       backlog: 0
 
-  - ipconn:
-      name: ZOSCONN
-      group: BANKZGRP
-      host: 127.0.0.1
-      port: 1234
-      tcpipservice: ZOSEE
-
-  # JVM Server Definition
-  - jvmserver:
-      name: ZOSCNJVM
-      group: BANKZGRP
-      jvmprofile: zosconn
-
   # DB2CONN Definition
   - db2conn:
-      name: DBD1
+      name: "{{ vars.db2_ssid }}"
       group: BANKZGRP
       connecterror: SQLCODE
-      db2id: DBD1
+      db2id: "{{ vars.db2_ssid }}"
       msgqueue1: CSMT
       plan: BANKZPLN
 

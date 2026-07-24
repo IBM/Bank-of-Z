@@ -43,31 +43,28 @@
         <div class="cds--content">
             <!-- Error/Notification Container -->
             <div id="notification-container"></div>
-            
+
             <cds-stack gap="7">
                 <!-- Search Section -->
                 <cds-form id="search-form" class="form-constrained">
-                    <cds-text-input
-                        id="customerId"
-                        label="Customer ID"
-                        placeholder="C1234567 or I000000015"
+                    <cds-text-input id="customerId" label="Customer ID" placeholder="C1234567 or I000000015"
                         helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234567 or I000000015)">
                     </cds-text-input>
                     <br />
                     <cds-button id="search-btn">Search Accounts</cds-button>
                 </cds-form>
-                
+
                 <!-- Account List Section -->
                 <cds-layer class="layer cds--content" id="account-list-section" style="display: none;">
                     <h3>Customer Accounts</h3>
                     <p>Select an account to view details:</p>
                     <div id="accounts-table"></div>
                 </cds-layer>
-                
+
                 <!-- Account Details Section -->
                 <cds-layer class="layer cds--content" id="details-section" style="display: none;">
                     <h3>Account Information</h3>
-                    
+
                     <cds-form id="account-form" class="form-constrained">
                         <cds-text-input id="accountNumber" label="Account ID" readonly></cds-text-input>
                         <cds-text-input id="customerNumber" label="Customer ID" readonly></cds-text-input>
@@ -87,6 +84,36 @@
             </cds-stack>
         </div>
     </cds-layer>
+
+    <!-- Account Details Section -->
+    <div id="details-section" class="cds--row" style="display: none;">
+        <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
+            <h3>Account Information</h3>
+            <form id="account-form">
+                <div class="cds--row">
+                    <div class="cds--col-md-4 cds--col-lg-4">
+                        <cds-text-input id="accountNumber" label="Account ID" readonly></cds-text-input>
+                        <cds-text-input id="customerNumber" label="Customer ID" readonly></cds-text-input>
+                        <cds-text-input id="availableBalance" label="Available Balance" readonly></cds-text-input>
+                        <cds-text-input id="accountType" label="Account Type" readonly></cds-text-input>
+                        <cds-text-input id="currency" label="Currency" readonly></cds-text-input>
+                        <cds-text-input id="status" label="Status" readonly></cds-text-input>
+                    </div>
+                    <div class="cds--col-md-4 cds--col-lg-4">
+                        <cds-text-input id="accountNumberField" label="Account Number" readonly></cds-text-input>
+                        <cds-text-input id="sortCode" label="Sort Code" readonly></cds-text-input>
+                        <cds-text-input id="iban" label="IBAN" readonly></cds-text-input>
+                        <cds-text-input id="nickname" label="Nickname"></cds-text-input>
+                        <cds-text-input id="openingDate" label="Opening Date" readonly></cds-text-input>
+                    </div>
+                </div>
+                <br>
+                <cds-button id="update-btn">Update Account</cds-button>
+                <cds-button id="view-transactions-btn" kind="tertiary">View Transactions</cds-button>
+            </form>
+        </div>
+    </div>
+    </div>
 
     <!-- Carbon Web Components - Component-specific imports -->
     <script type="module"
@@ -123,7 +150,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const customerIdParam = urlParams.get('customerId');
             const accountIdParam = urlParams.get('id') || urlParams.get('accountId');
-            
+
             if (customerIdParam) {
                 // Parse customer ID to get system type and numeric ID
                 const parsed = parseCustomerId(customerIdParam);
@@ -131,13 +158,13 @@
                     displayNotification('error', 'Invalid Customer ID', 'Please provide a valid customer ID with prefix (C or I)');
                     return;
                 }
-                
+
                 const { system, customerId: numericCustomerId } = parsed;
                 const formattedCustomerId = formatCustomerId(numericCustomerId, system);
-                
+
                 // Populate the Customer ID field
                 document.getElementById('customerId').value = formattedCustomerId;
-                
+
                 if (accountIdParam) {
                     // Direct link to specific account - load it directly
                     // Pass the original customerIdParam (with prefix) so searchAccount can parse it
@@ -156,6 +183,9 @@
 
             // Handle update
             document.getElementById('update-btn').addEventListener('click', updateAccount);
+
+            // Handle view transactions
+            document.getElementById('view-transactions-btn').addEventListener('click', viewTransactions);
         });
 
         function displayNotification(kind, title, message) {
@@ -167,7 +197,7 @@
             // Scroll to top to ensure notification is visible
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
+
         function clearNotification() {
             const container = document.getElementById('notification-container');
             container.innerHTML = '';
@@ -175,10 +205,10 @@
 
         async function searchCustomerAccounts() {
             const customerIdInput = document.getElementById('customerId').value.trim();
-            
+
             // Clear any previous notifications
             clearNotification();
-            
+
             if (!customerIdInput) {
                 displayNotification('error', 'Validation Error', 'Please enter a Customer ID');
                 return;
@@ -190,7 +220,7 @@
                 displayNotification('error', 'Validation Error', validation.error);
                 return;
             }
-            
+
             // Parse to get numeric ID and system
             const parsed = parseCustomerId(customerIdInput);
             const customerId = parsed.customerId;
@@ -201,9 +231,9 @@
             try {
                 const response = await api.customers.getCustomerAccounts(customerId, system);
                 const accounts = response.accounts || [];
-                
+
                 hideLoadingModal();
-                
+
                 if (accounts.length === 0) {
                     displayNotification('error', 'No Results', 'No accounts found for this customer');
                     document.getElementById('account-list-section').style.display = 'none';
@@ -223,7 +253,7 @@
             const listSection = document.getElementById('account-list-section');
             listSection.style.display = 'block';
             document.getElementById('details-section').style.display = 'none';
-            
+
             let tableRows = '';
             accounts.forEach((account, index) => {
                 const accountNumber = account.accountNumber || account.accountId || 'N/A';
@@ -238,7 +268,7 @@
                     </tr>
                 `;
             });
-            
+
             document.getElementById('accounts-table').innerHTML = `
                 <table class="cds--data-table cds--data-table--zebra">
                     <thead>
@@ -256,7 +286,7 @@
                     </tbody>
                 </table>
             `;
-            
+
             // Add click handlers to rows
             const rows = document.querySelectorAll('.account-row');
             rows.forEach(row => {
@@ -277,7 +307,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const accountId = accountIdParam || urlParams.get('id') || urlParams.get('accountId');
             const customerIdFromUrl = customerIdParam || urlParams.get('customerId');
-            
+
             if (!accountId) return;
 
             // Parse customer ID to strip prefix if present
@@ -306,10 +336,10 @@
                 // For IMS accounts, pass the numeric customerId to route to /api/ims/accounts/
                 const customerIdForApi = system === 'IMS' ? numericCustomerId : null;
                 const response = await api.accounts.getAccount(accountId, customerIdForApi);
-                
+
                 // Handle IMS response which may return multiple accounts
                 let account = response;
-                
+
                 // Helper function to parse array-like strings or return actual arrays
                 const parseArrayField = (field) => {
                     if (Array.isArray(field)) return field;
@@ -323,7 +353,7 @@
                     }
                     return field;
                 };
-                
+
                 // Check if accountId is an array (or array-like string)
                 const accountIds = parseArrayField(response.accountId);
                 if (Array.isArray(accountIds)) {
@@ -332,13 +362,13 @@
                     if (accountIndex === -1) {
                         throw new Error('Account not found in response');
                     }
-                    
+
                     // Extract single account data from arrays
                     const extractValue = (field) => {
                         const parsed = parseArrayField(field);
                         return Array.isArray(parsed) ? parsed[accountIndex] : parsed;
                     };
-                    
+
                     account = {
                         accountId: accountIds[accountIndex],
                         customerId: extractValue(response.customerId),
@@ -353,7 +383,7 @@
                     };
                     account._accountIndex = accountIndex; // Store index for balance lookup
                 }
-                
+
                 // Store account with system metadata
                 account._customerId = numericCustomerId; // Store numeric ID
                 account._system = system; // Store system type
@@ -387,10 +417,10 @@
                 // If not available, fall back to checking customer ID prefix
                 const system = account._system || (account.customerId && account.customerId.toString().startsWith('I') ? 'IMS' : 'CICS');
                 const isIMS = system === 'IMS';
-                
+
                 // Use the numeric customer ID (already stripped of prefix when stored)
                 const numericCustomerId = customerId || account._customerId || account.customerId;
-                
+
                 // Debug logging
                 console.log('displayAccountDetails - Debug Info:');
                 console.log('  account._system:', account._system);
@@ -401,13 +431,13 @@
                 console.log('  isIMS:', isIMS);
                 console.log('  numericCustomerId:', numericCustomerId);
                 console.log('  Will call getAccountBalances with:', account.accountId, isIMS ? numericCustomerId : null);
-                
+
                 // For IMS accounts, use numeric customerId; for CICS, use accountId only
                 const balance = await api.accounts.getAccountBalances(
                     account.accountId,
                     isIMS ? numericCustomerId : null
                 );
-                
+
                 // Handle IMS array response - use the account index if available
                 let balanceAmount;
                 if (Array.isArray(balance?.amount)) {
@@ -416,7 +446,7 @@
                 } else {
                     balanceAmount = balance?.amount;
                 }
-                
+
                 document.getElementById('availableBalance').value =
                     balanceAmount !== undefined
                         ? formatCurrency(balanceAmount, balance.currency)
@@ -442,7 +472,7 @@
                 showSuccessModal('Success', 'Account updated successfully');
             } catch (error) {
                 hideLoadingModal();
-                
+
                 if (error.message.includes('not supported') || error.message.includes('not implemented')) {
                     showErrorModal('Feature Not Implemented', error.message);
                 } else if (error.message.includes('Failed to fetch')) {
@@ -451,6 +481,11 @@
                     showErrorModal('Error', error.message || 'Failed to update account');
                 }
             }
+        }
+
+        function viewTransactions() {
+            if (!currentAccount) return;
+            window.location.href = `account-transactions.html?accountId=${currentAccount.accountId}`;
         }
     </script>
 </body>

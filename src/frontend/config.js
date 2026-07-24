@@ -10,9 +10,9 @@
 export const config = {
     api: {
         // Base URL for API endpoints.
-        // - Docker (port 3001): use relative '/api' so requests go through the
-        //   Node server.js proxy, which forwards to z/OS Connect internally.
-        //   Direct cross-origin calls from 3001 → 9080 are blocked by CORS.
+        // - Docker dev (port 3001): use relative '/api' so requests are proxied
+        //   by nginx to the zosConnect container at zosConnect:9080/api/*.
+        //   The /api prefix is preserved end-to-end; nginx does not strip it.
         // - z/OS Liberty (port 9081): use absolute URL directly to z/OS Connect
         //   on port 9080 (same hostname, CORS not an issue on z/OS).
         baseUrl: window.location.port === '3001'

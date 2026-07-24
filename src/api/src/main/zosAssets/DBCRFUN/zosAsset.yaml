@@ -9,5 +9,3 @@ providerProperties:
   program: "DBCRFUN"
   connectionRef: "bankzCicsConnection"
   ccsid: "037"
-
-# Made with Bob

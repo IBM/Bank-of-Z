@@ -29,4 +29,3 @@ scripts/update-frontend-file-zos.sh
 **/.taz-edt/
 **/datasets.yaml
 .gradle/
-.vscode/settings.json

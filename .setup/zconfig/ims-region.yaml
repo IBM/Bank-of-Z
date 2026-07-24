@@ -10,11 +10,13 @@ vars:
   java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_home: "/usr/lpp/ims/imsjava"
   db2_java_home: "/usr/lpp/db2d10"
+  debug_hlq: EQAW
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"
   db2_hlq: "{{ vars.db2_hlq }}"
+  debug_hlq: "{{ vars.debug_hlq }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: IBMUSER

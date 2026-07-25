@@ -125,14 +125,6 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 
 run_job_and_wait "/tmp/link-edit-imsiso-exit-$$.jcl" "8"
 
-# Step 6: Run EQANICRT to build IMSISO.RES + IMSISO.TYPE2 (must run before IMS starts)
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
-    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" --extraVar "imsid=${IMS_DATASTORE}" \
-    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-cmds.j2"  --outputFile "/tmp/create-imsiso-cmds-$$.jcl"
-
-run_job_and_wait "/tmp/create-imsiso-cmds-$$.jcl" "8"
-
 # =========================
 # Stage 2: Create IMS instance with zconfig
 # =========================
@@ -197,11 +189,20 @@ else
 fi
 
 # =========================
-# Stage 4: Submit IMS type-2 debug commands
+# Stage 4: Configure IMS Transaction Isolation (requires IMS running)
 # =========================
-print_stage "STAGE 4: Submit IMS Isolation type-2 commands"
+print_stage "STAGE 4: Configure IMS Transaction Isolation"
 
-# Step 8: Submit IMSISO type-2 commands to the live IMS region via CSLUSPOC
+# Step 6: Run EQANICRT to build IMSISO.RES + IMSISO.TYPE2 (IMS must be running)
+rm -f /tmp/create-imsiso-cmds*
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
+    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" --extraVar "imsid=${IMS_DATASTORE}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-cmds.j2"  --outputFile "/tmp/create-imsiso-cmds-$$.jcl"
+
+run_job_and_wait "/tmp/create-imsiso-cmds-$$.jcl" "8"
+
+# Step 7: Submit IMSISO type-2 commands to the live IMS region via CSLUSPOC
 rm -f /tmp/run-imsiso-cmds*
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" \

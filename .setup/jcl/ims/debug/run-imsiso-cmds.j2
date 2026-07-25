@@ -10,9 +10,9 @@
 //*  2) Set IMSPLEX to your IMSplex name                              *
 //*  3) Set IMSID   to the IMS subsystem ID (SSID) to route to       *
 //*********************************************************************
-// SET IMSHLQ=IMSV15
-// SET IMSPLEX=IMSPLEX
-// SET IMSID=IMS1
+// SET IMSHLQ={{ ims_sys_hlq }}
+// SET IMSPLEX={{ ims_plex }}
+// SET IMSID={{ imsid }}
 //*
 //SPOC     EXEC PGM=CSLUSPOC,
 //  PARM=('IMSPLEX=&IMSPLEX,ROUTE=&IMSID,WAIT=60,F=WRAP')

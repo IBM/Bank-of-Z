@@ -87,13 +87,15 @@ rm -f /tmp/create-imsiso-loadlib*
 rm -f /tmp/create-imsiso-tables*
 rm -f /tmp/compile-eqaopts*
 rm -f /tmp/link-edit-imsiso-exit*
+rm -f /tmp/create-imsiso-cmds*
 
+# Step 1: Allocate IMSISO.LOADLIB
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-loadlib.j2"  --outputFile "/tmp/create-imsiso-loadlib-$$.jcl"
 
 run_job_and_wait "/tmp/create-imsiso-loadlib-$$.jcl" "8"
 
-# Check if IMS Control Region is running
+# Step 2: APF-authorize IMSISO.LOADLIB (required before any module is loaded from it)
 print_info "${CYAN}[ZCONFIG-IMS]${NC} Checking IMS ISO loadlib authorization..."
 if opercmd "D PROG,APF" 2>/dev/null | grep -q "${BOZ_IMS_HLQ}.IMSISO.LOADLIB"; then
     print_success "IMS ISO loadlib is APF-authorized"
@@ -102,20 +104,34 @@ else
     opercmd "SETPROG APF,ADD,LIBRARY=${BOZ_IMS_HLQ}.IMSISO.LOADLIB,SMS"
 fi
 
+# Step 3: Create EQATITBL VSAM persistence table (independent of APF, can run after step 1)
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-tables.j2"  --outputFile "/tmp/create-imsiso-tables-$$.jcl"
 
 run_job_and_wait "/tmp/create-imsiso-tables-$$.jcl" "8"
 
+# Step 4: Compile and link custom EQAOPTS into IMSISO.LOADLIB (requires steps 1+2)
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.j2"  --outputFile "/tmp/compile-eqaopts-$$.jcl"
+    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/compile-eqaopts.j2"  --outputFile "/tmp/compile-eqaopts-$$.jcl"
 
 run_job_and_wait "/tmp/compile-eqaopts-$$.jcl" "8"
 
+# Step 5: Link-edit EQATIEDT + EQATIEXT exits into IMSISO.LOADLIB (requires steps 1+2)
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.j2"  --outputFile "/tmp/link-edit-imsiso-exit-$$.jcl"
+    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
+    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/link-edit-imsiso-exit.j2"  --outputFile "/tmp/link-edit-imsiso-exit-$$.jcl"
 
 run_job_and_wait "/tmp/link-edit-imsiso-exit-$$.jcl" "8"
+
+# Step 6: Run EQANICRT to build IMSISO.RES + IMSISO.TYPE2 (must run before IMS starts)
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
+    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-cmds.j2"  --outputFile "/tmp/create-imsiso-cmds-$$.jcl"
+
+run_job_and_wait "/tmp/create-imsiso-cmds-$$.jcl" "8"
 
 # =========================
 # Stage 2: Create IMS instance with zconfig
@@ -179,6 +195,20 @@ if netstat -a 2>/dev/null | grep -q ":${IMS_PORT}.*LISTEN"; then
 else
     print_warning "Port ${IMS_PORT} status could not be verified (may still be initializing)"
 fi
+
+# =========================
+# Stage 4: Submit IMS type-2 debug commands
+# =========================
+print_stage "STAGE 4: Submit IMS Isolation type-2 commands"
+
+# Step 8: Submit IMSISO type-2 commands to the live IMS region via CSLUSPOC
+rm -f /tmp/run-imsiso-cmds*
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" \
+    --extraVar "ims_plex=${IMS_PLEX}" --extraVar "imsid=${IMS_DATASTORE}" \
+    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/run-imsiso-cmds.j2"  --outputFile "/tmp/run-imsiso-cmds-$$.jcl"
+
+run_job_and_wait "/tmp/run-imsiso-cmds-$$.jcl" "8"
 
 print_success "IMS region setup completed!"
 print_info "IMS Datastore: ${IMS_DATASTORE}"

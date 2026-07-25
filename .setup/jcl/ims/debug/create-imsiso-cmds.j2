@@ -34,8 +34,8 @@
 //*  1. This job should complete with a return code 0.                *
 //*                                                                   *
 //*********************************************************************
-// SET DTHLQ=EQAW
-// SET IMSHLQ=IMSV15
+// SET DTHLQ={{ debug_hlq }}
+// SET IMSHLQ={{ ims_sys_hlq }}
 //DELETE    EXEC PGM=IDCAMS,REGION=1M
 //SYSPRINT DD SYSOUT=*
 //SYSIN    DD *
@@ -44,7 +44,7 @@
  SET MAXCC=0
 /*
 //CREATE EXEC  PGM=EQANICRT,REGION=0M,
-// PARM=('READMASK IVP1')
+// PARM=('READMASK IBACSUM')
 //STEPLIB  DD DSN=&DTHLQ..SEQAMOD,DISP=SHR
 //EQARESDS DD DSN={{ ims_hlq }}.IMSISO.RES,
 //            DISP=(NEW,CATLG,DELETE),

@@ -128,7 +128,7 @@ run_job_and_wait "/tmp/link-edit-imsiso-exit-$$.jcl" "8"
 # Step 6: Run EQANICRT to build IMSISO.RES + IMSISO.TYPE2 (must run before IMS starts)
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
-    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" \
+    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" --extraVar "imsid=${IMS_DATASTORE}" \
     --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-cmds.j2"  --outputFile "/tmp/create-imsiso-cmds-$$.jcl"
 
 run_job_and_wait "/tmp/create-imsiso-cmds-$$.jcl" "8"

@@ -141,22 +141,6 @@ else
     print_warning "Port ${IMS_PORT} status could not be verified (may still be initializing)"
 fi
 
-# =========================
-# Stage 3: Configure IMS Transaction Isolation (requires IMS running)
-# =========================
-print_stage "STAGE 3: Configure IMS Transaction Isolation"
-
-# Run EQANICRT to build IMSISO.RES + IMSISO.TYPE2 (IMS must be running)
-# Note: IMSISO.LOADLIB allocation, APF auth, EQATITBL, EQAOPTS and exits
-# are handled by zconfig as part of Stage 1.
-rm -f /tmp/create-imsiso-cmds*
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "ims_hlq=${BOZ_IMS_HLQ}" --extraVar "debug_hlq=${DEBUG_HLQ}" \
-    --extraVar "ims_sys_hlq=${IMS_SYS_HLQ}" --extraVar "imsid=${IMS_DATASTORE}" \
-    --templateFile "$SCRIPTS_DIR/../jcl/ims/debug/create-imsiso-cmds.j2"  --outputFile "/tmp/create-imsiso-cmds-$$.jcl"
-
-run_job_and_wait "/tmp/create-imsiso-cmds-$$.jcl" "8"
-
 print_success "IMS region setup completed!"
 print_info "IMS Datastore: ${IMS_DATASTORE}"
 print_info "IMS Connect Port: ${IMS_PORT}"

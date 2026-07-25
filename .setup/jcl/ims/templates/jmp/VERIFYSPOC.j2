@@ -5,7 +5,7 @@
 {%- endif %}
 //SPOC      EXEC PGM=CSLUSPOC,
 //  PARM=('IMSPLEX={{ ims.dfs_imsplex }},ROUTE={{ ims.dfs_ims_ssid }},WAIT=30,F=WRAP')
-//STEPLIB   DD DISP=SHR,DSN={{ ims.ims_sys_hlq }}.SDFSRESL
+//STEPLIB   DD DISP=SHR,DSN={{ ims.dfs_reslib }}
 //SYSPRINT  DD SYSOUT=*
 //SYSIN     DD *
      QRY IMS TYPE(ALL) SHOW(ALL)

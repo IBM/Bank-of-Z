@@ -28,6 +28,11 @@ stage_stop_tasks() {
     # =========================
     # Stop IBM IMS regions
     # =========================
+    # Delete stale stop members so jsub fails silently rather than executing
+    # outdated JCL that may reference deleted datasets.
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null

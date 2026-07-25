@@ -17,6 +17,7 @@ ims:
   ims_hlq: "{{ vars.ims_hlq }}"
   db2_hlq: "{{ vars.db2_hlq }}"
   debug_hlq: "{{ vars.debug_hlq }}"
+  ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: IBMUSER

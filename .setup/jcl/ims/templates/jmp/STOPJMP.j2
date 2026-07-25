@@ -2,7 +2,6 @@
 {%- set reg = ims.get('regions', [])[region_num | int - 1] %}
 {%- set region_num = 1 %}
 /*JOBPARM SYSAFF={{ reg.dfs_ims_syaff }}
-//JOBLIBS JCLLIB ORDER=({{ ims.dfs_proclib }},{{ ims.dfs_joblib }})
 //STARTCTL       EXEC PGM=ISFAFD
 //ISFOUT DD SYSOUT=*
 //ISFIN  DD *

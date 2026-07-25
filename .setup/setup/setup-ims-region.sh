@@ -36,6 +36,14 @@ export BOZ_IMS_HLQ="${IMS_APP_HLQ}"
 set +e
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
+# Refresh the stored STOPJMP member from the current template before submitting
+# to avoid executing a stale copy that may reference deleted datasets.
+if python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "region_num=1" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/STOPJMP.j2" \
+    --outputFile "/tmp/stopjmp-$$.txt" 2>/dev/null; then
+    dcp "/tmp/stopjmp-$$.txt" "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
+    rm -f "/tmp/stopjmp-$$.txt"
+fi
 jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
 sleep 5
 jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null

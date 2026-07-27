@@ -233,6 +233,19 @@ fi
 print_success "BAQ${APP_SHORT_NAME} restart issued - server will be ready in ~20 seconds"
 
 # =========================
+# Restart frontend Liberty server to pick up newly deployed frontend WAR.
+# =========================
+print_info "Restarting FE${APP_SHORT_NAME} to load newly deployed frontend WAR..."
+opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+sleep 8
+if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+    opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+else
+    jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+fi
+print_success "FE${APP_SHORT_NAME} restart issued - server will be ready in ~20 seconds"
+
+# =========================
 # Cleanup
 # =========================
 print_info "Cleaning up package file"

@@ -169,8 +169,8 @@ debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
 
-# z/OS Connect (API exposure + frontend static files)
-# Single Liberty instance hosts both api.war (/api) and bank-frontend-vanilla.war (/)
+# z/OS Connect (API exposure only)
+# Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.
 zosconnect:
   zosconnect_home: "{{ global.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"

@@ -248,32 +248,28 @@ verify_file_written "${HTTP_EP_DEST}"
 print_success "HTTPS port override deployed (httpsPort=${ZOSCONNECT_HTTPS_PORT})"
 
 # =========================
-# Override frontend WAR context root to / so it serves at the root of
-# the same Liberty instance as the API — no CORS, single origin, single port.
-# This overrides the Wazi Deploy-generated bank-frontend-vanilla.xml which
-# sets contextRoot="/bank-frontend-vanilla".
-#
-# IMPORTANT: Liberty resolves dropin conflicts alphabetically — last file wins.
-# "bank-frontend-vanilla.xml" (v) > "bank-frontend-root.xml" (r), so root.xml
-# would lose. We name it "zz-bank-frontend-root.xml" to sort after vanilla.xml.
+# Configure CORS so the frontend Liberty server (FEBOZ) can call the API.
+# Allows requests from both HTTP and HTTPS frontend origins.
 # =========================
-ZZ_DEST="${OVERRIDES_DIR}/zz-bank-frontend-root.xml"
-cat > "${ZZ_DEST}" << EOF
+CORS_DEST="${OVERRIDES_DIR}/cors.xml"
+cat > "${CORS_DEST}" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<server>
-    <!-- Override context root for frontend WAR - serve at / alongside /api -->
-    <webApplication id="bank-frontend-vanilla"
-                    location="\${server.config.dir}/apps/bank-frontend-vanilla.war"
-                    name="bank-frontend-vanilla"
-                    contextRoot="/">
-        <classloader delegation="parentLast" />
-    </webApplication>
+<server description="CORS configuration for frontend server">
+    <featureManager>
+        <feature>cors-1.0</feature>
+    </featureManager>
+
+    <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports) -->
+    <cors domain="/api"
+          allowedOrigins="http://*:${FRONTEND_HTTP_PORT}, https://*:${FRONTEND_HTTPS_PORT}"
+          allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
+          allowedHeaders="*"
+          allowCredentials="true"
+          maxAge="3600" />
 </server>
 EOF
-verify_file_written "${ZZ_DEST}"
-# Remove the old (losing) name if it exists from a previous run
-rm -f "${OVERRIDES_DIR}/bank-frontend-root.xml"
-print_success "Frontend WAR context root override deployed (zz-bank-frontend-root.xml)"
+verify_file_written "${CORS_DEST}"
+print_success "CORS configuration deployed (frontend ports ${FRONTEND_HTTP_PORT}/${FRONTEND_HTTPS_PORT})"
 
 sed \
   's#^\([[:space:]]*<webApplication id="My API".*\)$#<!-- \1 -->#' \

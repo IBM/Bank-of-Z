@@ -10,10 +10,14 @@
 export const config = {
     api: {
         // Base URL for API endpoints.
-        // - Docker dev (port 3001): proxied by nginx to zosConnect:9080/api/*.
-        // - z/OS Liberty: frontend and API share the same Liberty instance and
-        //   origin, so use a relative path - works for both HTTP and HTTPS.
-        baseUrl: '/api'
+        // - Docker dev (port 3001): use relative '/api' so requests are proxied
+        //   by nginx to the zosConnect container at zosConnect:9080/api/*.
+        // - z/OS Liberty: frontend (FEBOZ) and API (BAQBOZ) are on separate
+        //   Liberty instances. Use the same protocol and hostname as the current
+        //   page, but point at the z/OS Connect HTTPS port (9444).
+        baseUrl: window.location.port === '3001'
+            ? '/api'
+            : window.location.protocol + '//' + window.location.hostname + ':9444/api'
     },
     defaults: {
         sortCode: '987654'

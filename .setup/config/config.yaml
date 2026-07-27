@@ -53,7 +53,7 @@ global:
   zosconnect_https_port: 9444
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
-  # Frontend (separate Liberty server - not used in single-server design)
+  # Frontend (separate Liberty server - FE<APP_SHORT_NAME> on port 9445)
   frontend_http_port: 9081
   frontend_https_port: 9445
   frontend_task_user: "{{ global.zos_admin_user}}"

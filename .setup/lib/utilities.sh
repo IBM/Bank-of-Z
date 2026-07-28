@@ -183,9 +183,9 @@ run_job_and_wait() {
     esac
   fi
   print_error "Job failed: $JOBID"
-  print_info "===== JESYSMSG ====="
-  pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
-return 8
+  print_info "===== JOB LOG ====="
+  pjdd "$JOBID" '*'
+  return 8
 }
 
 # ============================================================

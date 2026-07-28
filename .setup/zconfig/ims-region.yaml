@@ -22,10 +22,10 @@ ims:
   ims_unit: SYSALLDA
   ims_target_user: IBMUSER
   # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
-  ims_lgmsg:                                                     
-      primary_space: 84                                          
-      secondary_space: 63                                        
-      unit: MB                                                   
+  ims_lgmsg:
+      primary_space: 84
+      secondary_space: 63
+      unit: MB
   ims_proclib:
     members:
     - member_name: DFSPBIMS
@@ -389,6 +389,25 @@ ims:
         imsplex:
           name: "{{ vars.ims_plex }}"
         rmname: 2RM1
+    - member_name: CSLDI000
+      config:
+        armrst: N
+        odbmname: "{{ vars.imsid }}ODBM"
+        imsplex:
+          name: "{{ vars.ims_plex }}"
+        rrs: N
+    - member_name: CSLDC000
+      config:
+        global_datastore_properties:
+          maxthrds: 10
+          minthrds: 2
+        local_datastore_properties:
+          odbm:
+            name: "{{ vars.imsid }}ODBM"
+            datastore:
+              - name: "{{ vars.imsid }}"
+                maxthrds: 5
+                minthrds: 1
     - member_name: HWSCFODB
       config:
         adapter:
@@ -409,7 +428,7 @@ ims:
           member: "{{ vars.imsid }}HWS"
           tmember: "{{ vars.ims_plex }}"
         odaccess:
-          odbmautoconn: false
+          odbmautoconn: true
           imsplex:
             member: HWS1
             tmember: "{{ vars.ims_plex }}"

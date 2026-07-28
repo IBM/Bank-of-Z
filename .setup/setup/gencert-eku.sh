@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 # =============================================================================
 # Script  : gencert-eku.sh
 # Summary : Generate a TLS server certificate with EKU serverAuth (OID
@@ -21,13 +21,17 @@
 # Called by addcert.sh after the keyring scaffold is in place.
 # =============================================================================
 
-# Derive SANDBOX_DIR from script location when not already in environment.
-# (setenv.sh requires bash; this script is sh — do not source it here.)
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -z "${SANDBOX_DIR:-}" ]; then
-  SANDBOX_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-  export SANDBOX_DIR
-fi
+# =========================
+# Source library scripts
+# =========================
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPTS_DIR/../config/setenv.sh"
+
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[GENCERT]${NC} %s\n" "${line}" 2>/dev/null || true
+done) 2>&1
 
 set -e  # Exit immediately on any non-zero return code
 
@@ -41,12 +45,12 @@ label='BoZ'
 # (sourced from config.yaml via setenv.sh).
 # -----------------------------------------------------------------------
 if [ -z "${JAVA_HOME:-}" ]; then
-  echo "[gencert-eku] FATAL: JAVA_HOME is not set" >&2; exit 1
+  print_error "JAVA_HOME is not set"; exit 1
 fi
 JAVA="$JAVA_HOME/bin/java"
 JAVAC="$JAVA_HOME/bin/javac"
 if [ ! -x "$JAVA" ]; then
-  echo "[gencert-eku] FATAL: java not found at $JAVA" >&2; exit 1
+  print_error "java not found at $JAVA"; exit 1
 fi
 
 if [ -n "${PYTHON_HOME:-}" ] && [ -x "$PYTHON_HOME/bin/python3" ]; then
@@ -54,25 +58,27 @@ if [ -n "${PYTHON_HOME:-}" ] && [ -x "$PYTHON_HOME/bin/python3" ]; then
 elif [ -x /usr/lpp/IBM/cyp/v3r14/pyz/bin/python3 ]; then
   PYTHON=/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3
 else
-  PYTHON=$(command -v python3 2>/dev/null) || { echo "[gencert-eku] FATAL: python3 not found" >&2; exit 1; }
+  PYTHON=$(command -v python3 2>/dev/null) || { print_error "python3 not found"; exit 1; }
 fi
 
 # Ensure ZOAU tools (dcp, tsocmd, etc.) are on PATH.
-# Primary: use $ZOAU_HOME (set from config.yaml, default /usr/lpp/IBM/zoau for ZOAU 1.3+).
-# Fallback: /usr/lpp/IBM/zoautil is the pre-1.3 install path used on some ZVDT images.
+# Primary: use $ZOAU_HOME (set from config.yaml, default /usr/lpp/IBM/zoau/v1r4).
+# Fallback: pre-1.3 install paths on older ZVDT images.
 if [ -n "${ZOAU_HOME:-}" ] && [ -x "$ZOAU_HOME/bin/dcp" ]; then
   export PATH="$ZOAU_HOME/bin:$PATH"
-elif [ -x /usr/lpp/IBM/zoau/bin/dcp ]; then
-  export PATH="/usr/lpp/IBM/zoau/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoau/v1r4/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoau/v1r4/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoau/v1r3/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoau/v1r3/bin:$PATH"
 elif [ -x /usr/lpp/IBM/zoautil/bin/dcp ]; then
   export PATH="/usr/lpp/IBM/zoautil/bin:$PATH"
 fi
-DCP=$(command -v dcp 2>/dev/null) || { echo "[gencert-eku] FATAL: dcp (ZOAU) not found on PATH" >&2; exit 1; }
+DCP=$(command -v dcp 2>/dev/null) || { print_error "dcp (ZOAU) not found on PATH"; exit 1; }
 
 _TOOLS_DIR="${SANDBOX_DIR}/../tools"
 BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
 if [ -z "$BCJAR" ]; then
-  echo "[gencert-eku] FATAL: bcprov-*.jar not found under $_TOOLS_DIR" >&2; exit 1
+  print_error "bcprov-*.jar not found under $_TOOLS_DIR"; exit 1
 fi
 
 # -----------------------------------------------------------------------
@@ -84,15 +90,15 @@ test "$ipaddr" = "IntfName:" && ipaddr=$(netstat -h 2>/dev/null \
 dnsname=$(hostname 2>/dev/null)
 
 if [ -z "$ipaddr" ] || [ -z "$dnsname" ]; then
-  echo "[gencert-eku] FATAL: could not determine IP ($ipaddr) or DNS ($dnsname)" >&2
+  print_error "Could not determine IP ($ipaddr) or DNS ($dnsname)"
   exit 1
 fi
 
 expire=$(tsocmd "RACDCERT CERTAUTH LIST(LABEL('$ca_label'))" \
   | awk '/End Date:/ {gsub("/","-",$3); print $3}')
 
-echo "[gencert-eku] IP=$ipaddr  DNS=$dnsname  VSICA expire=$expire"
-echo "[gencert-eku] Private key stays in RACF keyring throughout."
+print_info "IP=$ipaddr  DNS=$dnsname  VSICA expire=$expire"
+print_info "Private key stays in RACF keyring throughout."
 
 # Random passwords via Python
 CA_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
@@ -110,7 +116,7 @@ trap 'rm -rf "$TMPDIR"
 # 1. Generate keypair + cert in RACF, signed by VSICA.
 #    Private key is generated inside RACF and never leaves.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Generating keypair in RACF (SIGNWITH VSICA)..."
+print_info "Generating keypair in RACF (SIGNWITH VSICA)..."
 tsocmd "RACDCERT GENCERT \
   ID($userid) \
   SUBJECTSDN(CN('Bank of Z') O('IBM') OU('IBM BoZ') C('US')) \
@@ -128,7 +134,7 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 #    dcp is used because cp "//dataset" fails for CERTB64/CERTDER exports
 #    on this RACF version — dcp handles the dataset-to-USS copy correctly.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Exporting cert as PEM for re-signing..."
+print_info "Exporting cert as PEM for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
   DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
 $DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
@@ -138,7 +144,7 @@ $DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
 # 4. Export VSICA private key (PKCS12DER) so Bouncy Castle can re-sign.
 #    Dataset deleted in EXIT trap.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Exporting VSICA CA for re-signing..."
+print_info "Exporting VSICA CA for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$ca_label')) CERTAUTH \
   DSN('${userid}.BOZ.CAKEY') FORMAT(PKCS12DER) PASSWORD('${CA_PASS}')"
 cp "//'${userid}.BOZ.CAKEY'" "$TMPDIR/vsica.p12"
@@ -313,14 +319,14 @@ with open(sys.argv[1], 'wb') as f:
     f.write(src.encode('iso-8859-1'))
 PYEOF
 
-echo "[gencert-eku] Compiling ResignCert.java..."
+print_info "Compiling ResignCert.java..."
 $JAVAC -cp "$BCJAR" "$TMPDIR/ResignCert.java" -d "$TMPDIR"
 
 # -----------------------------------------------------------------------
 # 6. Run ResignCert — produces a DER cert with EKU, signed by VSICA,
 #    containing the SAME public key as the RACF-held private key.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Re-signing cert with EKU serverAuth..."
+print_info "Re-signing cert with EKU serverAuth..."
 $JAVA -cp "$TMPDIR:$BCJAR" ResignCert \
   "$TMPDIR/boz-orig.pem" \
   "$TMPDIR/vsica.p12" "$CA_PASS" \
@@ -328,14 +334,14 @@ $JAVA -cp "$TMPDIR:$BCJAR" ResignCert \
   "$ipaddr" "$dnsname" "$expire"
 
 test -s "$TMPDIR/boz-new.der" || {
-  echo "[gencert-eku] FATAL: boz-new.der not produced" >&2; exit 1; }
+  print_error "boz-new.der not produced"; exit 1; }
 
 # -----------------------------------------------------------------------
 # 7. Copy new DER cert to RACF dataset and IMPORT it.
 #    RACF will match it to the private key already held for label '$label'
 #    because they share the same public key.
 # -----------------------------------------------------------------------
-echo "[gencert-eku] Importing re-signed cert into RACF..."
+print_info "Importing re-signed cert into RACF..."
 # ALLOC MOD creates the dataset if absent or reuses it if present — no DELETE needed
 # since dcp -B overwrites (does not append) existing content.
 tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') MOD CATALOG \
@@ -352,10 +358,10 @@ tsocmd "RACDCERT ADD('${userid}.BOZ.NEWCERT') \
 
 tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 
-echo "[gencert-eku] Done."
-echo "[gencert-eku]   Cert label : $label"
-echo "[gencert-eku]   Private key: stays in RACF — never written to USS filesystem"
-echo "[gencert-eku]   Validity   : capped at CAB Forum limit for today's date (200/100/47 days)"
-echo "[gencert-eku]   SANs       : IP=$ipaddr  DNS=$dnsname"
-echo "[gencert-eku]   EKU        : TLS Web Server Authentication"
-echo "[gencert-eku]   Caller (addcert.sh) will connect cert to keyring $ring as DEFAULT."
+print_success "Certificate generated successfully."
+print_info "  Cert label : $label"
+print_info "  Private key: stays in RACF — never written to USS filesystem"
+print_info "  Validity   : capped at CAB Forum limit for today's date (200/100/47 days)"
+print_info "  SANs       : IP=$ipaddr  DNS=$dnsname"
+print_info "  EKU        : TLS Web Server Authentication"
+print_info "  Caller (addcert.sh) will connect cert to keyring $ring as DEFAULT."

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 # =============================================================================
 # Script  : addcert.sh
 # Summary : Create RACF keyring and server certificate for Bank of Z.
@@ -17,6 +17,18 @@
 #   - RACDCERT ADD FORMAT(CERTDER) returns the re-signed cert to RACF
 # =============================================================================
 
+# =========================
+# Source library scripts
+# =========================
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPTS_DIR/../config/setenv.sh"
+
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[ADD-CERTS]${NC} %s\n" "${line}" 2>/dev/null || true
+done) 2>&1
+
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
 ca_label=${ZOS_CA_LABEL}
@@ -28,11 +40,11 @@ profile=$userid.$ring.LST
 
 # Validate required environment variable
 if [[ -z "$userid" ]]; then
-  echo "[addcert] FATAL: ZOS_ADMIN_USER is not set" >&2
+  print_error "ZOS_ADMIN_USER is not set"
   exit 1
 fi
 if [[ -z "$ca_label" ]]; then
-  echo "[addcert] FATAL: ZOS_CA_LABEL is not set" >&2
+  print_error "ZOS_CA_LABEL is not set"
   exit 1
 fi
 
@@ -50,21 +62,20 @@ tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
 # '$label' from the keyring before generating a fresh one.
 if test $rc -eq 0
 then
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  if bash "$SCRIPT_DIR/gencert-eku.sh"; then
-    echo "[addcert] EKU cert generation succeeded — connecting cert to keyring..."
+  if bash "$SCRIPTS_DIR/gencert-eku.sh"; then
+    print_info "EKU cert generation succeeded — connecting cert to keyring..."
     tsocmd "RACDCERT ID($userid) \
       CONNECT(LABEL('$label') RING($ring) DEFAULT)"
     rc=$?
     # Only DIGTRING changed — CONNECT modifies ring membership, not the cert itself
     tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
     if test $rc -eq 0; then
-      echo "[addcert] Cert '$label' connected to keyring $userid/$ring as DEFAULT"
+      print_success "Cert '$label' connected to keyring $userid/$ring as DEFAULT"
     else
-      echo "[addcert] FATAL: failed to connect cert to keyring $userid/$ring" >&2
+      print_error "Failed to connect cert to keyring $userid/$ring"
     fi
   else
-    echo "[addcert] FATAL: gencert-eku.sh failed — Liberty cannot start without a server cert" >&2
+    print_error "gencert-eku.sh failed — Liberty cannot start without a server cert"
     rc=1
   fi
 fi

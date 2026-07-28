@@ -23,7 +23,7 @@ global:
   # Tools
   java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoau"  # pre-1.3 ZVDT images may need "/usr/lpp/IBM/zoautil"
+  zoau_home: "/usr/lpp/IBM/zoau/v1r4"  # ZOAU 1.3: /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
   zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
   zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
   dbb_home: "{{ global.sandbox_root }}/tools/dbb"
@@ -47,7 +47,8 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
-  
+  asm_hlq: "ASM"
+
   # GUI
   zosconnect_http_port: 9080
   zosconnect_https_port: 9444
@@ -68,7 +69,6 @@ global:
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
   ims_java_home: "/usr/lpp/ims/imsjava"
-  asm_hlq: "ASM"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
   

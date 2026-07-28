@@ -16,8 +16,6 @@ set +e
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
-else
-    source $HOME/.profile 2>/dev/null
 fi
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")

@@ -66,6 +66,8 @@ fi
 # Fallback: pre-1.3 install paths on older ZVDT images.
 if [ -n "${ZOAU_HOME:-}" ] && [ -x "$ZOAU_HOME/bin/dcp" ]; then
   export PATH="$ZOAU_HOME/bin:$PATH"
+elif [ -x /usr/lpp/IBM/zoau/bin/dcp ]; then
+  export PATH="/usr/lpp/IBM/zoau/bin:$PATH"
 elif [ -x /usr/lpp/IBM/zoau/v1r4/bin/dcp ]; then
   export PATH="/usr/lpp/IBM/zoau/v1r4/bin:$PATH"
 elif [ -x /usr/lpp/IBM/zoau/v1r3/bin/dcp ]; then

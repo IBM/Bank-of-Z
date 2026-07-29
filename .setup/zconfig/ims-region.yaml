@@ -392,7 +392,7 @@ ims:
     - member_name: CSLDI000
       config:
         armrst: N
-        odbmname: "{{ vars.imsid }}ODBM"
+        odbmname: 2ODB1
         imsplex:
           name: "{{ vars.ims_plex }}"
         rrs: N
@@ -403,7 +403,7 @@ ims:
           minthrds: 2
         local_datastore_properties:
           odbm:
-            name: "{{ vars.imsid }}ODBM"
+            name: 2ODB1
             datastore:
               - name: "{{ vars.imsid }}"
                 maxthrds: 5

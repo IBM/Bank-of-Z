@@ -5,7 +5,7 @@ title: Zowe Profile Setup
 
 # Zowe Profile Setup
 
-A Zowe profile stores the connection details that IDE extensions, such as Zowe Explorer and IBM Z Open Debug, and Zowe CLI use to communicate with your z/OS system. Configure this once. Both your IDE and the Zowe CLI deployment tooling use the same profile.
+A Zowe profile stores the connection details that your development environment and Zowe CLI use to communicate with your z/OS system. Configure the profile once and reuse it across the supported development and deployment workflows.
 
 ## Create the profile
 
@@ -80,7 +80,7 @@ Create `~/.zowe/zowe.config.json` with the following content. Update the fields 
 }
 ```
 
-For more information about profile types and configuration options, see the [IBM Z Open Editor documentation](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html).
+For more information about Zowe profiles and configuration options,, see [Creating a configuration profile in Zowe Explorer](https://ibm.github.io/zopeneditor-about/Docs/creating_team_profiles.html).
 
 ## Verify connectivity
 

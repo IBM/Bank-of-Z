@@ -5,13 +5,13 @@ title: Environment Configuration
 
 # Environment Configuration
 
-This section describes the configuration required before deploying Bank of Z. Complete these steps before starting one of the getting-started tutorials.
+This section describes the configuration required before deploying Bank of Z. Complete these steps before starting a deployment workflow.
 
 Before you begin, ensure that your z/OS environment meets all requirements described in [Prerequisites](prerequisites.md). In particular, the Db2 subsystem (DBD1) and required RACF definitions must be in place before the setup scripts can run successfully.
 
 ## Configure the application
 
-Edit `.setup/config/config.yaml` in your local clone of the repository. This file controls all paths and settings used by the setup scripts.
+Edit `.setup/config/config.yaml` in your local clone of the repository. This file defines the paths and configuration settings used during the build and deployment process.
 
 The fields you must update for your environment are:
 
@@ -95,11 +95,11 @@ license_server:
   verify: false
 ```
 
-> **Note:** The password is automatically encrypted after the first scan. You only need to provide it in plain text the first use.
+> **Note:** The password is automatically encrypted after the first use. You only need to provide it in plain text the first use.
 
 ## Next steps
 
-Continue with one of the following getting-started tutorials:
+Continue with one of the following deployment workflows:
 
 - [Deploy Using Direct USS Access](deploy-direct.html)
 - [Deploy Using Zowe CLI](deploy-zowe-cli.html)

@@ -54,7 +54,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | CICS TS Resource Builder | 1.0.6 | `zconfig.zcb_home` |
 | Git | Current supported version | Must be available in PATH on USS |
 
-**Note:** Bank of Z uses zconfig to provision and configure CICS resources, IMS resources, and the z/OS Connect runtime during the environment setup phase.
+**Note:** Bank of Z uses zconfig to provision and configure the CICS resources, IMS resources, and z/OS Connect runtime during the environment setup.
 
 ### USS access requirements
 
@@ -88,7 +88,7 @@ After your system administrator has confirmed the above are in place, run the pr
 .setup/setup-common.sh validate-prereqs
 ```
 
-This checks versions of DBB, ZOAU, zconfig, and Wazi Deploy, and verifies Git availability and network connectivity to GitHub. For a full description of each check, see [Deploy Using Direct USS Access](deploy-direct.html).
+This validates that the required build and deployment technologies are installed correctly by checking versions of DBB, ZOAU, zconfig, and Wazi Deploy, and by verifying Git availability and network connectivity to GitHub. For a complete description of each check, see [Deploy Using Direct USS Access](deploy-direct.html).
 
 ## Next steps
 

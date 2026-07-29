@@ -5,7 +5,7 @@ title: Development Best Practices
 
 # Development Best Practices
 
-Follow these recommendations when developing and testing changes in Bank of Z.
+Follow these best practices to help ensure efficient development, testing, and deployment when working with Bank of Z.
 
 ## Work in isolated branches
 
@@ -13,7 +13,7 @@ Create a dedicated branch for each feature, enhancement, or defect fix. Isolatin
 
 ## Keep your workspace configuration up to date
 
-Review your setup configuration before starting development activities. Ensure that paths, environment settings, and required dependencies match your target environment.
+Review your workspace configuration before starting development activities. Ensure that paths, environment settings, and required dependencies match your target environment.
 
 If configuration values change, update your local environment before running setup or deployment tasks.
 
@@ -23,7 +23,7 @@ Implement and validate changes in small increments rather than making large upda
 
 ## Validate changes frequently
 
-Run the appropriate setup and deployment workflow after making changes to verify that updates build and deploy successfully. Early validation helps identify issues before they affect additional development work.
+Run the appropriate build and deployment workflow after making changes to verify that your updates build and deploy successfully. Early validation helps identify issues before they affect additional development work.
 
 ## Keep source changes organized
 
@@ -31,7 +31,7 @@ Store application updates in the appropriate source directories and follow estab
 
 ## Review setup output
 
-Monitor workflow output and setup logs during development activities. Review any warnings or errors before proceeding to the next task.
+Monitor workflow output and log files during development activities. Review any warnings or errors before proceeding.
 
 ## Synchronize regularly
 
@@ -45,7 +45,7 @@ Update relevant documentation when introducing new functionality, modifying conf
 
 Select the workflow that best supports your current task:
 
-Use the Zowe CLI workflow when working with branch-based development and version-controlled changes.
-Use the GRUB workflow when you want to rapidly test local changes without committing them first.
+- Use the Zowe CLI workflow for branch-based development and version-controlled changes.
+- Use the GRUB workflow when you want to rapidly test local changes without committing them first.
 
 **Note:** Selecting the appropriate workflow can improve development efficiency and reduce turnaround time during testing.

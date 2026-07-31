@@ -398,14 +398,16 @@ ims:
         rrs: N
     - member_name: CSLDC000
       config:
-        maxthrds: 10
-        minthrds: 2
-        odbm:
-          name: 2ODB1
-          datastore:
-            name: "{{ vars.imsid }}"
-            maxthrds: 5
-            minthrds: 1
+        global_datastore_properties:
+          maxthrds: 10
+          minthrds: 2
+        local_datastore_properties:
+          odbm:
+            name: 2ODB1
+            datastore:
+              name: "{{ vars.imsid }}"
+              maxthrds: 5
+              minthrds: 1
     - member_name: HWSCFODB
       config:
         adapter:

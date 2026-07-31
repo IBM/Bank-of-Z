@@ -46,7 +46,7 @@ ims:
         extended_mcs_console_security_setting: true
         maximum_number_log_records_per_checkpoint_interval: 512K
         command_recognition_character: '@'
-        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 12K
+        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 256K
         maximum_number_dedb_buffers: 100
         dedb_buffer_pool_page_free_option: '0'
         dedb_additional_buffers: 10
@@ -112,8 +112,8 @@ ims:
         program_isolation_maximum_table_size: 1M
         ims_proclib_reader_procedure_name: "{{ vars.imsid }}RDR"
         suffix_of_the_program_preload_list_file: DC
-        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12K
-        work_area_pool_size_for_program_scheduling_definition_files: 24K
+        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 256K
+        work_area_pool_size_for_program_scheduling_definition_files: 512K
         inital_number_of_application_and_system_tasks: 5
         security_mixed_case_password_option: R
         number_of_message_queue_buffers: 5
@@ -370,7 +370,7 @@ ims:
     - member_name: CSLSI000
       config:
         armrst: false
-        sciname: 2SCI1
+        sciname: "{{ vars.ims_plex }}"
         imsplex:
           name: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
@@ -378,7 +378,7 @@ ims:
         armrst: false
         cmdlang: ENU
         cmdsec: false
-        omname: 2OM1
+        omname: "{{ vars.ims_plex }}"
         imsplex:
           name: "{{ vars.ims_plex }}"
           auditlog: SYSLOG.OM2Q01.LOG
@@ -388,11 +388,11 @@ ims:
         armrst: false
         imsplex:
           name: "{{ vars.ims_plex }}"
-        rmname: 2RM1
+        rmname: "{{ vars.ims_plex }}"
     - member_name: CSLDI000
       config:
         armrst: N
-        odbmname: 2ODB1
+        odbmname: "{{ vars.ims_plex }}"
         imsplex:
           name: "{{ vars.ims_plex }}"
         rrs: N
@@ -403,7 +403,7 @@ ims:
           minthrds: 2
         local_datastore_properties:
           odbm:
-            name: 2ODB1
+            name: "{{ vars.ims_plex }}"
             datastore:
               - name: "{{ vars.imsid }}"
                 maxthrds: 5

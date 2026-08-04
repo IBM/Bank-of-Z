@@ -1,0 +1,59 @@
+db2:
+  ## h26o
+  class: A
+  ssid: DBD2
+  hlq: DB2V13
+  insdspre: "{{ db2.hlq }}.{{ db2.ssid }}"
+  ## user catalog
+  userscat: CATALOG.VS01.DB2V13
+  userlcat: CATALOG.VS01.DB2V13
+  db2_authorization_ids:
+    authid: IBMUSER
+    sysadm: IBMUSER
+    sysam2: IBMUSER
+    sysopr1: IBMUSER
+    sysopr2: IBMUSER
+    secadm1: IBMUSER
+    secadm2: IBMUSER
+    secdefid: IBMUSER
+    inssqlid: IBMUSER
+    ivpsqlid: IBMUSER
+    rtm05pko: IBMUSER
+  volumes_and_sms_classes:
+    ## SMS volume for user catalog
+    volexit: DB2V13
+    ## STOR CLASS for creating user catalog
+    storcls: ARCH0A
+    ## DATA CLASS for creating user catalog
+    datacls: DCDB2EXT
+    ##Manager class : STANDEF
+    storcls3: ARCH0A
+    datacls3: DCDB2EXT
+    storcls6: ARCH0A
+    datacls6: DCDB2EXT
+    volsdat6: DB2V13
+    storcls7: ARCH0A
+    datacls7: DCDB2EXT
+    volsdat7: DB2V13
+    catddacl: DCDB2EXT
+    catdstcl: ARCH0A
+    catxdacl: DCDB2EXT
+    catxstcl: ARCH0A
+  db2_java_properties:
+    javahome: "/usr/lpp/java/java21/current_64"
+    claspath: "/usr/include/java_classes"
+    libpath: "/usr/lib/java_runtime64"
+    jccsid: IBMUSER
+    jvmamode: 64
+    javaenv: DB2A.DSN1WLMJ.JAVAENV
+    javaenvv: "/u/ibmuser/db2aenvfile.txt"
+    jvmprops: "/u/ibmuser/db2ajvmsp"
+  db2_decp_parameters:
+    asccsid: 1252
+  db2_smpe_target_libraries:
+    dsnexit: DB2V13.DB2A.SDSNEXIT
+  other_libraries:
+    cicsmod: CICSTS63.CICS.SDFHLOAD
+    cicscob: CICSTS63.CICS.SDFHCOB
+    cicspli: CICSTS63.CICS.SDFHPL1
+    cicsexci: CICSTS63.CICS.SDFHEXCI

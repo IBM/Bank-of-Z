@@ -10,4 +10,4 @@ mappings:
         - INQCUST-CUSTNO:
             required: false
             nullable: false
-            expression: "$pathParameters.customerId"
+            expression: "$substringAfter($pathParameters.customerId, 'C')"

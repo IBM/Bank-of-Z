@@ -171,10 +171,6 @@ set +a
 
 # List of variables to check
 VARS_TO_CHECK=(
-  NEXUS_USER
-  NEXUS_PASSWORD
-  IMS_USER
-  IMS_PASSWORD
   CICS_USER
   CICS_PASSWORD
 )

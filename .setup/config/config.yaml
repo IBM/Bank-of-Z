@@ -99,7 +99,7 @@ sandbox:
 
 # Zowe CLI configuration
 zowe:
-  rse_profile: "bankz"
+  rse_profile: "bank-of-z.rse"
 
 # Git repositories to clone
 repositories:
@@ -189,9 +189,9 @@ cics:
   cics_hlq: "{{ global.cics_hlq }}"
   uss_dir: "{{ global.cics_uss_dir }}"
   cics_sec: "{{ global.cics_sec }}"
-  host: "localhost"
-  user: "${CICS_USER}"
-  password: "${CICS_PASSWORD}"
+  host: "hsslp25p13.pok.stglabs.ibm.com"
+  user: "ibmuser"
+  password: "welcome0"
   cmci_port: 27100
   ipic_port: 4320
   debug_port: 27103

@@ -6,7 +6,7 @@ mappings:
     - code:
         required: true
         nullable: false
-        template: "{{$zosAssetResponse.abendCode}}"
+        template: "ERROR_CODE"
     - message:
         required: true
         nullable: false

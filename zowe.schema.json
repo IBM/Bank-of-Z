@@ -20,8 +20,6 @@
                                 "tso",
                                 "ssh",
                                 "rse",
-                                "cics",
-                                "zOpenDebug",
                                 "base"
                             ]
                         },
@@ -240,6 +238,15 @@
                                             "handshakeTimeout": {
                                                 "type": "number",
                                                 "description": "How long in milliseconds to wait for the SSH handshake to complete."
+                                            },
+                                            "hostKey": {
+                                                "type": "string",
+                                                "description": "The trusted host key of the z/OS SSH server, as the base64-encoded key blob presented by the server. When set, the server's key is verified against it before any credentials are sent."
+                                            },
+                                            "insecure": {
+                                                "type": "boolean",
+                                                "description": "Skip verification of the z/OS SSH server's host key, so the server's identity is not confirmed before credentials are sent.",
+                                                "default": false
                                             }
                                         },
                                         "required": []
@@ -321,6 +328,10 @@
                                             "tokenExpiration": {
                                                 "type": "string",
                                                 "description": "JWT expiration assigned to profile when \"zowe rse auth login\" is used for authentication."
+                                            },
+                                            "jobEncoding": {
+                                                "type": "string",
+                                                "description": "Host encoding used with job submission. The encoding should be specified in the form of \"IBM-1047\"."
                                             }
                                         },
                                         "required": []
@@ -331,168 +342,6 @@
                                                 "user",
                                                 "password",
                                                 "tokenValue"
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "if": {
-                                "properties": {
-                                    "type": {
-                                        "const": "cics"
-                                    }
-                                }
-                            },
-                            "then": {
-                                "properties": {
-                                    "properties": {
-                                        "type": "object",
-                                        "title": "CICS Profile",
-                                        "description": "A cics profile is required to issue commands in the cics command group that interact with CICS regions. The cics profile contains your host, port, user name, and password for the IBM CICS management client interface (CMCI) server of your choice.",
-                                        "properties": {
-                                            "host": {
-                                                "type": "string",
-                                                "description": "The CMCI server host name"
-                                            },
-                                            "port": {
-                                                "type": "number",
-                                                "description": "The CMCI server port",
-                                                "default": 1490
-                                            },
-                                            "user": {
-                                                "type": "string",
-                                                "description": "Your username to connect to CICS"
-                                            },
-                                            "password": {
-                                                "type": "string",
-                                                "description": "Your password to connect to CICS"
-                                            },
-                                            "regionName": {
-                                                "type": "string",
-                                                "description": "The name of the CICS region name to interact with"
-                                            },
-                                            "cicsPlex": {
-                                                "type": "string",
-                                                "description": "The name of the CICSPlex to interact with"
-                                            },
-                                            "rejectUnauthorized": {
-                                                "type": "boolean",
-                                                "description": "Reject self-signed certificates.",
-                                                "default": true
-                                            },
-                                            "protocol": {
-                                                "type": "string",
-                                                "description": "Specifies CMCI protocol (http or https).",
-                                                "default": "https",
-                                                "enum": [
-                                                    "http",
-                                                    "https"
-                                                ]
-                                            }
-                                        },
-                                        "required": []
-                                    },
-                                    "secure": {
-                                        "items": {
-                                            "enum": [
-                                                "user",
-                                                "password"
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "if": {
-                                "properties": {
-                                    "type": {
-                                        "const": "zOpenDebug"
-                                    }
-                                }
-                            },
-                            "then": {
-                                "properties": {
-                                    "properties": {
-                                        "type": "object",
-                                        "title": "Zowe Z Open Debug Profile",
-                                        "description": "Zowe Profile to use IBM z/OS Debugger",
-                                        "properties": {
-                                            "host": {
-                                                "type": "string",
-                                                "description": "The z/OS host name you are running the debugger against."
-                                            },
-                                            "dpsPort": {
-                                                "type": "number",
-                                                "description": "The port that Debug Profile Service is running on.",
-                                                "default": 8143
-                                            },
-                                            "dpsContextRoot": {
-                                                "type": "string",
-                                                "description": "The context root for Debug Profile Service",
-                                                "default": "api/v1"
-                                            },
-                                            "dpsSecured": {
-                                                "type": "boolean",
-                                                "description": "Is Debug Profile Service running securely?",
-                                                "default": true
-                                            },
-                                            "rdsPort": {
-                                                "type": "number",
-                                                "description": "The port that Remote Debug Service is running on. If the rdsPort is undefined, Z Open Debug will attempt to automatically discover it",
-                                                "default": 8001
-                                            },
-                                            "rdsSecured": {
-                                                "type": "boolean",
-                                                "description": "Is Remote Debug Service running securely?",
-                                                "default": true
-                                            },
-                                            "rejectUnauthorized": {
-                                                "type": "boolean",
-                                                "description": "Reject self-signed certificates",
-                                                "default": true
-                                            },
-                                            "uuid": {
-                                                "type": "string",
-                                                "description": "unique id for profile. This value is generated programatically and should not be changed. Doing so may cause unexpected behaviour."
-                                            },
-                                            "tokenValue": {
-                                                "type": "string",
-                                                "description": "The token value used for multi factored authentication"
-                                            },
-                                            "user": {
-                                                "type": "string"
-                                            },
-                                            "password": {
-                                                "type": "string"
-                                            },
-                                            "authenticationType": {
-                                                "type": "string",
-                                                "description": "How authentication is performed with Debug Profile Service. Supports either 'basic' or 'token' authentication.",
-                                                "default": "token",
-                                                "enum": [
-                                                    "basic",
-                                                    "token"
-                                                ]
-                                            },
-                                            "ccsPort": {
-                                                "type": "number",
-                                                "description": "The port for the Code Coverage Service. If specified, this will override the port returned from the Attach request. This is useful when the external port differs from the internal port."
-                                            },
-                                            "ccsSecured": {
-                                                "type": "boolean",
-                                                "description": "Is Code Coverage Service running securely? If specified, this will override the default security setting."
-                                            }
-                                        }
-                                    },
-                                    "secure": {
-                                        "items": {
-                                            "enum": [
-                                                "tokenValue",
-                                                "user",
-                                                "password"
                                             ]
                                         }
                                     }
@@ -592,14 +441,6 @@
                 },
                 "rse": {
                     "description": "Default rse profile",
-                    "type": "string"
-                },
-                "cics": {
-                    "description": "Default cics profile",
-                    "type": "string"
-                },
-                "zOpenDebug": {
-                    "description": "Default zOpenDebug profile",
                     "type": "string"
                 },
                 "base": {

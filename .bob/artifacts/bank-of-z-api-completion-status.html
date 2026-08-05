@@ -1,0 +1,228 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bank of Z — API Completion Status</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.6; background: #ffffff; color: #1f2328; padding: 32px 16px; }
+  .container { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; color: #1f2328; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f7f8fa; text-align: left; padding: 8px 10px; font-weight: 600; color: #57606a; border-bottom: 2px solid #e5e7eb; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .done   { background: #d1fae5; color: #065f46; }
+  .stub   { background: #fef3c7; color: #92400e; }
+  .missing{ background: #fee2e2; color: #991b1b; }
+  .partial{ background: #dbeafe; color: #1e3a8a; }
+  code { font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; background: #f7f8fa; padding: 1px 5px; border-radius: 3px; }
+  .note { background: #f7f8fa; border-left: 3px solid #3b82d4; padding: 10px 14px; font-size: 13px; color: #57606a; margin-top: 20px; border-radius: 0 4px 4px 0; }
+  .section-note { font-size: 12px; color: #57606a; margin-bottom: 8px; }
+  footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #57606a; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Bank of Z — API Completion Status</h1>
+  <p class="subtitle">Cross-reference of OpenAPI spec, <code>api.js</code> client, and frontend pages · Branch: <code>main</code></p>
+
+  <h2>CICS Endpoints</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>api.js</th>
+        <th>Frontend Page</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/customers</code></td>
+        <td><code>createCustomer()</code></td>
+        <td>customer-create.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/customers/{id}</code></td>
+        <td><code>getCustomer()</code></td>
+        <td>customer-details.html, customer-delete.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>PUT</code></td>
+        <td><code>/customers/{id}</code></td>
+        <td><code>updateCustomer()</code></td>
+        <td>customer-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>DELETE</code></td>
+        <td><code>/customers/{id}</code></td>
+        <td><code>deleteCustomer()</code></td>
+        <td>customer-delete.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/customers/{id}/accounts</code></td>
+        <td><code>getCustomerAccounts()</code></td>
+        <td>customer-details.html, account-deposit.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/accounts</code></td>
+        <td><code>getAccounts()</code></td>
+        <td><em>No frontend page</em></td>
+        <td><span class="badge missing">No UI</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/accounts/{id}</code></td>
+        <td><code>getAccount()</code></td>
+        <td>account-details.html, account-delete.html, account-transactions.html, transaction-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/accounts/{id}/balances</code></td>
+        <td><code>getAccountBalances()</code></td>
+        <td>account-details.html, customer-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/accounts/{id}/deposit</code></td>
+        <td><code>depositToAccount()</code></td>
+        <td>account-deposit.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/accounts/{id}/transactions</code></td>
+        <td><code>getAccountTransactions()</code></td>
+        <td>account-transactions.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/accounts/{id}/transactions/{txId}</code></td>
+        <td><code>getTransaction()</code></td>
+        <td>transaction-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>IMS Endpoints</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>api.js</th>
+        <th>Frontend Page</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/ims/customers/{id}</code></td>
+        <td><code>getCustomer() [IMS]</code></td>
+        <td>customer-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>PUT</code></td>
+        <td><code>/ims/customers/{id}</code></td>
+        <td><code>updateCustomer() [IMS]</code></td>
+        <td>customer-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/ims/customers/{id}/accounts</code></td>
+        <td><code>getCustomerAccounts() [IMS]</code></td>
+        <td>customer-details.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/ims/accounts/{id}</code></td>
+        <td><code>getAccount() [IMS]</code></td>
+        <td><em>No dedicated IMS page</em></td>
+        <td><span class="badge partial">Routed via CICS page</span></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/ims/accounts/{id}/balances</code></td>
+        <td><code>getAccountBalances() [IMS]</code></td>
+        <td>customer-details.html</td>
+        <td><span class="badge partial">Routed via CICS page</span></td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/ims/accounts/{custId}/{acctId}/deposit</code></td>
+        <td><code>depositToAccount() [IMS]</code></td>
+        <td>account-deposit.html</td>
+        <td><span class="badge done">Complete</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Frontend Stubs (api.js throws — not in OpenAPI spec)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Used In</th>
+        <th>Behaviour</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>createAccount()</code></td>
+        <td>account-create.html</td>
+        <td>Throws — not in OpenAPI spec</td>
+        <td><span class="badge missing">Broken page</span></td>
+      </tr>
+      <tr>
+        <td><code>updateAccount()</code></td>
+        <td>account-details.html</td>
+        <td>Throws — not in OpenAPI spec</td>
+        <td><span class="badge missing">Broken action</span></td>
+      </tr>
+      <tr>
+        <td><code>deleteAccount()</code></td>
+        <td>account-delete.html</td>
+        <td>Throws — not in OpenAPI spec</td>
+        <td><span class="badge missing">Broken page</span></td>
+      </tr>
+      <tr>
+        <td><code>searchCustomersByName()</code></td>
+        <td>customer-details.html</td>
+        <td>Throws — not in OpenAPI spec</td>
+        <td><span class="badge missing">Broken action</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Summary:</strong> 3 frontend pages are fully broken (<code>account-create.html</code>, <code>account-delete.html</code> delete action, <code>customer-details.html</code> search) because their corresponding API operations (<code>POST /accounts</code>, <code>DELETE /accounts/{id}</code>, customer name search) are not in the OpenAPI spec. The <code>GET /accounts</code> endpoint exists in the spec and <code>api.js</code> but has no frontend page. IMS account detail and transaction pages are not separately built — they share CICS pages via routing logic.
+  </div>
+
+  <footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

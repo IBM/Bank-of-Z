@@ -3,6 +3,7 @@
     "profiles": {
         "bank-of-z": {
             "properties": {
+                "host": "hsslp25p13.pok.stglabs.ibm.com",
                 "protocol": "https",
                 "rejectUnauthorized": false
             },

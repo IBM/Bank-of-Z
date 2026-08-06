@@ -43,17 +43,17 @@ tsocmd "SETROPTS GENERIC(RDATALIB)" \
 tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
  >/dev/null 2>&1
 
-# Remove existing cert label and keyring — expected to fail on a clean system
+# Remove existing cert label and keyring - expected to fail on a clean system
 tsocmd "RACDCERT ID($userid) \
   REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
 tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
 tsocmd "RACDCERT ID($userid) DELRING($ring)" \
- >/dev/null 2>&1
-# Only DIGTRING changed — DELRING/DELETE do not modify DIGTCERT
+ >/dev/null 2>&1 || true
+# Only DIGTRING changed - DELRING/DELETE do not modify DIGTCERT
 tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 
-# Remove RDATALIB profile — expected to fail on a clean system
+# Remove RDATALIB profile - expected to fail on a clean system
 tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) DELETE" \
  >/dev/null 2>&1
 tsocmd "RDELETE RDATALIB $profile" \

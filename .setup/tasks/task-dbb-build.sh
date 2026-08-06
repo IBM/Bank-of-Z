@@ -90,6 +90,7 @@ trap finalize_results EXIT
 # Build type selection
 # =========================
 BUILD_TYPE="${1:-}"
+BUILD_TYPE="${BUILD_TYPE#--}"   # strip leading -- if present
 BUILD_OPTIONS=""
 
 if [ "$BUILD_TYPE" = "full" ]; then

@@ -96,11 +96,10 @@ system_command_refresh_apps:
   wait_time_s: 3
   wait: true
 
-system_command_refresh_fronted:
+system_command_refresh_frontend:
   cmd: 'MODIFY {{frontend_job_name}},REFRESH,APPS'
   verbose: true
   wait_time_s: 3
-
 
 # load shared configuration
 include_global_config:

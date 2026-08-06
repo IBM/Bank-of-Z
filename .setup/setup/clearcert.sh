@@ -5,7 +5,7 @@
 #           for Bank of Z. Run before addcert.sh to ensure a clean slate.
 #
 # Called by setup-common.sh as a teardown step before addcert.sh.
-# All RACF commands are suppressed — failures are expected on a clean system.
+# All RACF commands are suppressed - failures are expected on a clean system.
 # =============================================================================
 
 # =========================
@@ -43,7 +43,7 @@ tsocmd "SETROPTS GENERIC(RDATALIB)" \
 tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
  >/dev/null 2>&1
 
-# Remove existing cert label and keyring - expected to fail on a clean system
+# Remove existing cert label and keyring
 tsocmd "RACDCERT ID($userid) \
   REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
 tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
@@ -53,12 +53,12 @@ tsocmd "RACDCERT ID($userid) DELRING($ring)" \
 tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH" \
  >/dev/null 2>&1 || true
 
-# Remove RDATALIB profile - expected to fail on a clean system
+# Remove RDATALIB profile
 tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) DELETE" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 tsocmd "RDELETE RDATALIB $profile" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 
 print_success "Teardown complete."

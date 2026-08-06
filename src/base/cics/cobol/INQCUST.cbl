@@ -104,6 +104,7 @@
        01 WS-D-RETRIED                 PIC X VALUE 'N'.
 
        01 WS-PROGRAM                   PIC X(8) VALUE SPACES.
+       01 WS-VERSION                   PIC X(8) VALUE 'V1.1.0  '.
 
 
       *

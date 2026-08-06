@@ -11,7 +11,6 @@ source "$LIB_DIR/utilities.sh"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 
-
 set +e
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
@@ -48,6 +47,8 @@ _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
 ZOS_CURRENT_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 ZOS_ADMIN_USER=$(get_section_value 'global' 'zos_admin_user')
+ZOS_CA_LABEL=$(get_section_value 'global' 'zos_ca_label')
+ZOS_KEYRING=$(get_section_value 'global' 'zos_keyring')
 
  # Application
 APP_BASE_NAME=$(get_section_value 'app' 'base_name')
@@ -73,7 +74,7 @@ DBB_REPO_URL=$(get_section_value 'repositories' 'dbb_url')
 # ZOAU
 ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 
-# ZBuuilder
+# ZBuilder
 ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
 
@@ -113,7 +114,7 @@ ZOSCONNECT_SERVER_FOLDER="${ZOSCONNECT_SERVER_FOLDER:-$(get_section_value 'zosco
 ZOSCONNECT_SYS_PROCLIB=$(get_section_value 'zosconnect' 'sys_proclib')
 ZOSCONNECT_TASK_USER=$(get_section_value 'zosconnect' 'task_user')
 
-# Fronted
+# Frontend
 FRONTEND_LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
 FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
@@ -130,6 +131,7 @@ CICS_HLQ=${CICS_HLQ:-$(get_section_value 'cics' 'cics_hlq')}
 CICS_USS_DIR=${CICS_USS_DIR:-$(get_section_value 'cics' 'uss_dir')}
 CICS_SEC=${CICS_SEC:-$(get_section_value 'cics' 'cics_sec')}
 CICS_SYS_PROCLIB=$(get_section_value 'cics' 'sys_proclib')
+CICS_HOST=${CICS_HOST:-$(get_section_value 'cics' 'host')}
 
 # IMS
 IMS_DISABLED=${IMS_DISABLED:-$(get_section_value 'ims' 'disabled')}

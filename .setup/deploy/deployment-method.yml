@@ -576,26 +576,26 @@ activities:
     - zosconnect_refresh
     - deploy
     
-  - name: 'Refresh Fronted'
-    description: 'Refresh Fronted application'
+  - name: 'Refresh Frontend'
+    description: 'Refresh Frontend Liberty application'
     actions:
-        - name: REFRESH_FRONTED
+        - name: REFRESH_FRONTEND
           steps:
-          - name: 'Refresh Fronted'
+          - name: 'Refresh Frontend'
             properties:
             - key: 'template'
               value: 'system_command'
             - key: "path_filter"
               value: '.*-frontend.*\.war$'
             - key: 'var_system_command'
-              value: 'system_command_refresh_fronted'
+              value: 'system_command_refresh_frontend'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
        - name: 'war'
     is_artifact: True
     tags:
-    - fronted_refresh
+    - frontend_refresh
     - deploy
 
 # Made with Bob

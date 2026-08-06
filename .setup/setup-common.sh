@@ -323,6 +323,42 @@ stage_populate_ims_database() {
 
 
 #########################################################
+# STAGE: Setup RACF certificates and keyring
+#########################################################
+stage_setup_certificates() {
+    print_stage "STAGE: Setup RACF certificates and keyring"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/clearcert.sh" ]; then
+        print_error "Certificate script not found: $BANK_DIR/.setup/setup/clearcert.sh"
+        exit 1
+    fi
+
+    if [ ! -f "$BANK_DIR/.setup/setup/addcert.sh" ]; then
+        print_error "Certificate script not found: $BANK_DIR/.setup/setup/addcert.sh"
+        exit 1
+    fi
+
+    cd "$BANK_DIR"
+    set -o pipefail
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/clearcert.sh"
+    if bash .setup/setup/clearcert.sh; then
+        print_success "RACF keyring teardown completed"
+    else
+        print_error "Failed to clear existing RACF certificates"
+        exit 1
+    fi
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/addcert.sh"
+    if bash .setup/setup/addcert.sh; then
+        print_success "RACF keyring and certificates created successfully"
+    else
+        print_error "Failed to setup RACF certificates"
+        exit 1
+    fi
+}
+
+#########################################################
 # STAGE: Setup zOS Connect server
 #########################################################
 stage_setup_zosconnect_server() {
@@ -485,10 +521,14 @@ main_setup() {
         stage_setup_ims_database
         stage_setup_ims_bankz_regions
     fi
-    
+
     stage_setup_zosconnect_server
-    
+
     stage_setup_frontend_server
+
+    # Certificates run last so addcert.sh + gencert-eku.sh regenerate the
+    # RACF keyring cert after the server config is in place.
+    stage_setup_certificates
     
     # Summary
     print_stage "SETUP COMPLETE"

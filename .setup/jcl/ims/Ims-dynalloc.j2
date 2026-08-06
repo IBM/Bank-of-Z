@@ -115,8 +115,8 @@
 //****************************************************************
 //IMSDALOC  PROC  SOUT=*
 //ASSEM  EXEC PGM=ASMA90,PARM='ALIGN,DECK,NOOBJECT'
-//STEPLIB  DD DSN={{ ims.asm_lib_hlq }},DISP=SHR
-//SYSLIB   DD DISP=SHR,DSN={{ ims.ims_hlq }}.SDFSMAC
+//STEPLIB  DD DSN={{ ims.asm_hlq }}.SASMMOD1,DISP=SHR
+//SYSLIB   DD DISP=SHR,DSN={{ ims.ims_sys_hlq }}.SDFSMAC
 //         DD DISP=SHR,DSN=SYS1.MACLIB
 //SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(10,5))
 //SYSPUNCH DD DSN=&OBJMOD,DCB=(RECFM=FB,LRECL=80,BLKSIZE=400),

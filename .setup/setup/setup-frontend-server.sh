@@ -53,26 +53,27 @@ sleep 2
 
 # Create the server using Liberty's server command (creates under FRONTEND_LIBERTY_HOME/usr by default)
 "${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
+RC=$?
+if [ $RC -eq 0 ]; then
+    print_success "Frontend Liberty server created successfully"
+else
+    print_error "Failed to create Frontend Liberty server (RC=$RC)"
+    exit 1
+fi
 
 # Move server to our WLP_USER_DIR
 if [ -d "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" ]; then
     mv "${FRONTEND_LIBERTY_HOME}/usr/servers/${SERVER_NAME}" "${WLP_USER_DIR}/servers/"
 fi
 
-RC=$?
-if [ $RC -eq 0 ]; then
-    print_success "Frontend Liberty server created successfully at $WLP_USER_DIR"
-else
-    print_error "Failed to create Frontend Liberty server (RC=$RC)"
-    exit 1
-fi
-
 # =========================
 # Configure server.xml
+# bash heredoc: variables expand (for ZOS_ADMIN_USER), Liberty variable refs
+# (${frontend.http.port} etc.) are dollar-escaped to prevent shell expansion.
 # =========================
 print_info "Configuring server.xml..."
 
-cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
+cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="Bank of Z Frontend Server">
 
@@ -81,29 +82,61 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << 'EOF'
         <feature>servlet-6.0</feature>
         <feature>jsp-3.1</feature>
         <feature>transportSecurity-1.0</feature>
+        <feature>ssl-1.0</feature>
     </featureManager>
 
     <!-- HTTP Endpoint Configuration -->
+    <!-- onError="FAIL" stops the server if the port cannot be opened -->
+    <!-- portOpenRetries="10" helps at IPL when ports may not be immediately available -->
     <httpEndpoint id="defaultHttpEndpoint"
-                  httpPort="${frontend.http.port}"
-                  httpsPort="${frontend.https.port}"
-                  host="*" />
+                  httpPort="\${frontend.http.port}"
+                  httpsPort="\${frontend.https.port}"
+                  host="*"
+                  onError="FAIL"
+                  portOpenRetries="10" />
 
     <!-- Application Configuration -->
-    <webApplication id="bank-frontend" 
-                    location="${server.config.dir}/apps/bank-frontend-vanilla.war" 
-                    name="bank-frontend" 
+    <webApplication id="bank-frontend"
+                    location="\${server.config.dir}/apps/bank-frontend-vanilla.war"
+                    name="bank-frontend"
                     contextRoot="/">
         <classloader delegation="parentLast" />
     </webApplication>
 
     <!-- Logging Configuration -->
-    <logging traceSpecification="*=info" 
-             maxFileSize="20" 
+    <logging traceSpecification="*=info"
+             maxFileSize="20"
              maxFiles="10" />
 
-    <!-- SSL Configuration (optional - for HTTPS) -->
-    <keyStore id="defaultKeyStore" password="Liberty" /> <!-- pragma: allowlist secret -->
+    <!-- SSL Configuration using RACF keyring -->
+    <!-- sslProtocol: restrict to TLS 1.2+ only -->
+    <ssl id="defaultSSLConfig"
+         keyStoreRef="defaultKeyStore"
+         sslProtocol="TLSv1.2,TLSv1.3"/>
+    <!-- For JCERACFKS (SAF keyring) keystores, Liberty requires the password
+         attribute to be present but ignores its value - "password" is the
+         conventional placeholder. The keyring itself is protected by RACF, not
+         by this field. -->
+    <keyStore id="defaultKeyStore"
+              location="safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING}"
+              type="JCERACFKS"
+              password="password"/>
+
+    <!-- Hide Liberty welcome page
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-httpdispatcher -->
+    <httpDispatcher enableWelcomePage="false"/>
+
+    <!-- Disable config polling to avoid idle CPU usage
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-config -->
+    <config updateTrigger="disabled"/>
+
+    <!-- Disable dropins and polling to avoid idle CPU usage
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-applicationmonitor -->
+    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+
+    <!-- Security hardening: remove X-Powered-By header
+         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-webcontainer -->
+    <webContainer disableXPoweredBy="true"/>
 
 </server>
 EOF
@@ -186,6 +219,11 @@ dcp "/tmp/FE${APP_SHORT_NAME}J.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}
 # =========================
 print_info "Creating apps directory..."
 mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/apps"
+# Ensure the apps dir is group-writable so Wazi Deploy (running as ${FRONTEND_TASK_USER})
+# can copy WARs into it at deploy time.
+chmod 775 "${WLP_USER_DIR}/servers/${SERVER_NAME}/apps"
+mkdir -p "${WLP_USER_DIR}/servers/${SERVER_NAME}/backup/apps"
+chmod 775 "${WLP_USER_DIR}/servers/${SERVER_NAME}/backup/apps"
 
 # =========================
 # Start the server

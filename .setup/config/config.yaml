@@ -23,7 +23,7 @@ global:
   # Tools
   java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoautil"
+  zoau_home: "/usr/lpp/IBM/zoau"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
   zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
   zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
   dbb_home: "{{ global.sandbox_root }}/tools/dbb"
@@ -37,6 +37,8 @@ global:
   # z/OS System
   zos_admin_user: "IBMUSER"
   zos_current_user: "${ZOS_CURRENT_USER}"
+  zos_ca_label: "VSICA"
+  zos_keyring: "BOZRING"
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
   igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
@@ -45,15 +47,16 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
-  
+  asm_hlq: "ASM"
+
   # GUI
   zosconnect_http_port: 9080
-  zosconnect_https_port: 9443
+  zosconnect_https_port: 9444
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
-  # Frontend
+  # Frontend (separate Liberty server - FE<APP_SHORT_NAME> on port 9445)
   frontend_http_port: 9081
-  frontend_https_port: 9444
+  frontend_https_port: 9445
   frontend_task_user: "{{ global.zos_admin_user}}"
 
 
@@ -166,10 +169,12 @@ debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
 
-# z/OS Connect (API exposure)
+# z/OS Connect (API exposure only)
+# Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.
 zosconnect:
   zosconnect_home: "{{ global.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"
+  server_name: "bankOfZServer"
   http_port: "{{ global.zosconnect_http_port }}"
   https_port: "{{ global.zosconnect_https_port }}"
   task_user: "{{ global.zosconnect_task_user }}"
@@ -179,6 +184,7 @@ zosconnect:
 frontend:
   liberty_home: "{{ global.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"
+  server_name: "bankz-frontend"
   http_port: "{{ global.frontend_http_port }}"
   https_port: "{{ global.frontend_https_port }}"
   sys_proclib: "{{ global.sys_proclib }}"
@@ -220,7 +226,7 @@ ims:
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  asm_lib_hlq: "ASM.SASMMOD1"
+  asm_hlq: "{{ global.asm_hlq }}"
   dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
   dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
   dfs_recon3: "{{ ims.ims_hlq }}.RECON3"

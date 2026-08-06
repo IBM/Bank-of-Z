@@ -21,7 +21,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue
-    printf "${CYAN}[DB2-GRANT]${NC} %s\n" "${line}"
+    printf "${CYAN}[DB2-GRANT]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
 # =========================
@@ -43,6 +43,8 @@ set +e
 tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
+tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
+tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
 set -e
 
@@ -56,6 +58,7 @@ run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
 RC=$?
 
 rm -f /tmp/Db2-*
+rm -f "$SCRIPTS_DIR/../config/.env"
 
 # =========================
 # Result

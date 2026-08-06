@@ -7,7 +7,7 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
-  java_home: "/usr/lpp/java/java21/current_64"
+  java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_home: "/usr/lpp/ims/imsjava"
   db2_java_home: "/usr/lpp/db2d10"
 ims:
@@ -17,13 +17,13 @@ ims:
   db2_hlq: "{{ vars.db2_hlq }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
-  ims_target_user: "{{ vars.ims_user_lower }}"
-  ims_lgmsg:
-    primary_space: 84
-    secondary_space: 63
-    unit: MB
+  ims_target_user: IBMUSER
+  # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
+  ims_lgmsg:                                                     
+      primary_space: 84                                          
+      secondary_space: 63                                        
+      unit: MB                                                   
   ims_proclib:
-    #$hg remove list of DSN
     members:
     - member_name: DFSPBIMS
       config:
@@ -39,38 +39,38 @@ ims:
         automatic_restart: false
         dedb_maximum_buffer_size: 4096
         coordinator_controller_convert_abend_on_cancel: false
-        communication_input_output_pool_maximum_size: 2048M
+        communication_input_output_pool_maximum_size: 2047M
         extended_mcs_console_security_setting: true
-        maximum_number_log_records_per_checkpoint_interval: 500000
+        maximum_number_log_records_per_checkpoint_interval: 512K
         command_recognition_character: '@'
-        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 12288
+        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 12K
         maximum_number_dedb_buffers: 100
-        dedb_buffer_pool_page_free_option: 0
+        dedb_buffer_pool_page_free_option: '0'
         dedb_additional_buffers: 10
         recovery_control_server_name: "{{ vars.imsid }}DRC"
-        database_workarea_pool_size: 24576
-        dfsdc_file_suffix: 0
+        database_workarea_pool_size: 24K
+        dfsdc_file_suffix: '0'
         console_message_descriptor_overide: 7
-        component_subset_configuration_file_suffix: '000' #$hg pratap has fixed it, need to merge the fix
+        component_subset_configuration_file_suffix: '000'
         database_server_name: "{{ vars.imsid }}DLI"
-        database_server_private_size_for_program_scheduling_definition_files: 716800
+        database_server_private_size_for_program_scheduling_definition_files: 700K
         undeliverable_message_purge_time: 60
-        database_scheduling_pool_size: 49152 #$hg204800
+        database_scheduling_pool_size: 48K
         dynamic_terminal_descriptor_file_suffix: I
         transaction_manager_module_storage_pool_maximum_size: 2047M
         fast_path_message_buffer_pool_maximum_size: 2047M
         fast_path_default_message_buffer_size: 256
-        fast_path_maximum_pcb_pool_size: 12288
-        dynamic_terminal_enablement_option: true
+        fast_path_maximum_pcb_pool_size: 12K
+        dynamic_terminal_enablement_option: Y
         long_term_page_fixing_queue_buffer: 1
-        message_format_buffer_pool_maximum_size: 49152
+        message_format_buffer_pool_maximum_size: 48K
         front_end_switch_enablement: false
         front_end_switch_timeout_value: 0
         long_term_storage_page_fixing_options_file_suffix: DC
         control_region_dump_formatting_option: D
         fast_path_enablement: true
-        dedb_area_auto_open_option: false
-        dedb_auto_restart_option_after_lock_manager_reconnect: false
+        dedb_area_auto_open_option: N
+        dedb_auto_restart_option_after_lock_manager_reconnect: N
         fast_path_workpool_maximum_pool_size: 2047M
         number_of_format_fetch_request_elements: 30
         otma_xcf_group_name: IMSXCFGN
@@ -85,7 +85,7 @@ ims:
         number_of_distinct_updates_to_dedb_ci_before_combining_into_single_logrecord_of_entire_ci: 10
         logical_terminal_hash_table_slot_count: 256
         subordinate_database_server_enablement: S
-        static_input_terminal_option: true
+        static_input_terminal_option: Y
         common_buffer_pool_upper_limit_expansion_for_lu62_device_manager: 2047M
         private_buffer_pool_upper_limit_expansion_for_lu62_device_manager: 2047M
         maximum_number_of_application_and_system_tasks: 255
@@ -100,17 +100,17 @@ ims:
         msc_parallel_session_count_for_initilization: 0
         allocate_psb_security_enablement_for_open_database_allocation: false
         maximum_number_of_output_threads_for_fast_path: 5
-        open_transaction_server_restart_behavior_option: true
+        open_transaction_server_restart_behavior_option: Y
         otma_non_response_mode_transaction_scheduling_program_to_program_switch: false
         allow_member_name_overide_by_otma_prerouting_exit: false
-        open_transaction_server_security_option: false
+        open_transaction_server_security_option: N
         open_transaction_server_synchronous_output_tpipe: false
-        program_isolation_getmain_size_increment: 65536
-        program_isolation_maximum_table_size: 1048576
+        program_isolation_getmain_size_increment: 64K
+        program_isolation_maximum_table_size: 1M
         ims_proclib_reader_procedure_name: "{{ vars.imsid }}RDR"
         suffix_of_the_program_preload_list_file: DC
-        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12288
-        work_area_pool_size_for_program_scheduling_definition_files: 24576 #$hg974848
+        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12K
+        work_area_pool_size_for_program_scheduling_definition_files: 24K
         inital_number_of_application_and_system_tasks: 5
         security_mixed_case_password_option: R
         number_of_message_queue_buffers: 5
@@ -140,29 +140,39 @@ ims:
         ims_type_2_svc_number: 203
         shared_vso_remote_site_emergency_restart_option: NONE
         time_controlled_operation_security_enablement: false
-        transaction_security_option: true
+        transaction_security_option: Y
         io_pcb_timestamp_format: L
         number_of_user_hash_table_slots: 256
         user_messaage_table_enablement: false
         vtam_authorized_path_facility_enablement: 1
         dfsvsm_file_suffix: DC
-        work_area_pool_maximum_size: 49152
+        work_area_pool_maximum_size: 48K
         four_digit_year_timestamp: false
     - member_name: DFSDF000
       config:
+        catalog:
+          catalog: true
+          alias: DFSC
+          retention:
+            days: 40
+            versions: 55
+          ixvolser: "{{ vars.ims_sys_hlq }}"
+          access: UPDATE
+          acbmgmt: CATALOG
         common_service_layer:
           cmdsec: false
           imsplex: "{{ vars.ims_plex }}"
           modblks: DYN
         dynamic_resources:
-          autoexport: AUTO
-          autoimport: AUTO
           rddsdsn:
           - "{{ vars.ims_hlq }}.RDDS1"
           - "{{ vars.ims_hlq }}.RDDS2"
           - "{{ vars.ims_hlq }}.RDDS3"
+          autoimport: AUTO
+          autoexport: AUTO
         logger:
           oldsdef:
+            mode: DUAL
             olds:
             - '00'
             - '01'
@@ -172,23 +182,14 @@ ims:
             - '05'
             - '99'
             bufno: 5
-            mode: DUAL
           wadsdef:
+            mode: SINGLE
             wads:
             - '0'
             - '1'
             - '8'
             - '9'
           arc: 3
-        catalog:
-          catalog: true
-          alias: DFSC
-          retention:
-            days: 40
-            versions: 55
-          acbmgmt: CATALOG
-          access: UPDATE
-          ixvolser: "{{ vars.ims_sys_hlq }}"
     - member_name: DFSFIXDC
       config:
         nuc: 33
@@ -354,26 +355,26 @@ ims:
           keep_buffer_in_memory: N
           keep_buffer_prefix_in_memory: N
         serviceability_and_trace_options:
-          disp: 'ON'
           dl/i: 'ON'
+          lock: 'ON'
+          disp: 'ON'
+          schd: 'ON'
           dlog: 'ON'
           latc: 'ON'
-          lock: 'ON'
           qmgr: 'ON'
-          schd: 'ON'
           sqtt: 'ON'
           strg: 'ON'
     - member_name: CSLSI000
       config:
-        armrst: N
+        armrst: false
         sciname: 2SCI1
         imsplex:
           name: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
       config:
-        armrst: N
+        armrst: false
         cmdlang: ENU
-        cmdsec: N
+        cmdsec: false
         omname: 2OM1
         imsplex:
           name: "{{ vars.ims_plex }}"
@@ -381,37 +382,14 @@ ims:
         cmdtextdsn: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:
-        armrst: N
-        rmname: 2RM1
+        armrst: false
         imsplex:
           name: "{{ vars.ims_plex }}"
+        rmname: 2RM1
     - member_name: HWSCFODB
       config:
-        hws:
-          id: "{{ vars.imsid }}HWS"
-          xibarea: 100
-          racf: false
-          rrs: false
-        tcpip:
-          hostname: TCPIP
-          portid:
-          - '9977'
-          - LOCAL
-          racfid: SYS1
-          timeout: 5000
-          ipv6: true
-          sslport: 9966
-          sslenvar: HWSDPSSL
-          maxsoc: 600
-          exit:
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
-          - HWSSOAP1
-          - HWSDPWR1
+        adapter:
+          xml: true
         datastore:
           id: "{{ vars.imsid }}"
           group: IMSXCFGN
@@ -419,11 +397,14 @@ ims:
           tmember: "{{ vars.imsid }}"
           dru: HWSYDRU0
           appl: APPLID1
+        hws:
+          id: "{{ vars.imsid }}HWS"
+          xibarea: 100
+          racf: false
+          rrs: false
         imsplex:
           member: "{{ vars.imsid }}HWS"
           tmember: "{{ vars.ims_plex }}"
-        adapter:
-          xml: true
         odaccess:
           odbmautoconn: false
           imsplex:
@@ -433,6 +414,34 @@ ims:
             id: 9978
             porttmot: 6000
           odbmtmot: 6000
+        tcpip:
+          hostname: TCPIP
+          portid:
+          - '9977'
+          - LOCAL
+          racfid: SYS1
+          timeout: 5000
+          ipv6: true
+          maxsoc: 600
+          exit:
+          - HWSIMSO0
+          - HWSIMSO1
+          - HWSSMPL0
+          - HWSSMPL1
+          - HWSCSLO0
+          - HWSCSLO1
+          - HWSIMSO0
+          - HWSIMSO1
+          - HWSSMPL0
+          - HWSSMPL1
+          - HWSCSLO0
+          - HWSCSLO1
+          - HWSIMSO0
+          - HWSIMSO1
+          - HWSSMPL0
+          - HWSSMPL1
+          - HWSCSLO0
+          - HWSCSLO1
     - member_name: BPECONFG
       config:
         lang: ENU
@@ -451,18 +460,23 @@ ims:
         - ims_component: BPE
           type: STG
           level: MEDIUM
+          pages: ''
         - ims_component: BPE
           type: CBS
           level: MEDIUM
+          pages: ''
         - ims_component: BPE
           type: DISP
           level: HIGH
+          pages: ''
         - ims_component: BPE
           type: AWE
           level: HIGH
+          pages: ''
         - ims_component: BPE
           type: SSRV
           level: HIGH
+          pages: ''
         - ims_component: HWS
           type: '*'
           level: HIGH
@@ -515,3 +529,10 @@ ims:
         dfsjbp: samples/ivp/ims/IMSIVPJBP
         dfscats2: samples/ivp/opendb/OpenDBCatalogSQLType2
         dfscatd2: samples/ivp/opendb/OpenDBCatalogDLIType2
+  external_subsystem:
+  - SST: DB2
+    SSN: "{{ vars.db2_ssid }}"
+    LIT: SYS1
+    ESMT: DSNMIN10
+    REO: R
+    CRC: '-'

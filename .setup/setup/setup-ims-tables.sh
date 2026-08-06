@@ -24,7 +24,7 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue
-    printf "${CYAN}[SETUP-IMS-TABLES]${NC} %s\n" "${line}"
+    printf "${CYAN}[SETUP-IMS-TABLES]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
 # =========================

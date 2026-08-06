@@ -16,8 +16,6 @@ set +e
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
-else
-    source $HOME/.profile 2>/dev/null
 fi
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
@@ -173,4 +171,32 @@ set -a
 chmod 777 "$ENV_FILE" 2>/dev/null || true
 source "$ENV_FILE"
 set +a
+
+# List of variables to check
+VARS_TO_CHECK=(
+  NEXUS_USER
+  NEXUS_PASSWORD
+  IMS_USER
+  IMS_PASSWORD
+  CICS_USER
+  CICS_PASSWORD
+)
+
+error=0
+
+for var in "${VARS_TO_CHECK[@]}"; do
+  if [ -z "${!var}" ]; then
+    print_error "Error: variable '$var' is not set or is empty." >&2
+    error=1
+  fi
+done
+
+if [ "$error" -eq 1 ]; then
+  print_error "One or more variables are missing. Stopping script." >&2
+  rm -f "$ENV_FILE"
+  exit 1
+fi
+
+print_info "All variables are properly set."
+
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH

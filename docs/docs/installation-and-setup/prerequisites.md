@@ -48,7 +48,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | IBM Python SDK | 3.14 | `python.python_home` |
 | IBM Dependency Based Build (DBB) | 3.0.5 | `dbb.dbb_home` |
 | Z Open Automation Utilities (ZOAU) | 1.4.1.0 | `zoau.zoau_home` |
-| z/OS Middleware Configuration Tool (zconfig) | 0.6.0 | `zconfig.zconfig_home` |
+| z/OS Middleware Configuration Tool (zconfig) | 0.7.0 | `zconfig.zconfig_home` |
 | Wazi Deploy | 3.0.7.3 | `wazideploy.wazideploy_home` |
 | ZCodeScan | 1.0.2 | `zcodescan.zcodescan_home` |
 | CICS TS Resource Builder | 1.0.6 | `zconfig.zcb_home` |
@@ -79,6 +79,33 @@ Ensure that you have the following access before proceeding:
 Appropriate security definitions must also be configured in RACF or an equivalent security manager before deployment. The required definitions depend on your target environment. Contact your system administrator if you are unsure what is required.
 
 > **Note:** Access to z/OS environments, middleware, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding.
+
+## External tools requirements
+
+The following external tools and libraries are required to build and deploy Bank of Z.
+
+### Python libraries
+
+Install the required Python libraries by running the following commands:
+
+```bash
+pip install pyyaml
+pip install jinja2
+```
+
+### Gradle
+
+Download the latest supported Gradle binary distribution from the [Gradle releases](https://gradle.org/releases/) page.
+
+After downloading the archive, install Gradle on z/OS USS by running the following commands:
+
+```bash
+jar xf gradle-9.5.1-bin.zip
+chmod +x gradle-9.5.1/bin/gradle
+chtag -tc UTF-8 gradle-9.5.1/bin/gradle
+```
+
+>**Note:** Update the version number in the commands if you download a different Gradle release.
 
 ## Verify prerequisites
 

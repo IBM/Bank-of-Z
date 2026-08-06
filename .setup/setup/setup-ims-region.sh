@@ -19,7 +19,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue
-    printf "${CYAN}[ZCONFIG-IMS]${NC} %s\n" "${line}"
+    printf "${CYAN}[ZCONFIG-IMS]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
 # =========================
@@ -89,13 +89,18 @@ IMS_USER=$(printf '%s' "${IMS_USER}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
-zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
+zconfig apply -e ims_user="${IMS_USER}" \
+              -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \
-              -e ims_sys_hlq="${IMS_SYS_HLQ}" -e db2_hlq="${DB2_HLQ}" \
-              -e java_home="${JAVA_HOME}" -e db2_java_home="${DB2_JAVA_HOME}" \
+              -e ims_sys_hlq="${IMS_SYS_HLQ}" \
+              -e db2_hlq="${DB2_HLQ}" \
+              -e java_home="${JAVA_HOME}" \
+              -e db2_java_home="${DB2_JAVA_HOME}" \
               -e ims_java_home="${IMS_JAVA_HOME}" \
-              -e db2_ssid="${DB2_SSID}"  ims-region.yaml -v
+              -e db2_ssid="${DB2_SSID}" \
+              ims-region.yaml -v
+
 RC=$?
 if [ "$RC" -eq 0 ]; then
     print_success "ZConfig IMS region creation completed successfully!"

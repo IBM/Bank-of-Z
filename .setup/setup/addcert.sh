@@ -53,7 +53,7 @@ tsocmd "RACDCERT ID($userid) ADDRING($ring)"
 tsocmd "RACDCERT ID($userid) \
  CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
 rc=$?
-# Only DIGTRING changed — CONNECT modifies ring membership, not the cert itself
+# Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself
 tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
 
 # Step 2: Generate the server cert with EKU serverAuth via Bouncy Castle CSR
@@ -63,11 +63,11 @@ tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
 if test $rc -eq 0
 then
   if bash "$SCRIPTS_DIR/gencert-eku.sh"; then
-    print_info "EKU cert generation succeeded — connecting cert to keyring..."
+    print_info "EKU cert generation succeeded - connecting cert to keyring..."
     tsocmd "RACDCERT ID($userid) \
       CONNECT(LABEL('$label') RING($ring) DEFAULT)"
     rc=$?
-    # Only DIGTRING changed — CONNECT modifies ring membership, not the cert itself
+    # Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself
     tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
     if test $rc -eq 0; then
       print_success "Cert '$label' connected to keyring $userid/$ring as DEFAULT"
@@ -75,7 +75,7 @@ then
       print_error "Failed to connect cert to keyring $userid/$ring"
     fi
   else
-    print_error "gencert-eku.sh failed — Liberty cannot start without a server cert"
+    print_error "gencert-eku.sh failed - Liberty cannot start without a server cert"
     rc=1
   fi
 fi

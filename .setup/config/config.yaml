@@ -33,12 +33,12 @@ global:
   zosconnect_home: "/usr/lpp/IBM/zosconnect"
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
-
   # z/OS System
   zos_admin_user: "IBMUSER"
   zos_current_user: "${ZOS_CURRENT_USER}"
   zos_ca_label: "VSICA"
   zos_keyring: "BOZRING"
+  zos_create_certs: True
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
   igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"

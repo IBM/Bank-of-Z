@@ -116,6 +116,7 @@
        01 WS-CONVERTED-VAL2            PIC S9(10)V99 VALUE 0.
        01 WS-CONVERTED-VAL3            PIC S9(10)V99 VALUE 0.
        01 WS-CONVERTED-VAL4            PIC S9(10)V99 VALUE 0.
+       01 WS-CONVERTED-VAL55-sh        PIC S9(10)V99 VALUE 0.
 
        01 SUBPGM-PARMS.
           03 SUBPGM-ACCNO              PIC X(8).

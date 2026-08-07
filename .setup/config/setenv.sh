@@ -10,6 +10,7 @@ export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
+export PATH="/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH"
 
 set +e
 # Load CICS/IMS credentials

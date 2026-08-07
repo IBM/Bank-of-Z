@@ -37,11 +37,13 @@ fi
 
 print_info "Removing existing keyring and certificates for $userid/$ring..."
 
-# Ensure RDATALIB class is active
+# Ensure RDATALIB class is active.
+# Requires RACF SPECIAL authority - run once per image by an admin via grant-perm-user.sh.
+# Suppressed with || true - class may already be active or user may lack SPECIAL.
 tsocmd "SETROPTS GENERIC(RDATALIB)" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
- >/dev/null 2>&1
+ >/dev/null 2>&1 || true
 
 # Remove existing cert label and keyring
 tsocmd "RACDCERT ID($userid) \

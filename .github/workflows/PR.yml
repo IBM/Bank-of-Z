@@ -1,4 +1,4 @@
-name: PR Workflow
+name: pr-workflow
 on:
     pull_request:
         types:
@@ -10,7 +10,7 @@ jobs:
     controller:
         runs-on: self-hosted
         steps:
-            - name: PR pipeline trigger
+            - name: pr-summary
               run: |
                   echo " "
                   echo "PR pipeline triggered"

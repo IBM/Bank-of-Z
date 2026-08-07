@@ -96,7 +96,7 @@ All other configuration values use template references ({% raw %}`{{section.fiel
 
 ## Grant Db2 permissions (non-IBMUSER accounts only)
 
-If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects before running the environment setup.
+If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects before running the `environment` setup.
 
 Run the following command as an administrator, replacing `MYUSER` with your user ID: 
 

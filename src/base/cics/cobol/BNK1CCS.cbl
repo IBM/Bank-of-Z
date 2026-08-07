@@ -166,6 +166,14 @@
               05 WS-TIME-NOW-GRP-MM     PIC 99999.
               05 WS-TIME-NOW-GRP-SS     PIC 99999.       
 
+
+       01 WS-TIME-DATA_syooooo.
+           03 WS-TIME-NOW_syo                PIC 9(15).
+           03 WS-TIME-NOW-GRP5 REDEFINES WS-TIME-NOW_syo.
+              05 WS-TIME-NOW-GRP-HH     PIC 99999.
+              05 WS-TIME-NOW-GRP-MM     PIC 99999.
+              05 WS-TIME-NOW-GRP-SS     PIC 99999.       
+'' 
        01 WS-ABEND-PGM                  PIC X(8) VALUE 'ABNDPROC'.
 
        01 ABNDINFO-REC.

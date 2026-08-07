@@ -60,12 +60,12 @@ global:
   
   # GUI
   zosconnect_http_port: 9080
-  zosconnect_https_port: 9443
+  zosconnect_https_port: 9444
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
   # Frontend
   frontend_http_port: 9081
-  frontend_https_port: 9444
+  frontend_https_port: 9445
   frontend_task_user: "{{ global.zos_admin_user}}"
 
 

@@ -73,7 +73,7 @@ The **global** section contains the primary configuration values required to con
 | Variable | Default Value | Description |
 |---|---|---|
 | `zosconnect_http_port` | `9080` | z/OS Connect HTTP port |
-| `zosconnect_https_port` | `9443` | z/OS Connect HTTPS port |
+| `zosconnect_https_port` | `9444` | z/OS Connect HTTPS port |
 | `zosconnect_task_user` | `{{ global.zos_admin_user }}` | z/OS Connect task user |
 
 ### Frontend
@@ -81,7 +81,7 @@ The **global** section contains the primary configuration values required to con
 | Variable | Default Value | Description |
 |---|---|---|
 | `frontend_http_port` | `9081` | Frontend HTTP port |
-| `frontend_https_port` | `9444` | Frontend HTTPS port |
+| `frontend_https_port` | `9445` | Frontend HTTPS port |
 | `frontend_task_user` | `{{ global.zos_admin_user }}` | Frontend task user |
 
 ### CICS

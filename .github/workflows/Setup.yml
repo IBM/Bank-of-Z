@@ -16,6 +16,7 @@ env:
 jobs:
     setup:
         runs-on: self-hosted
+        name: parameters
         steps:
           - name: pipeline-parameters
             run: |
@@ -27,7 +28,7 @@ jobs:
                 echo "application                        = ${{ env.application}}"
                 echo "zosHost                            = ${{ env.zosHost}}"
 
-          - name: Clone Repo to z/OS Unix System Services
+          - name: clone-repository-to-uss
             run: ssh ${{ env.zosHost }} ". ./.profile && gitClone.sh -w ${{ env.uniqueWorkspaceId }} -r https://${{ secrets.githubAccessToken }}@github.com/${{ github.repository }}.git -b ${{ env.branch }}"
 
     install:

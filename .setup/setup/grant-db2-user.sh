@@ -34,19 +34,32 @@ if [[ -z "$MYUSER" ]]; then
     exit 1
 fi
 
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
 rm -f /tmp/Db2-* 2>/dev/null || true
+rm -f "$SCRIPTS_DIR/../config/.env" 2>/dev/null || true
 
 # =========================
 # RACF
 # =========================
 set +e
 tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
+set -e
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
-set -e
+
+# =========================
+# DROP
+# =========================
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2DROP" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-drop.j2"  --outputFile "/tmp/CICS-Db2-drop-$$.jcl"
+run_job_and_wait "/tmp/CICS-Db2-drop-$$.jcl" "8"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2DROP" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-drop.j2"  --outputFile "/tmp/IMS-Db2-drop-$$.jcl"
+run_job_and_wait "/tmp/IMS-Db2-drop-$$.jcl" "8"
 
 # =========================
 # Generate and submit the grant JCL
@@ -57,8 +70,10 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile "$CONFIG_FILE" \
 run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
 RC=$?
 
-rm -f /tmp/Db2-*
-rm -f "$SCRIPTS_DIR/../config/.env"
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
+rm -f /tmp/Db2-* 2>/dev/null || true
+rm -f "$SCRIPTS_DIR/../config/.env" 2>/dev/null || true
 
 # =========================
 # Result

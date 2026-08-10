@@ -145,7 +145,7 @@ try {
             def content = fileToModify.getText('UTF-8')
             // Replace only standalone occurrences of 9080 (word boundaries)
             content = content.replaceAll(/\b9080\b/, zosConnectHttpPort.toString())
-            content = content.replaceAll(/\9444\b/, zosConnectHttpsPort.toString())
+            content = content.replaceAll(/\b9444\b/, zosConnectHttpsPort.toString())
             fileToModify.setText(content, 'UTF-8')
             log.info("Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
             println("> Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")

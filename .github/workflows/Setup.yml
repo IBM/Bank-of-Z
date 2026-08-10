@@ -1,0 +1,83 @@
+name: boz-install
+on:
+    workflow_call:
+        secrets:
+            githubAccessToken:
+                required: true
+
+env:
+    uniqueWorkspaceId: ${{ vars.ZOS_SANDBOX_DIR }}/setup/${{ github.repository }}/${{ github.ref_name }}/setup_s${{ github.run_number }}
+    branch: ${{ github.ref_name }}
+    application: ${{ github.event.repository.name }}
+    zosHost: ${{ vars.ZOS_HOST }}
+    bozFrontendUrl: http://9.47.80.84:9081
+
+
+jobs:
+    setup:
+        runs-on: self-hosted
+        name: parameters
+        steps:
+          - name: pipeline-parameters
+            run: |
+                echo " "
+                echo "Following are the CI-CD pipeline parameters"
+                echo "*******************************************"
+                echo "uniqueWorkspaceId                  = ${{ env.uniqueWorkspaceId}}"
+                echo "branch                             = ${{ env.branch}}"
+                echo "application                        = ${{ env.application}}"
+                echo "zosHost                            = ${{ env.zosHost}}"
+
+          - name: clone-repository-to-uss
+            run: ssh ${{ env.zosHost }} ". ./.profile && gitClone.sh -w ${{ env.uniqueWorkspaceId }} -r https://${{ secrets.githubAccessToken }}@github.com/${{ github.repository }}.git -b ${{ env.branch }}"
+
+    install:
+        needs: setup
+        runs-on: self-hosted
+        steps:
+          - name: full-install-procedure
+            run: |
+              ssh ${{ env.zosHost }} "
+                . ./.profile &&
+                cd ${{ env.uniqueWorkspaceId }} &&
+                if [ -d ${{ env.application }} ]; then cd ${{ env.application }}; fi &&
+                bash .setup/setup-remote.sh
+              "
+
+    verify-frontend:
+         needs: install
+         runs-on: self-hosted
+         steps:
+          - name: verify-zos-frontend-availability
+            run: |
+              ADMIN_URL="${{ env.bozFrontendUrl }}/admin.html"
+              HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" --max-time 10 --insecure "$ADMIN_URL")
+              CURL_EXIT=$?
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "OK: $ADMIN_URL returned HTTP 200"
+                exit 0
+              fi
+              echo "FAIL: $ADMIN_URL returned HTTP ${HTTP_STATUS:-000} (curl exit code: $CURL_EXIT)" >&2
+              # curl exit codes: 6=DNS failure, 7=connection refused, 28=timeout, 35=SSL error
+              exit 1
+
+    verify-list-customer:
+        needs: verify-frontend
+        runs-on: self-hosted
+        defaults:
+            run:
+                working-directory: ${{ github.workspace }}
+        steps:
+          - name: checkout-repository
+            uses: actions/checkout@v4
+
+          - name: check-python-installation
+            run: |
+              python3 --version
+              echo "Python check passed"
+
+          - name: test-get-customer-details-C0000001
+            run: |
+              cd ${{ github.workspace }}
+              bash tests/test_get_customer.sh
+

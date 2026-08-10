@@ -41,7 +41,7 @@
           03 WS-CICS-RESP2-DISP        PIC 9(10)     VALUE 0.
           03 FILLER                    PIC X(15)     VALUE
                                                       ' ABENDING TASK.'.
-       01 SWITCHES.
+       01 SWITCHES_new.
           03 VALID-DATA-SW             PIC X         VALUE 'Y'.
              88 VALID-DATA                           VALUE 'Y'.
 

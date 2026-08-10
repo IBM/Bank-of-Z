@@ -57,7 +57,7 @@
               88 SEND-DATAONLY        VALUE '2'.
               88 SEND-DATAONLY-ALARM  VALUE '3'.       
 
-       01 ACTION-ALPHA.
+       01 ACTION-ALPHA_1.
            03 ACTION-NUM              PIC 9.
 
       *

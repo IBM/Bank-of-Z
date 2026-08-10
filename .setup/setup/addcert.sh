@@ -80,13 +80,16 @@ then
   fi
 fi
 
-# Step 3: Grant Liberty access to the keyring via RDATALIB
+# Step 3: Grant Liberty access to the keyring via RDATALIB.
+# RDATALIB profile and SETROPTS are managed by grant-perm-user.sh (requires
+# RACF SPECIAL). These commands are best-effort here - || true prevents abort
+# if the user lacks SPECIAL authority (profile already defined by admin).
 if test $rc -eq 0
 then
-  tsocmd "RDEFINE RDATALIB $profile"
-  tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) ACCESS(CONTROL)"
-  rc=$?
-  tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH"
+  tsocmd "RDEFINE RDATALIB $profile" 2>/dev/null || true
+  tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) ACCESS(CONTROL)" 2>/dev/null || true
+  tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" 2>/dev/null || true
+  print_info "RDATALIB: run grant-perm-user.sh as admin if Liberty cannot read the keyring"
 fi
 
 exit $rc

@@ -29,13 +29,11 @@ This setup automates the preparation of your z/OS USS environment for Bank of Z 
 
 
 ⚠️⚠️**NOTES**⚠️⚠️:
-- If you don't use `IBMUSER`  you need to grant your user for database creation.
-  Edit [../.setup/jcl/Db2-grant.jcl](../.setup/jcl/Db2-grant.jcl) and replace `MYUSER`with your user. Then issue the commands:
-   
+- If you don't use `IBMUSER` you need to grant your user DB2 and RACF keyring permissions.
+  Run the following as an administrator, replacing `MYUSER` with your user ID:
+
    ```bash
-   JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
-   jls $JOBID # CC must be 0004 max
-   pjdd $JOBID SYSPRINT
+   .setup/setup/grant-perm-user.sh MYUSER
    ```
 - During the static scan step of the pipeline simulation flow, you must create the ZCodeScan configuration file
   using the **ISO8859-1** encoding. By default, the `zcs_config_file.yml file must be located in your home directory.`

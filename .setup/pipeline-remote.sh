@@ -34,7 +34,7 @@ stage_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
-        bash EXECUTION_MODE=$EXECUTION_MODE ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
         PID=$!
         # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
         wait "$PID"

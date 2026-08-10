@@ -417,6 +417,30 @@ stage_setup_mq_queue_manager() {
 }
 
 #########################################################
+# STAGE: Setup Db2 subsystem
+#########################################################
+stage_setup_db2_subsystem() {
+    print_stage "STAGE: Provision Db2 subsystem with zconfig"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-db2-subsystem.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-db2-subsystem.sh"
+        exit 1
+    fi
+
+    print_info "Running Db2 subsystem provisioning script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-db2-subsystem.sh"
+    cd "$BANK_DIR"
+
+    set -o pipefail
+    if .setup/setup/setup-db2-subsystem.sh; then
+        print_success "Db2 subsystem provisioning completed successfully"
+    else
+        print_error "Failed to provision Db2 subsystem"
+        exit 1
+    fi
+}
+
+#########################################################
 # STAGE: Setup CICS region
 #########################################################
 stage_setup_cics_region() {
@@ -552,6 +576,8 @@ main_setup() {
 
     # infrastructure
     stage_stop_tasks
+
+    stage_setup_db2_subsystem
 
     stage_setup_database
 

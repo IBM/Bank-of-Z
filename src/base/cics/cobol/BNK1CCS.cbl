@@ -45,11 +45,17 @@
            03 VALID-DATA-SW           PIC X VALUE 'Y'.
               88 VALID-DATA           VALUE 'Y'.
 
-       01 FLAGS.
+      * 01 FLAGS.
+      *     03 SEND-FLAG               PIC X.
+      *        88 SEND-ERASE           VALUE '1'.
+      *        88 SEND-DATAONLY        VALUE '2'.
+      *        88 SEND-DATAONLY-ALARM  VALUE '3'.
+
+       01 FLAGS_new
            03 SEND-FLAG               PIC X.
               88 SEND-ERASE           VALUE '1'.
               88 SEND-DATAONLY        VALUE '2'.
-              88 SEND-DATAONLY-ALARM  VALUE '3'.
+              88 SEND-DATAONLY-ALARM  VALUE '3'.       
 
        01 ACTION-ALPHA.
            03 ACTION-NUM              PIC 9.

@@ -52,7 +52,7 @@
       *        88 SEND-DATAONLY-ALARM  VALUE '3'.
 
        01 FLAGS_new.
-           03 SEND-FLAG             PIC X.
+           03 SEND-FLAG_1111             PIC X.
               88 SEND-ERASE           VALUE '1'.
               88 SEND-DATAONLY        VALUE '2'.
               88 SEND-DATAONLY-ALARM  VALUE '3'.       

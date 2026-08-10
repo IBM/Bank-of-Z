@@ -68,17 +68,14 @@ db2:
 
 All other fields use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field reference, see [Configuration Reference](../reference/configuration-reference.html).
 
-## Grant Db2 permissions (non-IBMUSER accounts only)
+## Grant permissions (non-IBMUSER accounts only)
 
-If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects. Otherwise, the `environment` setup fails during Db2 table creation.
+If you are not using the `IBMUSER` user ID, run `grant-perm-user.sh` as an admin to grant your user ID the required DB2 and RACF keyring permissions. Otherwise, the setup fails during DB2 table creation and Liberty cannot read the TLS certificate.
 
-1. Edit `.setup/jcl/Db2-grant.jcl` and replace `MYUSER` with your TSO user ID.
-2. Submit the job and verify that it completes with a condition code (CC) of 0004 or lower:
+Run the following command as an administrator, replacing `MYUSER` with your user ID:
 
 ```bash
-JOBID=$(jsub -f .setup/jcl/Db2-grant.jcl)
-jls $JOBID        # CC must be 0004 max
-pjdd $JOBID SYSPRINT
+.setup/setup/grant-perm-user.sh MYUSER
 ```
 
 ## Create the ZCodeScan configuration File

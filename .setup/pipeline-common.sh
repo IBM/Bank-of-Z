@@ -37,7 +37,7 @@ stage_static_scan_bank_of_z() {
     cd "$SCRIPTS_DIR"
     
     set -o pipefail
-    if ${SCRIPTS_DIR}/.setup/tasks/task-zcodescan-static-scan.sh; then
+    if ${SCRIPTS_DIR}/tasks/task-zcodescan-static-scan.sh; then
         print_success "Bank of Z application static scan completed successfully"
     else
         print_error "Failed to static scan Bank of Z"
@@ -63,7 +63,7 @@ stage_build_bank_of_z() {
     cd "$SCRIPTS_DIR"
     
     set -o pipefail
-    if bash ${SCRIPTS_DIR}/.setup/tasks/task-dbb-build.sh $1; then
+    if bash ${SCRIPTS_DIR}/tasks/task-dbb-build.sh $1; then
         print_success "Bank of Z application build completed successfully"
     else
         print_error "Failed to build Bank of Z"
@@ -89,7 +89,7 @@ stage_deploy_bank_of_z() {
     cd "$SCRIPTS_DIR"
     
     set -o pipefail
-    if ${SCRIPTS_DIR}/.setup/tasks/task-wazi-deploy.sh; then
+    if ${SCRIPTS_DIR}/tasks/task-wazi-deploy.sh; then
         print_success "Bank of Z application deploy completed successfully"
     else
         print_error "Failed to deploy Bank of Z"

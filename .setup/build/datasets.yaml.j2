@@ -25,6 +25,10 @@ variables:
   - name: ZOSCONNECT_HTTP_PORT
     value: {{ zosconnect.http_port }}
 
+  # z/OS connect https port
+  - name: ZOSCONNECT_HTTPS_PORT
+    value: {{ zosconnect.https_port }}
+
   # z/OS macro library. Example: SYS1.MACLIB
   - name: MACLIB
     value: SYS1.MACLIB

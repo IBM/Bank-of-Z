@@ -214,9 +214,14 @@ main_deploy() {
 main() {
     local phase="${1:-}"
 
-    # Detect Execution Mode
-    detect_bank_of_z_location
-
+    if [[ "$EXECUTION_MODE" == "vscode" ]]; then
+        cd $SCRIPTS_DIR
+        git pull
+    else
+        # Detect Execution Mode
+        detect_bank_of_z_location
+    fi
+    
     case "$phase" in
         validate-prereqs)
             main_validation

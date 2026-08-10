@@ -34,7 +34,7 @@ set +e
 drm "${APP_HLQ}.${IMS_DATASTORE}.ACCOUNT.DB" 2>/dev/null
 drm "${APP_HLQ}.${IMS_DATASTORE}.ACCTYPE.DB" 2>/dev/null
 drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTACCS.DB" 2>/dev/null
-drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/${IMS_DATASTORE}
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/null
 drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTTYPE.DB" 2>/dev/null
 drm "${APP_HLQ}.${IMS_DATASTORE}.HISTORY.DB" 2>/dev/null
 drm "${APP_HLQ}.${IMS_DATASTORE}.TSTAT.DB" 2>/dev/null

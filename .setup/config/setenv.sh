@@ -49,6 +49,7 @@ ZOS_CURRENT_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '
 ZOS_ADMIN_USER=$(get_section_value 'global' 'zos_admin_user')
 ZOS_CA_LABEL=$(get_section_value 'global' 'zos_ca_label')
 ZOS_KEYRING=$(get_section_value 'global' 'zos_keyring')
+ZOS_CREATE_CERTS=$(get_section_value 'global' 'zos_create_certs')
 
  # Application
 APP_BASE_NAME=$(get_section_value 'app' 'base_name')

@@ -5,15 +5,15 @@
 #           1.3.6.1.5.5.7.3.1) signed by VSICA, with the private key
 #           remaining in the RACF keyring at all times.
 #
-# Approach (re-sign existing RACF cert — private key never leaves RACF):
-#   1. RACDCERT GENCERT SIGNWITH(CERTAUTH LABEL('$ca_label')) — RACF generates
+# Approach (re-sign existing RACF cert - private key never leaves RACF):
+#   1. RACDCERT GENCERT SIGNWITH(CERTAUTH LABEL('$ca_label')) - RACF generates
 #      keypair and a VSICA-signed cert.  Private key stays in RACF.
 #   2. dcp export the cert as CERTB64 (PEM) to USS.
 #   3. Bouncy Castle reads the public key from the PEM, builds a new
 #      TBSCertificate with EKU serverAuth + SANs + 397-day validity, and
 #      re-signs it with VSICA's key (exported as PKCS12DER, deleted after).
 #   4. dcp the new DER cert back to a RACF dataset.
-#   5. RACDCERT ADD FORMAT(CERTDER) — RACF matches the new cert to the
+#   5. RACDCERT ADD FORMAT(CERTDER) - RACF matches the new cert to the
 #      private key it already holds (same public key).
 #   6. Connect cert to ${ZOS_KEYRING} as DEFAULT.
 #   7. Liberty uses safkeyring://${ZOS_ADMIN_USER}/${ZOS_KEYRING} (JCERACFKS).
@@ -41,7 +41,7 @@ ring=${ZOS_KEYRING}
 label='BoZ'
 
 # -----------------------------------------------------------------------
-# Resolve tools — JAVA_HOME and PYTHON_HOME must be set by the environment
+# Resolve tools - JAVA_HOME and PYTHON_HOME must be set by the environment
 # (sourced from config.yaml via setenv.sh).
 # -----------------------------------------------------------------------
 if [ -z "${JAVA_HOME:-}" ]; then
@@ -105,7 +105,7 @@ print_info "Private key stays in RACF keyring throughout."
 # Random passwords via Python
 CA_PASS=$($PYTHON -c "import secrets; print(secrets.token_urlsafe(18))")
 
-# Race-safe temp dir — chmod after mkdir to guarantee 700 regardless of umask
+# Race-safe temp dir - chmod after mkdir to guarantee 700 regardless of umask
 TMPDIR=${TMPDIR:-/tmp}/boz-cert-$$
 mkdir -p "$TMPDIR"
 chmod 700 "$TMPDIR"
@@ -134,13 +134,13 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 # -----------------------------------------------------------------------
 # 3. Export the cert (public side only) as CERTB64 (PEM) to USS via dcp.
 #    dcp is used because cp "//dataset" fails for CERTB64/CERTDER exports
-#    on this RACF version — dcp handles the dataset-to-USS copy correctly.
+#    on this RACF version - dcp handles the dataset-to-USS copy correctly.
 # -----------------------------------------------------------------------
 print_info "Exporting cert as PEM for re-signing..."
 tsocmd "RACDCERT EXPORT(LABEL('$label')) ID($userid) \
   DSN('${userid}.BOZ.CERTB64') FORMAT(CERTB64)"
 $DCP "${userid}.BOZ.CERTB64" "$TMPDIR/boz-orig.pem"
-# Java (ResignCert) handles Cp1047/EBCDIC decoding directly — no conversion needed here.
+# Java (ResignCert) handles Cp1047/EBCDIC decoding directly - no conversion needed here.
 
 # -----------------------------------------------------------------------
 # 4. Export VSICA private key (PKCS12DER) so Bouncy Castle can re-sign.
@@ -242,7 +242,7 @@ public class ResignCert {
         X509Certificate caCert = (X509Certificate) caKs.getCertificate(caAlias);
 
         // Parse the RACF-exported cert.  dcp copies EBCDIC bytes (Cp1047)
-        // from the RACF dataset — try Cp1047 first, fall back to ISO-8859-1.
+        // from the RACF dataset - try Cp1047 first, fall back to ISO-8859-1.
         byte[] pemBytes = Files.readAllBytes(Paths.get(origPem));
         String decoded1047 = new String(pemBytes, "Cp1047");
         String pemStr = decoded1047.contains("-----BEGIN") ? decoded1047
@@ -325,7 +325,7 @@ print_info "Compiling ResignCert.java..."
 $JAVAC -cp "$BCJAR" "$TMPDIR/ResignCert.java" -d "$TMPDIR"
 
 # -----------------------------------------------------------------------
-# 6. Run ResignCert — produces a DER cert with EKU, signed by VSICA,
+# 6. Run ResignCert - produces a DER cert with EKU, signed by VSICA,
 #    containing the SAME public key as the RACF-held private key.
 # -----------------------------------------------------------------------
 print_info "Re-signing cert with EKU serverAuth..."
@@ -344,7 +344,7 @@ test -s "$TMPDIR/boz-new.der" || {
 #    because they share the same public key.
 # -----------------------------------------------------------------------
 print_info "Importing re-signed cert into RACF..."
-# ALLOC MOD creates the dataset if absent or reuses it if present — no DELETE needed
+# ALLOC MOD creates the dataset if absent or reuses it if present - no DELETE needed
 # since dcp -B overwrites (does not append) existing content.
 tsocmd "ALLOC DATASET('${userid}.BOZ.NEWCERT') MOD CATALOG \
   RECFM(V,B) LRECL(1028) BLKSIZE(27998) TRACKS SPACE(5,5)"
@@ -362,7 +362,7 @@ tsocmd "SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH"
 
 print_success "Certificate generated successfully."
 print_info "  Cert label : $label"
-print_info "  Private key: stays in RACF — never written to USS filesystem"
+print_info "  Private key: stays in RACF - never written to USS filesystem"
 print_info "  Validity   : capped at CAB Forum limit for today's date (200/100/47 days)"
 print_info "  SANs       : IP=$ipaddr  DNS=$dnsname"
 print_info "  EKU        : TLS Web Server Authentication"

@@ -10,6 +10,7 @@ vars:
   java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_home: "/usr/lpp/ims/imsjava"
   db2_java_home: "/usr/lpp/db2d10"
+  ims_target_user: IBMUSER
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
@@ -17,7 +18,7 @@ ims:
   db2_hlq: "{{ vars.db2_hlq }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
-  ims_target_user: IBMUSER
+  ims_target_user: "{{ vars.ims_target_user }}"
   # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
   ims_lgmsg:                                                     
       primary_space: 84                                          

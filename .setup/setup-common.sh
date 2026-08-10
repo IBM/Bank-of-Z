@@ -528,7 +528,9 @@ main_setup() {
 
     # Certificates run last so addcert.sh + gencert-eku.sh regenerate the
     # RACF keyring cert after the server config is in place.
-    stage_setup_certificates
+    if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then
+        stage_setup_certificates
+    fi
     
     # Summary
     print_stage "SETUP COMPLETE"

@@ -59,13 +59,18 @@ finalize_results() {
 
 trap finalize_results EXIT
 
+rm -f /tmp/IMS-Db2-* 2>/dev/null || true
+rm -f /tmp/CICS-Db2-* 2>/dev/null || true
 rm -f /tmp/Db2-* 2>/dev/null || true
+rm -f "$SCRIPTS_DIR/../config/.env" 2>/dev/null || true
 
 # =========================
 # DB2 RACF access (DSNR class)
 # =========================
 print_info "Granting DB2 DSNR access for $MYUSER..."
+set +e
 tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
+set -e
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
@@ -73,7 +78,7 @@ tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
 tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
 
 # =========================
-# RACF keyring access (RDATALIB class)
+# RACF keyring access
 # Requires RACF SPECIAL authority - run once per image by an admin.
 # SETROPTS failures are suppressed - the class may already be active.
 # =========================
@@ -85,6 +90,17 @@ tsocmd "RDEFINE RDATALIB $RDATALIB_PROFILE UACC(NONE)" >/dev/null 2>&1 || true
 tsocmd "PERMIT $RDATALIB_PROFILE CLASS(RDATALIB) ID($MYUSER) ACCESS(CONTROL)"
 tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" >/dev/null 2>&1 || true
 print_success "RDATALIB access granted for $MYUSER on keyring $RDATALIB_PROFILE"
+
+# =========================
+# DROP
+# =========================
+print_info "Dropping existing DB2 tables for $MYUSER..."
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2DROP" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-drop.j2" --outputFile "/tmp/CICS-Db2-drop-$$.jcl"
+run_job_and_wait "/tmp/CICS-Db2-drop-$$.jcl" "8"
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2DROP" --templateFile "$SCRIPTS_DIR/../jcl/ims/Db2-drop.j2" --outputFile "/tmp/IMS-Db2-drop-$$.jcl"
+run_job_and_wait "/tmp/IMS-Db2-drop-$$.jcl" "8"
 
 # =========================
 # Generate and submit the DB2 grant JCL

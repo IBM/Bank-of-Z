@@ -118,7 +118,7 @@ main() {
     print_success "Remote environment setup completed successfully!"
     
     # Purge all ended jobs
-    opercmd '$POJQ,JM=*' > /dev/null 2>&1 & || true
+    opercmd '$POJQ,JM=*' > /dev/null 2>&1 || true &
     
     echo ""
     echo "Next steps:"

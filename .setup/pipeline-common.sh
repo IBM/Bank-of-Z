@@ -26,14 +26,14 @@ stage_static_scan_bank_of_z() {
     print_stage "STAGE: Static scan Bank of Z"
     
     # Verify installation script exists
-    if [ ! -f "$SCRIPTS_DIR/.setup/tasks/task-zcodescan-static-scan.sh" ]; then
-        print_error "Installation script not found: $SCRIPTS_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
+    if [ ! -f "$SCRIPTS_DIR/tasks/task-zcodescan-static-scan.sh" ]; then
+        print_error "Installation script not found: $SCRIPTS_DIR/tasks/task-zcodescan-static-scan.sh"
         exit 1
     fi
     
     # Run zcode scan task
     print_info "Running Bank of Z static scan script..."
-    print_info "Executing: bash $SCRIPTS_DIR/.setup/tasks/task-zcodescan-static-scan.sh"
+    print_info "Executing: bash $SCRIPTS_DIR/tasks/task-zcodescan-static-scan.sh"
     cd "$SCRIPTS_DIR"
     
     set -o pipefail
@@ -52,14 +52,14 @@ stage_build_bank_of_z() {
     print_stage "STAGE: Build Bank of Z"
     
     # Verify installation script exists
-    if [ ! -f "$SCRIPTS_DIR/.setup/tasks/task-dbb-build.sh" ]; then
-        print_error "Installation script not found: $SCRIPTS_DIR/.setup/tasks/task-dbb-build.sh"
+    if [ ! -f "$SCRIPTS_DIR/tasks/task-dbb-build.sh" ]; then
+        print_error "Installation script not found: $SCRIPTS_DIR/tasks/task-dbb-build.sh"
         exit 1
     fi
     
     # Run installation script
     print_info "Running Bank of Z build script..."
-    print_info "Executing: bash $SCRIPTS_DIR/.setup/tasks/task-dbb-build.sh $1"
+    print_info "Executing: bash $SCRIPTS_DIR/tasks/task-dbb-build.sh $1"
     cd "$SCRIPTS_DIR"
     
     set -o pipefail
@@ -78,14 +78,14 @@ stage_deploy_bank_of_z() {
     print_stage "STAGE: Deploy Bank of Z"
     
     # Verify installation script exists
-    if [ ! -f "$SCRIPTS_DIR/.setup/tasks/task-wazi-deploy.sh" ]; then
-        print_error "Installation script not found: $SCRIPTS_DIR/.setup/tasks/task-wazi-deploy.sh"
+    if [ ! -f "$SCRIPTS_DIR/tasks/task-wazi-deploy.sh" ]; then
+        print_error "Installation script not found: $SCRIPTS_DIR/tasks/task-wazi-deploy.sh"
         exit 1
     fi
     
     # Run installation script
     print_info "Running Bank of Z deploy script..."
-    print_info "Executing: bash $SCRIPTS_DIR/.setup/tasks/task-wazi-deploy.sh"
+    print_info "Executing: bash $SCRIPTS_DIR/tasks/task-wazi-deploy.sh"
     cd "$SCRIPTS_DIR"
     
     set -o pipefail

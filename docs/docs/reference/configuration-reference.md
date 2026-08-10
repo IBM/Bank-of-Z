@@ -5,7 +5,7 @@ title: Configuration Reference
 
 # Configuration Reference
 
-Bank of Z uses the `.setup/config/config.yaml` file to define environment-specific settings used during setup, build, and deployment. The configuration file uses YAML format and supports variable expansion to simplify configuration management.
+Bank of Z uses the `.setup/config/config.yaml` file to define the environment-specific settings used during setup, build, and deployment. The configuration file is written in YAML and supports variable expansion to simplify configuration management.
 
 ## Configuration file overview
 
@@ -18,7 +18,7 @@ The configuration file supports:
 
 ## Required settings
 
-The following settings are required for a successful setup.
+The following configuration sections are required for a successful setup.
 
 ### Sandbox configuration
 
@@ -52,7 +52,7 @@ app:
 
 ### DBB configuration
 
-The `dbb` section identifies the IBM Dependency Based Build (DBB) installation and Java runtime.
+The `dbb` section defines the location of the IBM Dependency Based Build (DBB) installation and Java runtime used during the build process.
 
 ```yaml
 dbb:
@@ -67,7 +67,7 @@ dbb:
 
 ## Optional settings
 
-Depending on your environment and tooling requirements, additional configuration sections can be defined.
+Depending on your environment and deployment requirements, additional configuration sections can be defined.
 
 ### Repository configuration
 
@@ -126,7 +126,7 @@ dbb:
   dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
 ```
 
-Variables are resolved during setup processing.
+Variables are resolved automatically during setup.
 
 Environment variables can also be referenced:
 
@@ -140,7 +140,7 @@ cics:
 
 ## Validation rules
 
-The setup process validates configuration values before run.
+The setup process validates the configuration before it runs.
 
 Validation includes:
 

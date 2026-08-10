@@ -45,7 +45,7 @@ All three workflows run the same three stages, each stage is run as a subcommand
 .setup/setup-common.sh validate-prereqs
 ```
 
-Verifies that all required tools are installed on z/OS USS at the versions specified in `config.yaml`. This includes DBB, ZOAU, zconfig, Wazi Deploy, Java, Git, and network connectivity to GitHub.
+Verifies that the required build, deployment, runtime technologies are installed on z/OS USS at the versions specified in `config.yaml`. This includes DBB, ZOAU, zconfig, Wazi Deploy, Java, Git, and network connectivity to GitHub.
 
 ### Stage 2: Provision middleware
 
@@ -77,7 +77,7 @@ Provisions the complete application runtime from scratch. This stage is fully au
 
 Builds the application from source and deploys the generated artifacts to the provisioned runtime:
 
-1. Runs a full DBB build for all application sources, including COBOL, PL/I, Assembler, BMS, Java, and z/OS Connect APIs.
+1. Performs a full application build using IBM Dependency Based Build (DBB), compiling COBOL, PL/I, Assembler, BMS, Java, and z/OS Connect APIs sources.
 2. Packages the build outputs into a deployment archive
 3. Runs Wazi Deploy to deploy the archive to the CICS and IMS environments
 4. Populates Db2 with application test data
@@ -89,7 +89,7 @@ The initial build and deployment typically take approximately 15 to 20 minutes.
 
 After the initial deployment is complete, most day-to-day development can be performed using an incremental build and deploy instead of rebuilding the entire environment.
 
-The incremental workflow rebuilds and deploys only the application components affected by your source code changes, reducing build time while preserving the existing runtime environment.
+The incremental workflow rebuilds and deploys only the application components affected by your source code changes, reducing build time while preserving the existing runtime environment. It is intended for day-to-day development activities, such as implementing enhancement or fixing defects.
 
 For more information, see:
 

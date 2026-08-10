@@ -5,17 +5,17 @@ title: Repository Structure
 
 # Repository Structure
 
-The Bank of Z repository contains the application source, setup automation, build assets, deployment configuration, and supporting documentation required to build and deploy the application.
+The Bank of Z repository contains the application source, setup automation, build and deployment assets, configuration files, and supporting documentation required to develop, build, and deploy the application.
 
 ## Top-level structure
 
 | Directory / File | Description |
 |-----------------|-------------|
 | `src/` | Application source code — COBOL, BMS, IMS, z/OS Connect APIs, and the web frontend |
-| `.setup/` | All automation for provisioning, building, and deploying Bank of Z |
-| `.vscode/` | VS Code task definitions for triggering setup and pipeline scripts |
+| `.setup/` | All scripts and assets for provisioning, building, and deploying Bank of Z |
+| `.vscode/` | Workspace task definitions for running setup and pipeline scripts |
 | `scripts/` | Utility scripts for downloading and installing IDE extensions |
-| `docs/` | Product documentation |
+| `docs/` | Bank of Z documentation |
 | `zcodescan/` | ZCodeScan configuration for static analysis |
 | `dbb-app.yaml` | DBB application descriptor |
 | `zapp.yaml` | z/OS application manifest |
@@ -40,10 +40,10 @@ The Bank of Z repository contains the application source, setup automation, buil
 
 | Script | Runs on | Description |
 |--------|---------|-------------|
-| `setup-local.sh` | Local machine | Creates the USS workspace, clones the repository on USS, and invokes `setup-remote.sh` via Zowe CLI. Used by the Zowe CLI workflow. |
+| `setup-local.sh` | Local machine | Creates the workspace on z/OS USS, clones the current Git branch, and invokes `setup-remote.sh` via Zowe CLI. |
 | `setup-remote.sh` | z/OS USS | Chains the three setup stages in sequence. Used by both the Zowe CLI and GRUB workflows. |
 | `setup-common.sh` | z/OS USS | Implements the three setup stages: `validate-prereqs`, `environment`, and `install-bank-of-z`. |
-| `pipeline-local.sh` | Local machine | Uploads pipeline assets and invokes `pipeline-remote.sh` via Zowe CLI. Used by the Zowe CLI workflow for incremental builds. |
+| `pipeline-local.sh` | Local machine | Uploads the required pipeline assets and invokes `pipeline-remote.sh` by using Zowe CLI. Used by the Zowe CLI workflow for incremental builds. |
 | `pipeline-remote.sh` | z/OS USS | Runs the DBB build and Wazi Deploy on USS. Used by both workflows for incremental builds. |
 
 ### Configuration and assets
@@ -65,7 +65,7 @@ The Bank of Z repository contains the application source, setup automation, buil
 
 | Script | Description |
 |--------|-------------|
-| `download-vsix.js` | Downloads all required IDE extension VSIX packages |
+| `download-vsix.js` | Downloads the required IDE extension VSIX packages |
 | `install-bobide-vsix.js` | Installs downloaded VSIX packages into IBM Bob Premium Package for Z |
 | `install-vscode-vsix.js` | Installs downloaded VSIX packages into VS Code |
 
@@ -75,4 +75,4 @@ See [`scripts/README.md`](../../../scripts/README.md) for usage instructions.
 
 ## Documentation (`docs/`)
 
-Documentation is maintained alongside the application source. See the [Architecture](../architecture/) section for information about the Bank of Z solution design, and [Installation and Setup](../installation-and-setup/) to deploy the application.
+Documentation is maintained alongside the application source. See the [Architecture](../architecture/) section for information about the Bank of Z solution design, and [Installation and Setup](../installation-and-setup/) for deployment instructions.

@@ -24,13 +24,13 @@ cd Bank-of-Z
 
 ## 2. Edit the configuration file
 
-Open `.setup/config/config.yaml` in your local editor and update it for your environment. For information about each configuration field, see [Environment Configuration](../installation-and-setup/environment-configuration.html).
+Open `.setup/config/config.yaml` by using your preferred text editor and update it for your environment. For information about each configuration field, see [Environment Configuration](../installation-and-setup/environment-configuration.html).
 
 ---
 
 ## 3. Push your branch
 
-The script detects your current local branch and clones it from GitHub to z/OS USS. Your branch must be pushed to the remote before running the script. Local commits that have not been pushed will not included.
+The script detects your current local branch and clones it from GitHub to z/OS USS. Your branch must be pushed to the remote before running the script. Local commits that have not been pushed are not included.
 
 ```bash
 git add .setup/config/config.yaml
@@ -59,7 +59,7 @@ The script runs the following stages:
 3. Invokes `setup-remote.sh` on USS, which runs the following stages:
    - `validate-prereqs` — Verifies that all required tools are installed on USS.
    - `environment` — Provisions Db2, CICS, IMS, z/OS Connect, and the frontend server.
-   - `install-bank-of-z` — Builds the application, deploys it by using Wazi Deploy, and populates test data.
+   - `install-bank-of-z` — Builds the application, deploys the generated artifacts by using Wazi Deploy, and populates the Db2 and IMS databases with sample data.
 
 The initial deployment typically takes 15 to 20 minutes. Logs are written to `/tmp/remote-setup.log` on your local machine.
 

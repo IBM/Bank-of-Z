@@ -5,7 +5,7 @@ title: Deploy Using GRUB
 
 # Deploy Using GRUB
 
-Use this procedure to deploy Bank of Z using GRUB. GRUB syncs your local file changes to z/OS USS and triggers the setup scripts automatically. You don not to commit your changes before deploying.
+Use this procedure to deploy Bank of Z using GRUB. GRUB synchronizes your local file changes to z/OS USS and automatically triggers the setup scripts. You do not need to commit your changes before deploying.
 
 **Before you begin, ensure that:**
 - Your z/OS environment meets the requirements described in [Prerequisites](prerequisites.html)
@@ -24,9 +24,9 @@ cd Bank-of-Z
 
 ## 2. Edit the configuration file
 
-Open `.setup/config/config.yaml` in your local editor and update it for your environment. For more information about each configuration field, see [Environment Configuration](environment-configuration.html).
+Open `.setup/config/config.yaml` by using your preferred text editor and update it for your environment. For more information about each configuration field, see [Environment Configuration](environment-configuration.html).
 
-You don not need to commit your changes after editing. GRUB syncs the file as-is.
+You do not need to commit your changes after editing. GRUB synchronizes the file as-is.
 
 ---
 
@@ -44,7 +44,7 @@ After the sync completes, the configured post-sync hook runs `setup-remote.sh` o
 
 - `validate-prereqs` — Verifies that all required tools are installed on USS.
 - `environment` — Provisions Db2, CICS, IMS, z/OS Connect, and the frontend server.
-- `install-bank-of-z` — Builds the application, deploys it by using Wazi Deploy, and populates the test data.
+- `install-bank-of-z` — Builds the application, deploys the generated artifacts by using Wazi Deploy, and populates the Db2 and IMS databases with sample data.
 
 The initial deployment typically takes 15 to 20 minutes. Subsequent syncs are typically faster because only changed files are transferred.
 

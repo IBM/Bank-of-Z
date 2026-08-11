@@ -184,19 +184,20 @@ VARS_TO_CHECK=(
 
 error=0
 
-for var in "${VARS_TO_CHECK[@]}"; do
-  if [ -z "${!var}" ]; then
-    print_error "Error: variable '$var' is not set or is empty." >&2
-    error=1
-  fi
-done
-
-if [ "$error" -eq 1 ]; then
-  print_error "One or more variables are missing. Stopping script." >&2
-  rm -f "$ENV_FILE"
-  exit 1
+if [ "$(uname)" = "OS/390" ]; then
+    for var in "${VARS_TO_CHECK[@]}"; do
+      if [ -z "${!var}" ]; then
+        print_error "Error: variable '$var' is not set or is empty." >&2
+        error=1
+      fi
+    done
+    
+    if [ "$error" -eq 1 ]; then
+      print_error "One or more variables are missing. Stopping script." >&2
+      rm -f "$ENV_FILE"
+      exit 1
+    fi
+    print_info "All variables are properly set."
 fi
-
-print_info "All variables are properly set."
 
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH

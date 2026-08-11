@@ -43,7 +43,7 @@ The **global** section contains the primary configuration values required to con
 |---|---|---|
 | `java_home` | `{{ sandbox.root }}/tools/J21.0_64` | Java installation path |
 | `python_home` | `/usr/lpp/IBM/cyp/v3r14/pyz` | Python installation path |
-| `zoau_home` | `/usr/lpp/IBM/zoautil` | ZOAU installation path |
+| `zoau_home` | `/usr/lpp/IBM/zoau` | ZOAU installation path |
 | `zconfig_home` | `{{ global.sandbox_root }}/tools/zconfig` | zconfig installation path |
 | `zcb_home` | `{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6` | CICS Resource Builder installation path |
 | `dbb_home` | `{{ global.sandbox_root }}/tools/dbb` | DBB installation path |
@@ -59,8 +59,11 @@ The **global** section contains the primary configuration values required to con
 |---|---|---|
 | `zos_admin_user` | `IBMUSER` | z/OS administrator user ID |
 | `zos_current_user` | `${ZOS_CURRENT_USER}` | Current z/OS user ID |
+| `zos_ca_label` | `VSICA` | RACF certificate authority (CA) label |
+| `zos_keyring` | `BOZRING` | RACF keyring name |
 | `sys_proclib` | `SYS1.PROCLIB` | System PROCLIB dataset |
 | `tcpip_hlq` | `TCPIP` | TCP/IP high-level qualifier |
+| `asm_hlq` | `ASM` | High-level qualifier for Assembler resources |
 | `igzxjni2` | `/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x` | COBOL IGZXJNI2 library path |
 | `igy_hlq` | `IGY.V6R5M0` | COBOL compiler high-level qualifier |
 | `fel_hlq` | `FEL` | High-level qualifier (FEL) |

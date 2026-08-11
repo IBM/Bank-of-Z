@@ -35,7 +35,7 @@ global:
   # Tools
   java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoautil"
+  zoau_home: "/usr/lpp/IBM/zoau"
   zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
   zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
   dbb_home: "{{ global.sandbox_root }}/tools/dbb"
@@ -49,8 +49,11 @@ global:
   # z/OS System
   zos_admin_user: "IBMUSER"
   zos_current_user: "${ZOS_CURRENT_USER}"
+  zos_ca_label: "VSICA"
+  zos_keyring: "BOZRING"
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
+  asm_hlq: "ASM"
   igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
   igy_hlq: "IGY.V6R5M0"
   fel_hlq: "FEL"

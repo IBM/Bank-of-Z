@@ -70,6 +70,7 @@ stage_execute_pipeline() {
     ENV_VARS="$ENV_VARS && export GIT_REPOSITORY='$GIT_REPO'"
     ENV_VARS="$ENV_VARS && export GIT_BRANCH='$GIT_BRANCH'"
     ENV_VARS="$ENV_VARS && export BANK_OF_Z_WORK_DIR='$BANK_DIR'"
+    ENV_VARS="$ENV_VARS && export EXECUTION_MODE='$EXECUTION_MODE'"
     
     # Execute the pipeline script on remote
     set -o pipefail

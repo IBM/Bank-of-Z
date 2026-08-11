@@ -223,12 +223,11 @@ print_success "BankZ deployment completed successfully"
 # files on its own - an explicit restart is the reliable way to load new WARs.
 # =========================
 print_info "Restarting BAQ${APP_SHORT_NAME} to load newly deployed WARs..."
-opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
-sleep 8
+opercmd "C BAQ${APP_SHORT_NAME}" 2>&1 >/dev/null || true
 if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-    opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+    opercmd "S BAQ${APP_SHORT_NAME}" 2>&1 >/dev/null || true
 else
-    jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
+    jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>&1 >/dev/null || true
 fi
 print_success "BAQ${APP_SHORT_NAME} restart issued - server will be ready in ~20 seconds"
 
@@ -236,12 +235,11 @@ print_success "BAQ${APP_SHORT_NAME} restart issued - server will be ready in ~20
 # Restart frontend Liberty server to pick up newly deployed frontend WAR.
 # =========================
 print_info "Restarting FE${APP_SHORT_NAME} to load newly deployed frontend WAR..."
-opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
-sleep 8
+opercmd "C FE${APP_SHORT_NAME}" 2>&1 >/dev/null || true
 if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-    opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+    opercmd "S FE${APP_SHORT_NAME}" 2>&1 > /dev/null || true
 else
-    jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+    jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>&1 >/dev/null || true
 fi
 print_success "FE${APP_SHORT_NAME} restart issued - server will be ready in ~20 seconds"
 

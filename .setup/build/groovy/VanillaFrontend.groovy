@@ -37,6 +37,7 @@ log.info("Output Directory: ${outputDirectory}")
 def vanillaFrontendRelativePath = config.getVariable('vanillaFrontendPath') ?: 'src/frontend'
 def vanillaFrontendPath = "${workspace}/${appDirName}/${vanillaFrontendRelativePath}"
 def zosConnectHttpPort = config.getVariable('zosConnectHttpPort') ?: '9080'
+def zosConnectHttpsPort = config.getVariable('zosConnectHttpsPort') ?: '9444'
 
 log.info("Vanilla frontend relative path: ${vanillaFrontendRelativePath}")
 log.info("Vanilla frontend directory: ${vanillaFrontendPath}")
@@ -144,9 +145,12 @@ try {
             def content = fileToModify.getText('UTF-8')
             // Replace only standalone occurrences of 9080 (word boundaries)
             content = content.replaceAll(/\b9080\b/, zosConnectHttpPort.toString())
+            content = content.replaceAll(/\b9444\b/, zosConnectHttpsPort.toString())
             fileToModify.setText(content, 'UTF-8')
             log.info("Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
             println("> Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
+            log.info("Port replaced (9444 -> ${zosConnectHttpsPort}) in: ${filename}")
+            println("> Port replaced (9444 -> ${zosConnectHttpsPort}) in: ${filename}")
         }
     }
     
@@ -158,7 +162,7 @@ try {
     // Tag text files as ISO8859-1 and binary files as binary so Liberty serves them correctly
     def createWarCmd = "cd ${tempWarDir.absolutePath} && " +
         "find . -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.yaml' -o -name '*.json' -o -name '*.xml' | xargs chtag -t -c ISO8859-1 2>/dev/null; " +
-        "find . -path './assets/images/*' | xargs chtag -b 2>/dev/null; " +
+        "find ./assets/images -type f | xargs chtag -b 2>/dev/null; " +
         "jar -cvf ${warFile.absolutePath} *"
     def warProc = [shell, "-c", createWarCmd].execute(env, new File(workspace))
     warProc.waitFor()
@@ -237,3 +241,4 @@ try {
 return 0
 
 // Made with Bob
+

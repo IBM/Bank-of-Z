@@ -97,7 +97,7 @@ global:
 
 All other configuration values use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field description of every configuration property, see [Configuration Reference](../reference/configuration-reference.html).
 
-## Grant Db2 permissions (non-IBMUSER accounts only)
+## Grant permissions (non-IBMUSER accounts only)
 
 If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects before running the `environment` setup.
 

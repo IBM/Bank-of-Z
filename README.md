@@ -76,7 +76,7 @@ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keyc
 certutil -addstore Root %USERPROFILE%\Downloads\vsica_ca.pem
 ```
 
-Then open **`https://<image-ip>:9444`** in any browser.
+Then open **`https://<image-ip>:9445/admin.html`** in any browser.
 
 ## Documentation
 

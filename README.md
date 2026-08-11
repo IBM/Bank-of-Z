@@ -59,7 +59,7 @@ First, copy the CA cert from the image (Change Python path if needed):
 ```bash
 ssh <zos-user>@<image-ip> \
   '/usr/lpp/IBM/cyp/v3r14/pyz/bin/python3 -c "
-raw=open(\"/u/<zos-user>/common_cacert\",\"rb\").read()
+raw=open(\"/u/ibmuser/common_cacert\",\"rb\").read()
 open(\"/tmp/vsica_ca.pem\",\"w\").write(raw.decode(\"cp1047\"))"'
 scp <zos-user>@<image-ip>:/tmp/vsica_ca.pem "$HOME/Downloads/vsica_ca.pem"
 ```

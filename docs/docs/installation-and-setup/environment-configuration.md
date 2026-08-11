@@ -7,75 +7,125 @@ title: Environment Configuration
 
 This section describes the configuration required before deploying Bank of Z. Complete these steps before starting one of the getting-started tutorials.
 
-Before you begin, ensure that your z/OS environment meets all requirements described in [Prerequisites](prerequisites.md). In particular, the Db2 subsystem (DBD1) and required RACF definitions must be in place before the setup scripts can run successfully.
+Before you begin, ensure that your z/OS environment meets all requirements described in [Prerequisites](prerequisites.md). In particular, the Db2 subsystem (DBD1) and required RACF definitions must be in place before the setup scripts.
 
 ## Configure the application
 
-Edit `.setup/config/config.yaml` in your local clone of the repository. This file controls all paths and settings used by the setup scripts.
+Edit `.setup/config/config.yaml` in your local clone of the repository. This file controls the paths, environment setting, and middleware configuration used during setup, build, and deployment.
 
-The fields you must update for your environment are:
+Update the values in the **global** section to match your environment. Unless otherwise noted, the remaining configuration values use template references and do not require modification. 
 
 ```yaml
-# Sandbox root directory on z/OS USS
-# All setup outputs are created under this path
-sandbox:
-  path: "/usr/local/sandboxes/bank-of-z"   # ← change to your USS workspace path
+# Global properties
+# - Shared by middleware/tools 
+# - Subject to change with middleware/tools updates
+global:
 
-# Application identity — used for dataset naming
-app:
-  base_name: "BANKZ"     # Dataset high-level qualifier (max 8 chars)
-  short_name: "BOZ"      # Short identifier (max 4 chars)
-  zos_version: "V0R1M0"  # Version string used in dataset names
+  # Sandbox
+  sandbox_root: "/usr/local/sandboxes"
 
-# IBM Dependency Based Build
-dbb:
-  dbb_home: "/usr/local/sandboxes/tools/dbb"  # ← path to DBB installation on USS
+  # Application
+  app_base_name: "BANKZ"
+  app_hlq: "{{ global.app_base_name }}"
+  app_short_name: "BOZ" # Maximum 3 characters
+  app_version: "0"
+  app_release: "1"
+  app_modification: "0"
 
-# Java (on z/OS USS)
-java:
-  java_home: "/usr/local/sandboxes/tools/J21.0_64"  # ← path to Java 21 on USS
+  # Tools
+  java_home: "{{ sandbox.root }}/tools/J21.0_64"
+  python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
+  zoau_home: "/usr/lpp/IBM/zoau"
+  zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
+  zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
+  dbb_home: "{{ global.sandbox_root }}/tools/dbb"
+  gradle_home:  "{{ global.sandbox_root }}/tools/gradle-9.5.1"
+  zcodescan_home: "/global/opt/pyenv/akf"
+  wazideploy_home: "/global/opt/pyenv/gdp"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect"
+  liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
-# Z Open Automation Utilities
-zoau:
-  zoau_home: "/usr/lpp/IBM/zoautil"  # ← path to ZOAU installation on USS
 
-# zconfig (provisioning tool)
-zconfig:
-  zconfig_home: "/usr/local/sandboxes/tools/zconfig"  # ← path to zconfig on USS
-  zcb_home: "/usr/local/sandboxes/tools/zrb/cics-resource-builder-1.0.6"
+  # z/OS System
+  zos_admin_user: "IBMUSER"
+  zos_current_user: "${ZOS_CURRENT_USER}"
+  zos_ca_label: "VSICA"
+  zos_keyring: "BOZRING"
+  sys_proclib: "SYS1.PROCLIB"
+  tcpip_hlq: "TCPIP"
+  asm_hlq: "ASM"
+  igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
+  igy_hlq: "IGY.V6R5M0"
+  fel_hlq: "FEL"
+  ipv_hlq: "IPV"
+  pli_hlq: "PLI.V6R2M0"
+  debug_hlq: "EQAW"
+  
+  # GUI
+  zosconnect_http_port: 9080
+  zosconnect_https_port: 9444
+  zosconnect_task_user: "{{ global.zos_admin_user }}"
 
-# Wazi Deploy
-wazideploy:
-  wazideploy_home: "/global/opt/pyenv/gdp"  # ← path to Wazi Deploy on USS
+  # Frontend
+  frontend_http_port: 9081
+  frontend_https_port: 9445
+  frontend_task_user: "{{ global.zos_admin_user}}"
 
-# ZCodeScan (static analysis)
-zcodescan:
-  zcodescan_home: "/global/opt/pyenv/akf"    # ← path to ZCodeScan on USS
-  config_file: "${HOME}/zcs_config_file.yml"  # ← path to your ZCodeScan config file
 
-# z/OS Connect
-zosconnect:
-  zosconnect_home: "/usr/lpp/IBM/zosconnect/bin/"
-  http_port: 9080   # ← update if your environment uses different ports
-  https_port: 9443
-
-# Db2
-db2:
-  ssid: "DBD1"       # ← Db2 subsystem ID (must exist before deployment)
-  hostname: "localhost"
-  port: 8102
+  # CICS
+  cics_hlq: "CICSTS63"
+  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_sec: "YES"
+  
+  # IMS
+  ims_disabled: "false"
+  ims_sys_hlq: "IMSV15"
+  ims_java_home: "/usr/lpp/ims/imsjava"
+  ims_datastore: "IMS2"
+  ims_dfsplex: "PLEX2"
+  
+  # DB2
+  db2_hlq: "DB2V13"
+  db2_dsntep: "DSNTEP13"
+  db2_ssid: "DBD1"
+  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
+  db2_sqlid: "{{ global.zos_current_user }}"
+  db2_java_home: "/usr/lpp/db2d10"
+  db2_grants:
+  - "CICSUSER"
 ```
 
-All other fields use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field reference, see [Configuration Reference](../reference/configuration-reference.html).
+All other configuration values use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field description of every configuration property, see [Configuration Reference](../reference/configuration-reference.html).
 
 ## Grant permissions (non-IBMUSER accounts only)
 
-If you are not using the `IBMUSER` user ID, run `grant-perm-user.sh` as an admin to grant your user ID the required DB2 and RACF keyring permissions. Otherwise, the setup fails during DB2 table creation and Liberty cannot read the TLS certificate.
+If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects before running the `environment` setup.
 
-Run the following command as an administrator, replacing `MYUSER` with your user ID:
+Run the following command as an administrator, replacing `MYUSER` with your user ID: 
 
 ```bash
 .setup/setup/grant-perm-user.sh MYUSER
+```
+
+## Set the IMS and CICS credentials
+
+Before running the setup scripts, set the following environment variables:
+
+| Variable | Description |
+|---|---|
+| `IMS_USER` | IMS user ID |
+| `IMS_PASSWORD` | IMS password |
+| `CICS_USER` | CICS user ID |
+| `CICS_PASSWORD` | CICS password |
+
+Example:
+
+```bash
+export IMS_USER=<your_ims_user>
+export IMS_PASSWORD=<your_ims_password>
+
+export CICS_USER=<your_cics_user>
+export CICS_PASSWORD=<your_cics_password>
 ```
 
 ## Create the ZCodeScan configuration File

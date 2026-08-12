@@ -96,10 +96,12 @@ zconfig apply -e ims_user="${IMS_USER}" \
               -e ims_sys_hlq="${IMS_SYS_HLQ}" \
               -e db2_hlq="${DB2_HLQ}" \
               -e java_home="${JAVA_HOME}" \
-              -e db2_java_home="${DB2_JAVA_HOME}" \
+              -e db2_java_dir="${DB2_JAVA_FOLDER}" \
+              -e ims_java_dir="${IMS_JAVA_FOLDER}" \
               -e ims_java_home="${IMS_JAVA_HOME}" \
               -e db2_ssid="${DB2_SSID}" \
               -e ims_target_user="${IMS_USER}" \
+              -e ims_ixvolser="${IMS_IXVOLSER}" \
               ims-region.yaml -v
 
 RC=$?

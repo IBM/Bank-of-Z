@@ -290,3 +290,23 @@ detect_bank_of_z_location() {
     BANK_OF_Z_WORK_DIR=$(dirname $BANK_DIR)
     return 0
 }
+
+# Executes a TSO command and handles its return code.
+# The command output is temporarily stored in a log file.
+# In case of failure, a warning message and the log content are displayed.
+# The temporary log file is then removed, and the TSO command return code
+# is returned to the caller.
+run_tso() {
+    set +e
+    local cmd="$1"
+    print_info "TSO Cmd: $cmd"
+    tsocmd "$cmd"> "/tmp/run_tso_$$.log"  2>&1 
+    local rc=$?
+    if [ $rc -ne 0 ]; then
+        print_warning "TSO Command failed (rc=$rc): $cmd"
+        cat "/tmp/run_tso_$$.log"
+    fi
+    rm -f "/tmp/run_tso_$$.log"
+    set -e
+    return $rc
+}

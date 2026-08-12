@@ -433,18 +433,6 @@ ims:
           - HWSSMPL1
           - HWSCSLO0
           - HWSCSLO1
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
     - member_name: BPECONFG
       config:
         lang: ENU

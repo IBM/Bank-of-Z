@@ -421,14 +421,11 @@ ims:
           hostname: TCPIP
           portid:
           - '9977'
-          - LOCAL
           racfid: SYS1
           timeout: 5000
           ipv6: true
           maxsoc: 600
           exit:
-          - HWSIMSO0
-          - HWSIMSO1
           - HWSSMPL0
           - HWSSMPL1
           - HWSCSLO0

@@ -107,8 +107,11 @@ set -e
 # =====================================
 # DB2 RACF access (OPERCMDS class)
 # =====================================
+print_info "Granting OPERCMDS access for $MYUSER..."
+set +e
 run_tso "PERMIT MVS.SET*.** CLASS(OPERCMDS) ID($MYUSER) ACCESS(UPDATE)"
 run_tso "SETROPTS RACLIST(OPERCMDS) REFRESH"
+set -e
 
 # =========================
 # DB2 DROP

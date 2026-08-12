@@ -21,7 +21,9 @@
   GRANT USE OF BUFFERPOOL BP1 TO {{ db2_user }};
 
   GRANT BINDADD TO {{ db2_user }};
-
+  GRANT BIND ON PLAN {{ db2.plan }} TO  {{ db2_user }};
+  GRANT BIND ON PLAN IBTRAN, IBGHIST, IBSHIST TO {{ db2_user }};
+  
   GRANT CREATEIN ON SCHEMA BANKZ TO {{ db2_user }};
   GRANT CREATEIN ON SCHEMA {{ ims.db2_database }} TO {{ db2_user }};
 

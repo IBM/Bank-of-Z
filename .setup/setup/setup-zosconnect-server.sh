@@ -86,8 +86,8 @@ set +e
 opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null &
 sleep 5
 print_info "Configuring RACF STARTED profile..."
-run_tso "RDEFINE STARTED BAQ${APP_SHORT_NAME}.* STDATA(USER(${ZOSCONNECT_TASK_USER}) TRUSTED(YES))" 2>/dev/null
-run_tso "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
+run_tso "RDEFINE STARTED BAQ${APP_SHORT_NAME}.* STDATA(USER(${ZOSCONNECT_TASK_USER}) TRUSTED(YES))"
+run_tso "SETROPTS RACLIST(STARTED) REFRESH"
 mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
 

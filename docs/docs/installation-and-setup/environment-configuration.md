@@ -80,7 +80,7 @@ global:
   # IMS
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
-  ims_java_home: "/usr/lpp/ims/imsjava"
+  ims_java_dir: "/usr/lpp/ims/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
   
@@ -90,7 +90,7 @@ global:
   db2_ssid: "DBD1"
   db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
-  db2_java_home: "/usr/lpp/db2d10"
+  db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
 ```

@@ -17,13 +17,14 @@
 * IMS Java native code (libT2DLI.so)
 **********************************************************************
 LIBPATH=>
-{{ java.java_home }}/lib:>
-{{ java.java_home }}/lib/j9vm:>
-{{ java.java_home }}/lib/default:>
-{{ java.java_home }}/bin/j9vm:>
-{{ java.java_home }}/bin/:>
 {{ ims.ims_java_home }}/lib:>
-{{ db2.db2_java_home }}/lib
+{{ ims.ims_java_home }}/lib/j9vm:>
+{{ ims.ims_java_home }}/lib/default:>
+{{ ims.ims_java_home }}/bin/j9vm:>
+{{ ims.ims_java_home }}/bin/:>
+{{ ims.ims_java_dir }}/lib:>
+{{ db2.db2_java_dir }}/base/lib:>
+{{ db2.db2_java_dir }}/jdbc/lib
 *
 ./      ENDUP
 /*

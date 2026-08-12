@@ -64,35 +64,54 @@ rm -f /tmp/CICS-Db2-* 2>/dev/null || true
 rm -f /tmp/Db2-* 2>/dev/null || true
 rm -f "$SCRIPTS_DIR/../config/.env" 2>/dev/null || true
 
-# =========================
-# DB2 RACF access (DSNR class)
-# =========================
-print_info "Granting DB2 DSNR access for $MYUSER..."
-set +e
-tsocmd "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
-set -e
-tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
-tsocmd "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
-tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
-tsocmd "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
-tsocmd "SETROPTS RACLIST(DSNR) REFRESH"
 
-# =========================
+# =====================================
+# DB2 RACF access (SMF class)
+# =====================================
+set +e
+print_info "Granting SMF access for $MYUSER..."
+run_tso "RDEFINE FACILITY BPX.SMF UACC(NONE)"
+run_tso "PERMIT BPX.SMF CLASS(FACILITY) ID($MYUSER) ACCESS(READ)"
+run_tso "SETROPTS RACLIST(FACILITY) REFRESH"
+run_tso "RLIST FACILITY BPX.SMF ALL"
+set -e
+
+# =====================================
+# DB2 RACF access (DSNR class)
+# =====================================
+set +e
+print_info "Granting DB2 DSNR access for $MYUSER..."
+run_tso "RDEFINE DSNR (${DB2_SSID}.BATCH) UACC(NONE)"
+run_tso "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
+run_tso "PERMIT ${DB2_SSID}.BATCH CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
+run_tso "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($MYUSER) ACCESS(READ)"
+run_tso "PERMIT ${DB2_SSID}.* CLASS(DSNR) ID($ZOS_ADMIN_USER) ACCESS(READ)"
+run_tso "SETROPTS RACLIST(DSNR) REFRESH"
+set -e
+
+# =========================================================================
 # RACF keyring access
 # Requires RACF SPECIAL authority - run once per image by an admin.
 # SETROPTS failures are suppressed - the class may already be active.
-# =========================
+# =========================================================================
 print_info "Granting RACF keyring access for $MYUSER..."
 RDATALIB_PROFILE="${ZOS_ADMIN_USER}.${ZOS_KEYRING}.LST"
-tsocmd "SETROPTS GENERIC(RDATALIB)" >/dev/null 2>&1 || true
-tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" >/dev/null 2>&1 || true
-tsocmd "RDEFINE RDATALIB $RDATALIB_PROFILE UACC(NONE)" >/dev/null 2>&1 || true
-tsocmd "PERMIT $RDATALIB_PROFILE CLASS(RDATALIB) ID($MYUSER) ACCESS(CONTROL)"
-tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" >/dev/null 2>&1 || true
-print_success "RDATALIB access granted for $MYUSER on keyring $RDATALIB_PROFILE"
+set +e
+run_tso "SETROPTS GENERIC(RDATALIB)"
+run_tso "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)"
+run_tso "RDEFINE RDATALIB $RDATALIB_PROFILE UACC(NONE)"
+run_tso "PERMIT $RDATALIB_PROFILE CLASS(RDATALIB) ID($MYUSER) ACCESS(CONTROL)"
+run_tso "SETROPTS RACLIST(RDATALIB) REFRESH"
+set -e
+
+# =====================================
+# DB2 RACF access (OPERCMDS class)
+# =====================================
+run_tso "PERMIT MVS.SET*.** CLASS(OPERCMDS) ID($MYUSER) ACCESS(UPDATE)"
+run_tso "SETROPTS RACLIST(OPERCMDS) REFRESH"
 
 # =========================
-# DROP
+# DB2 DROP
 # =========================
 print_info "Dropping existing DB2 tables for $MYUSER..."
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
@@ -103,10 +122,9 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 run_job_and_wait "/tmp/IMS-Db2-drop-$$.jcl" "8"
 
 # =========================
-# Generate and submit the DB2 grant JCL
+# DB2 GRANT
 # =========================
 print_info "Submitting DB2 table grant JCL for $MYUSER..."
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile "$CONFIG_FILE" \
     --extraVar "db2_user=$MYUSER" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-grant-user.j2" --outputFile "/tmp/CICS-Db2-grant-$$.jcl"
-
 run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"

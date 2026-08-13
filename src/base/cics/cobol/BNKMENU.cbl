@@ -157,7 +157,7 @@
       *
               WHEN OTHER
                  MOVE LOW-VALUES TO BNK1MEO
-                 MOVE 'Invalid key pressed.' TO MESSAGEO
+                 MOVE 'Invalid key pressed. Please try again.' TO MESSAGEO
                  MOVE -1 TO ACTIONL
                  SET SEND-DATAONLY-ALARM TO TRUE
                  PERFORM SEND-MAP

@@ -111,7 +111,7 @@ ims:
         program_isolation_getmain_size_increment: 64K
         program_isolation_maximum_table_size: 1M
         ims_proclib_reader_procedure_name: "{{ vars.imsid }}RDR"
-        suffix_of_the_program_preload_list_file: DC
+        #suffix_of_the_program_preload_list_file: DC
         common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 256K
         work_area_pool_size_for_program_scheduling_definition_files: 512K
         inital_number_of_application_and_system_tasks: 5

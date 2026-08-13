@@ -78,8 +78,16 @@ certutil -addstore Root %USERPROFILE%\Downloads\vsica_ca.pem
 
 Then open the Bank of Z frontend:
 
+**HTTP**
+
 ```bash
-https://<image-ip>:9445/bank-frontend-vanilla
+http://:9081/admin.html
+```
+
+**HTTPS**
+
+```bash
+https://:9445/admin.html
 ```
 
 ## Documentation

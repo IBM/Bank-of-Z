@@ -461,33 +461,6 @@ activities:
     - ims_maclib_management
     - ims
 
-  - name: IMS_SPOC_MANAGEMENT
-    description: |
-      This activity is dedicated to the update of MacLib
-    actions:
-        - name: IMS_SPOC
-          description: |
-            This action is applicable when we add or modify artifacts.
-          steps:
-          - name: IMS_SPOC
-            description: |
-              This step activates all new IMS artifacts
-            properties:
-              - key: template
-                value: job_submit
-              - key: var_job_submit
-                value: jcl_ims_spoc
-            when:
-              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
-    types:
-      - name: 'PSBLOAD'
-      - name: 'DBDLOAD'
-      - name: 'IMSLOAD'
-    is_artifact: True
-    tags:
-    - ims_spoc_management
-    - ims
-
   - name: 'Deploy IMS JAR'
     description: 'Copy the IMS Java JMP JAR to the USS classpath directory'
     actions:

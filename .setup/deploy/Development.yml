@@ -206,10 +206,3 @@ jcl_ims_maclib:
   dest: "{{working_folder}}/ims_maclib.jcl"
   use_template: True
   max_rc: 8
-
-# Variables for ims_ims_spoc jcl building block
-jcl_ims_spoc:
-  src: "{{script_dir}}/../deploy/ims_spoc.jcl.j2"
-  dest: "{{working_folder}}/ims_spoclib.jcl"
-  use_template: True
-  max_rc: 8

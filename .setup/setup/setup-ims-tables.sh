@@ -45,8 +45,18 @@ set -e
 # =========================
 # IMS dynalloc
 # =========================
-rm -f "/tmp/IMS-table-*"
+rm -f "/tmp/IMS-dynalloc-*" 2>/dev/null || true
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "jobname=DYNALLOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-dynalloc.j2"  --outputFile "/tmp/IMS-table-$$.jcl"
-run_job_and_wait "/tmp/IMS-table-$$.jcl" 
+    --extraVar "jobname=DYNALLOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-dynalloc.j2"  --outputFile "/tmp/IMS-dynalloc-$$.jcl"
+run_job_and_wait "/tmp/IMS-dynalloc-$$.jcl" 
+
+# =========================
+# IMS SPOC
+# =========================
+rm -f "/tmp/IMS-spoc-*" 2>/dev/null || true
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=SPOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-spoc.jcl.j2"  --outputFile "/tmp/IMS-spoc-$$.jcl"
+run_job_and_wait "/tmp/IMS-spoc-$$.jcl"  "8"
+
+
 exit $?

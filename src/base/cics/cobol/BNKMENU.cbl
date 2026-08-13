@@ -157,7 +157,7 @@
       *
               WHEN OTHER
                  MOVE LOW-VALUES TO BNK1MEO
-                 MOVE 'Invalid key. Use a valid option.' TO MESSAGEO
+                 MOVE 'Unrecognized key. Select a menu option.' TO MESSAGEO
                  MOVE -1 TO ACTIONL
                  SET SEND-DATAONLY-ALARM TO TRUE
                  PERFORM SEND-MAP

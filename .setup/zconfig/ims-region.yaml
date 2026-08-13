@@ -210,36 +210,6 @@ ims:
         - dbd: IVPDB4
           nbrsegs: '6'
           page_fixed: true
-    - member_name: DFSMPLDC
-      config:
-        modules:
-        - CSQACLST
-        - CSQAMLST
-        - CSQAPRH
-        - CSQAVICM
-        - CSQFSALM
-        - CSQQDEFV
-        - CSQQCONN
-        - CSQQDISC
-        - CSQQTERM
-        - CSQQINIT
-        - CSQQBACK
-        - CSQQCMMT
-        - CSQQESMT
-        - CSQQPREP
-        - CSQQTTHD
-        - CSQQWAIT
-        - CSQQNORM
-        - CSQQSSOF
-        - CSQQSSON
-        - CSQFSTAB
-        - CSQQRESV
-        - CSQQSNOP
-        - CSQQCMND
-        - CSQQCVER
-        - CSQQTMID
-        - CSQQTRGI
-        - CSQQCON2
     - member_name: DFSYDTI
       config:
         descriptors:

@@ -72,7 +72,7 @@
           03 COMM-DOB-SPLIT-MM         PIC 99.
           03 COMM-DOB-SPLIT-YYYY       PIC 9999.
 
-       01 COMM-ADDR-SPLIT.
+       01 COMM-ADDR-SPLIT1.
           03 COMM-ADDR-SPLIT1         PIC X(60).
           03 COMM-ADDR-SPLIT2         PIC X(60).
           03 COMM-ADDR-SPLIT3         PIC X(40).

@@ -81,13 +81,13 @@ Then open the Bank of Z frontend:
 **HTTP**
 
 ```bash
-http://:9081/admin.html
+http://<your-zos-host>:9081/admin.html
 ```
 
 **HTTPS**
 
 ```bash
-https://:9445/admin.html
+https://<your-zos-host>:9445/admin.html
 ```
 
 ## Documentation

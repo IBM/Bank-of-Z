@@ -87,13 +87,13 @@ Open the Bank of Z frontend in a browser:
 **HTTP**
 
 ```bash
-http://:9081/admin.html
+http://<your-zos-host>:9081/admin.html
 ```
 
 **HTTPS**
 
 ```bash
-https://:9445/admin.html
+https://<your-zos-host>:9445/admin.html
 ```
 
 For HTTPS access and certificate configuration, Accessing Bank of Z over HTTPS in the (README)[https://github.com/IBM/Bank-of-Z/blob/main/README.md].

@@ -58,8 +58,8 @@ db2_bind_package_template: "db2_bind_package.jcl.j2"
 db2_bind_plan_template: "db2_bind_plan.jcl.j2"
 
 # z/OS Connect
-zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
-zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQ' + app.short_name }}"
+default_zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
+default_zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQ' + app.short_name }}"
 cics_host: "{{ extra_vars.cics_host if extra_vars.cics_host is defined else 'localhost' }}"
 cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '2006' }}"
 cics_user: "{{ extra_vars.cics_user if extra_vars.cics_user is defined else default_cics_user }}"
@@ -79,19 +79,19 @@ template_name_zosconnect_config:
 
 # System commands for z/OS Connect server management
 system_command_start_server:
-  cmd: 'S {{zos_connect_job_name}}'
+  cmd: 'S {{default_zos_connect_job_name}}'
   verbose: false
   wait_time_s: 5
   wait: true
 
 system_command_refresh_config:
-  cmd: 'MODIFY {{zos_connect_job_name}},REFRESH,CONFIG'
+  cmd: 'MODIFY {{default_zos_connect_job_name}},REFRESH,CONFIG'
   verbose: false
   wait_time_s: 3
   wait: true
 
 system_command_refresh_apps:
-  cmd: 'MODIFY {{zos_connect_job_name}},REFRESH,APPS'
+  cmd: 'MODIFY {{default_zos_connect_job_name}},REFRESH,APPS'
   verbose: false
   wait_time_s: 3
   wait: true
@@ -204,12 +204,5 @@ jcl_ims_catpop:
 jcl_ims_maclib:
   src: "{{script_dir}}/../deploy/ims_maclib.jcl.j2"
   dest: "{{working_folder}}/ims_maclib.jcl"
-  use_template: True
-  max_rc: 8
-
-# Variables for ims_ims_spoc jcl building block
-jcl_ims_spoc:
-  src: "{{script_dir}}/../deploy/ims_spoc.jcl.j2"
-  dest: "{{working_folder}}/ims_spoclib.jcl"
   use_template: True
   max_rc: 8

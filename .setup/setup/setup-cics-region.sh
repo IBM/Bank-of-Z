@@ -262,8 +262,8 @@ set -e
 # Stage 7: Generate CICS proc
 # =========================
 # Create JCL with each line padded to exactly 80 characters for FB80 dataset
-rm -f "/tmp/CICS${APP_SHORT_NAME}.jcl"
-cat > "/tmp/CICS${APP_SHORT_NAME}.jcl" << EOF
+rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
+cat > "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" << EOF
 //CICS${APP_SHORT_NAME}  PROC
 //*
 //* Bank of Z CICS started task
@@ -277,14 +277,14 @@ cat > "/tmp/CICS${APP_SHORT_NAME}.jcl" << EOF
 EOF
 
 # Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/CICS${APP_SHORT_NAME}.jcl"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
 
 # Copy to PROCLIB using dcp
 print_info "Copying JCL to ${CICS_SYS_PROCLIB}..."
-dcp "/tmp/CICS${APP_SHORT_NAME}.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
+dcp "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
 
 # Clean up temp files
-rm -f "/tmp/CICS${APP_SHORT_NAME}.jcl"
+rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "proclib=${CICS_SYS_PROCLIB}" --extraVar "task_name=CICS${APP_SHORT_NAME}" \

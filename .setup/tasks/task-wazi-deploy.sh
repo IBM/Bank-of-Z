@@ -172,9 +172,9 @@ fi
 
 # Resolve environment varaiables in config file.
 export TMPL_CONFIG_FILE="/tmp/config.yaml"
-cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2"
+cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2.$$"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --templateFile "$TMPL_CONFIG_FILE.j2"  --outputFile "$TMPL_CONFIG_FILE"
+    --templateFile "$TMPL_CONFIG_FILE.j2.$$"  --outputFile "$TMPL_CONFIG_FILE"
 
 rm -rf "${DEPLOY_LOG_FOLDER}/work-bankz"
 

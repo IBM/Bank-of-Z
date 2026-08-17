@@ -124,11 +124,9 @@ main() {
         /IntfName:[[:space:]]*(TCPIPLINK|OSA[0-9]+)/ { intf=$2 }
         /Address:/ && intf { print $2; exit }
       ')
-    dnsname=$(hostname 2>/dev/null)
     echo ""
     print_info "Remote setup logs available at: /tmp/remote-setup.log"
     print_info "The Bank of Z interface is available at: https://${ipaddr}:"
-    print_info "- https://${dnsname}:${FRONTEND_HTTPS_PORT}/"
     print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
     echo ""
 }

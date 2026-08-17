@@ -49,6 +49,8 @@
     url: /docs/tutorials/deploy-bank-of-z.html
   - title: CICS Enhancement Scenario
     url: /docs/tutorials/cics-enhancement-scenario.html
+  - title: Incremental Build
+    url: /docs/tutorials/incremental-build.html
 - title: Development Workflows
   url: /docs/development-workflows/
   children:

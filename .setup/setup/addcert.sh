@@ -29,6 +29,18 @@ exec > >(while IFS= read -r line; do
     printf "${CYAN}[ADD-CERTS]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
+finalize_results() {
+    RC=$?
+    if [ $RC -eq 0 ]; then
+        print_success " Process completed"
+    else
+        print_error "Process failed"
+    fi
+    exit "$RC"
+}
+
+trap finalize_results EXIT
+
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}
 ca_label=${ZOS_CA_LABEL}
@@ -49,12 +61,11 @@ if [[ -z "$ca_label" ]]; then
 fi
 
 # Step 1: Create the keyring and connect VSICA as the trust anchor.
-tsocmd "RACDCERT ID($userid) ADDRING($ring)"
-tsocmd "RACDCERT ID($userid) \
- CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
+run_tso "RACDCERT ID($userid) ADDRING($ring)"
+run_tso "RACDCERT ID($userid) CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
 rc=$?
 # Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself
-tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
+run_tso "SETROPTS RACLIST(DIGTRING) REFRESH"
 
 # Step 2: Generate the server cert with EKU serverAuth via Bouncy Castle CSR
 # round-trip (gencert-eku.sh).  The private key is generated in RACF and never
@@ -63,19 +74,19 @@ tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
 if test $rc -eq 0
 then
   if bash "$SCRIPTS_DIR/gencert-eku.sh"; then
-    print_info "EKU cert generation succeeded - connecting cert to keyring..."
-    tsocmd "RACDCERT ID($userid) \
+    print_info "EKU cert generation succeeded - connecting cert to keyring..."
+    run_tso "RACDCERT ID($userid) \
       CONNECT(LABEL('$label') RING($ring) DEFAULT)"
     rc=$?
-    # Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself
-    tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH"
+    # Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself
+    run_tso "SETROPTS RACLIST(DIGTRING) REFRESH"
     if test $rc -eq 0; then
       print_success "Cert '$label' connected to keyring $userid/$ring as DEFAULT"
     else
       print_error "Failed to connect cert to keyring $userid/$ring"
     fi
   else
-    print_error "gencert-eku.sh failed - Liberty cannot start without a server cert"
+    print_error "gencert-eku.sh failed - Liberty cannot start without a server cert"
     rc=1
   fi
 fi
@@ -86,9 +97,9 @@ fi
 # if the user lacks SPECIAL authority (profile already defined by admin).
 if test $rc -eq 0
 then
-  tsocmd "RDEFINE RDATALIB $profile" 2>/dev/null || true
-  tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) ACCESS(CONTROL)" 2>/dev/null || true
-  tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" 2>/dev/null || true
+  run_tso "RDEFINE RDATALIB $profile"  || true
+  run_tso "PERMIT $profile CLASS(RDATALIB) ID($userid) ACCESS(CONTROL)"  || true
+  run_tso "SETROPTS RACLIST(RDATALIB) REFRESH"  || true
   print_info "RDATALIB: run grant-perm-user.sh as admin if Liberty cannot read the keyring"
 fi
 

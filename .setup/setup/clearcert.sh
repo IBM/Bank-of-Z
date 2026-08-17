@@ -40,27 +40,19 @@ print_info "Removing existing keyring and certificates for $userid/$ring..."
 # Ensure RDATALIB class is active.
 # Requires RACF SPECIAL authority - run once per image by an admin via grant-perm-user.sh.
 # Suppressed with || true - class may already be active or user may lack SPECIAL.
-tsocmd "SETROPTS GENERIC(RDATALIB)" \
- >/dev/null 2>&1 || true
-tsocmd "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" \
- >/dev/null 2>&1 || true
+run_tso "SETROPTS GENERIC(RDATALIB)" || true
+run_tso "SETROPTS CLASSACT(RDATALIB) RACLIST(RDATALIB)" || true
 
 # Remove existing cert label and keyring
-tsocmd "RACDCERT ID($userid) \
-  REMOVE(LABEL('$label') RING($ring))" >/dev/null 2>&1 || true
-tsocmd "RACDCERT ID($userid) DELETE(LABEL('$label'))" >/dev/null 2>&1 || true
-tsocmd "RACDCERT ID($userid) DELRING($ring)" \
- >/dev/null 2>&1 || true
+run_tso "RACDCERT ID($userid) REMOVE(LABEL('$label') RING($ring))"  || true
+run_tso "RACDCERT ID($userid) DELETE(LABEL('$label'))"  || true
+run_tso "RACDCERT ID($userid) DELRING($ring)" || true
 # Only DIGTRING changed - DELRING/DELETE do not modify DIGTCERT
-tsocmd "SETROPTS RACLIST(DIGTRING) REFRESH" \
- >/dev/null 2>&1 || true
+run_tso "SETROPTS RACLIST(DIGTRING) REFRESH" || true
 
 # Remove RDATALIB profile
-tsocmd "PERMIT $profile CLASS(RDATALIB) ID($userid) DELETE" \
- >/dev/null 2>&1 || true
-tsocmd "RDELETE RDATALIB $profile" \
- >/dev/null 2>&1 || true
-tsocmd "SETROPTS RACLIST(RDATALIB) REFRESH" \
- >/dev/null 2>&1 || true
+run_tso "PERMIT $profile CLASS(RDATALIB) ID($userid) DELETE" || true
+run_tso "RDELETE RDATALIB $profile" || true
+run_tso "SETROPTS RACLIST(RDATALIB) REFRESH" || true
 
 print_success "Teardown complete."

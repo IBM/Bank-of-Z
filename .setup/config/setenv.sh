@@ -10,7 +10,7 @@ export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
-
+export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 set +e
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
@@ -45,7 +45,7 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${B
 # Global
 _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
-ZOS_CURRENT_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
+ZOS_CURRENT_USER=$(get_section_value 'global' 'zos_current_user')
 ZOS_ADMIN_USER=$(get_section_value 'global' 'zos_admin_user')
 ZOS_CA_LABEL=$(get_section_value 'global' 'zos_ca_label')
 ZOS_KEYRING=$(get_section_value 'global' 'zos_keyring')
@@ -146,7 +146,9 @@ IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
 IMS_PLEX=${IMS_PLEX:-$(get_section_value 'ims' 'dfs_imsplex')}
 IMS_JAVA_CONF_PATH=${IMS_JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
 IMS_DFS_IMS_SSID=${IMS_DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
+IMS_JAVA_FOLDER="${IMS_JAVA_FOLDER:-$(get_section_value 'ims' 'ims_java_dir')}"
 IMS_JAVA_HOME="${IMS_JAVA_HOME:-$(get_section_value 'ims' 'ims_java_home')}"
+IMS_IXVOLSER="${IMS_IXVOLSER:-$(get_section_value 'ims' 'ixvolser')}"
 
 # zconfig
 ZCONFIG_ZCB_HOME=$(get_section_value 'zconfig' 'zcb_home')
@@ -159,7 +161,7 @@ DEBUG_TCPIP_HQL=$(get_section_value 'debug' 'tcpip_hlq')
 # Db2
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
-DB2_JAVA_HOME="${DB2_JAVA_HOME:-$(get_section_value 'db2' 'db2_java_home')}"
+DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

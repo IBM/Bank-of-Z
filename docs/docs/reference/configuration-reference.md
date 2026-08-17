@@ -101,7 +101,7 @@ The **global** section contains the primary configuration values required to con
 |---|---|---|
 | `ims_disabled` | `false` | Whether IMS is disabled |
 | `ims_sys_hlq` | `IMSV15` | IMS system high-level qualifier |
-| `ims_java_home` | `/usr/lpp/ims/imsjava` | IMS Java installation path |
+| `ims_java_dir` | `/usr/lpp/ims/imsjava` | IMS Java installation path |
 | `ims_datastore` | `IMS2` | IMS datastore name |
 | `ims_dfsplex` | `PLEX2` | IMS DFSPLEX name |
 
@@ -114,7 +114,7 @@ The **global** section contains the primary configuration values required to con
 | `db2_ssid` | `DBD1` | DB2 subsystem ID |
 | `db2_runlib` | `{{ global.db2_ssid }}.RUNLIB.LOAD` | DB2 RUNLIB dataset |
 | `db2_sqlid` | `{{ global.zos_current_user }}` | DB2 SQL ID |
-| `db2_java_home` | `/usr/lpp/db2d10` | DB2 Java installation path |
+| `db2_java_dir` | `/usr/lpp/db2d10` | DB2 Java installation path |
 | `db2_grants` | `CICSUSER` | List of DB2 grantees |
 
 ## Sections settings

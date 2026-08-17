@@ -126,13 +126,11 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-httpdispatcher -->
     <httpDispatcher enableWelcomePage="false"/>
 
-    <!-- Disable config polling to avoid idle CPU usage
-         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-config -->
-    <config updateTrigger="disabled"/>
+    <!-- config requires updateTrigger="mbean" for REFRESH command support -->
+    <config updateTrigger="mbean"/>
 
-    <!-- Disable dropins and polling to avoid idle CPU usage
-         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-applicationmonitor -->
-    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <!-- applicationMonitor requires updateTrigger="mbean" for REFRESH command support -->
+    <applicationMonitor updateTrigger="mbean" dropinsEnabled="false"/>
 
     <!-- Security hardening: remove X-Powered-By header
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-webcontainer -->

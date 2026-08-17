@@ -488,14 +488,21 @@ print_usage() {
     echo "Usage: bash setup-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zconfig, DBB, wazi-deploy)"
-    echo "  environment       Initialize workspace and infrastructure prerequisites"
-    echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
+    echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
+    echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
+    echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
+    echo "  bash setup-common.sh verify-installation"
+    echo ""
+    echo "verify-installation environment variables:"
+    echo "  BASE_URL       z/OS Connect API base URL  (default: derived from config)"
+    echo "  FRONTEND_URL   Frontend Liberty base URL  (default: derived from config)"
+    echo "  IMS_DISABLED   Set to true to skip IMS-specific tests"
 }
 
 #########################################################
@@ -578,6 +585,61 @@ main_validation() {
     print_phase_next_step "validation"
 }
 
+#########################################################
+# STAGE: Post-install verification tests
+#########################################################
+stage_verify_installation() {
+    print_stage "STAGE: Post-install Verification Tests"
+
+    local tests_dir="${BANK_DIR}/tests"
+    local run_all="${tests_dir}/run-all.sh"
+
+    if [ ! -f "$run_all" ]; then
+        print_error "Test runner not found: $run_all"
+        exit 1
+    fi
+
+    # Derive defaults from config if the caller did not supply overrides
+    local zconn_host
+    local zconn_port
+    local fe_host
+    local fe_port
+    zconn_host="${CICS_HOST:-localhost}"
+    zconn_port="${ZOSCONNECT_HTTP_PORT:-9080}"
+    fe_host="${CICS_HOST:-localhost}"
+    fe_port="${FRONTEND_HTTP_PORT:-9081}"
+
+    export BASE_URL="${BASE_URL:-http://${zconn_host}:${zconn_port}/api}"
+    export FRONTEND_URL="${FRONTEND_URL:-http://${fe_host}:${fe_port}}"
+    export IMS_DISABLED="${IMS_DISABLED:-false}"
+
+    print_info "BASE_URL     : ${BASE_URL}"
+    print_info "FRONTEND_URL : ${FRONTEND_URL}"
+    print_info "IMS_DISABLED : ${IMS_DISABLED}"
+
+    chmod +x "${tests_dir}"/test_*.sh "$run_all" 2>/dev/null || true
+
+    set -o pipefail
+    if bash "$run_all"; then
+        print_success "All verification tests passed"
+    else
+        print_error "One or more verification tests failed"
+        exit 1
+    fi
+}
+
+main_verify_installation() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_verify_installation
+
+    print_stage "VERIFICATION COMPLETE"
+    print_success "Installation verification completed successfully!"
+}
+
 main() {
     local phase="${1:-}"
 
@@ -602,6 +664,9 @@ main() {
             if [[ "$IMS_DISABLED" != "true" ]]; then
                 stage_populate_ims_database
             fi
+            ;;
+        verify-installation)
+            main_verify_installation
             ;;
         -h|--help|help|"")
             print_usage

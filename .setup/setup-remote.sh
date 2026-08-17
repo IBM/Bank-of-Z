@@ -126,7 +126,7 @@ main() {
       ')
     echo ""
     print_info "Remote setup logs available at: /tmp/remote-setup.log"
-    print_info "The Bank of Z interface is available at: https://${ipaddr}:"
+    print_info "The Bank of Z interface is available at:"
     print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
     echo ""
 }

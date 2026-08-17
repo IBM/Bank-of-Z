@@ -84,6 +84,17 @@ Runs a complete DBB build, packages the outputs, deploys via Wazi Deploy, and po
 
 Open the Bank of Z frontend in a browser:
 
+**HTTP**
+
+```bash
+http://<your-zos-host>:9081/admin.html
 ```
-http://<your-zos-host>:9080/bank-frontend-vanilla
+
+**HTTPS**
+
+```bash
+https://<your-zos-host>:9445/admin.html
 ```
+
+For HTTPS access and certificate configuration, Accessing Bank of Z over HTTPS in the (README)[https://github.com/IBM/Bank-of-Z/blob/main/README.md].
+

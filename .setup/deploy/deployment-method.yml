@@ -461,33 +461,6 @@ activities:
     - ims_maclib_management
     - ims
 
-  - name: IMS_SPOC_MANAGEMENT
-    description: |
-      This activity is dedicated to the update of MacLib
-    actions:
-        - name: IMS_SPOC
-          description: |
-            This action is applicable when we add or modify artifacts.
-          steps:
-          - name: IMS_SPOC
-            description: |
-              This step activates all new IMS artifacts
-            properties:
-              - key: template
-                value: job_submit
-              - key: var_job_submit
-                value: jcl_ims_spoc
-            when:
-              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
-    types:
-      - name: 'PSBLOAD'
-      - name: 'DBDLOAD'
-      - name: 'IMSLOAD'
-    is_artifact: True
-    tags:
-    - ims_spoc_management
-    - ims
-
   - name: 'Deploy IMS JAR'
     description: 'Copy the IMS Java JMP JAR to the USS classpath directory'
     actions:
@@ -501,47 +474,48 @@ activities:
     - deploy_jar
     - deploy
 
-  - name: 'Deploy WAR files'
-    description: 'Copy the z/OS Connect WAR files into the destination folder'
+  - name: DEPLOY_ZOS_CONNECT
+    short_name: DEPLOY_ZOS_CONNECT
+    description: |
+      This activity deals with IBM z/OS Connect artifacts
     actions:
-        - name: 'Copy to USS'
-          steps:
+      - name: RESTORE_TO_USS
+        description: |
+          Restores the war file to Unix System Services
+        types:
+          - name: "war"
+        tags:
+          - zosconnect_copy
+        is_artifact: True
+        steps:
           - name: USS_ARCHIVE
           - name: USS_COPY
           - name: USS_RESTORE
             plan_tags:
-            - restore
-            - never
-    types:
-       - name: 'war'
-    is_artifact: True
-    tags:
-    - zosconnect_copy
-    - deploy
-
-  - name: 'Deploy Config Files'
-    description: 'Process and deploy z/OS Connect configuration files with variable substitution'
-    actions:
-        - name: 'Process z/OS Connect config files'
-          steps:
-          - name: ZOS_CONNECT_CONFIG
+              - restore
+              - never
+      - name: CONFIG_FILES
+        description: |
+          Process and deploy z/OS Connect configuration files with variable substitution
+        steps:
+          - name: ZOS_CONNECT_CREATE
             properties:
-            - key: "template"
-              value: "template"
-            - key: "var_template_name"
-              value: "template_name_zosconnect_config"
-            - key: "path_filter"
-              value: '^(?!.*-frontend).*\.war$'
+              - key: "template"
+                value: "template"
+              - key: "var_template_name"
+                value: "template_name_zosconnect_config"
+              - key: "path_filter"
+                value: '^(?!.*-frontend).*\.war$'
             loop:
-               loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
-               loop_var: "api_name"
-            when:
-              - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
-    types:
-       - name: 'war'
-    is_artifact: True
+              loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
+              loop_var: "api_name"
+            types:
+              - name: "war"
+            tags:
+              - zosconnect_config
+            is_artifact: True
     tags:
-    - zosconnect_config
+    - deploy_war
     - deploy
 
   - name: 'Refresh z/OS Connect'
@@ -576,26 +550,26 @@ activities:
     - zosconnect_refresh
     - deploy
     
-  - name: 'Refresh Fronted'
-    description: 'Refresh Fronted application'
+  - name: 'Refresh Frontend'
+    description: 'Refresh Frontend Liberty application'
     actions:
-        - name: REFRESH_FRONTED
+        - name: REFRESH_FRONTEND
           steps:
-          - name: 'Refresh Fronted'
+          - name: 'Refresh Frontend'
             properties:
             - key: 'template'
               value: 'system_command'
             - key: "path_filter"
               value: '.*-frontend.*\.war$'
             - key: 'var_system_command'
-              value: 'system_command_refresh_fronted'
+              value: 'system_command_refresh_frontend'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
        - name: 'war'
     is_artifact: True
     tags:
-    - fronted_refresh
+    - frontend_refresh
     - deploy
 
 # Made with Bob

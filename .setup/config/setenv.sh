@@ -10,8 +10,7 @@ export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
 source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
-
-
+export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 set +e
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
@@ -46,8 +45,11 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${B
 # Global
 _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
-ZOS_CURRENT_USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
+ZOS_CURRENT_USER=$(get_section_value 'global' 'zos_current_user')
 ZOS_ADMIN_USER=$(get_section_value 'global' 'zos_admin_user')
+ZOS_CA_LABEL=$(get_section_value 'global' 'zos_ca_label')
+ZOS_KEYRING=$(get_section_value 'global' 'zos_keyring')
+ZOS_CREATE_CERTS=$(get_section_value 'global' 'zos_create_certs')
 
  # Application
 APP_BASE_NAME=$(get_section_value 'app' 'base_name')
@@ -73,7 +75,7 @@ DBB_REPO_URL=$(get_section_value 'repositories' 'dbb_url')
 # ZOAU
 ZOAU_HOME="${ZOAU_HOME:-$(get_section_value 'zoau' 'zoau_home')}"
 
-# ZBuuilder
+# ZBuilder
 ZBUILDER_SOURCE=$(get_section_value 'zbuilder' 'source_dir')
 ZBUILDER_TARGET=$(get_section_value 'zbuilder' 'target_dir')
 
@@ -113,7 +115,7 @@ ZOSCONNECT_SERVER_FOLDER="${ZOSCONNECT_SERVER_FOLDER:-$(get_section_value 'zosco
 ZOSCONNECT_SYS_PROCLIB=$(get_section_value 'zosconnect' 'sys_proclib')
 ZOSCONNECT_TASK_USER=$(get_section_value 'zosconnect' 'task_user')
 
-# Fronted
+# Frontend
 FRONTEND_LIBERTY_HOME=$(get_section_value 'frontend' 'liberty_home')
 FRONTEND_HTTP_PORT=$(get_section_value 'frontend' 'http_port')
 FRONTEND_HTTPS_PORT=$(get_section_value 'frontend' 'https_port')
@@ -130,6 +132,7 @@ CICS_HLQ=${CICS_HLQ:-$(get_section_value 'cics' 'cics_hlq')}
 CICS_USS_DIR=${CICS_USS_DIR:-$(get_section_value 'cics' 'uss_dir')}
 CICS_SEC=${CICS_SEC:-$(get_section_value 'cics' 'cics_sec')}
 CICS_SYS_PROCLIB=$(get_section_value 'cics' 'sys_proclib')
+CICS_HOST=${CICS_HOST:-$(get_section_value 'cics' 'host')}
 
 # IMS
 IMS_DISABLED=${IMS_DISABLED:-$(get_section_value 'ims' 'disabled')}
@@ -143,7 +146,9 @@ IMS_DATASTORE=${IMS_DATASTORE:-$(get_section_value 'ims' 'datastore')}
 IMS_PLEX=${IMS_PLEX:-$(get_section_value 'ims' 'dfs_imsplex')}
 IMS_JAVA_CONF_PATH=${IMS_JAVA_CONF_PATH:-$(get_section_value 'ims' 'java_conf_path')}
 IMS_DFS_IMS_SSID=${IMS_DFS_IMS_SSID:-$(get_section_value 'ims' 'dfs_ims_ssid')}
+IMS_JAVA_FOLDER="${IMS_JAVA_FOLDER:-$(get_section_value 'ims' 'ims_java_dir')}"
 IMS_JAVA_HOME="${IMS_JAVA_HOME:-$(get_section_value 'ims' 'ims_java_home')}"
+IMS_IXVOLSER="${IMS_IXVOLSER:-$(get_section_value 'ims' 'ixvolser')}"
 
 # zconfig
 ZCONFIG_ZCB_HOME=$(get_section_value 'zconfig' 'zcb_home')
@@ -156,7 +161,7 @@ DEBUG_TCPIP_HQL=$(get_section_value 'debug' 'tcpip_hlq')
 # Db2
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
-DB2_JAVA_HOME="${DB2_JAVA_HOME:-$(get_section_value 'db2' 'db2_java_home')}"
+DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')
@@ -181,19 +186,20 @@ VARS_TO_CHECK=(
 
 error=0
 
-for var in "${VARS_TO_CHECK[@]}"; do
-  if [ -z "${!var}" ]; then
-    print_error "Error: variable '$var' is not set or is empty." >&2
-    error=1
-  fi
-done
-
-if [ "$error" -eq 1 ]; then
-  print_error "One or more variables are missing. Stopping script." >&2
-  rm -f "$ENV_FILE"
-  exit 1
+if [ "$(uname)" = "OS/390" ]; then
+    for var in "${VARS_TO_CHECK[@]}"; do
+      if [ -z "${!var}" ]; then
+        print_error "Error: variable '$var' is not set or is empty." >&2
+        error=1
+      fi
+    done
+    
+    if [ "$error" -eq 1 ]; then
+      print_error "One or more variables are missing. Stopping script." >&2
+      rm -f "$ENV_FILE"
+      exit 1
+    fi
+    print_info "All variables are properly set."
 fi
-
-print_info "All variables are properly set."
 
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH

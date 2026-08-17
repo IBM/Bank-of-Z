@@ -7,9 +7,11 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
-  java_home: "/usr/local/sandboxes/tools/J21.0_64"
-  ims_java_home: "/usr/lpp/ims/imsjava"
-  db2_java_home: "/usr/lpp/db2d10"
+  ims_java_home: "/usr/local/sandboxes/tools/J21.0_64"
+  ims_java_dir: "/usr/lpp/ims/imsjava"
+  db2_java_dir: "/usr/lpp/db2d10"
+  ims_target_user: IBMUSER
+  ims_ixvolser: "IMSV15"
   debug_hlq: EQAW
 ims:
   ims_id: "{{ vars.imsid }}"
@@ -20,7 +22,7 @@ ims:
   ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
-  ims_target_user: IBMUSER
+  ims_target_user: "{{ vars.ims_target_user }}"
   # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
   ims_lgmsg:
       primary_space: 84
@@ -159,7 +161,7 @@ ims:
           retention:
             days: 40
             versions: 55
-          ixvolser: "{{ vars.ims_sys_hlq }}"
+          ixvolser: "{{ vars.ims_ixvolser }}"
           access: UPDATE
           acbmgmt: CATALOG
         common_service_layer:
@@ -484,13 +486,13 @@ ims:
     - member_name: DFSJVMEV
       config:
         libpath:
-        - "{{ vars.java_home }}/lib"
-        - "{{ vars.java_home }}/lib/j9vm"
-        - "{{ vars.java_home }}/lib/default"
-        - "{{ vars.java_home }}/bin/j9vm"
-        - "{{ vars.java_home }}/bin/"
         - "{{ vars.ims_java_home }}/lib"
-        - "{{ vars.db2_java_home }}/jdbc/lib"
+        - "{{ vars.ims_java_home }}/lib/j9vm"
+        - "{{ vars.ims_java_home }}/lib/default"
+        - "{{ vars.ims_java_home }}/bin/j9vm"
+        - "{{ vars.ims_java_home }}/bin/"
+        - "{{ vars.ims_java_dir }}/lib"
+        - "{{ vars.db2_java_dir }}/jdbc/lib"
     - member_name: DFSJVMMS
       config:
         jvm_options:

@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-# Test Case: Get Customer Details
+# Test Case: Get Customer Details (CICS path)
 # Customer ID : C0000001 (CICS customer, numeric ID 0000001)
 # Endpoint    : GET /api/customers/{customerId}
 # Expectation : lastName == "Higins"
+#
+# Environment variables:
+#   BASE_URL   Base URL of the z/OS Connect API server (default: http://9.47.80.84:9080/api)
 set -eu
 
-BASE_URL="http://9.47.80.84:9080/api"
+BASE_URL="${BASE_URL:-http://9.47.80.84:9080/api}"
 CUSTOMER_ID="0000001"           # Strip the C prefix as per frontend parseCustomerId logic
 EXPECTED_LAST_NAME="Higins"
 

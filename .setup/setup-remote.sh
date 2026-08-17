@@ -119,18 +119,15 @@ main() {
     
     # Purge all ended jobs
     opercmd '$POJQ,JM=*' > /dev/null 2>&1 || true &
-    
-    echo ""
-    echo "Next steps:"
-    echo "  1. Review the setup on remote USS: $BANK_OF_Z_WORK_DIR"
-    echo "  2. Check the Bank of Z installation"
-    echo "  3. Connect to CICS using x3270:"
-    echo "     - Enter 'logon applid(CICSBOZ)'"
-    echo "     - Enter 'OMEN' as transaction name"
-    echo "     - Enter 1 then 1234 as customer"
-    echo "  4. Run pipeline builds from VSCode tasks"
+    ipaddr=$(netstat -h 2>/dev/null |
+      awk '
+        /IntfName:[[:space:]]*(TCPIPLINK|OSA[0-9]+)/ { intf=$2 }
+        /Address:/ && intf { print $2; exit }
+      ')
     echo ""
     print_info "Remote setup logs available at: /tmp/remote-setup.log"
+    print_info "The Bank of Z interface is available at:"
+    print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
     echo ""
 }
 

@@ -164,6 +164,7 @@ DEBUG_TCPIP_HQL="{{ debug.tcpip_hlq }}"
 EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 
 # Db2
+DB2_PROVISION="${DB2_PROVISION:-{{ global.db2_provision }}}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"

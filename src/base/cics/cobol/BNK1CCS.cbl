@@ -113,6 +113,7 @@
              05 SUBPGM-BIRTH-MONTH             PIC 99 DISPLAY.
              05 SUBPGM-BIRTH-YEAR              PIC 9999 DISPLAY.
           03 SUBPGM-PHONE                      PIC X(20).
+          03 SUBPGM-EMAIL                      PIC X(100).
           03 SUBPGM-ADDR.
              05 SUBPGM-ADDR-LINE1              PIC X(50).
              05 SUBPGM-ADDR-LINE2              PIC X(50).
@@ -191,6 +192,10 @@
                  MOVE SPACES TO CUSTSNO
                  MOVE SPACES TO CUSTAD1O
                  MOVE SPACES TO CUSTAD2O
+      *
+      *          Pre-fill default value for Country field
+      *
+                 MOVE 'United Kingdom' TO COUNTRYO
 
                  MOVE -1 TO CUSTTITL
                  SET SEND-ERASE TO TRUE
@@ -988,6 +993,9 @@
            MOVE POSTCODEI TO SUBPGM-POSTCODE.
            MOVE COUNTRYI TO SUBPGM-COUNTRY.
            MOVE SPACES TO SUBPGM-PHONE.
+           MOVE SPACES TO SUBPGM-EMAIL.
+           INSPECT CUSTEMLI REPLACING ALL '_' BY ' '.
+           MOVE CUSTEMLI TO SUBPGM-EMAIL.
            MOVE SPACES TO SUBPGM-STATUS.
 
            MOVE DOBDDI TO SUBPGM-BIRTH-DAY.

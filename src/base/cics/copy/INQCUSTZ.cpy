@@ -15,6 +15,7 @@
              05 INQCUST-DOB-MM            PIC 99 DISPLAY.
              05 INQCUST-DOB-YYYY          PIC 9999 DISPLAY.
           03 INQCUST-PHONE                PIC X(20).
+          03 INQCUST-EMAIL                PIC X(100).
           03 INQCUST-ADDR.
              05 INQCUST-ADDR-LINE1        PIC X(50).
              05 INQCUST-ADDR-LINE2        PIC X(50).

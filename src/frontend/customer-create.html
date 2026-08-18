@@ -76,6 +76,12 @@
                         required>
                     </cds-text-input>
                     <cds-text-input
+                        id="emailAddress"
+                        label="Email address"
+                        placeholder="Enter email address"
+                        maxlength="100">
+                    </cds-text-input>
+                    <cds-text-input
                         id="addressLine1"
                         label="Address line 1"
                         placeholder="Enter address line 1"
@@ -160,7 +166,7 @@
         // Mirrors the OpenAPI constraints in src/api/src/main/api/openapi.yaml#CreateCustomerRequest.
         // The backend (CRECUST COBOL) silently truncates over-length names instead of
         // rejecting them, so this is the only place that actually stops it.
-        function validateCustomerData({ firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country }) {
+        function validateCustomerData({ firstName, lastName, phoneNumber, emailAddress, dateOfBirth, addressLine1, addressLine2, city, postalCode, country }) {
             const requiredFields = {
                 'First name': firstName,
                 'Last name': lastName,
@@ -181,12 +187,16 @@
                 'First name': [firstName, 50],
                 'Last name': [lastName, 50],
                 'Phone number': [phoneNumber, 15],
+                'Email address': [emailAddress, 100],
                 'Address line 1': [addressLine1, 100],
                 'Address line 2': [addressLine2, 100],
                 'City': [city, 50],
                 'Postal code': [postalCode, 10],
                 'Country': [country, 50]
             };
+            if (emailAddress && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
+                return 'Email address must be a valid email format';
+            }
             for (const [label, [value, max]] of Object.entries(maxLengths)) {
                 if (value && value.length > max) {
                     return `${label} must be ${max} characters or fewer (currently ${value.length})`;
@@ -206,6 +216,7 @@
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
+            const emailAddress = document.getElementById('emailAddress').value;
             const dateOfBirth = document.getElementById('dateOfBirth').value;
             const addressLine1 = document.getElementById('addressLine1').value;
             const addressLine2 = document.getElementById('addressLine2').value;
@@ -214,7 +225,7 @@
             const country = document.getElementById('country').value;
 
             const validationError = validateCustomerData({
-                firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
+                firstName, lastName, phoneNumber, emailAddress, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
             });
             if (validationError) {
                 showErrorModal('Validation Error', validationError);
@@ -227,6 +238,7 @@
                 lastName,
                 dateOfBirth: dateOfBirth ? parseDate(dateOfBirth) : undefined,
                 phoneNumber: phoneNumber || undefined,
+                emailAddress: emailAddress || undefined,
                 address: {
                     addressLine1,
                     addressLine2: addressLine2 || undefined,

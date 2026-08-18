@@ -14,6 +14,7 @@
                 CUSTOMER_LAST_NAME             CHAR(50),
                 CUSTOMER_DATE_OF_BIRTH         INTEGER,
                 CUSTOMER_PHONE                 CHAR(20),
+                CUSTOMER_EMAIL                 CHAR(100),
                 CUSTOMER_ADDR_LINE1            CHAR(50),
                 CUSTOMER_ADDR_LINE2            CHAR(50),
                 CUSTOMER_CITY                  CHAR(50),

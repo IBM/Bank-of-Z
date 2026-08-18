@@ -322,6 +322,7 @@
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
                         <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
                         <cds-text-input id="phoneNumber" label="Phone Number" value="${customer.phoneNumber || ''}"></cds-text-input>
+                        <cds-text-input id="emailAddress" label="Email Address" value="${customer.emailAddress || ''}"></cds-text-input>
                         <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formattedDOB}"></cds-text-input>
                         <cds-text-input id="addressLine1" label="Address Line 1" value="${customer.address?.addressLine1 || ''}"></cds-text-input>
                         <cds-text-input id="addressLine2" label="Address Line 2" value="${customer.address?.addressLine2 || ''}"></cds-text-input>
@@ -570,6 +571,7 @@
             const city = document.getElementById('city').value.trim();
             const postalCode = document.getElementById('postalCode').value.trim();
             const country = document.getElementById('country').value.trim();
+            const emailAddress = document.getElementById('emailAddress') ? document.getElementById('emailAddress').value.trim() : '';
             
             // Validation: Valid titles
             const VALID_TITLES = ['Professor', 'Mr', 'Mrs', 'Miss', 'Ms', 'Dr', 'Drs', 'Lord', 'Sir', 'Lady', ''];
@@ -600,6 +602,7 @@
             if (firstName) updatedData.firstName = firstName;
             if (lastName) updatedData.lastName = lastName;
             if (phoneNumber) updatedData.phoneNumber = phoneNumber;
+            if (emailAddress) updatedData.emailAddress = emailAddress;
             if (dateOfBirth) updatedData.dateOfBirth = dateOfBirth;
             
             // Address object (only include if at least one field is provided)

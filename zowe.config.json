@@ -27,8 +27,11 @@
                     "type": "rse",
                     "properties": {
                         "port": 8195,
-                        "basePath": "rseapi"
-                    }
+                        "basePath": "rseapi",
+                        "host": "9.114.13.83",
+                        "rejectUnauthorized": false
+                    },
+                    "secure": []
                 },
                 "cics": {
                     "type": "cics",

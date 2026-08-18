@@ -4,8 +4,8 @@
         <segment id="1">
             <field name="CRECUSTZ" originalName="CRECUSTZ" included="Y" path="CRECUSTZ" fileName="CRECUST.cpy" structureIndex="0" structSrcFileName="CRECUST_request_0.cpy" srcLine="01 CRECUSTZ.">
                 <startPos>1</startPos>
-                <bytes>403</bytes>
-                <maxBytes>403</maxBytes>
+                <bytes>503</bytes>
+                <maxBytes>503</maxBytes>
                 <applicationDatatype datatype="STRUCT"/>
                 <field name="COMM-EYECATCHER" originalName="COMM-EYECATCHER" included="Y" path="CRECUSTZ.COMM-EYECATCHER" srcLine="03 COMM-EYECATCHER PIC X(4) USAGE DISPLAY.">
                     <startPos>1</startPos>
@@ -100,55 +100,61 @@
                     <maxBytes>20</maxBytes>
                     <applicationDatatype datatype="CHAR"/>
                 </field>
-                <field name="COMM-ADDR" originalName="COMM-ADDR" included="Y" path="CRECUSTZ.COMM-ADDR" srcLine="03 COMM-ADDR.">
+                <field name="COMM-EMAIL" originalName="COMM-EMAIL" included="Y" path="CRECUSTZ.COMM-EMAIL" srcLine="03 COMM-EMAIL PIC X(100) USAGE DISPLAY.">
                     <startPos>159</startPos>
+                    <bytes>100</bytes>
+                    <maxBytes>100</maxBytes>
+                    <applicationDatatype datatype="CHAR"/>
+                </field>
+                <field name="COMM-ADDR" originalName="COMM-ADDR" included="Y" path="CRECUSTZ.COMM-ADDR" srcLine="03 COMM-ADDR.">
+                    <startPos>259</startPos>
                     <bytes>210</bytes>
                     <maxBytes>210</maxBytes>
                     <applicationDatatype datatype="STRUCT"/>
                     <field name="COMM-ADDR-LINE1" originalName="COMM-ADDR-LINE1" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-ADDR-LINE1" srcLine="05 COMM-ADDR-LINE1 PIC X(50) USAGE DISPLAY.">
-                        <startPos>159</startPos>
-                        <bytes>50</bytes>
-                        <maxBytes>50</maxBytes>
-                        <applicationDatatype datatype="CHAR"/>
-                    </field>
-                    <field name="COMM-ADDR-LINE2" originalName="COMM-ADDR-LINE2" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-ADDR-LINE2" srcLine="05 COMM-ADDR-LINE2 PIC X(50) USAGE DISPLAY.">
-                        <startPos>209</startPos>
-                        <bytes>50</bytes>
-                        <maxBytes>50</maxBytes>
-                        <applicationDatatype datatype="CHAR"/>
-                    </field>
-                    <field name="COMM-CITY" originalName="COMM-CITY" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-CITY" srcLine="05 COMM-CITY PIC X(50) USAGE DISPLAY.">
                         <startPos>259</startPos>
                         <bytes>50</bytes>
                         <maxBytes>50</maxBytes>
                         <applicationDatatype datatype="CHAR"/>
                     </field>
-                    <field name="COMM-POSTCODE" originalName="COMM-POSTCODE" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-POSTCODE" srcLine="05 COMM-POSTCODE PIC X(10) USAGE DISPLAY.">
+                    <field name="COMM-ADDR-LINE2" originalName="COMM-ADDR-LINE2" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-ADDR-LINE2" srcLine="05 COMM-ADDR-LINE2 PIC X(50) USAGE DISPLAY.">
                         <startPos>309</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-CITY" originalName="COMM-CITY" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-CITY" srcLine="05 COMM-CITY PIC X(50) USAGE DISPLAY.">
+                        <startPos>359</startPos>
+                        <bytes>50</bytes>
+                        <maxBytes>50</maxBytes>
+                        <applicationDatatype datatype="CHAR"/>
+                    </field>
+                    <field name="COMM-POSTCODE" originalName="COMM-POSTCODE" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-POSTCODE" srcLine="05 COMM-POSTCODE PIC X(10) USAGE DISPLAY.">
+                        <startPos>409</startPos>
                         <bytes>10</bytes>
                         <maxBytes>10</maxBytes>
                         <applicationDatatype datatype="CHAR"/>
                     </field>
                     <field name="COMM-COUNTRY" originalName="COMM-COUNTRY" included="Y" path="CRECUSTZ.COMM-ADDR.COMM-COUNTRY" srcLine="05 COMM-COUNTRY PIC X(50) USAGE DISPLAY.">
-                        <startPos>319</startPos>
+                        <startPos>419</startPos>
                         <bytes>50</bytes>
                         <maxBytes>50</maxBytes>
                         <applicationDatatype datatype="CHAR"/>
                     </field>
                 </field>
                 <field name="COMM-STATUS" originalName="COMM-STATUS" included="Y" path="CRECUSTZ.COMM-STATUS" srcLine="03 COMM-STATUS PIC X(10) USAGE DISPLAY.">
-                    <startPos>369</startPos>
+                    <startPos>469</startPos>
                     <bytes>10</bytes>
                     <maxBytes>10</maxBytes>
                     <applicationDatatype datatype="CHAR"/>
                 </field>
                 <field name="COMM-CREATED-DATE" originalName="COMM-CREATED-DATE" included="Y" path="CRECUSTZ.COMM-CREATED-DATE" srcLine="03 COMM-CREATED-DATE.">
-                    <startPos>379</startPos>
+                    <startPos>479</startPos>
                     <bytes>8</bytes>
                     <maxBytes>8</maxBytes>
                     <applicationDatatype datatype="STRUCT"/>
                     <field name="COMM-CREATED-DAY" originalName="COMM-CREATED-DAY" included="Y" path="CRECUSTZ.COMM-CREATED-DATE.COMM-CREATED-DAY" srcLine="05 COMM-CREATED-DAY PIC 9(2) USAGE DISPLAY.">
-                        <startPos>379</startPos>
+                        <startPos>479</startPos>
                         <bytes>2</bytes>
                         <maxBytes>2</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -157,7 +163,7 @@
                         <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
                     </field>
                     <field name="COMM-CREATED-MONTH" originalName="COMM-CREATED-MONTH" included="Y" path="CRECUSTZ.COMM-CREATED-DATE.COMM-CREATED-MONTH" srcLine="05 COMM-CREATED-MONTH PIC 9(2) USAGE DISPLAY.">
-                        <startPos>381</startPos>
+                        <startPos>481</startPos>
                         <bytes>2</bytes>
                         <maxBytes>2</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -166,7 +172,7 @@
                         <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
                     </field>
                     <field name="COMM-CREATED-YEAR" originalName="COMM-CREATED-YEAR" included="Y" path="CRECUSTZ.COMM-CREATED-DATE.COMM-CREATED-YEAR" srcLine="05 COMM-CREATED-YEAR PIC 9(4) USAGE DISPLAY.">
-                        <startPos>383</startPos>
+                        <startPos>483</startPos>
                         <bytes>4</bytes>
                         <maxBytes>4</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -176,7 +182,7 @@
                     </field>
                 </field>
                 <field name="COMM-CREDIT-SCORE" originalName="COMM-CREDIT-SCORE" included="Y" path="CRECUSTZ.COMM-CREDIT-SCORE" srcLine="03 COMM-CREDIT-SCORE PIC 9(3) USAGE DISPLAY.">
-                    <startPos>387</startPos>
+                    <startPos>487</startPos>
                     <bytes>3</bytes>
                     <maxBytes>3</maxBytes>
                     <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -185,12 +191,12 @@
                     <applicationDatatype datatype="DECIMAL" precision="3" scale="0"/>
                 </field>
                 <field name="COMM-CS-REVIEW-DATE" originalName="COMM-CS-REVIEW-DATE" included="Y" path="CRECUSTZ.COMM-CS-REVIEW-DATE" srcLine="03 COMM-CS-REVIEW-DATE.">
-                    <startPos>390</startPos>
+                    <startPos>490</startPos>
                     <bytes>8</bytes>
                     <maxBytes>8</maxBytes>
                     <applicationDatatype datatype="STRUCT"/>
                     <field name="COMM-CS-REVIEW-DAY" originalName="COMM-CS-REVIEW-DAY" included="Y" path="CRECUSTZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-DAY" srcLine="05 COMM-CS-REVIEW-DAY PIC 9(2) USAGE DISPLAY.">
-                        <startPos>390</startPos>
+                        <startPos>490</startPos>
                         <bytes>2</bytes>
                         <maxBytes>2</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -199,7 +205,7 @@
                         <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
                     </field>
                     <field name="COMM-CS-REVIEW-MONTH" originalName="COMM-CS-REVIEW-MONTH" included="Y" path="CRECUSTZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-MONTH" srcLine="05 COMM-CS-REVIEW-MONTH PIC 9(2) USAGE DISPLAY.">
-                        <startPos>392</startPos>
+                        <startPos>492</startPos>
                         <bytes>2</bytes>
                         <maxBytes>2</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -208,7 +214,7 @@
                         <applicationDatatype datatype="DECIMAL" precision="2" scale="0"/>
                     </field>
                     <field name="COMM-CS-REVIEW-YEAR" originalName="COMM-CS-REVIEW-YEAR" included="Y" path="CRECUSTZ.COMM-CS-REVIEW-DATE.COMM-CS-REVIEW-YEAR" srcLine="05 COMM-CS-REVIEW-YEAR PIC 9(4) USAGE DISPLAY.">
-                        <startPos>394</startPos>
+                        <startPos>494</startPos>
                         <bytes>4</bytes>
                         <maxBytes>4</maxBytes>
                         <marshaller isSigned="N" isSignLeading="N" isSignSeparate="N" isWCHAROnly="N">
@@ -218,13 +224,13 @@
                     </field>
                 </field>
                 <field name="COMM-SUCCESS" originalName="COMM-SUCCESS" included="Y" path="CRECUSTZ.COMM-SUCCESS" srcLine="03 COMM-SUCCESS PIC X USAGE DISPLAY.">
-                    <startPos>398</startPos>
+                    <startPos>498</startPos>
                     <bytes>1</bytes>
                     <maxBytes>1</maxBytes>
                     <applicationDatatype datatype="CHAR"/>
                 </field>
                 <field name="COMM-FAIL-CODE" originalName="COMM-FAIL-CODE" included="Y" path="CRECUSTZ.COMM-FAIL-CODE" srcLine="03 COMM-FAIL-CODE PIC X USAGE DISPLAY.">
-                    <startPos>399</startPos>
+                    <startPos>499</startPos>
                     <bytes>1</bytes>
                     <maxBytes>1</maxBytes>
                     <applicationDatatype datatype="CHAR"/>

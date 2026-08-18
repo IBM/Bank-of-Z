@@ -92,6 +92,13 @@ COUNTRY  DFHMDF POS=(14,18),LENGTH=50,ATTRB=(NORM,UNPROT,FSET),        *
                COLOR=GREEN,                                            *
                HILIGHT=UNDERLINE
          DFHMDF POS=(14,69),ATTRB=(PROT,ASKIP),LENGTH=1
+         DFHMDF POS=(16,1),LENGTH=16,ATTRB=(NORM,PROT),                *
+               COLOR=NEUTRAL,INITIAL=' Email Address  '
+CUSTEML  DFHMDF POS=(16,18),LENGTH=50,                                 *
+               ATTRB=(UNPROT,FSET,NORM),COLOR=GREEN,                   *
+               HILIGHT=UNDERLINE
+         DFHMDF POS=(16,69),LENGTH=0,                                  *
+               ATTRB=(PROT,ASKIP),COLOR=GREEN
          DFHMDF POS=(15,1),LENGTH=16,ATTRB=(NORM,PROT),                *
                COLOR=NEUTRAL,INITIAL=' Customer D.O.B.'
 DOBDD    DFHMDF POS=(15,18),LENGTH=2,ATTRB=(NORM,UNPROT,FSET,NUM),     *

@@ -32,6 +32,10 @@ mappings:
         required: false
         nullable: false
         template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-PHONE\"}}"
+    - emailAddress:
+        required: false
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDCUST.\"COMM-EMAIL\"}}"
     - address:
         required: false
         nullable: false

@@ -47,6 +47,10 @@ mappings:
             required: false
             nullable: false
             template: "{{$body.phoneNumber}}"
+        - COMM-EMAIL:
+            required: false
+            nullable: false
+            template: "{{$body.emailAddress}}"
         - COMM-ADDR:
             required: false
             nullable: false

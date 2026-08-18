@@ -16,6 +16,7 @@
              05 COMM-DOB-MONTH         PIC 99 DISPLAY.
              05 COMM-DOB-YEAR          PIC 9999 DISPLAY.
           03 COMM-PHONE                PIC X(20).
+          03 COMM-EMAIL                PIC X(100).
           03 COMM-ADDR.
              05 COMM-ADDR-LINE1        PIC X(50).
              05 COMM-ADDR-LINE2        PIC X(50).

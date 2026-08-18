@@ -159,6 +159,7 @@ DEBUG_HLQ=$(get_section_value 'debug' 'debug_hlq')
 DEBUG_TCPIP_HQL=$(get_section_value 'debug' 'tcpip_hlq')
 
 # Db2
+DB2_PROVISION="${DB2_PROVISION:-$(get_section_value 'global' 'db2_provision')}"
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"

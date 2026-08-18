@@ -74,6 +74,7 @@ global:
   ims_ixvolser: "IMSV15"
   
   # DB2
+  db2_provision: "false"   # set to "true" to provision a new Db2 subsystem with zconfig
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
   db2_ssid: "DBD1"

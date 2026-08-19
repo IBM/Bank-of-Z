@@ -5,10 +5,11 @@
 # Expectation : lastName == "Higins"
 #
 # Environment variables:
-#   BASE_URL   Base URL of the z/OS Connect API server (default: http://9.47.80.84:9080/api)
+#   BASE_URL   Base URL of the z/OS Connect API server (default: http://localhost:9080/api)
 set -eu
 
-BASE_URL="${BASE_URL:-http://9.47.80.84:9080/api}"
+# shellcheck source=test-setup.sh
+source "$(dirname "$0")/test-setup.sh"
 CUSTOMER_ID="0000001"           # Strip the C prefix as per frontend parseCustomerId logic
 EXPECTED_LAST_NAME="Higins"
 

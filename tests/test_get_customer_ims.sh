@@ -7,10 +7,11 @@
 # Expectation : customer fields present, accounts list non-empty, balances returned
 #
 # Environment variables:
-#   BASE_URL   Base URL of the z/OS Connect API server (default: http://9.47.80.84:9080/api)
+#   BASE_URL   Base URL of the z/OS Connect API server (default: http://localhost:9080/api)
 set -eu
 
-BASE_URL="${BASE_URL:-http://9.47.80.84:9080/api}"
+# shellcheck source=test-setup.sh
+source "$(dirname "$0")/test-setup.sh"
 CUSTOMER_ID="000000015"
 PASS=0
 FAIL=0

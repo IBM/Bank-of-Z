@@ -4,11 +4,11 @@
 # Expectation : HTTP 200
 #
 # Environment variables:
-#   FRONTEND_URL   Base URL of the Frontend Liberty server (default: http://9.47.80.84:9081)
+#   FRONTEND_URL   Base URL of the Frontend Liberty server (default: http://localhost:9081)
 set -eu
 
-FRONTEND_URL="${FRONTEND_URL:-http://9.47.80.84:9081}"
-ADMIN_URL="${FRONTEND_URL}/admin.html"
+# shellcheck source=test-setup.sh
+source "$(dirname "$0")/test-setup.sh"
 
 echo "=== Test: Frontend Availability ==="
 echo "Endpoint : GET ${ADMIN_URL}"

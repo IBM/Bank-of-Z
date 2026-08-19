@@ -39,7 +39,8 @@ if [ ! -f "$RUN_ALL" ]; then
     print_error "Test runner not found: $RUN_ALL"
     exit 1
 fi
-
+# Disable UNBOUND check
+set +u
 chmod +x "${TESTS_DIR}"/test_*.sh "$RUN_ALL" 2>/dev/null || true
 
 # =========================

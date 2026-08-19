@@ -589,36 +589,15 @@ main_validation() {
 stage_verify_installation() {
     print_stage "STAGE: Post-install Verification Tests"
 
-    local tests_dir="${BANK_DIR}/tests"
-    local run_all="${tests_dir}/run-all.sh"
+    local task="${SCRIPTS_DIR}/tasks/task-install-verification.sh"
 
-    if [ ! -f "$run_all" ]; then
-        print_error "Test runner not found: $run_all"
+    if [ ! -f "$task" ]; then
+        print_error "Verification task not found: $task"
         exit 1
     fi
 
-    # Derive defaults from config if the caller did not supply overrides
-    local zconn_host
-    local zconn_port
-    local fe_host
-    local fe_port
-    zconn_host="${CICS_HOST:-localhost}"
-    zconn_port="${ZOSCONNECT_HTTP_PORT:-9080}"
-    fe_host="${CICS_HOST:-localhost}"
-    fe_port="${FRONTEND_HTTP_PORT:-9081}"
-
-    export BASE_URL="${BASE_URL:-http://${zconn_host}:${zconn_port}/api}"
-    export FRONTEND_URL="${FRONTEND_URL:-http://${fe_host}:${fe_port}}"
-    export IMS_DISABLED="${IMS_DISABLED:-false}"
-
-    print_info "BASE_URL     : ${BASE_URL}"
-    print_info "FRONTEND_URL : ${FRONTEND_URL}"
-    print_info "IMS_DISABLED : ${IMS_DISABLED}"
-
-    chmod +x "${tests_dir}"/test_*.sh "$run_all" 2>/dev/null || true
-
     set -o pipefail
-    if bash "$run_all"; then
+    if bash "$task"; then
         print_success "All verification tests passed"
     else
         print_error "One or more verification tests failed"

@@ -522,16 +522,14 @@ main_setup() {
         stage_setup_ims_bankz_regions
     fi
 
-    stage_setup_zosconnect_server
-
-    stage_setup_frontend_server
-
-    # Certificates run last so addcert.sh + gencert-eku.sh regenerate the
-    # RACF keyring cert after the server config is in place.
+    # Certificates
     if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then
         stage_setup_certificates
     fi
-    
+
+    stage_setup_zosconnect_server
+    stage_setup_frontend_server
+
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
@@ -601,6 +599,21 @@ main() {
             stage_populate_database
             if [[ "$IMS_DISABLED" != "true" ]]; then
                 stage_populate_ims_database
+            fi
+            
+            # Restart frontend and z/OS Connect servers (dropinsEnabled="false")
+            opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            sleep 5
+            if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+            fi
+            if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"  2>/dev/null || true
             fi
             ;;
         -h|--help|help|"")

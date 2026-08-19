@@ -125,9 +125,9 @@ main() {
         /Address:/ && intf { print $2; exit }
       ')
     echo ""
-    print_info "Remote setup logs available at: /tmp/remote-setup.log"
     print_info "The Bank of Z interface is available at:"
     print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
+    print_info "(Please allow about 20s for the interface to become available)"
     echo ""
 }
 

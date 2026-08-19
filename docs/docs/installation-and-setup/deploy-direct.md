@@ -96,5 +96,14 @@ http://<your-zos-host>:9081/admin.html
 https://<your-zos-host>:9445/admin.html
 ```
 
-For HTTPS access and certificate configuration, Accessing Bank of Z over HTTPS in the (README)[https://github.com/IBM/Bank-of-Z/blob/main/README.md].
+For HTTPS access and certificate configuration, see [Accessing Bank of Z over HTTPS](https://github.com/IBM/Bank-of-Z/blob/main/README.md).
 
+---
+
+## 8. Run post-install verification tests
+
+```bash
+.setup/setup-common.sh verify-installation
+```
+
+Runs the integration test suite in `tests/` against the deployed application. The tests exercise the CICS and IMS API paths and report a pass/fail result for each. All tests must pass before the installation is considered complete.

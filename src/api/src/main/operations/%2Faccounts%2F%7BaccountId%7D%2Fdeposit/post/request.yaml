@@ -43,7 +43,3 @@ mappings:
                 required: false
                 nullable: false
                 expression: 496
-            - COMM-DESCRIPTION:
-                required: false
-                nullable: false
-                expression: "$body.description ? $body.description : ''"

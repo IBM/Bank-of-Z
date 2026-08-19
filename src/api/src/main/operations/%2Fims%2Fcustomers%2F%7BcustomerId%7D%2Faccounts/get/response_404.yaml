@@ -11,3 +11,5 @@ mappings:
         required: true
         nullable: false
         template: "The requested resource was not found"
+
+# Made with Bob

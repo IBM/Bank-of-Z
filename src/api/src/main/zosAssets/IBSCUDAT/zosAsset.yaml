@@ -1,7 +1,7 @@
 ---
 version: 1.0
 type: "imsTransaction-1.0"
-description: "Save Customer Data"
+description: ""
 providerProperties:
   language: "COBOL"
   transactionCode: "IBSCUDAT"

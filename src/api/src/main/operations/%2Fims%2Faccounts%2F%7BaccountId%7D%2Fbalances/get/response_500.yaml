@@ -11,3 +11,5 @@ mappings:
         required: true
         nullable: false
         template: "An internal server error occurred"
+
+# Made with Bob

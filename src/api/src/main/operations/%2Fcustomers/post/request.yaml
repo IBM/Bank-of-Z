@@ -22,7 +22,7 @@ mappings:
             - COMM-LAST-NAME:
                 required: false
                 nullable: false
-                template: "{{$exists(body.lastName) ? $body.lastName : \"\"}}"
+                template: "{{$exists(body.lastName) ? $body.firstName : \"\"}}"
         - COMM-DOB:
             required: false
             nullable: false
@@ -30,29 +30,19 @@ mappings:
             - COMM-DOB-DAY:
                 required: false
                 nullable: false
-                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth,\
-                  \ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth,\
-                  \ 8, 2)) : 0"
+                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth, /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth, 8, 2)) : 0"
             - COMM-DOB-MONTH:
                 required: false
                 nullable: false
-                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth,\
-                  \ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth,\
-                  \ 5, 2)) : 0"
+                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth, /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth, 5, 2)) : 0"
             - COMM-DOB-YEAR:
                 required: false
                 nullable: false
-                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth,\
-                  \ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth,\
-                  \ 0, 4)) : 0"
+                expression: "$exists($body.dateOfBirth) and $match($body.dateOfBirth, /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.dateOfBirth, 0, 4)) : 0"
         - COMM-PHONE:
             required: false
             nullable: false
             template: "{{$body.phoneNumber}}"
-        - COMM-EMAIL:
-            required: false
-            nullable: false
-            template: "{{$body.emailAddress}}"
         - COMM-ADDR:
             required: false
             nullable: false

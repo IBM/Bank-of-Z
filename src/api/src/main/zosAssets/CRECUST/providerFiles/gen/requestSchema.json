@@ -101,22 +101,14 @@
               }
             },
             "COMM-PHONE" : {
-               "maxLength" : 20,
-               "type" : "string",
-               "x-ibm-zcon-metadata" : {
-                 "type" : "03 COMM-PHONE PIC X(20) USAGE DISPLAY.",
-                 "name" : "COMM-PHONE"
-               }
-             },
-             "COMM-EMAIL" : {
-               "maxLength" : 100,
-               "type" : "string",
-               "x-ibm-zcon-metadata" : {
-                 "type" : "03 COMM-EMAIL PIC X(100) USAGE DISPLAY.",
-                 "name" : "COMM-EMAIL"
-               }
-             },
-             "COMM-ADDR" : {
+              "maxLength" : 20,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 COMM-PHONE PIC X(20) USAGE DISPLAY.",
+                "name" : "COMM-PHONE"
+              }
+            },
+            "COMM-ADDR" : {
               "type" : "object",
               "properties" : {
                 "COMM-ADDR-LINE1" : {

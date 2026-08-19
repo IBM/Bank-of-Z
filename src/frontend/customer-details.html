@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Updated for testing DBB HTML detection -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#000000">
@@ -322,7 +321,6 @@
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
                         <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
                         <cds-text-input id="phoneNumber" label="Phone Number" value="${customer.phoneNumber || ''}"></cds-text-input>
-                        <cds-text-input id="emailAddress" label="Email Address" value="${customer.emailAddress || ''}"></cds-text-input>
                         <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formattedDOB}"></cds-text-input>
                         <cds-text-input id="addressLine1" label="Address Line 1" value="${customer.address?.addressLine1 || ''}"></cds-text-input>
                         <cds-text-input id="addressLine2" label="Address Line 2" value="${customer.address?.addressLine2 || ''}"></cds-text-input>
@@ -397,10 +395,6 @@
                 return;
             }
             
-            // Get the customer ID with prefix from currentCustomer
-            const system = currentCustomer?._system || 'CICS';
-            const customerIdWithPrefix = currentCustomer ? formatCustomerId(currentCustomer.customerId, system) : null;
-            
             let tableHTML = `
                 <table class="cds--data-table">
                     <thead>
@@ -434,9 +428,9 @@
                 // For IMS accounts (with customerId), use accountId as accountNumber if not present
                 const accountNumber = account.accountNumber || (account.customerId ? account.accountId : 'N/A');
                 
-                // Pass customer ID with prefix for both CICS and IMS accounts
-                const viewLink = customerIdWithPrefix
-                    ? `account-details.html?customerId=${customerIdWithPrefix}&accountId=${account.accountId}`
+                // For IMS accounts, pass customerId in the URL; for CICS, pass accountId
+                const viewLink = account.customerId
+                    ? `account-details.html?customerId=${account.customerId}&accountId=${account.accountId}`
                     : `account-details.html?id=${account.accountId}`;
                 
                 tableHTML += `
@@ -571,7 +565,6 @@
             const city = document.getElementById('city').value.trim();
             const postalCode = document.getElementById('postalCode').value.trim();
             const country = document.getElementById('country').value.trim();
-            const emailAddress = document.getElementById('emailAddress') ? document.getElementById('emailAddress').value.trim() : '';
             
             // Validation: Valid titles
             const VALID_TITLES = ['Professor', 'Mr', 'Mrs', 'Miss', 'Ms', 'Dr', 'Drs', 'Lord', 'Sir', 'Lady', ''];
@@ -602,7 +595,6 @@
             if (firstName) updatedData.firstName = firstName;
             if (lastName) updatedData.lastName = lastName;
             if (phoneNumber) updatedData.phoneNumber = phoneNumber;
-            if (emailAddress) updatedData.emailAddress = emailAddress;
             if (dateOfBirth) updatedData.dateOfBirth = dateOfBirth;
             
             // Address object (only include if at least one field is provided)
@@ -620,9 +612,7 @@
             showLoadingModal('Updating customer...');
             
             try {
-                // Determine system type from stored customer data
-                const system = currentCustomer._system || 'CICS';
-                const updatedCustomer = await api.customers.updateCustomer(currentCustomer.customerId, updatedData, system);
+                const updatedCustomer = await api.customers.updateCustomer(currentCustomer.customerId, updatedData);
                 hideLoadingModal();
                 
                 // Update current customer with the response

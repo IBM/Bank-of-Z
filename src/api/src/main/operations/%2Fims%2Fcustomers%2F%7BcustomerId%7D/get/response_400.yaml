@@ -11,3 +11,5 @@ mappings:
         required: true
         nullable: false
         template: "Invalid request parameters"
+
+# Made with Bob

@@ -9,7 +9,7 @@
       *
       * US Government Users Restricted Rights - Use, duplication or
       * disclosure restricted by GSA ADP Schedule Contract
-      * with IBM Corp. 
+      * with IBM Corp.
       ******************************************************************
 
        ENVIRONMENT DIVISION.
@@ -253,14 +253,15 @@
            MOVE 'N' to JAVA-PRIMED.
            MOVE 0 TO TERM-IO.
            SET ADDRESS OF LTERMPCB TO ADDRESS OF IOPCBA.
+      *     DISPLAY 'IOPCBA   = ' IOPCBA.
+      *     DISPLAY 'LTERMPCB = ' LTERMPCB.
+      *     DISPLAY 'JAVA     = ' JAVA-PRIMED.
            PERFORM WITH TEST BEFORE UNTIL TERM-IO = 1
-            DISPLAY 'IBTRAN: CALL GU'
+            DISPLAY 'READY TO CALL DLI'
               CALL 'CBLTDLI' USING GU, LTERMPCB, INPUT-AREA
-              DISPLAY 'IBTRAN: TPSTAT=' TPSTAT
+      *     DISPLAY 'AFTER CALLING DLI'
               IF TPSTAT  = '  ' OR TPSTAT = MESSAGE-EXIST
               THEN
-                DISPLAY 'IBTRAN: ACCID=' IN-ACCID
-                DISPLAY 'IBTRAN: AMT=' IN-AMOUNT ' TYPE=' IN-TRXTYPE
 
       * DOING ACCOUNT DEPOSIT/WITHDRAWAL
                 PERFORM ACCOUNT-ACTIVITY thru ACCOUNT-ACTIVITY-END
@@ -271,19 +272,24 @@
                 THEN
                   MOVE 1 TO TERM-IO
                 ELSE
-                 DISPLAY 'GU FROM IOPCB FAILED: ' TPSTAT
+                 DISPLAY 'GU FROM IOPCB FAILED WITH STATUS CODE: '
+                    TPSTAT
                 END-IF
               END-IF
            END-PERFORM.
 
            IF JAVA-PRIMED = 'Y'
            THEN
+      *      DISPLAY 'DeleteLocalRef HISTSEG-BUFF-PTR'
              Call DeleteLocalRef USING BY VALUE JNIEnvPtr,
                                      BY VALUE HISTSEG-BUFF-PTR
 
+      *      DISPLAY 'DeleteLocalRef DB2InsertTran-class-ref'
              Call DeleteLocalRef USING BY VALUE JNIEnvPtr,
                                      BY VALUE DB2InsertTran-class-ref
            END-IF.
+
+           DISPLAY 'Goback'.
 
            GOBACK.
 
@@ -300,7 +306,6 @@
              SET ADDRESS OF DBPCB TO ADDRESS OF DBPCB1
              CALL 'CBLTDLI'
                USING GHU, DBPCB, ACCOUNT-SEG, ACCOUNT-SSA1
-             DISPLAY 'ACCT-ACT: GHU DBSTAT=' DBSTAT
              IF DBSTAT NOT = SPACES
                IF DBSTAT = GB OR DBSTAT = GE
                  MOVE NOACCOUNT TO MSG-OUT
@@ -309,8 +314,6 @@
                  MOVE BAD-STATUS TO MSG-OUT
                END-IF
              ELSE
-               DISPLAY 'ACCT-ACT: BAL=' BALANCE-ACC
-               DISPLAY 'ACCT-ACT: TXID=' LASTTXID-ACC
       * UPDATE THE HISTORY SEG
                COMPUTE ACCID-HIST = ACCID
                COMPUTE TXID-HIST = ACCID-HIST * MULT-FACTOR
@@ -337,12 +340,11 @@
 
       * UPDATE THE BALANCE AND LASTTXID IN THE ACCOUNT SEGMENT FIRST
                COMPUTE LASTTXID-ACC = LASTTXID-ACC + 1
-               IF IN-TRXTYPE = 'w' OR IN-TRXTYPE = 'W'
+               IF IN-TRXTYPE = 'w'
                  COMPUTE BALANCE-ACC = BALANCE-ACC - AMOUNT-HIST
                ELSE
                  COMPUTE BALANCE-ACC = BALANCE-ACC + AMOUNT-HIST
                END-IF
-               DISPLAY 'ACCT-ACT: NEWBAL=' BALANCE-ACC
                
       * SET THE BALANCE IN HISTORY SEGMENT
                COMPUTE BALANCE-HIST = BALANCE-ACC
@@ -445,7 +447,8 @@
 
            IF TPSTAT NOT = SPACES
              THEN
-             DISPLAY 'INSERT TO IOPCB FAILED WITH STATUS CODE: ' TPSTAT
+             DISPLAY 'INSERT TO IOPCB FAILED WITH STATUS CODE: '
+                TPSTAT
            END-IF.
        INSERT-IO-END.
 

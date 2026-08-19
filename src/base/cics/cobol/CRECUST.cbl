@@ -73,7 +73,6 @@
           03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-PHONE          PIC X(20).
-          03 HV-CUSTOMER-EMAIL          PIC X(100).
           03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
           03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
           03 HV-CUSTOMER-CITY           PIC X(50).
@@ -1170,7 +1169,6 @@
               (COMM-DOB-MONTH * 100) +
               COMM-DOB-DAY.
            MOVE COMM-PHONE TO HV-CUSTOMER-PHONE.
-           MOVE COMM-EMAIL TO HV-CUSTOMER-EMAIL.
            MOVE COMM-ADDR-LINE1 OF COMM-ADDR
               TO HV-CUSTOMER-ADDR-LINE1.
            MOVE COMM-ADDR-LINE2 OF COMM-ADDR
@@ -1228,7 +1226,6 @@
                   CUSTOMER_LAST_NAME,
                   CUSTOMER_DATE_OF_BIRTH,
                   CUSTOMER_PHONE,
-                  CUSTOMER_EMAIL,
                   CUSTOMER_ADDR_LINE1,
                   CUSTOMER_ADDR_LINE2,
                   CUSTOMER_CITY,
@@ -1247,7 +1244,6 @@
                   :HV-CUSTOMER-LAST-NAME,
                   :HV-CUSTOMER-DOB,
                   :HV-CUSTOMER-PHONE,
-                  :HV-CUSTOMER-EMAIL,
                   :HV-CUSTOMER-ADDR-LINE1,
                   :HV-CUSTOMER-ADDR-LINE2,
                   :HV-CUSTOMER-CITY,

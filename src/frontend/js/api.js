@@ -27,17 +27,6 @@ class ApiConfiguration {
 }
 
 /**
- * Helper function to determine system type from customer ID
- * @param {string} customerId - Customer ID with prefix (C for CICS, I for IMS)
- * @returns {string} 'IMS' or 'CICS'
- */
-function getSystemFromCustomerId(customerId) {
-    if (!customerId) return 'CICS';
-    const idStr = customerId.toString().toUpperCase();
-    return idStr.startsWith('I') ? 'IMS' : 'CICS';
-}
-
-/**
  * Base API client with common request handling
  */
 class BaseApi {
@@ -137,7 +126,6 @@ class CustomersApi extends BaseApi {
      * @param {string} customerData.lastName - Last name (required)
      * @param {string} [customerData.dateOfBirth] - Date of birth (YYYY-MM-DD)
      * @param {string} [customerData.phoneNumber] - Phone number
-     * @param {string} [customerData.emailAddress] - Email address (max 100 characters)
      * @param {Object} [customerData.address] - Address object
      * @param {string} [customerData.customerStatus] - Customer status
      * @returns {Promise<CreateCustomerResponse>} Created customer with customerId and sortCode
@@ -153,39 +141,25 @@ class CustomersApi extends BaseApi {
 
     /**
      * Update customer information
-     * PUT /customers/{customerId} or PUT /ims/customers/{customerId}
-     * Routes based on explicit system parameter
+     * PUT /customers/{customerId}
      * @param {string} customerId - Unique identifier for the customer (numeric, without prefix)
      * @param {Object} customerData - Updated customer data
-     * @param {string} [system] - System type: 'IMS' or 'CICS' (optional, defaults to CICS)
      * @returns {Promise<Customer>} Updated customer details
      */
-    async updateCustomer(customerId, customerData, system = 'CICS') {
-        if (system === 'IMS') {
-            // Route to IMS endpoint
-            return this.request(`${this.configuration.baseUrl}/ims/customers/${customerId}`, {
-                method: 'PUT',
-                body: JSON.stringify(customerData)
-            });
-        } else {
-            // Route to CICS endpoint
-            return this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
-                method: 'PUT',
-                body: JSON.stringify(customerData)
-            });
-        }
+    async updateCustomer(customerId, customerData) {
+        return this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
+            method: 'PUT',
+            body: JSON.stringify(customerData)
+        });
     }
 
     /**
-     * Delete customer
-     * DELETE /customers/{customerId}
-     * @param {string} customerId - Unique customer identifier
-     * @returns {Promise<void>} No content on success
+     * Delete customer (stub - not in OpenAPI spec)
+     * @param {string} customerNumber - Unique customer identifier
+     * @returns {Promise<Object>} Rejected promise
      */
-    async deleteCustomer(customerId) {
-        await this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
-            method: 'DELETE'
-        });
+    async deleteCustomer(customerNumber) {
+        throw new Error('Customer deletion is not supported in the OpenBanking API specification');
     }
 
     /**
@@ -298,42 +272,16 @@ class AccountsApi extends BaseApi {
 
     /**
      * Deposit funds to an account
-     * POST /accounts/{accountId}/deposit (CICS)
-     * POST /ims/accounts/{customerId}/{accountId}/deposit (IMS)
+     * POST /accounts/{accountId}/deposit
      * @param {string} accountId - Unique identifier for the account
      * @param {Object} depositData - Deposit data
      * @param {number} depositData.amount - Deposit amount (must be positive, minimum 0.01)
      * @param {string} depositData.sortCode - 6-digit bank sort code
      * @param {string} [depositData.description] - Description of the deposit (max 40 characters)
-     * @param {string} [customerId] - Customer ID (required for IMS, optional for CICS)
      * @returns {Promise<Object>} Deposit result with updated balances
      */
-    async depositToAccount(accountId, depositData, customerId = null) {
-        let url;
-        const system = getSystemFromCustomerId(customerId);
-        
-        console.log('=== DEPOSIT DEBUG ===');
-        console.log('customerId received:', customerId);
-        console.log('system determined:', system);
-        
-        // Strip the C/I prefix to get numeric ID for API
-        const numericCustomerId = customerId ? customerId.toString().replace(/^[CI]/i, '') : null;
-        console.log('numericCustomerId:', numericCustomerId);
-        
-        if (system === 'IMS' && numericCustomerId) {
-            // IMS endpoint: /ims/accounts/{customerId}/{accountId}/deposit
-            url = `${this.configuration.baseUrl}/ims/accounts/${numericCustomerId}/${accountId}/deposit`;
-            console.log('Using IMS endpoint');
-        } else {
-            // CICS endpoint: /accounts/{accountId}/deposit
-            url = `${this.configuration.baseUrl}/accounts/${accountId}/deposit`;
-            console.log('Using CICS endpoint');
-        }
-        
-        console.log('Final URL:', url);
-        console.log('===================');
-        
-        return this.request(url, {
+    async depositToAccount(accountId, depositData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/deposit`, {
             method: 'POST',
             body: JSON.stringify(depositData)
         });
@@ -430,7 +378,6 @@ export { ApiClient, CustomersApi, AccountsApi, ApiConfiguration };
  * @property {string} lastName - Customer last name
  * @property {string} [dateOfBirth] - Customer date of birth (YYYY-MM-DD)
  * @property {string} [phoneNumber] - Customer phone number
- * @property {string} [emailAddress] - Customer email address (max 100 characters)
  * @property {Address} [address] - Customer address
  * @property {string} [customerStatus] - Current status (ACTIVE, INACTIVE, SUSPENDED)
  * @property {string} [createdDate] - Date when customer account was created

@@ -62,7 +62,6 @@
           03 HV-CUSTOMER-LAST-NAME      PIC X(50).
           03 HV-CUSTOMER-DOB            PIC S9(9) COMP.
           03 HV-CUSTOMER-PHONE          PIC X(20).
-          03 HV-CUSTOMER-EMAIL          PIC X(100).
           03 HV-CUSTOMER-ADDR-LINE1     PIC X(50).
           03 HV-CUSTOMER-ADDR-LINE2     PIC X(50).
           03 HV-CUSTOMER-CITY           PIC X(50).
@@ -272,7 +271,6 @@
                      CUSTOMER_LAST_NAME,
                      CUSTOMER_DATE_OF_BIRTH,
                      CUSTOMER_PHONE,
-                     CUSTOMER_EMAIL,
                      CUSTOMER_ADDR_LINE1,
                      CUSTOMER_ADDR_LINE2,
                      CUSTOMER_CITY,
@@ -290,7 +288,6 @@
                      :HV-CUSTOMER-LAST-NAME,
                      :HV-CUSTOMER-DOB,
                      :HV-CUSTOMER-PHONE,
-                     :HV-CUSTOMER-EMAIL,
                      :HV-CUSTOMER-ADDR-LINE1,
                      :HV-CUSTOMER-ADDR-LINE2,
                      :HV-CUSTOMER-CITY,
@@ -339,10 +336,6 @@
               MOVE COMM-PHONE TO HV-CUSTOMER-PHONE
            END-IF.
 
-           IF COMM-EMAIL(1:1) NOT = ' '
-              MOVE COMM-EMAIL TO HV-CUSTOMER-EMAIL
-           END-IF.
-
            IF COMM-ADDR-LINE1 OF COMM-ADDR (1:1) NOT = ' '
               MOVE COMM-ADDR-LINE1 OF COMM-ADDR
                  TO HV-CUSTOMER-ADDR-LINE1
@@ -374,7 +367,6 @@
                      CUSTOMER_LAST_NAME = :HV-CUSTOMER-LAST-NAME,
                      CUSTOMER_DATE_OF_BIRTH = :HV-CUSTOMER-DOB,
                      CUSTOMER_PHONE = :HV-CUSTOMER-PHONE,
-                     CUSTOMER_EMAIL = :HV-CUSTOMER-EMAIL,
                      CUSTOMER_ADDR_LINE1 = :HV-CUSTOMER-ADDR-LINE1,
                      CUSTOMER_ADDR_LINE2 = :HV-CUSTOMER-ADDR-LINE2,
                      CUSTOMER_CITY = :HV-CUSTOMER-CITY,
@@ -409,7 +401,6 @@
            MOVE HV-CUSTOMER-LAST-NAME TO COMM-LAST-NAME
               OF COMM-NAME.
            MOVE HV-CUSTOMER-PHONE TO COMM-PHONE.
-           MOVE HV-CUSTOMER-EMAIL TO COMM-EMAIL.
            MOVE HV-CUSTOMER-ADDR-LINE1 TO COMM-ADDR-LINE1
               OF COMM-ADDR.
            MOVE HV-CUSTOMER-ADDR-LINE2 TO COMM-ADDR-LINE2

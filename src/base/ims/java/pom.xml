@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ibm.ims</groupId>
+	<artifactId>nazare-ims-jmp</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.15.0</version>
+				<configuration>
+					<release>21</release>
+					<staleMillis>1</staleMillis>
+					<!-- NOTE: The 'useIncrementalCompilation' flag is set to 'false' due
+						to a known bug. See https://issues.apache.org/jira/browse/MCOMPILER-209 -->
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+				</configuration>
+			</plugin>
+		</plugins>
+		<directory>${outputDir}</directory>
+	</build>
+
+	<dependencies>
+		<!-- DB2 JDBC Driver from Maven Central -->
+		<dependency>
+			<groupId>com.ibm.db2</groupId>
+			<artifactId>jcc</artifactId>
+			<version>12.1.4.0</version>
+		</dependency>
+
+		<!-- IMS Universal Driver from Maven Central -->
+		<dependency>
+			<groupId>com.ibm.ims</groupId>
+			<artifactId>udb</artifactId>
+			<version>15.166</version>
+		</dependency>
+
+		<!-- IBM z/OS Java SDK from Maven Central -->
+		<dependency>
+			<groupId>com.ibm.jzos</groupId>
+			<artifactId>ibmjzos</artifactId>
+			<version>2.4.11.3</version>
+		</dependency>
+		
+		<!-- JAXB API -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.4.0-b180830.0359</version>
+		</dependency>
+	</dependencies>
+
+
+
+
+	<properties>
+		<maven.compiler.release>21</maven.compiler.release>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+</project>

@@ -8,10 +8,10 @@ mappings:
         nullable: false
         template: "{{$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-ACCNO\"}}"
     - availableBalance:
-        required: true
-        nullable: false
+        required: false
+        nullable: true
         expression: "$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-AV-BAL\""
     - actualBalance:
-        required: true
-        nullable: false
+        required: false
+        nullable: true
         expression: "$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-ACT-BAL\""

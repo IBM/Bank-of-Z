@@ -10,5 +10,4 @@ mappings:
     - message:
         required: true
         nullable: false
-        template: "Invalid request parameters — check title, date of birth, and required\
-          \ fields"
+        template: "Invalid request parameters — check title, date of birth, and required fields"

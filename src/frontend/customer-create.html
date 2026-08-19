@@ -36,12 +36,9 @@
             <h1>Create new customer</h1>
         </cds-layer>
 
-        <div class="cds--content">
-            <cds-stack gap="7">
-                <h2>Customer Information</h2>
-                
-                <div class="form-constrained">
-                    <cds-stack gap="7">
+        <cds-grid class="cds--content">
+            <cds-column lg="8" md="6" sm="4">
+                <cds-stack gap="7">
                     <cds-select id="title" label-text="Title">
                         <cds-select-item value="Mr">Mr</cds-select-item>
                         <cds-select-item value="Mrs">Mrs</cds-select-item>
@@ -74,12 +71,6 @@
                         placeholder="Enter phone number"
                         maxlength="20"
                         required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="emailAddress"
-                        label="Email address"
-                        placeholder="Enter email address"
-                        maxlength="100">
                     </cds-text-input>
                     <cds-text-input
                         id="addressLine1"
@@ -125,10 +116,14 @@
                     </cds-date-picker>
                     <cds-button id="submit-btn" type="submit" style="width:100%;">Submit</cds-button>
                 </cds-stack>
-                </div>
-            </cds-stack>
-        </div>
-    </cds-layer>
+            </cds-column>
+            <cds-column lg="8" md="2" sm="0">
+                <img class="page-image"
+                        src="assets/images/ibm-fireside-chat-trans-bus.png" 
+                        alt="customer">
+            </cds-column>
+        </cds-grid>
+    </div>
 
     <!-- Carbon Web Components - Component-specific imports -->
     <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
@@ -166,7 +161,7 @@
         // Mirrors the OpenAPI constraints in src/api/src/main/api/openapi.yaml#CreateCustomerRequest.
         // The backend (CRECUST COBOL) silently truncates over-length names instead of
         // rejecting them, so this is the only place that actually stops it.
-        function validateCustomerData({ firstName, lastName, phoneNumber, emailAddress, dateOfBirth, addressLine1, addressLine2, city, postalCode, country }) {
+        function validateCustomerData({ firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country }) {
             const requiredFields = {
                 'First name': firstName,
                 'Last name': lastName,
@@ -187,16 +182,12 @@
                 'First name': [firstName, 50],
                 'Last name': [lastName, 50],
                 'Phone number': [phoneNumber, 15],
-                'Email address': [emailAddress, 100],
                 'Address line 1': [addressLine1, 100],
                 'Address line 2': [addressLine2, 100],
                 'City': [city, 50],
                 'Postal code': [postalCode, 10],
                 'Country': [country, 50]
             };
-            if (emailAddress && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
-                return 'Email address must be a valid email format';
-            }
             for (const [label, [value, max]] of Object.entries(maxLengths)) {
                 if (value && value.length > max) {
                     return `${label} must be ${max} characters or fewer (currently ${value.length})`;
@@ -216,7 +207,6 @@
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
-            const emailAddress = document.getElementById('emailAddress').value;
             const dateOfBirth = document.getElementById('dateOfBirth').value;
             const addressLine1 = document.getElementById('addressLine1').value;
             const addressLine2 = document.getElementById('addressLine2').value;
@@ -225,7 +215,7 @@
             const country = document.getElementById('country').value;
 
             const validationError = validateCustomerData({
-                firstName, lastName, phoneNumber, emailAddress, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
+                firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
             });
             if (validationError) {
                 showErrorModal('Validation Error', validationError);
@@ -238,7 +228,6 @@
                 lastName,
                 dateOfBirth: dateOfBirth ? parseDate(dateOfBirth) : undefined,
                 phoneNumber: phoneNumber || undefined,
-                emailAddress: emailAddress || undefined,
                 address: {
                     addressLine1,
                     addressLine2: addressLine2 || undefined,

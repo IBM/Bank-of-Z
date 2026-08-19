@@ -22,10 +22,6 @@ tags:
   - name: Transactions
     description: Transaction history endpoints
 
-servers:
-  - url: /api
-    description: z/OS Connect API base path
-
 security:
   - OAuth2:
       - accounts
@@ -46,7 +42,7 @@ paths:
           description: Unique identifier for the customer
           schema:
             type: string
-            example: "000000015"
+            example: "CUST123456"
       responses:
         '200':
           description: Customer information retrieved successfully
@@ -64,44 +60,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    put:
-      tags:
-        - Customers
-      summary: Update customer information
-      description: Update detailed information for a specific customer
-      operationId: updateIMSCustomer
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          description: Unique identifier for the customer
-          schema:
-            type: string
-            example: "000000015"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CustomerUpdate'
-      responses:
-        '200':
-          description: Customer updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Customer'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  
+
   /ims/customers/{customerId}/accounts:
     get:
       tags:
@@ -116,7 +75,7 @@ paths:
           description: Unique identifier for the customer
           schema:
             type: string
-            example: "000000015"
+            example: "CUST123456"
       responses:
         '200':
           description: Accounts retrieved successfully
@@ -149,7 +108,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "1504" #pragma: allowlist secret
+            example: "ACC987654321" #pragma: allowlist secret
       responses:
         '200':
           description: Account details retrieved successfully
@@ -182,7 +141,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "1504" #pragma: allowlist secret
+            example: "ACC987654321" #pragma: allowlist secret
       responses:
         '200':
           description: Balance information retrieved successfully
@@ -190,52 +149,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Balance'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /ims/accounts/{customerId}/{accountId}/deposit:
-    post:
-      tags:
-        - Accounts
-      summary: Deposit funds to account
-      description: Deposit funds into a specific account
-      operationId: depositToIMSAccount
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          description: Unique identifier for the customer identifier
-          schema:
-            type: string
-            example: "000000015" #pragma: allowlist secret
-        - name: accountId
-          in: path
-          required: true
-          description: Unique identifier for the account
-          schema:
-            type: string
-            example: "1504" #pragma: allowlist secret
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DepositRequest'
-      responses:
-        '201':
-          description: Deposit successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DepositResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -335,33 +248,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      tags:
-        - Customers
-      summary: Delete customer
-      description: Delete a specific customer
-      operationId: deleteCustomer
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          description: Unique identifier for the customer
-          schema:
-            type: string
-            example: "0000010000000001"
-      responses:
-        '204':
-          description: Customer deleted successfully
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -560,7 +446,7 @@ paths:
           description: Unique identifier for the account
           schema:
             type: string
-            example: "987654-3000" #pragma: allowlist secret
+            example: "ACC987654321" #pragma: allowlist secret
         - name: fromDate
           in: query
           description: Start date for transaction history (ISO 8601 format)
@@ -696,11 +582,6 @@ components:
           maxLength: 20
           description: Customer phone number
           example: "+44 20 7946 0958"
-        emailAddress:
-          type: string
-          maxLength: 100
-          description: Customer email address
-          example: "john.smith@example.com"
         address:
           $ref: '#/components/schemas/Address'
         customerStatus:
@@ -756,11 +637,6 @@ components:
           type: string
           description: Customer phone number
           example: "+44 20 7946 0958"
-        emailAddress:
-          type: string
-          maxLength: 100
-          description: Customer email address
-          example: "john.smith@example.com"
         address:
           $ref: '#/components/schemas/Address'
         customerStatus:

@@ -54,8 +54,6 @@ jobs:
                 . ./.profile &&
                 cd ${{ env.uniqueWorkspaceId }} &&
                 if [ -d ${{ env.application }} ]; then cd ${{ env.application }}; fi &&
-                BASE_URL=http://${{ env.zosHost }}:9080/api \
-                FRONTEND_URL=http://${{ env.zosHost }}:9081 \
                 bash .setup/setup-common.sh verify-installation
               "
 

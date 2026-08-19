@@ -2,9 +2,11 @@
 # run-all.sh — Run every test_*.sh in the tests/ directory and report results.
 #
 # Environment variables forwarded to each test script:
-#   BASE_URL       z/OS Connect API base URL  (e.g. http://<host>:<port>/api)
-#   FRONTEND_URL   Frontend Liberty base URL  (e.g. http://<host>:<port>)
-#   IMS_DISABLED   Set to "true" to skip IMS tests
+#   BASE_URL           z/OS Connect API base URL  (e.g. http://<host>:<port>/api)
+#   FRONTEND_URL       Frontend Liberty base URL  (e.g. http://<host>:<port>)
+#   BASE_HTTPS_URL     z/OS Connect HTTPS URL (e.g. https://<host>:<port>/api; optional)
+#   FRONTEND_HTTPS_URL Frontend Liberty HTTPS URL (e.g. https://<host>:<port>; optional)
+#   IMS_DISABLED       Set to "true" to skip IMS tests
 #
 # Exit code: 0 if all tests pass, 1 if any test fails.
 set -eu
@@ -43,9 +45,11 @@ run_test() {
 echo "================================================================"
 echo " Bank of Z — Installation Verification Tests"
 echo "================================================================"
-echo " BASE_URL     : ${BASE_URL:-<not set, using script defaults>}"
-echo " FRONTEND_URL : ${FRONTEND_URL:-<not set, using script defaults>}"
-echo " IMS_DISABLED : ${IMS_DISABLED:-false}"
+echo " BASE_URL           : ${BASE_URL:-<not set, using script defaults>}"
+echo " FRONTEND_URL       : ${FRONTEND_URL:-<not set, using script defaults>}"
+echo " BASE_HTTPS_URL     : ${BASE_HTTPS_URL:-<not set, HTTPS tests will be skipped>}"
+echo " FRONTEND_HTTPS_URL : ${FRONTEND_HTTPS_URL:-<not set, HTTPS tests will be skipped>}"
+echo " IMS_DISABLED       : ${IMS_DISABLED:-false}"
 echo "================================================================"
 
 for script in "$TESTS_DIR"/test_*.sh; do

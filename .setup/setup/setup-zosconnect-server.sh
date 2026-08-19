@@ -74,7 +74,6 @@ fi
 # =========================
 set +e
 opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null
-jcan P "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 sleep 5
 mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
@@ -308,7 +307,7 @@ if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
     print_info "  Stop:   opercmd 'C BAQ${APP_SHORT_NAME}'"
 else
     print_info "  Start:  jsub '${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)'"
-    print_info "  Stop:   jcan P 'BAQ${APP_SHORT_NAME}'"
+    print_info "  Stop:   opercmd 'C BAQ${APP_SHORT_NAME}'"
 fi
 print_info ""
 

@@ -10,7 +10,7 @@
 # Environment variables:
 #   BASE_URL       Base URL of the z/OS Connect API server (default: http://localhost:9080/api)
 #   BASE_HTTPS_URL HTTPS base URL (default: https://localhost:9444/api; skipped when not set)
-set -eu
+set -e
 
 # shellcheck source=test-setup.sh
 source "$(dirname "$0")/test-setup.sh"

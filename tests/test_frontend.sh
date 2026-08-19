@@ -6,7 +6,7 @@
 # Environment variables:
 #   FRONTEND_URL        Base URL of the Frontend Liberty server (default: http://localhost:9081)
 #   FRONTEND_HTTPS_URL  HTTPS base URL (default: https://localhost:9445; skipped when not set)
-set -eu
+set -e
 
 # shellcheck source=test-setup.sh
 source "$(dirname "$0")/test-setup.sh"

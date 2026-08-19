@@ -9,7 +9,7 @@
 #   IMS_DISABLED       Set to "true" to skip IMS tests
 #
 # Exit code: 0 if all tests pass, 1 if any test fails.
-set -eu
+set -e
 
 TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -45,11 +45,6 @@ run_test() {
 echo "================================================================"
 echo " Bank of Z — Installation Verification Tests"
 echo "================================================================"
-echo " BASE_URL           : ${BASE_URL:-<not set, using script defaults>}"
-echo " FRONTEND_URL       : ${FRONTEND_URL:-<not set, using script defaults>}"
-echo " BASE_HTTPS_URL     : ${BASE_HTTPS_URL:-<not set, HTTPS tests will be skipped>}"
-echo " FRONTEND_HTTPS_URL : ${FRONTEND_HTTPS_URL:-<not set, HTTPS tests will be skipped>}"
-echo " IMS_DISABLED       : ${IMS_DISABLED:-false}"
 echo "================================================================"
 
 for script in "$TESTS_DIR"/test_*.sh; do

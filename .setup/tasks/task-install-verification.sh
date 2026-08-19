@@ -32,7 +32,7 @@ print_info "IMS_DISABLED : ${IMS_DISABLED}"
 # =========================
 # Locate test runner
 # =========================
-TESTS_DIR="${BANK_DIR}/tests"
+TESTS_DIR="${SCRIPTS_DIR}/../../tests"
 RUN_ALL="${TESTS_DIR}/run-all.sh"
 
 if [ ! -f "$RUN_ALL" ]; then

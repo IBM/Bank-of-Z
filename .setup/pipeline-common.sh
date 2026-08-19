@@ -99,6 +99,30 @@ stage_deploy_bank_of_z() {
 
 
 #########################################################
+# STAGE: Verify Installation
+#########################################################
+stage_verify_installation() {
+    print_stage "STAGE: Post-install Verification Tests"
+
+    if [ ! -f "$SCRIPTS_DIR/tasks/task-install-verification.sh" ]; then
+        print_error "Verification task not found: $SCRIPTS_DIR/tasks/task-install-verification.sh"
+        exit 1
+    fi
+
+    print_info "Running installation verification script..."
+    print_info "Executing: bash $SCRIPTS_DIR/tasks/task-install-verification.sh"
+    cd "$SCRIPTS_DIR"
+
+    set -o pipefail
+    if bash ${SCRIPTS_DIR}/tasks/task-install-verification.sh; then
+        print_success "Installation verification completed successfully"
+    else
+        print_error "Installation verification failed"
+        exit 1
+    fi
+}
+
+#########################################################
 # Main execution helpers
 #########################################################
 print_phase_next_step() {
@@ -126,12 +150,14 @@ print_usage() {
     echo "  build             Build the Bank of Z baseline"
     echo "  deploy            Deploy the Bank of Z baseline"
     echo "  build-and-deploy  Build and deploy the Bank of Z updates"
+    echo "  verify            Run post-install verification tests"
     echo ""
     echo "Examples:"
     echo "  bash pipeline-common.sh validate-prereqs"
     echo "  bash pipeline-common.sh build"
     echo "  bash pipeline-common.sh deploy"
     echo "  bash pipeline-common.sh build-and-deploy"
+    echo "  bash pipeline-common.sh verify"
 }
 
 print_phase_next_step() {
@@ -207,6 +233,19 @@ main_deploy() {
     print_success "DEPLOY setup completed successfully!"
 }
 
+main_verify() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_verify_installation
+
+    # Summary
+    print_stage "VERIFICATION COMPLETE"
+    print_success "Installation verification completed successfully!"
+}
+
 #########################################################
 # Main execution
 #########################################################
@@ -247,6 +286,9 @@ main() {
             main_static_scan
             main_build "$@"
             main_deploy
+            ;;
+        verify)
+            main_verify
             ;;
         -h|--help|help|"")
             print_usage

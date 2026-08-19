@@ -488,14 +488,21 @@ print_usage() {
     echo "Usage: bash setup-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zconfig, DBB, wazi-deploy)"
-    echo "  environment       Initialize workspace and infrastructure prerequisites"
-    echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
+    echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
+    echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
+    echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
+    echo "  bash setup-common.sh verify-installation"
+    echo ""
+    echo "verify-installation environment variables:"
+    echo "  BASE_URL       z/OS Connect API base URL  (default: derived from config)"
+    echo "  FRONTEND_URL   Frontend Liberty base URL  (default: derived from config)"
+    echo "  IMS_DISABLED   Set to true to skip IMS-specific tests"
 }
 
 #########################################################
@@ -576,6 +583,40 @@ main_validation() {
     print_phase_next_step "validation"
 }
 
+#########################################################
+# STAGE: Post-install verification tests
+#########################################################
+stage_verify_installation() {
+    print_stage "STAGE: Post-install Verification Tests"
+
+    local task="${SCRIPTS_DIR}/tasks/task-install-verification.sh"
+
+    if [ ! -f "$task" ]; then
+        print_error "Verification task not found: $task"
+        exit 1
+    fi
+
+    set -o pipefail
+    if bash "$task"; then
+        print_success "All verification tests passed"
+    else
+        print_error "One or more verification tests failed"
+        exit 1
+    fi
+}
+
+main_verify_installation() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_verify_installation
+
+    print_stage "VERIFICATION COMPLETE"
+    print_success "Installation verification completed successfully!"
+}
+
 main() {
     local phase="${1:-}"
 
@@ -615,6 +656,9 @@ main() {
             else
                 jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"  2>/dev/null || true
             fi
+            ;;
+        verify-installation)
+            main_verify_installation
             ;;
         -h|--help|help|"")
             print_usage

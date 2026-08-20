@@ -481,8 +481,8 @@ ims:
           level: HIGH
           pages: '100'
         exitmbr:
-        - HWSEXIT0
-        - HWS
+        - member_name: HWSEXIT0
+          ims_component: HWS
     - member_name: DFSJVMEV
       config:
         libpath:

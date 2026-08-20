@@ -36,8 +36,6 @@ stage_stop_tasks() {
     jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
     jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
     sleep 5
-    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
-    sleep 1
     opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null
     sleep 1
     opercmd "C ${IMS_DATASTORE}OM" 2>/dev/null
@@ -45,6 +43,13 @@ stage_stop_tasks() {
     opercmd "C ${IMS_DATASTORE}RM" 2>/dev/null
     sleep 1
     opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null
+    sleep 1
+    # IMS Connect
+    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}ODBM" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}RL" 2>/dev/null
     
     # =========================
     # Stop IBM CICS regions

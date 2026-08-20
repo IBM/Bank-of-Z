@@ -12,6 +12,8 @@ vars:
   db2_java_dir: "/usr/lpp/db2d10"
   ims_target_user: IBMUSER
   ims_ixvolser: "IMSV15"
+  ims_irlm_enablement: false
+  ims_database_lock_manager_server_name: "XRLM"
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
@@ -80,8 +82,8 @@ ims:
         dependent_region_scheduling_connection_id: "{{ vars.imsid }}"
         ims_identifier: "{{ vars.imsid }}"
         time_to_calculate_iovf_free_space_for_each_open_area: 7200
-        irlm_enablement: false
-        database_lock_manager_server_name: XRLM
+        irlm_enablement: "{{ vars.ims_irlm_enablement }}"
+        database_lock_manager_server_name: "{{ vars.ims_database_lock_manager_server_name }}"
         resource_access_security_checking_option: A
         long_message_record_size: 0
         number_of_distinct_updates_to_dedb_ci_before_combining_into_single_logrecord_of_entire_ci: 10
@@ -408,7 +410,7 @@ ims:
           member: "{{ vars.imsid }}HWS"
           tmember: "{{ vars.ims_plex }}"
         odaccess:
-          odbmautoconn: false
+          odbmautoconn: true
           imsplex:
             member: HWS1
             tmember: "{{ vars.ims_plex }}"
@@ -426,18 +428,6 @@ ims:
           ipv6: true
           maxsoc: 600
           exit:
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
           - HWSIMSO0
           - HWSIMSO1
           - HWSSMPL0

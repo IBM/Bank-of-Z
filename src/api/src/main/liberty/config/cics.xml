@@ -2,6 +2,7 @@
 <server description="CICS configuration">
   <featureManager>
     <feature>zosconnect:cics-1.0</feature>
+    <feature>zosconnect:mcp-1.0</feature>
   </featureManager>
 
   <zosconnect_cicsIpicConnection id="bankzCicsConnection" host="${CICS_HOST}" port="${CICS_PORT}"

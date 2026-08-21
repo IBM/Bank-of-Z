@@ -36,7 +36,7 @@ set +e
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
-sleep 5
+sleep 20
 jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
 jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
 jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null

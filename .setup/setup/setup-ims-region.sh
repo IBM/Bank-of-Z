@@ -28,11 +28,18 @@ done) 2>&1
 export ZCONFIG_HOME=$(echo "$ZCONFIG_HOME" | sed "s|~|$HOME|g")
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
+export BOZ_IMS_HLQ="${IMS_APP_HLQ}"
 
 # =========================
 # Stop IBM BOZ regions
 # =========================
 set +e
+# Delete stale stop members so jsub fails silently rather than executing
+# outdated JCL that may reference deleted datasets. Members are rebuilt
+# correctly by setup-ims-bankz-regions.sh on the next full provision.
+mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)" 2>/dev/null || true
+mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)" 2>/dev/null || true
+mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
@@ -89,8 +96,7 @@ IMS_USER=$(printf '%s' "${IMS_USER}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
-zconfig apply -e ims_user="${IMS_USER}" \
-              -e ims_user_lower="${IMS_USER_LOWER}" \
+zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \
               -e ims_sys_hlq="${IMS_SYS_HLQ}" \
@@ -100,6 +106,7 @@ zconfig apply -e ims_user="${IMS_USER}" \
               -e ims_java_dir="${IMS_JAVA_FOLDER}" \
               -e ims_java_home="${IMS_JAVA_HOME}" \
               -e db2_ssid="${DB2_SSID}" \
+              -e debug_hlq="${DEBUG_HLQ}" \
               -e ims_target_user="${IMS_USER}" \
               -e ims_ixvolser="${IMS_IXVOLSER}" \
               ims-region.yaml -v

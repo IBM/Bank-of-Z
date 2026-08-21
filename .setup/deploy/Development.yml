@@ -59,6 +59,7 @@ db2_bind_plan_template: "db2_bind_plan.jcl.j2"
 
 # z/OS Connect
 default_zos_connect_root: "{{ extra_vars.zos_connect_root if extra_vars.zos_connect_root is defined else '/var/zosconnect/servers/wazideploy-cics' }}"
+zos_connect_root: "{{ default_zos_connect_root }}"
 default_zos_connect_job_name: "{{ extra_vars.zos_connect_job_name if extra_vars.zos_connect_job_name is defined else 'BAQ' + app.short_name }}"
 cics_host: "{{ extra_vars.cics_host if extra_vars.cics_host is defined else 'localhost' }}"
 cics_port: "{{ extra_vars.cics_port if extra_vars.cics_port is defined else '2006' }}"

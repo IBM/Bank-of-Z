@@ -111,7 +111,7 @@ zconfig apply -e ims_user="${IMS_USER}" \
               -e ims_target_user="${IMS_USER}" \
               -e ims_ixvolser="${IMS_IXVOLSER}" \
               -e ims_irlm_enablement="${IMS_IRLM_ENABLEMENT:-false}" \
-              -e ims_database_lock_manager_server_name="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-XRLM}" \
+              -e ims_database_lock_manager_server_name="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-IRLM}" \
               ims-region.yaml -v
 
 RC=$?

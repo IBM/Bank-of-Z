@@ -43,7 +43,7 @@ mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
 jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
-sleep 5
+sleep 20
 jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
 jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
 jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
@@ -96,7 +96,8 @@ IMS_USER=$(printf '%s' "${IMS_USER}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
-zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
+zconfig apply -e ims_user="${IMS_USER}" \
+              -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \
               -e ims_sys_hlq="${IMS_SYS_HLQ}" \
@@ -109,6 +110,8 @@ zconfig apply -e ims_user="${IMS_USER}" -e ims_user_lower="${IMS_USER_LOWER}"\
               -e debug_hlq="${DEBUG_HLQ}" \
               -e ims_target_user="${IMS_USER}" \
               -e ims_ixvolser="${IMS_IXVOLSER}" \
+              -e ims_irlm_enablement="${IMS_IRLM_ENABLEMENT:-false}" \
+              -e ims_database_lock_manager_server_name="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-XRLM}" \
               ims-region.yaml -v
 
 RC=$?

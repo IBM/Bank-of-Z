@@ -54,7 +54,7 @@ stage_stop_tasks() {
     sleep 1
     opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null
     sleep 1
-    opercmd "C ${IMS_DATASTORE}RL" 2>/dev/null
+    opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null
     
     # =========================
     # Stop IBM CICS regions

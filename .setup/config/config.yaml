@@ -72,6 +72,8 @@ global:
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
   ims_ixvolser: "IMSV15"
+  ims_irlm_enablement: false
+  ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
   db2_hlq: "DB2V13"
@@ -246,6 +248,8 @@ ims:
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
   dfs_imsplex: "{{ global.ims_dfsplex }}"
   ixvolser: "{{ global.ims_ixvolser }}"
+  irlm_enablement: "{{ global.ims_irlm_enablement }}"
+  database_lock_manager_server_name: "{{ global.ims_database_lock_manager_server_name }}"
   regions:
   - with_db2: yes
     use_pseudo_wfi: no

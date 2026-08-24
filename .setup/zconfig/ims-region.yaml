@@ -14,7 +14,7 @@ vars:
   ims_ixvolser: "IMSV15"
   debug_hlq: EQAW
   ims_irlm_enablement: false
-  ims_database_lock_manager_server_name: "XRLM"
+  ims_database_lock_manager_server_name: "IRLM"
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
@@ -25,6 +25,8 @@ ims:
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: "{{ vars.ims_target_user }}"
+  irlm:
+      irlmnm: "{{ vars.ims_database_lock_manager_server_name }}"
   # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
   ims_lgmsg:
       primary_space: 84

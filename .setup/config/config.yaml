@@ -169,6 +169,7 @@ wazideploy:
 debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
+  eqaprof_conf_dir: "{{ sandbox.path }}/debug"
 
 # z/OS Connect (API exposure only)
 # Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.

@@ -470,6 +470,34 @@ stage_setup_ims_region() {
 }
 
 #########################################################
+# STAGE: Setup DPS
+#########################################################
+stage_setup_debug_profile_service() {
+    print_stage "STAGE: Configure Debug Profile Service"
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-debug.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-debug.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Debug Profile Service setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-debug.sh"
+    cd "$BANK_DIR"
+    
+    
+    set -o pipefail
+    if .setup/setup/setup-debug.sh; then
+        print_success "Debug Profile Service setup completed successfully"
+    else
+        print_error "Failed to setup Debug Profile Service"
+        exit 1
+    fi
+}
+
+
+#########################################################
 # Main execution helpers
 #########################################################
 print_phase_next_step() {
@@ -533,6 +561,8 @@ main_setup() {
         stage_setup_ims_database
         stage_setup_ims_bankz_regions
     fi
+
+    stage_setup_debug_profile_service
 
     # Certificates
     if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then

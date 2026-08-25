@@ -205,45 +205,8 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --templateFile "$SCRIPTS_DIR/../jcl/cics/tcpip-create.j2"  --outputFile "/tmp/tcpip-create-$$.jcl"
 run_job_and_wait "/tmp/tcpip-create-$$.jcl"
 
-opercmd "S EQARMTD"
-
-# ======================================
-# Stage 5: Add CICS region to dtcn.ports
-# ======================================
-print_stage "Stage 6: Add CICS region to dtcn.ports"
 # =========================
-# Update /etc/debug/dtcn.ports
-# =========================
-DTCN_PORTS="/etc/debug/dtcn.ports"
-DTCN_PORTS_TMP="/tmp/dtcn.ports$$"
-print_info "Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
-
-if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PORTS}"; then
-    print_info "CICSBOZ already present in ${DTCN_PORTS}"
-else
-    print_info "Trying to add CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
-    set +e
-    chtag -tc IBM-1047 "$DTCN_PORTS"
-    RC=$?
-    set -e
-    if [ $RC -eq 0 ]; then
-        rm -f /tmp/dtcn.ports*
-        cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
-        echo "" >> "$DTCN_PORTS_TMP"
-        echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
-        cp "${DTCN_PORTS_TMP}" "$DTCN_PORTS"
-        chtag -r "$DTCN_PORTS"
-        opercmd "C EQAPROF"  
-        sleep 5
-        opercmd "S EQAPROF" 
-        sleep 5
-    else
-        print_warning "Fail adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS} (maybe permission deny)."
-    fi
-fi
-
-# =========================
-# # Stage 6: Configure RACF STARTED profile
+# # Stage 5: Configure RACF STARTED profile
 # =========================
 print_info "Configuring RACF STARTED profile..."
 set +e
@@ -259,7 +222,7 @@ chown -R "$CICS_USER" "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
 set -e
 
 # =========================
-# Stage 7: Generate CICS proc
+# Stage 6: Generate CICS proc
 # =========================
 # Create JCL with each line padded to exactly 80 characters for FB80 dataset
 rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
@@ -293,7 +256,7 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 dcp "/tmp/CICS${APP_SHORT_NAME}J.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
 
 # =========================
-# Stage 8: Start CICS region
+# Stage 7: Start CICS region
 # =========================
 print_stage "STAGE 5: Start CICS region"
 if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
@@ -316,7 +279,7 @@ fi
 print_info ""
 
 # =========================
-# Stage 9: Cleanup
+# Stage 8: Cleanup
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 print_success "CICS Bank of Z setup completed"

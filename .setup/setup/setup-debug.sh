@@ -85,7 +85,7 @@ print_stage "Stage 3: Modify eqaprof.env to customize for BANKZ IMS"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${IMS_APP_HLQ}" \
     --extraVar "debug_hlq=${DEBUG_HLQ}" \
-    --extraVar ="app_hlq=${APP_HLQ}" \
+    --extraVar "app_hlq=${APP_HLQ}" \
     --templateFile "$SCRIPTS_DIR/../debug_config/eqaprof.env.j2"  --outputFile "${EQAPROF_CONF_DIR}/eqaprof.env"
 
 

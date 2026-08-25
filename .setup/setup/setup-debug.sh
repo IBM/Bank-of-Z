@@ -82,6 +82,9 @@ fi
 # =======================================================
 print_stage "Stage 3: Modify eqaprof.env to customize for BANKZ IMS"
 
+EQADREST_ENV="/etc/debug/eqadrest.env"
+cp "${EQADREST_ENV}" "${EQAPROF_CONF_DIR}/eqadrest.env"
+
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${IMS_APP_HLQ}" \
     --extraVar "debug_hlq=${DEBUG_HLQ}" \
@@ -94,7 +97,7 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 # ===================================
 set +e
 print_stage "Stage 4: Start EQAPROF task"
-opercmd "S EQAPROF,CFGDIR=${EQAPROF_CONF_DIR}" 
+opercmd -p "S EQAPROF,CFGDIR='${EQAPROF_CONF_DIR}'" 
 
 if netstat | grep -q "EQARMTD"
 then 

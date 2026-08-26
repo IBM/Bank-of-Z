@@ -287,7 +287,8 @@ application:
           value: "bank-frontend-vanilla.war"
         - name: zosConnectHttpPort
           value: "${ZOSCONNECT_HTTP_PORT}"
-   
+        - name: zosConnectHttpsPort
+          value: "${ZOSCONNECT_HTTPS_PORT}"
 
     # ----------------------------------------------------------
     # ServerXmlPackager task

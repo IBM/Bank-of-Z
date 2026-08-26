@@ -70,12 +70,14 @@ stage_execute_pipeline() {
     ENV_VARS="$ENV_VARS && export GIT_REPOSITORY='$GIT_REPO'"
     ENV_VARS="$ENV_VARS && export GIT_BRANCH='$GIT_BRANCH'"
     ENV_VARS="$ENV_VARS && export BANK_OF_Z_WORK_DIR='$BANK_DIR'"
-    ENV_VARS="$ENV_VARS && export EXECUTION_MODE='$EXECUTION_MODE'"
+    ENV_VARS="$ENV_VARS && export EXECUTION_MODE='vscode'"
+    ENV_VARS="$ENV_VARS && export ZOWE_RSE_PROFILE='manzanita'"
+    ENV_VARS="$ENV_VARS && export RSE_PROFILE_ARG='--rse-profile manzanita'"
     
     # Execute the pipeline script on remote
     set -o pipefail
     
-    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/pipeline.log; then
+    if zowe rse-api-for-zowe-cli issue unix-shell "$ENV_VARS && bash $BANK_DIR/.setup/pipeline-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" --rse-profile manzanita 2>&1 | tee /tmp/pipeline.log; then
         # Check for errors in the log
         if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/pipeline.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
             print_warning "Pipeline completed but some warnings were detected"

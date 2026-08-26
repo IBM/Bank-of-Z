@@ -216,7 +216,9 @@ main() {
 
     if [[ "$EXECUTION_MODE" == "vscode" ]]; then
         cd $SCRIPTS_DIR
-        git pull
+        git fetch origin
+        git checkout "${GIT_BRANCH:-main}"
+        git pull origin "${GIT_BRANCH:-main}"
     else
         # Detect Execution Mode
         detect_bank_of_z_location

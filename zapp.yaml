@@ -43,7 +43,6 @@ profiles:
       lifecycle: user
       lifecycleArgs:
         - "--hlq ${dbbHlq}"
-        - "--config ${dbbWorkspace}/${dbbApplication}/dbb-app_ub.yaml"
         - "--errPrefix ${errPrefix}" # Requires advanced capabilities
         - "--verbose"
       additionalDependencies:

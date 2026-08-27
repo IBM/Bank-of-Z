@@ -29,20 +29,10 @@ application:
             - "Bank-of-Z/src/base"
             - "Bank-of-Z/src/api/src/main/api"
             - "Bank-of-Z/src/frontend"
-      - name: sourceDirs
-        condition: "${LIFECYCLE} == 'user'"
-        value:
-            - "Bank-of-Z/src/base"
-
-# The above condition fails the build with a Yaml schema violation ... 
-
-#$DBB_HOME/bin/dbb build user --hlq IBMUSER.BOZ.UB --errPrefix U351600 --verbose '/u/ibmuser/userBuild_boz/Bank-of-Z/src/base/cics/cobol/ABNDPROC.cbl' at path 
-#/u/ibmuser/userBuild_boz/Bank-of-Z
-#IBM Dependency Based Build 3.0.5.2
-#BUILD
-#
-#BGZTK0171E An unexpected error occurred: Yaml file '/u/ibmuser/userBuild_boz/Bank-of-Z/dbb-app.yaml' does not match the schema in schema/applicationConfigurationSchema.json. Errors:[/application/tasks/0/variables/1: property 'condition' is not defined in the schema and the schema does not allow additional properties]
-
+        select:
+           - condition: "${LIFECYCLE} == 'user'"
+             value:
+                - "Bank-of-Z/src/base"
 
     - task: ScannerInit
       variables:

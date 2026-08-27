@@ -56,11 +56,11 @@ DTCN_PORTS="/etc/debug/dtcn.ports"
 DTCN_PORTS_TMP="/tmp/dtcn.ports$$"
 print_info "Checking ${DTCN_PORTS} for CICS${APP_SHORT_NAME}..."
 
-if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:27103([[:space:]]*)$" "${DTCN_PORTS}"; then
+if grep -Eq "^[[:space:]]*CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT}([[:space:]]*)$" "${DTCN_PORTS}"; then
     print_info "CICSBOZ already present in ${DTCN_PORTS}"
     cp "${DTCN_PORTS}" "${EQAPROF_CONF_DIR}/dtcn.ports"
 else
-    print_info "Trying to add CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS}"
+    print_info "Trying to add CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT} to ${DTCN_PORTS}"
     set +e
     chtag -tc IBM-1047 "$DTCN_PORTS"
     RC=$?
@@ -69,11 +69,11 @@ else
         rm -f /tmp/dtcn.ports*
         cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
         echo "" >> "$DTCN_PORTS_TMP"
-        echo "  CICS${APP_SHORT_NAME}:27103" >> "$DTCN_PORTS_TMP"
+        echo "  CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT}" >> "$DTCN_PORTS_TMP"
         cp "${DTCN_PORTS_TMP}" "${EQAPROF_CONF_DIR}/dtcn.ports"
         chtag -r "$DTCN_PORTS"
     else
-        print_warning "Fail adding CICS${APP_SHORT_NAME}:27103 to ${DTCN_PORTS} (maybe permission deny)."
+        print_warning "Fail adding CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT} to ${DTCN_PORTS} (maybe permission deny)."
     fi
 fi
 

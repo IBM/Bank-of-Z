@@ -170,6 +170,9 @@ debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
   eqaprof_conf_dir: "{{ sandbox.path }}/debug"
+  eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
+  eqaprof_port: 8192
+  eqaprof_port_shutdown: 8105
 
 # z/OS Connect (API exposure only)
 # Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI That Speaks Mainframe — IBM Bob PPZ + Bank of Z Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --ibm-blue: #0f62fe;
+    --ibm-blue-dark: #0043ce;
+    --ibm-gray-10: #f4f4f4;
+    --ibm-gray-20: #e0e0e0;
+    --ibm-gray-70: #525252;
+    --ibm-gray-90: #262626;
+    --ibm-gray-100: #161616;
+    --ibm-red: #da1e28;
+    --ibm-orange: #ff6a00;
+    --ibm-yellow: #f1c21b;
+    --ibm-green: #24a148;
+    --ibm-teal: #009d9a;
+    --sidebar-width: 280px;
+    --font: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', 'Consolas', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: #fff; color: var(--ibm-gray-100); display: flex; min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+  /* ── Sidebar ── */
+  nav#sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--ibm-gray-100);
+    color: #fff;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 0 0 2rem;
+    z-index: 100;
+  }
+  nav#sidebar .nav-logo {
+    padding: 1.25rem 1.25rem 1rem;
+    background: var(--ibm-blue);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #fff;
+    border-bottom: 2px solid var(--ibm-blue-dark);
+  }
+  nav#sidebar .nav-logo span { display: block; font-size: 1rem; font-weight: 700; letter-spacing: 0; text-transform: none; margin-top: 0.2rem; }
+  nav#sidebar ul { list-style: none; padding: 0.5rem 0; }
+  nav#sidebar ul li a {
+    display: block;
+    padding: 0.45rem 1.25rem;
+    color: #c6c6c6;
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: background 0.15s, color 0.15s;
+    border-left: 3px solid transparent;
+  }
+  nav#sidebar ul li a:hover, nav#sidebar ul li a.active {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border-left-color: var(--ibm-blue);
+  }
+  nav#sidebar ul li.section-header a {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.77rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-top: 1rem;
+    cursor: default;
+    pointer-events: none;
+    border-left-color: transparent;
+  }
+  nav#sidebar ul li.appendix a { padding-left: 1.75rem; }
+
+  /* ── Main content ── */
+  main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 2.5rem 3rem;
+    max-width: 1000px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    border-bottom: 3px solid var(--ibm-blue);
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+  }
+  .page-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--ibm-gray-100); line-height: 1.25; }
+  .page-header .meta { margin-top: 0.75rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .page-header .meta span { font-size: 0.82rem; color: var(--ibm-gray-70); }
+  .page-header .meta strong { color: var(--ibm-gray-100); }
+
+  /* ── Sections ── */
+  section { margin-bottom: 3rem; scroll-margin-top: 1.5rem; }
+  h2 { font-size: 1.35rem; font-weight: 700; color: var(--ibm-gray-100); margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--ibm-gray-20); }
+  h3 { font-size: 1.1rem; font-weight: 600; color: var(--ibm-gray-90); margin: 1.5rem 0 0.75rem; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: var(--ibm-blue-dark); margin: 1.25rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  p { margin-bottom: 0.75rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  /* ── Presenter note ── */
+  .presenter-note {
+    background: #fff8e1;
+    border-left: 4px solid var(--ibm-yellow);
+    padding: 0.65rem 1rem;
+    margin: 0.75rem 0 1rem;
+    font-size: 0.85rem;
+    color: #5a4000;
+    border-radius: 0 4px 4px 0;
+  }
+  .presenter-note strong { color: #3d2b00; }
+
+  /* ── Prompt box ── */
+  .prompt-box {
+    background: #f0f4ff;
+    border-left: 4px solid var(--ibm-blue);
+    padding: 0.85rem 1rem;
+    margin: 0.5rem 0 1rem;
+    font-size: 0.9rem;
+    color: var(--ibm-gray-90);
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+  }
+
+  /* ── Tables ── */
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1.25rem; font-size: 0.875rem; }
+  th { background: var(--ibm-gray-100); color: #fff; padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; }
+  td { padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--ibm-gray-20); vertical-align: top; }
+  tr:hover td { background: var(--ibm-gray-10); }
+  .agenda-table td:nth-child(1) { font-weight: 700; white-space: nowrap; color: var(--ibm-blue); }
+  .agenda-table td:nth-child(3) { white-space: nowrap; color: var(--ibm-gray-70); font-size: 0.82rem; }
+  .agenda-table td:nth-child(4) em { font-style: italic; color: var(--ibm-gray-90); }
+  .agenda-table tr.appendix-row td:nth-child(1) { color: var(--ibm-teal); }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--ibm-gray-100);
+    color: #dcdcdc;
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    margin: 0.75rem 0 1rem;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--ibm-gray-10);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    color: var(--ibm-blue-dark);
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  /* ── Mermaid ── */
+  .mermaid { background: var(--ibm-gray-10); border-radius: 6px; padding: 1.25rem; margin: 1rem 0 1.5rem; overflow-x: auto; }
+
+  /* ── Lists ── */
+  ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+  li { margin-bottom: 0.3rem; }
+  ul.bullet-plain { list-style: disc; }
+
+  /* ── Why it matters differentiators ── */
+  .differentiator { margin: 0.6rem 0; }
+  .differentiator-title { font-weight: 600; color: var(--ibm-gray-100); }
+
+  /* ── Step header badge ── */
+  .step-badge {
+    display: inline-block;
+    background: var(--ibm-blue);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .step-badge.appendix { background: var(--ibm-teal); }
+  .step-badge.code { background: var(--ibm-green); }
+  .step-badge.scan { background: #6929c4; }
+
+  /* ── Timing tag ── */
+  .timing { font-size: 0.8rem; color: var(--ibm-gray-70); font-weight: 400; margin-left: 0.25rem; }
+
+  /* ── Horizontal rule ── */
+  hr { border: none; border-top: 1px solid var(--ibm-gray-20); margin: 2rem 0; }
+
+  /* ── Footer ── */
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--ibm-gray-20); font-size: 0.78rem; color: var(--ibm-gray-70); }
+  footer code { font-size: 0.78em; }
+
+  /* ── Responsive ── */
+  @media (max-width: 800px) {
+    nav#sidebar { display: none; }
+    main { margin-left: 0; padding: 1.5rem; }
+  }
+
+  /* ── Violation table colors ── */
+  .sev-high { color: var(--ibm-red); font-weight: 700; }
+  .sev-med { color: var(--ibm-orange); font-weight: 600; }
+  .sev-low { color: #b28900; }
+
+  /* ── Fix label ── */
+  .fix-label { font-weight: 700; }
+  .fix-stage { font-style: italic; color: var(--ibm-gray-70); font-size: 0.85em; }
+
+  /* ── Best used tag ── */
+  .best-used { background: #e8f4f8; border-radius: 4px; padding: 0.4rem 0.85rem; font-size: 0.83rem; color: #004b5e; margin-bottom: 0.75rem; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav id="sidebar">
+  <div class="nav-logo"><span>IBM Bob PPZ + Bank of Z Demo</span></div>
+  <ul>
+    <li><a href="#agenda">Agenda</a></li>
+    <li class="section-header"><a href="#">Core Steps</a></li>
+    <li><a href="#step1">Step 1 — Introduction</a></li>
+    <li><a href="#step2">Step 2 — Multi-Language Explanation</a></li>
+    <li><a href="#step3">Step 3 — Audit Trail Analysis</a></li>
+    <li><a href="#step4">Step 4 — Add Email (End-to-End)</a></li>
+    <li><a href="#step4a" style="padding-left:2rem">4a — Impact Analysis</a></li>
+    <li><a href="#step4b" style="padding-left:2rem">4b — Implementation Plan</a></li>
+    <li><a href="#step4c" style="padding-left:2rem">4c — Code Changes</a></li>
+    <li><a href="#step4d" style="padding-left:2rem">4d — Build &amp; Deploy</a></li>
+    <li><a href="#step5">Step 5 — ZCodeScan</a></li>
+    <li><a href="#step6">Step 6 — Customizing Bob</a></li>
+    <li><a href="#step7">Step 7 — Summary &amp; Next Steps</a></li>
+    <li class="section-header"><a href="#">Appendix A</a></li>
+    <li class="appendix"><a href="#a1">A1 — PL/I Batch Analysis</a></li>
+    <li class="appendix"><a href="#a2">A2 — Funds Transfer Analysis</a></li>
+    <li class="appendix"><a href="#a3">A3 — IMS Database Analysis</a></li>
+    <li class="appendix"><a href="#a4">A4 — CRECUST Refactor</a></li>
+  </ul>
+</nav>
+
+<!-- ── Main ── -->
+<main>
+
+<!-- Page header -->
+<div class="page-header">
+  <h1>AI That Speaks Mainframe: Accelerating Z Modernization with IBM Bob Premium Package for Z</h1>
+  <div class="meta">
+    <span><strong>Author:</strong> Biao Hao (biaohao@us.ibm.com)</span>
+    <span><strong>Last updated:</strong> 2026-08-27</span>
+  </div>
+  <p style="margin-top:0.75rem;font-size:0.9rem;color:#525252;"><strong>Goal:</strong>Show how IBM Bob Premium Package for Z (PPZ) accelerates understanding, analysis, and safe delivery of changes across a real multi-language mainframe application — and how it can be extended to fit any team's standards.</p>
+</div>
+
+<!-- ══════════════════ AGENDA ══════════════════ -->
+<section id="agenda">
+  <h2>Agenda</h2>
+  <p style="font-size:0.88rem;color:#525252;margin-bottom:0.75rem;">Select from the full list of demo scenarios, depending on focus and time available.</p>
+  <table class="agenda-table">
+    <thead><tr><th>Step</th><th>Topic</th><th>Time</th><th>Key message</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Introduction — Bob, PPZ, Bank-of-Z</td><td>5 min</td><td><em>Bob starts from the same frontier model as Claude Code — PPZ is what makes it useful on Z.</em></td></tr>
+      <tr><td>2</td><td>Multi-language flow explanation</td><td>10 min</td><td><em>Five files, five languages, one coherent answer — no copy-paste.</em></td></tr>
+      <tr><td>3</td><td>Customer audit trail analysis</td><td>8 min</td><td><em>A compliance question answered in 60 seconds vs. a full day.</em></td></tr>
+      <tr><td>4a</td><td>Add email — impact analysis</td><td>8 min</td><td><em>15 components. The hidden inline struct trap — caught before anyone wrote a line of code.</em></td></tr>
+      <tr><td>4b</td><td>Add email — implementation plan</td><td>5 min</td><td><em>Exact byte positions in COMMAREA. Not 'here's what to change' — 'here's exactly how'.</em></td></tr>
+      <tr><td>4c</td><td>Add email — code changes</td><td>5 min</td><td><em>Bob makes all the code changes across 30+ files — COBOL, BMS, z/OS Connect, Web UI. It also introduced and fixed 7 bugs, caught at compile, deploy, and runtime.</em></td></tr>
+      <tr><td>4d</td><td>Add email — build, deploy &amp; live UI</td><td>5 min</td><td><em>This field didn't exist this morning. It's live on Z now.</em></td></tr>
+      <tr><td>5</td><td>ZCodeScan pre-commit review</td><td>5 min</td><td><em>Your rules, enforced by AI, before the code ever reaches CICS.</em></td></tr>
+      <tr><td>6</td><td>Customizing Bob</td><td>5 min</td><td><em>Every other AI tool is a black box. Bob's behavior is version-controlled YAML.</em></td></tr>
+      <tr><td>7</td><td>Summary &amp; next steps</td><td>3 min</td><td><em>Pick one change request. Run an impact analysis. Compare it to how long it takes today.</em></td></tr>
+      <tr class="appendix-row"><td>A1</td><td>PL/I batch program analysis</td><td>8 min</td><td><em>PL/I is not an afterthought — explain and change a 912-line batch program in one prompt.</em></td></tr>
+      <tr class="appendix-row"><td>A2</td><td>Funds transfer failure path analysis</td><td>8 min</td><td><em>Deadlock prevention, partial rollback, and abend codes — all traced from source.</em></td></tr>
+      <tr class="appendix-row"><td>A3</td><td>IMS database analysis</td><td>8 min</td><td><em>IMS DL/I, PSBs, DBDs — Bob reads assembly source and explains the access boundary.</em></td></tr>
+      <tr class="appendix-row"><td>A4</td><td>CRECUST async credit check refactor</td><td>8 min</td><td><em>530 lines extracted into a clean service interface. Ready to swap for an API call.</em></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════ STEP 1 ══════════════════ -->
+<section id="step1">
+  <h2><span class="step-badge">Step 1</span> Introduction: The Agent and the App <span class="timing">⏱ ~5 min</span></h2>
+  <div class="presenter-note"><strong>Presenter note:</strong> See <code>bobz-demo/1x-bob-and-ppz-overview.md</code> for the full product overview, comparison table, and talking points.</div>
+
+  <h3>1a — What Is IBM Bob?</h3>
+  <p>What you're looking at is <strong>IBM Bob</strong> — IBM's AI SDLC partner. It's available as <strong>Bob IDE</strong> (VS Code chat) and <strong>Bob Shell</strong> (terminal CLI). Bob combines <strong>intelligent multi-model orchestration</strong> with an agentic tool loop that reads files, queries codebases, runs commands, and reasons across multiple sources in a single turn. It is not a chatbot you paste snippets into.</p>
+  <p><strong>Bob vs the competition — 30-second framing:</strong></p>
+  <table>
+    <thead><tr><th></th><th>GitHub Copilot</th><th>Claude Code</th><th>IBM Bob</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Model quality</strong></td><td>Frontier (GPT, Claude, Gemini)</td><td>Frontier (Claude Sonnet / Opus)</td><td>Frontier — intelligent multi-model routing</td></tr>
+      <tr><td><strong>Inline completion</strong></td><td>✅ Best-in-class</td><td>❌ No tab completion</td><td>✅ Yes</td></tr>
+      <tr><td><strong>Multi-file agent</strong></td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+      <tr><td><strong>Customizable modes / skills</strong></td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Team-authored Markdown, version-controlled</td></tr>
+      <tr><td><strong>Z / mainframe awareness</strong></td><td>❌ None</td><td>❌ None</td><td>✅ Via PPZ extensions</td></tr>
+    </tbody>
+  </table>
+  <p>On general coding tasks, <strong>Bob</strong> is on par with Copilot and Claude Code — frontier models, agentic editing, customizable modes and skills. The question is what you build on top of that foundation — and that's where <strong>Bob Premium Package for Z</strong> comes in.</p>
+
+  <h3>1b — What Is Bob Premium Package for Z (PPZ)?</h3>
+  <p><strong>Bob Premium Package for Z</strong> — or Bob PPZ — adds the Z-specific capability layer that turns Bob from a general-purpose AI SDLC partner into a mainframe-aware AI engineer. It ships as extensions to Bob IDE and Bob Shell across four pillars: Workflows, Application Analysis (Z Understand), Code Capabilities, and Integrations.</p>
+  <p><img src="1x-bob4Z-architecture-SaaS.svg" alt="Bob Premium Package for Z — Solution Architecture" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"><br><small>Source: <a href="https://www.ibm.com/docs/en/bobz/3.0.0?topic=overview-solution-architecture" target="_blank">IBM Docs — Bob PPZ 3.0 Solution Architecture</a></small></p>
+  <p><strong>Components in the architecture diagram:</strong></p>
+  <ol>
+    <li><strong>Architect and Developer</strong> work in <strong>Bob IDE</strong> or <strong>Bob Shell</strong>; the local mainframe codebase is read directly</li>
+    <li><strong>IBM Bob</strong> (SaaS) hosts the agent with intelligent multi-model orchestration; LLM requests route to managed services (e.g. AWS Bedrock) via the IBM Bob cloud backend (on-prem deployment available Q3 2026)</li>
+    <li><strong>PPZ extensions</strong> — Z Understand (knowledge graph + agent tools, running on a Linux VM s390x or x86) and ZCodeScan (team-defined static analysis rules)</li>
+    <li><strong>z/OS (remote)</strong> — the mainframe target; Bob builds and deploys changes via DBB and Wazi Deploy</li>
+  </ol>
+  <p><strong>PPZ adds four pillars that no other AI tool has for Z:</strong></p>
+  <table>
+    <thead><tr><th>Pillar</th><th>What it adds</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Workflows</strong></td><td>Guided multi-step processes from the Bob chat interface: generate documentation, refactor COBOL/PL/I into modular services, generate or sync a data dictionary</td></tr>
+      <tr><td><strong>Application Analysis (Z Understand)</strong></td><td>Pre-indexed knowledge graph of the entire codebase — programs, copybooks, DB2 tables, call chains, paragraph-level control flow — queryable by the agent in real time</td></tr>
+      <tr><td><strong>Code Capabilities</strong></td><td>Z-aware generation, explanation, business-rule extraction, refactoring, and documentation across COBOL, JCL, PL/I, REXX, and Assembler</td></tr>
+      <tr><td><strong>Integrations</strong></td><td>Z Open Editor (MCP tools), ZCodeScan (team-defined YAML rule enforcement), and z/OS Debugger — usable directly from Bob IDE or Bob Shell</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Key differentiator:</strong></p>
+  <ul>
+    <li>General AI tools (such as GitHub Copilot) can grep for <code>COPY CUSTOMER</code>. Bob PPZ queries the <strong>Z Understand graph</strong> and returns every program that copies it, which need a DB2 DBRM rebind, which have a BMS dependency, and which are PL/I rather than COBOL — in one query.</li>
+    <li>This is your rules, your workflows, your institutional knowledge — encoded once and applied consistently by AI. When a senior developer retires, their expertise doesn't walk out the door. It lives in a YAML file and a Markdown skill.</li>
+  </ul>
+
+  <h3>1c — The App: Bank-of-Z</h3>
+  <p>The application we'll be using for the demo, Bank-of-Z, is a multi-language banking application running on IBM Z — it has CICS transactions, IMS, DB2, PL/I batch, z/OS Connect REST APIs, and a web UI.</p>
+  <p><strong>Logical Architecture:</strong></p>
+  <div class="mermaid">
+graph TB
+    classDef user     fill:#DBEAFE,stroke:#2563EB,color:#000
+    classDef web      fill:#E8F4F8,stroke:#4A90A4,color:#000
+    classDef api      fill:#FFF4E6,stroke:#D4A574,color:#000
+    classDef trans    fill:#F0E6FF,stroke:#9B7EBF,color:#000
+    classDef data     fill:#E6FFE6,stroke:#4BAD4B,color:#000
+    classDef batch    fill:#FFF8E6,stroke:#C9A020,color:#000
+    User(["👤 Customer / User"]):::user
+    subgraph zOS["z/OS"]
+        direction LR
+        subgraph WebTier["Web Tier"]
+            WebUI["Web UI (Carbon Design)"]:::web
+        end
+        subgraph APITier["API Tier"]
+            Gateway["REST API Gateway (z/OS Connect)"]:::api
+        end
+        subgraph TransactionTier["Transaction Tier"]
+            CICS["CICS Transactions — Customer · Account · Funds Transfer · Credit Check"]:::trans
+            IMS["IMS Transactions — Customer · Account (IMS DB path)"]:::trans
+        end
+        subgraph DataTier["Data Tier"]
+            DB2[("DB2 — Customer · Account · Transactions")]:::data
+            IMSDB[("IMS DB — Customer · Account · History")]:::data
+        end
+        subgraph BatchTier["Batch Tier"]
+            Batch["Monthly Statements (PL/I Batch)"]:::batch
+        end
+    end
+    User -->|"browser"| WebUI
+    WebUI -->|"REST / JSON"| Gateway
+    Gateway -->|"CICS path (C… IDs)"| CICS
+    Gateway -->|"IMS path (I… IDs)"| IMS
+    CICS <-->|"read / write"| DB2
+    IMS <-->|"read / write"| IMSDB
+    Batch -->|"read"| DB2
+    Batch -.->|"generates"| User
+  </div>
+  <p><strong>Key messages:</strong></p>
+  <ul>
+    <li><strong>Everything is inside z/OS</strong> — Web UI, API Gateway, transactions, databases, batch — all z/OS</li>
+    <li><strong>One API, two transaction engines</strong> — CICS for relational (DB2), IMS for hierarchical (IMS DB); routing is transparent to the user</li>
+    <li><strong>Batch closes the loop</strong> — monthly statement generation reads DB2 and delivers output to the customer</li>
+  </ul>
+  <p><strong>Bank-of-Z at a glance:</strong></p>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+    <tbody>
+      <tr><td>Web UI</td><td>HTML / JavaScript (Carbon Design)</td></tr>
+      <tr><td>API Gateway</td><td>z/OS Connect with JSONata mappings</td></tr>
+      <tr><td>CICS Presentation</td><td>COBOL + BMS 3270 maps</td></tr>
+      <tr><td>CICS Business Programs</td><td>COBOL (30+ programs, DB2 backend)</td></tr>
+      <tr><td>IMS Path</td><td>COBOL + PL/I + Java bridge (IMS DB backend)</td></tr>
+      <tr><td>Batch Reporting</td><td>PL/I + JCL</td></tr>
+      <tr><td>Data</td><td>DB2 (CUSTOMER, ACCOUNT, PROCTRAN) + IMS DB</td></tr>
+      <tr><td>Build &amp; Deploy</td><td>IBM DBB, Wazi Deploy, ZCodeScan</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Key points in the architecture:</strong></p>
+  <ul>
+    <li>The <strong>two runtime paths</strong> — CICS (customer IDs <code>C…</code>) and IMS (customer IDs <code>I…</code>) — both exposed through the same z/OS Connect REST gateway; routing is client-side in <code>api.js</code></li>
+    <li>The <strong>presentation / business separation</strong> inside CICS: BNK1xxx programs handle 3270 screens and call business programs via <code>EXEC CICS LINK</code></li>
+    <li>The <strong>five async credit agency child tasks</strong> (<code>CRDTAGY1</code>–<code>5</code>) spawned by <code>CRECUST</code> using CICS containers and <code>RUN TRANSID</code> — a sophisticated CICS Async API pattern</li>
+    <li>The <strong>audit trail</strong> — every CICS mutation (INSERT/UPDATE/DELETE on CUSTOMER or ACCOUNT) writes to <code>PROCTRAN</code></li>
+    <li>The <strong>batch path</strong> — <code>BNKSTMT.pli</code> (PL/I) running under JES to generate monthly statements, reading from all three DB2 tables</li>
+    <li>The <strong>build pipeline</strong> — DBB impact build triggers recompile of all copybook dependents; Wazi Deploy promotes load modules; ZCodeScan enforces standards before commit</li>
+  </ul>
+  <p>Every scenario you'll see today involves real code from this application — real cross-language tracing, real impact analysis, real code changes deployed on Z. Nothing is mocked or pre-computed.</p>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 2 ══════════════════ -->
+<section id="step2">
+  <h2><span class="step-badge">Step 2</span> Multi-Language Program Explanation <span class="timing">⏱ ~10 min</span></h2>
+  <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/2-multi-language-program-explanation.md</code> for the full pre-captured output.</div>
+
+  <h3>Prompt</h3>
+  <div class="prompt-box">Explain the complete end-to-end flow when a user creates a new customer in the Bank of Z web UI. Start from the JavaScript fetch call in api.js, trace through the z/OS Connect JSONata request mapping, into the CICS presentation program BNK1CCS.cbl, then CRECUST.cbl — including the asynchronous CICS child tasks it spawns to the five credit agency stubs, how it aggregates credit scores using CICS containers and FETCH ANY NOSUSPEND, and finally how it writes to DB2. Explain what happens at each layer if all five credit agency child tasks time out before returning.</div>
+
+  <h3>What Bob produces</h3>
+  <p>Bob reads <strong>five files simultaneously</strong> across five technology layers in a single pass:</p>
+  <ol>
+    <li><code>src/frontend/js/api.js</code> — JavaScript fetch call</li>
+    <li><code>src/api/src/main/operations/%2Fcustomers/post/request.yaml</code> — z/OS Connect JSONata mapping</li>
+    <li><code>src/base/cics/cobol/BNK1CCS.cbl</code> — CICS presentation program</li>
+    <li><code>src/base/cics/cobol/CRECUST.cbl</code> — Business program with async credit checks</li>
+    <li><code>src/base/cics/cobol/CRDTAGY1.cbl</code> — Credit agency stub</li>
+  </ol>
+  <p>It produces:</p>
+  <ul>
+    <li>A layer-by-layer narrative from JS → z/OS Connect → COBOL → DB2</li>
+    <li>An explanation of the CICS async child task pattern (<code>PUT CONTAINER</code> / <code>RUN TRANSID</code> / <code>FETCH ANY NOSUSPEND</code>)</li>
+    <li>The exact timeout path: what <code>COMM-FAIL-CODE = 'G'</code> means, which paragraphs are skipped, and what the web UI shows the user</li>
+    <li>A <strong>Mermaid flow diagram</strong> of the complete path</li>
+    <li>Cyclomatic complexity per paragraph (CREDIT-CHECK scores 19 — the dominant risk)</li>
+  </ul>
+
+  <h3>Why it matters</h3>
+  <p><strong>1. Cross-language, cross-layer reasoning in one pass</strong><br>
+  GitHub Copilot and similar tools work on open files. Bob was asked about a flow that spans JavaScript → YAML → two COBOL programs → PL/I awareness, and returned a single coherent narrative. No context-switching, no copy-paste.</p>
+  <p><strong>2. Project-level institutional knowledge</strong><br>
+  Before reading a single source file, Bob consulted the project's knowledge base — a structured rulebook checked into source control alongside the code. That gave it facts invisible in any single file: the z/OS Connect always uses <code>transid: OMEN</code>; <code>BNK1CCS</code> has an inline COMMAREA with no COPY statement; routing is client-side based on customer ID prefix. An LLM with no project context would speculate on these points. Bob does not.</p>
+  <p><strong>3. "What happens when it breaks?" is answered at every layer</strong><br>
+  The question specifically asked about the timeout path. Bob traced the exact divergence point (line 776 of <code>CRECUST.cbl</code>), named every paragraph skipped, and described the HTTP 400 the web UI receives — <strong>with exact <code>COMM-FAIL-CODE</code> values from the source</strong>. No mainframe developer who hasn't read <code>CRECUST.cbl</code> recently could answer this off the top of their head.</p>
+  <p><strong>4. Grounded — never speculates</strong><br>
+  Bob is configured to never speculate about code it has not read directly. Every claim in the output is traceable to a specific line in a specific file. This is auditable.</p>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 3 ══════════════════ -->
+<section id="step3">
+  <h2><span class="step-badge">Step 3</span> Customer Audit Trail Analysis <span class="timing">⏱ ~8 min</span></h2>
+  <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/3-customer-audit-trail-analysis.md</code> for the full pre-captured output.</div>
+
+  <h3>Prompt</h3>
+  <div class="prompt-box">Using the Z Understand project, find every COBOL program in Bank of Z that reads or writes the <code>CUSTOMER</code> DB2 table, and for each one tell me: which SQL operation it performs (SELECT, INSERT, UPDATE, DELETE), which paragraph contains that operation, and whether the program also writes to <code>PROCTRAN</code> as part of the same transaction. Then identify any program that reads from <code>CUSTOMER</code> but does not write an audit row to <code>PROCTRAN</code> — those are the gaps in the audit trail.</div>
+
+  <h3>What Bob produces</h3>
+  <p>Bob invokes the <strong>Z Understand</strong> tools against the pre-indexed project, then correlates:</p>
+  <ul>
+    <li><strong>11 runtime usages</strong> of the CUSTOMER table across <strong>6 programs</strong> (5 COBOL + 1 PL/I)</li>
+    <li>For each usage: SQL operation, paragraph name, line number</li>
+    <li>Cross-reference against PROCTRAN writes in the same program</li>
+    <li>A gap analysis distinguishing <em>genuine compliance gaps</em> from <em>expected read-only paths</em> and <em>test data loaders</em></li>
+  </ul>
+  <p><strong>Result:</strong> The audit trail has <strong>one genuine gap</strong> — <code>UPDCUST</code> — and three correctly unaudited paths:</p>
+  <ul>
+    <li><code>UPDCUST</code> — <strong>⚠️ audit gap</strong>: mutates CUSTOMER (SELECT + UPDATE in <code>UPDATE-CUSTOMER-DB2</code>, line 222) with no PROCTRAN write. Every customer update is invisible to the audit trail</li>
+    <li><code>INQCUST</code> (read-only — correct by design)</li>
+    <li><code>BNKSTMT.pli</code> (batch reporting — correct by design)</li>
+    <li><code>BANKDATA</code> (test data loader — a legitimate <strong>production risk flag</strong> if ever run against prod)</li>
+  </ul>
+
+  <h3>Why it matters</h3>
+  <p><strong>1. A compliance question answered in seconds, not days</strong><br>
+  A traditional audit of "which programs touch the CUSTOMER table and do they all write audit records?" requires a mainframe developer to grep source, trace COPYbook dependencies, and cross-reference PROCTRAN usage — across 30+ programs. Bob answered it in one prompt, and surfaced a <strong>real gap</strong> (<code>UPDCUST</code>) that had gone unnoticed.</p>
+  <p><strong>2. Multi-language awareness</strong><br>
+  The result includes <code>BNKSTMT.pli</code> — a PL/I batch program. Z Understand (and therefore Bob) indexes all supported languages in one project. A tool that only understands COBOL would miss it.</p>
+  <p><strong>3. Risk nuance, not just a list</strong><br>
+  Bob didn't just say "these programs have no PROCTRAN write." It assessed <em>why</em> — identifying <code>UPDCUST</code> as a genuine compliance gap requiring remediation, distinguishing it from a compliant read-only inquiry (<code>INQCUST</code>) and a legitimate production risk in <code>BANKDATA</code>.</p>
+  <p><strong>4. Follow-on suggestion included</strong><br>
+  Bob proactively suggested: <em>"Run the same audit trail check against the ACCOUNT table."</em> The analyst didn't have to think of that — it's the natural next step.</p>
+  <p><strong>5. The "10× faster compliance audit" story</strong><br>
+  This scenario is the most direct translation of AI value into a business metric: a task that took a senior developer a day now takes 60 seconds. Regulators care about this.</p>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 4 ══════════════════ -->
+<section id="step4">
+  <h2><span class="step-badge">Step 4</span> Add Email to Customer Info (End-to-End Change Delivery) <span class="timing">⏱ ~23 min total</span></h2>
+  <p>This step is in four sub-parts, from analysis to plan to implementation to deployment. Show as much as time allows.</p>
+
+  <!-- 4a -->
+  <section id="step4a" style="margin-top:1.5rem">
+    <h3>4a — Impact Analysis</h3>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/4a-add-email-impact-analysis.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">I want to add an email address field to the customer data model. The field should be optional, max 50 characters, stored in the CUSTOMER DB2 table as CUSTOMER_EMAIL CHAR(50). Also, place the email field right after phone number. Please do a full impact analysis: identify every file that needs to change, explain why, and flag any risks — especially around COMMAREA sizing and z/OS Connect provider files.</div>
+    <h4>What Bob produces</h4>
+    <ul>
+      <li><strong>15 affected components</strong> across DB2, COBOL copybooks, COBOL programs, BMS maps, z/OS Connect provider files, JSONata mappings, OpenAPI schema, and Web UI</li>
+      <li>A <strong>change propagation map</strong> showing the critical deployment sequence (DDL first, then COBOL compile, then DBRM bind, then z/OS Connect, then Web UI)</li>
+      <li><strong>Risk matrix</strong> — R1 (critical): COMMAREA length change and byte-position alignment; <code>BNK1DCS.cbl</code> flagged as having no COPY statement (inline manual struct — high risk of missing it)</li>
+      <li>Effort estimate and recommended next steps</li>
+    </ul>
+    <h4>Why it matters</h4>
+    <p><strong>1. Cross-stack blast radius in one query</strong><br>
+    Adding a field to a DB2 table in a mainframe app touches COBOL copybooks, inline structs, BMS maps, z/OS Connect <code>.dai</code> descriptor files, JSONata mappings, OpenAPI schemas, and HTML. Bob enumerated all 15 components without being told what the stack looks like.</p>
+    <p><strong>2. The hidden trap was caught upfront</strong><br>
+    Bob flagged <code>BNK1DCS.cbl</code> as having an inline COMMAREA struct with no COPY statement — meaning it won't inherit the new field automatically. This is the kind of thing that causes a production outage 6 months after a change. An impact analysis that misses it costs real money.</p>
+    <p><strong>3. Deployment order is a first-class output</strong><br>
+    The impact analysis doesn't just say "these files change." It says <em>in what order</em> to deploy them, and <em>why</em> the order matters (DDL before DBRM bind; COBOL before z/OS Connect provider files). This is the difference between a useful analysis and a list.</p>
+  </section>
+
+  <!-- 4b -->
+  <section id="step4b" style="margin-top:1.5rem">
+    <h3>4b — Implementation Plan</h3>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/4b-add-email-implementation-plan.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">You are in Z Architect mode. Based on the impact analysis, create a detailed implementation plan for adding the CUSTOMER_EMAIL field. Organize it into workstreams. For each file change, show the exact edit — the before and after code. Include appendices with exact byte positions in COMMAREs and z/OS Connect provider file startPos values. Also cover rollback. Do not make any changes to any files — produce the plan document only.</div>
+    <h4>What Bob produces</h4>
+    <p>A full implementation plan covering workstreams A–G:</p>
+    <table>
+      <thead><tr><th>Workstream</th><th>Scope</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>DB2 DDL: <code>ALTER TABLE</code></td></tr>
+        <tr><td>B</td><td>5 COBOL copybooks (exact field insertions with PIC clauses)</td></tr>
+        <tr><td>C</td><td>2 BMS screen maps (exact DFHMDF field definitions with row/column)</td></tr>
+        <tr><td>D</td><td>6 COBOL programs (exact <code>MOVE</code>, host variable, SQL clause edits)</td></tr>
+        <tr><td>E</td><td>Build, bind, deploy sequence</td></tr>
+        <tr><td>F</td><td>z/OS Connect: 6 provider CPYs, <code>.dai</code> startPos values, 4 mapping YAMLs, OpenAPI</td></tr>
+        <tr><td>G</td><td>3 Web UI files (HTML, JS)</td></tr>
+      </tbody>
+    </table>
+    <p>Plus exact byte-position appendices and a complete rollback plan.</p>
+    <h4>Why it matters</h4>
+    <p><strong>1. Not a summary — exact edits</strong><br>
+    The plan includes the before/after COBOL code, the exact <code>startPos</code> values in the <code>.dai</code> descriptor files, and the exact JSONata expression for the null-guard (<code>$exists($body.email) ? $body.email : ""</code>). A developer can execute this plan without reading additional documentation.</p>
+    <p><strong>2. The stuff most AI tools miss</strong><br>
+    The appendix specifies exact byte offsets in four COMMAREAs. Bob computed these from the existing copybook structures — not from a schema registry. This is the difference between "here's what to change" and "here's exactly how to change it safely."</p>
+    <p><strong>3. Rollback is first-class</strong><br>
+    The plan includes a rollback matrix: what to do if DDL is deployed but programs aren't yet bound, if programs are bound but defects are found, if z/OS Connect is deployed and broken, and if the Web UI needs reversion. Rollback is an afterthought in most AI-generated plans.</p>
+  </section>
+
+  <!-- 4c -->
+  <section id="step4c" style="margin-top:1.5rem">
+    <h3>4c — Code Changes</h3>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Code</strong> mode. Open <code>bobz-demo/4c-add-email-implementation-summary.md</code> to walk through what was actually built.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">Using the implementation plan, make all the code changes required to add the CUSTOMER_EMAIL field. Work through each workstream in order: COBOL copybooks first, then BMS maps, then COBOL programs, then z/OS Connect provider files and mapping YAMLs, then the OpenAPI schema, and finally the Web UI. For each file, show me what you changed and why. Flag any risks you encounter as you go — especially anything related to inline structs, COMMAREA byte alignment, or z/OS Connect descriptor files.</div>
+    <h4>What Bob produces</h4>
+    <p>Bob makes all the code changes across 30+ files — every layer of the stack, unassisted:</p>
+    <ul>
+      <li>Adds <code>CUSTOMER_EMAIL CHAR(50)</code> to the DB2 DECLARE TABLE in <code>CUSTDB2.cpy</code></li>
+      <li>Adds <code>05 CUSTOMER-EMAIL PIC X(50)</code> to <code>CUSTOMER.cpy</code> and <code>03 COMM-EMAIL PIC X(50)</code> to all four COMMAREA copybooks</li>
+      <li>Adds <code>DFHMDF</code> field definitions to <code>BNK1CCM.bms</code> and <code>BNK1DCM.bms</code></li>
+      <li>Updates host variables, SQL INSERT/SELECT/UPDATE clauses, and MOVE statements in all six affected COBOL programs</li>
+      <li>Manually syncs the four inline structs (no COPY) in <code>BNK1DCS.cbl</code>, <code>BNK1CCS.cbl</code>, and <code>CRECUST.cbl</code></li>
+      <li>Updates all z/OS Connect <code>.dai</code> startPos values, <code>gen/</code> CPY files, and JSON schemas across four provider sets</li>
+      <li>Adds JSONata null-guard mappings in all four request/response YAMLs</li>
+      <li>Adds the <code>email</code> field to three OpenAPI schemas and three Web UI files</li>
+    </ul>
+    <p>Bob is not perfect. The implementation summary covers the full change record — including 7 bugs Bob introduced and then caught and fixed:</p>
+    <ul>
+      <li>15 commits across 30+ files</li>
+      <li>7 self-introduced bugs, caught at compile, deploy, and runtime:
+        <ul style="margin-top:0.3rem">
+          <li><span class="fix-label">Fix 2</span> <span class="fix-stage">(caught at compile)</span>: <code>END-EXEC.</code> shifted to Area A in <code>CUSTDB2.cpy</code> — RC=8 compile failures in 4 programs. One indentation character.</li>
+          <li><span class="fix-label">Fix 6</span> <span class="fix-stage">(caught at runtime — critical)</span>: <code>WS-CHILD-DATA</code> in <code>CRECUST.cbl</code> is an inline struct with no COPY. When <code>CUSTOMER.cpy</code> was updated, <code>WS-CHILD-DATA</code> didn't inherit the email field. Result: CICS <code>GET CONTAINER</code> returned <code>LENGERR</code> → <code>COMM-FAIL-CODE = 'E'</code> → HTTP 400. Invisible until runtime testing.</li>
+          <li><span class="fix-label">Fix 7</span> <span class="fix-stage">(caught at runtime — critical)</span>: Email field byte position was placed at end-of-COMMAREA instead of after the phone field — a 50-byte misalignment that cascaded through all z/OS Connect <code>.dai</code> files. Only visible when live data came back garbled.</li>
+        </ul>
+      </li>
+    </ul>
+    <h4>Why it matters</h4>
+    <p><strong>1. AI that does the work, not just describes it</strong><br>
+    Bob didn't generate a checklist for a human to follow. It opened each file, computed the byte offsets, wrote the COBOL, and applied every change across COBOL, BMS, z/OS Connect, and the Web UI. The developer reviewed and approved — but didn't need to manually compute anything.</p>
+    <p><strong>2. Honesty builds trust</strong><br>
+    Bob introduced 7 bugs and fixed all of them — some at compile, some after deploy, some only visible at runtime. These are exactly the defects that escape into production in traditional change delivery: an <code>END-EXEC.</code> shifted to Area A; a silent CICS <code>LENGERR</code> from an unsynced inline struct; a 50-byte byte-position misalignment only visible when live data came back garbled. Bob is not flawless, but it finds and fixes its own mistakes. <strong>The implementation summary is a living record</strong> — a realistic picture of AI-assisted mainframe change delivery, not a sanitised success story.</p>
+    <p><strong>3. Cross-stack consistency</strong><br>
+    The same AI that wrote the COBOL also updated the JSONata mapping, the OpenAPI schema, and the HTML form. No handoff, no translation error between layers.</p>
+  </section>
+
+  <!-- 4d -->
+  <section id="step4d" style="margin-top:1.5rem">
+    <h3>4d — Build, Deploy, and Demo</h3>
+    <h4>Live demonstration</h4>
+    <p>Pull the changes to the Z environment, run a complete DBB build, package the outputs, deploy via Wazi Deploy, and populate Db2 and IMS with test data.</p>
+    <pre><code>.setup/setup-common.sh environment (if needed)
+.setup/setup-common.sh install-bank-of-z</code></pre>
+    <p><strong>DBB</strong> knows which programs include <code>CUSTOMER.cpy</code> and recompiles them all. <strong>Wazi Deploy</strong> promotes load modules to CICS.</p>
+    <p>Open the <strong>Bank-of-Z Web UI</strong> in a browser:</p>
+    <ul>
+      <li>Navigate to <strong>Create Customer</strong> — the email field is now present in the form</li>
+      <li>Create a new customer with an email address, submit</li>
+      <li>Navigate to <strong>Customer Details</strong> for that customer — email is displayed and editable</li>
+    </ul>
+    <p><img src="4d-add-email-deployment.png" alt="Customer Details — email field live" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"></p>
+    <h4>Why it matters</h4>
+    <p><strong>1. The "wow" moment — end-to-end in one session</strong><br>
+    From a blank workspace to a live feature running on Z. Impact analysis → plan → code changes → build → deploy → demo. A change that typically takes a sprint was delivered in conversations.</p>
+    <p><strong>2. z/OS-native deployment — not a simulation</strong><br>
+    The build runs <strong>DBB</strong> on z/OS. The deploy runs <strong>Wazi Deploy</strong> to a live CICS region. The UI serves from <strong>Liberty on z/OS</strong>. This is not a local mock or a staging environment — it's the real stack.</p>
+    <p style="margin-top:1rem;font-style:italic;color:#0043ce;font-weight:500;">This email field didn't exist in the codebase this morning. An AI agent reasoned about a 30-year-old COBOL application, produced a safe implementation plan with exact byte positions, made the changes, caught 7 bugs, and it's running on Z. What change request would you want to try this on?</p>
+  </section>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 5 ══════════════════ -->
+<section id="step5">
+  <h2><span class="step-badge scan">Step 5</span> ZCodeScan: Custom Rule Enforcement Before Commit <span class="timing">⏱ ~5 min</span></h2>
+  <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Code</strong> mode. See <code>bobz-demo/5-zCodeScan-rule-review-before-commit.md</code> for the full pre-captured output.</div>
+
+  <h3>Prompt</h3>
+  <div class="prompt-box">Review XFRFUN.cbl against the Bank of Z ZCodeScan rule set defined in zcodescan/zcodescan-rules.yaml. Identify every violation, state the rule ID and severity, explain what the violation is and where it occurs (paragraph name and approximate line), and suggest the minimal fix for each. Focus especially on: CICS HANDLE CONDITION usage, SELECT * in embedded SQL, 88-level names not prefixed TEST, missing END-IF or END-EVALUATE, inline PERFORM bodies over 30 lines, and SQLCODE checks after every EXEC SQL.</div>
+
+  <h3>What Bob produces</h3>
+  <p><strong>13 violations</strong> across <code>XFRFUN.cbl</code>, organized by rule ID and severity:</p>
+  <table>
+    <thead><tr><th>Priority</th><th>Rule</th><th>Severity</th><th>Location</th></tr></thead>
+    <tbody>
+      <tr><td>🔴</td><td><code>CheckSqlcodeAfterExecSqlRule</code></td><td class="sev-high">HIGH</td><td><code>WRITE-TO-PROCTRAN-DB2</code> — CICS ASKTIME/LINK calls silently ignore errors</td></tr>
+      <tr><td>🟠</td><td><code>CicsNoHandleRule</code></td><td class="sev-med">MEDIUM</td><td><code>PREMIERE/A010</code> line 272 — <code>HANDLE ABEND</code> hidden control jump</td></tr>
+      <tr><td>🟠</td><td><code>GotoRule</code></td><td class="sev-med">MEDIUM</td><td>9 locations including cross-section GO TOs at lines 1282, 1479</td></tr>
+      <tr><td>🟠</td><td><code>ProcedureRule</code></td><td class="sev-med">MEDIUM</td><td>5 sections over 100 lines (largest: <code>UPDATE-ACCOUNT-DB2</code> at ~600 lines)</td></tr>
+      <tr><td>🟠</td><td><code>NestedIfLimitRule</code></td><td class="sev-med">MEDIUM</td><td><code>UPDATE-ACCOUNT-DB2-TO</code> — 8 levels deep</td></tr>
+      <tr><td>🟡</td><td><code>DisplayUponConsoleRule</code></td><td class="sev-low">MEDIUM</td><td>20+ DISPLAY statements throughout</td></tr>
+      <tr><td>🟡</td><td><code>StopRunRule</code></td><td class="sev-low">MEDIUM</td><td>Unreachable <code>GOBACK</code> after <code>EXEC CICS RETURN</code></td></tr>
+      <tr><td>🟡</td><td><code>EvaluateWhenOtherRule</code></td><td class="sev-low">MEDIUM</td><td><code>ABEND-HANDLING</code> EVALUATE with no WHEN OTHER</td></tr>
+    </tbody>
+  </table>
+  <p>Each violation includes the exact fix — minimal, not a rewrite.</p>
+
+  <h3>Why it matters</h3>
+  <p><strong>1. Your rules, enforced by AI</strong><br>
+  The rule set in <code>zcodescan/zcodescan-rules.yaml</code> is the team's own standards — not generic COBOL advice from the internet. Bob applied <em>your</em> rules to <em>your</em> code. This is the difference between a linter and a peer reviewer who knows the house style.</p>
+  <p><strong>2. Pre-commit gate, not post-production incident</strong><br>
+  The HIGH violation — CICS commands with no RESP check — is the kind of defect that surfaces as an unexplained task abend in production at 2am. Catching it before commit means it never reaches CICS.</p>
+  <p><strong>3. Prioritized, not a dump</strong><br>
+  The output is sorted by risk — HIGH first, then ordered by fix effort. A developer knows exactly where to start. Generic code review tools produce flat lists.</p>
+  <p><strong>4. Transition into the customization story</strong><br>
+  Segue naturally: <em>"The rules Bob just applied — those came from a YAML file your team controls. Let's talk about what else you can customize."</em></p>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 6 ══════════════════ -->
+<section id="step6">
+  <h2><span class="step-badge">Step 6</span> Customizing Bob <span class="timing">⏱ ~5 min</span></h2>
+  <p>This step combines <strong>live demo + talking points</strong>. Use the prompts below to show customization live — don't just describe it.</p>
+
+  <h3>6a — Adding a new Mode</h3>
+  <p>Every mode in Bob is a named entry in a single YAML file your team owns and version-controls. A mode defines the agent's role, its instructions, what files it can edit, and when to use it. Z Architect mode, for example, is configured to read the project knowledge base first, never speculate about code it hasn't opened, and always use Z Understand for cross-program queries. You can create a new mode for any workflow — a DB2 Performance Mode, a Security Audit Mode, an Incident Triage Mode. The same file is already in source control in this project.</p>
+  <p><strong>Try this prompt:</strong></p>
+  <div class="prompt-box">What modes are available to me in this project, and what is each one designed for?</div>
+  <p>Bob reads <code>.bob/custom_modes.yaml</code>, lists every mode, and summarizes its purpose. Shows the audience that modes are discoverable and self-documenting.</p>
+
+  <h3>6b — Adding a Skill</h3>
+  <p>A skill is a reusable instruction set Bob loads on demand — it's a <code>SKILL.md</code> file your team authors and stores under <code>.bob/</code> in the repo. The ZCodeScan review you just saw — that's a skill. The impact analysis workflow — that's a skill. If your team has a standard process for change requests, incident triage, DB2 runbook generation, or DR documentation — encode it as a skill. Every developer gets that expertise, every time, consistently. Senior developer retires? Their checklist stays.</p>
+  <p>Open the project's commit guidelines file as an example of a Bob-readable instruction file already in the repository. For a full skill, the file has a <code>SKILL.md</code> name with a YAML frontmatter block declaring its name, description, and trigger conditions.</p>
+  <p><strong>Try this prompt:</strong></p>
+  <div class="prompt-box">What skills are available in this project? Briefly describe what each one does.</div>
+  <p>Bob lists and summarizes all skills, showing the audience they are first-class discoverable assets.</p>
+
+  <h3>6c — ZCodeScan rule customization</h3>
+  <p>The rule set Bob just applied against XFRFUN.cbl is a YAML file your team owns and version-controls. You define the rules: your naming conventions, your CICS patterns, your SQL standards. New joiners get the same review quality as your most experienced COBOL developer. And when auditors ask what standards your team enforces — you show them a YAML file in source control, not a verbal description.</p>
+  <p>Open <code>zcodescan/zcodescan-rules.yaml</code> and scroll to a rule definition.</p>
+  <p><strong>Try this prompt:</strong></p>
+  <div class="prompt-box">Summarize the ZCodeScan rules currently defined in zcodescan/zcodescan-rules.yaml. Group them by category and explain what each rule is trying to prevent.</div>
+  <p>Bob reads the rule file, groups rules by theme (CICS safety, SQL hygiene, code structure, naming), and explains the engineering rationale for each. Demonstrates that the rules are self-documenting and auditable.</p>
+
+  <h3>Why it matters</h3>
+  <p><strong>1. It's not a black box</strong><br>
+  Many AI coding tools are a black box — you get what the vendor built. Bob is explicitly extensible. Your team's standards, your team's workflows, your team's guardrails.</p>
+  <p><strong>2. Institutional knowledge is preserved and reused</strong><br>
+  When a senior developer encodes their review checklist as a ZCodeScan rule or a skill, that knowledge doesn't walk out the door when they retire. It's version-controlled, reviewable, and used by every team member.</p>
+  <p><strong>3. Governance story</strong><br>
+  For regulated industries (banking, insurance, government): the ability to define, version-control, and audit the rules Bob applies is a compliance differentiator. "Our AI agent applies our standards" is a much stronger audit answer than "we used a generic AI assistant."</p>
+</section>
+
+<hr>
+
+<!-- ══════════════════ STEP 7 ══════════════════ -->
+<section id="step7">
+  <h2><span class="step-badge">Step 7</span> Summary and Next Steps <span class="timing">⏱ ~3 min</span></h2>
+
+  <h3>Recap what we just demonstrated</h3>
+  <table>
+    <thead><tr><th>Scenario</th><th>What it showed</th><th>Business value</th></tr></thead>
+    <tbody>
+      <tr><td>Multi-language flow explanation</td><td>Bob traced JS → z/OS Connect → COBOL → DB2 in one prompt</td><td>New developer onboarding in hours, not weeks</td></tr>
+      <tr><td>Audit trail analysis</td><td>Bob identified every program touching CUSTOMER and assessed PROCTRAN coverage</td><td>Compliance question answered in 60 seconds vs. a day</td></tr>
+      <tr><td>Impact analysis</td><td>Bob enumerated 15 components and flagged the inline-struct trap upfront</td><td>Changes delivered safely; no surprise production outages</td></tr>
+      <tr><td>Implementation plan</td><td>Bob produced exact edits with byte positions across a 7-workstream change</td><td>Reduced implementation effort by 50%+</td></tr>
+      <tr><td>ZCodeScan review</td><td>Bob applied team-specific rules and prioritized fixes</td><td>Defects caught before commit, not at 2am</td></tr>
+      <tr><td>Customization</td><td>Modes, skills, rules — all team-controlled</td><td>AI that fits your standards, not the other way around</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Suggested next steps</h3>
+  <ol>
+    <li><strong>Connect Bob to your Z Understand project</strong> — get the cross-program analysis capabilities on your own codebase today</li>
+    <li><strong>Define your first ZCodeScan rule</strong> — start with one rule your team cares about (SQLCODE checks, RESP checks, GO TO)</li>
+    <li><strong>Pick a real change request</strong> — run an impact analysis on it and compare the result to how long it would have taken manually</li>
+    <li><strong>Pilot with one team</strong> — identify 2–3 developers who will use Bob daily and collect before/after time metrics</li>
+  </ol>
+</section>
+
+<hr>
+
+<!-- ══════════════════ APPENDIX A ══════════════════ -->
+<section id="appendix">
+  <h2>Appendix A — Additional Demo Scenarios</h2>
+  <p>These scenarios are <strong>not part of the core flow</strong> but are ready to use for extended sessions, technical deep-dives, or when the audience asks "what else can it do?" Each appendix step is a fully worked example with the exact prompt and pre-captured output.</p>
+
+  <!-- A1 -->
+  <section id="a1" style="margin-top:1.5rem">
+    <h3><span class="step-badge appendix">A1</span> PL/I Batch Program Analysis + Code Change</h3>
+    <div class="best-used">📌 Best used: After Step 2 (multi-language explanation), or as a standalone PL/I deep-dive for audiences with batch/PL/I workloads</div>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. Open <code>src/base/batch/pli/BNKSTMT.pli</code> in the editor before running the prompt — this gives Bob direct access to the procedure bodies, local variable declarations, and exact print formatting logic. See <code>bobz-demo/a1-bnkstmt-pli-analysis.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">Explain the business logic of this bank statement generator and add a new column to the output for transaction category. Show me the changes to be made only.</div>
+    <h4>What Bob produces</h4>
+    <p><strong>Part 1 — Business logic explanation:</strong></p>
+    <ul>
+      <li>A full call-tree narrative of all 11 procedures (<code>MAIN</code> → <code>GET_STATEMENT_PERIOD</code> → <code>PROCESS_ALL_ACCOUNTS</code> → <code>GENERATE_STATEMENT</code> → … → <code>PRINT_FOOTER</code>)</li>
+      <li>Key business rules surfaced from the source: credit/debit classification by <code>HV_TRAN_TYPE</code>, the back-calculated opening balance formula, the 55-line page-overflow mechanism, the February leap-year limitation, and null-indicator handling for optional fields</li>
+      <li>The two JCL input files (<code>DATECARD</code>, <code>SORTCODE</code>) and their fallback behaviour</li>
+    </ul>
+    <p><strong>Part 2 — Targeted code changes (3 edits, 1 file):</strong></p>
+    <table>
+      <thead><tr><th>#</th><th>Location</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Working variables (after line 131)</td><td><code>DCL TRAN_CATEGORY CHAR(12)</code></td></tr>
+        <tr><td>2</td><td><code>PROCESS_TRANSACTIONS</code> header (lines 658–667)</td><td>Add <code>CATEGORY</code> column to header and extend separator</td></tr>
+        <tr><td>3</td><td><code>PRINT_TRANSACTION</code> print logic (lines 763–773)</td><td><code>SELECT</code> block mapping <code>HV_TRAN_TYPE</code> to 12-char label; trim description from 30→18 chars to stay within 132-char line width</td></tr>
+      </tbody>
+    </table>
+    <p>Bob also flags the <strong>132-char line width constraint</strong> proactively — adding the category without trimming description would silently truncate the print output on z/OS.</p>
+    <h4>Why it matters</h4>
+    <p><strong>1. PL/I is not an afterthought</strong><br>Most AI coding tools have weak or zero PL/I support. Bob read a 912-line PL/I batch program, understood the SQL cursor lifecycle, the <code>PUT SKIP EDIT</code> print formatting, the <code>SELECT/WHEN</code> construct, and the PL/I null-indicator pattern — and reasoned correctly about all of them.</p>
+    <p><strong>2. Single-prompt: explain + change</strong><br>The prompt asked for both an explanation <em>and</em> code changes in one shot. Bob held both tasks simultaneously — it used the explanation pass to understand the constraints (line width, type codes), then applied that understanding directly to the change specification.</p>
+    <p><strong>3. The constraint catch</strong><br>The 132-character <code>REPORT_LINE</code> limit was never mentioned in the prompt. Bob identified it from the <code>DCL REPORT_LINE CHAR(132)</code> declaration and pro-actively suggested trimming the description field from 30 to 18 characters to stay within the constraint.</p>
+    <p><strong>4. "No other files change" is an output</strong><br>Bob explicitly stated: <em>"No DB2 schema change, no cursor change, no host variable additions, no copybook changes, no JCL changes."</em> A confident, verifiable blast-radius statement.</p>
+  </section>
+
+  <!-- A2 -->
+  <section id="a2" style="margin-top:1.5rem">
+    <h3><span class="step-badge appendix">A2</span> COBOL Funds Transfer Program: Logic + Failure Path Analysis</h3>
+    <div class="best-used">📌 Best used: After Step 2 or as a standalone CICS deep-dive for audiences interested in transaction integrity and error handling</div>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. Open <code>src/base/cics/cobol/XFRFUN.cbl</code> in the editor before running the prompt — the file is 2,060 lines, and opening it lets Bob trace the exact <code>COMM-FAIL-CODE</code> values, locking-order branches, and abend handler. See <code>bobz-demo/a2-xfrfun-funds-transfer-analysis.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">Explain what this program does, including how it handles the case where the source account update succeeds but the target account update fails.</div>
+    <h4>What Bob produces</h4>
+    <p><strong>Part 1 — Program overview:</strong> COMMAREA interface, full execution call tree, and the two PROCTRAN rows written per successful transfer.</p>
+    <p><strong>Part 2 — The locking order strategy (deadlock prevention):</strong><br>
+    XFRFUN always locks the <strong>lower account number first</strong>, regardless of which is FROM and which is TO. This ensures two concurrent transfers between the same pair of accounts always acquire DB2 row locks in the same order — breaking the deadlock cycle. Bob also traces the DB2 deadlock retry loop (<code>SQLCODE -911</code>): up to 5 retries with a 1-second CICS DELAY, then <code>ABEND 'RUF2'</code>.</p>
+    <p><strong>Part 3 — The partial-failure case:</strong></p>
+    <table>
+      <thead><tr><th>Scenario</th><th><code>COMM-FAIL-CODE</code></th><th>Rollback mechanism</th><th>PROCTRAN written?</th></tr></thead>
+      <tbody>
+        <tr><td>TO account not found</td><td><code>'2'</code></td><td>Explicit <code>SYNCPOINT ROLLBACK</code> (×2)</td><td>❌ No</td></tr>
+        <tr><td>TO account DB2 error</td><td><code>'3'</code></td><td>CICS ABEND <code>'TO  '</code> → UOW rollback</td><td>❌ No</td></tr>
+        <tr><td>FROM account not found</td><td><code>'1'</code></td><td><code>SYNCPOINT ROLLBACK</code></td><td>❌ No</td></tr>
+        <tr><td>PROCTRAN write fails</td><td>—</td><td>CICS ABEND <code>'WPCD'</code>/<code>'WPCT'</code> → UOW rollback</td><td>❌ Both rows rolled back</td></tr>
+        <tr><td>Both accounts updated</td><td>—</td><td>None needed</td><td>✅ Two rows written</td></tr>
+      </tbody>
+    </table>
+    <h4>Why it matters</h4>
+    <p><strong>1. "How does it handle X?" is answered from the actual code</strong><br>Bob traced all four code paths from source, named the exact <code>COMM-FAIL-CODE</code> value for each, and identified which used explicit <code>SYNCPOINT ROLLBACK</code> vs CICS task abend. No guessing.</p>
+    <p><strong>2. The locking order insight</strong><br>The deadlock prevention strategy at lines 378–904 is architectural knowledge that lives only in the code. Bob identified it as such and explained <em>why</em> it works. A developer new to this program would take hours to reach the same understanding.</p>
+    <p><strong>3. Design gaps surfaced proactively</strong><br>Bob flagged the "no overdraft checking" constraint — not as a bug, but as an intentional design decision that the calling layer must account for.</p>
+  </section>
+
+  <!-- A3 -->
+  <section id="a3" style="margin-top:1.5rem">
+    <h3><span class="step-badge appendix">A3</span> IMS Database Analysis: IBGCUDAT Segments and CUSTOMER/CUSTACCS Relationship</h3>
+    <div class="best-used">📌 Best used: For audiences with IMS workloads, or after Step 2 to demonstrate Bob's IMS fluency</div>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. No single file needs to be pre-opened — navigate to <code>src/base/ims/</code> in the explorer. Bob will read both the PSB and DBD assembly sources automatically. See <code>bobz-demo/a3-ims-ibgcudat-analysis.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">Show me all the IMS segments that IBGCUDAT accesses, and explain the parent-child relationship between CUSTOMER and CUSTACCS databases.</div>
+    <h4>What Bob produces</h4>
+    <p>Bob reads <code>IBGCUDAT.asm</code> (PSB), <code>IBGCUDAT.cbl</code> (program), <code>CUSTOMER.asm</code> (DBD), and <code>CUSTACCS.asm</code> (DBD) — then synthesises across all four sources.</p>
+    <p><strong>Surprise answer — CUSTOMER and CUSTACCS have no IMS parent-child relationship</strong> — both are independent flat HDAM databases with <code>PARENT=0</code>. CUSTACCS is a cross-reference table (the IMS equivalent of a join table). A less rigorous tool would have speculated from the naming.</p>
+    <p><strong>PSB cross-reference matrix:</strong></p>
+    <table>
+      <thead><tr><th>PSB</th><th>CUSTOMER</th><th>CUSTACCS</th><th>ACCOUNT</th><th>HISTORY</th><th>TSTAT</th><th>Ref tables</th></tr></thead>
+      <tbody>
+        <tr><td><code>IBGCUDAT</code></td><td>G</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><code>IBSCUDAT</code></td><td>R</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><code>IBLOGIN/OUT</code></td><td>R</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><code>IBACSUM</code></td><td>—</td><td>G</td><td>G</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td><code>IBTRAN</code></td><td>—</td><td>G</td><td>R</td><td><strong>I</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><code>IBLOAD</code></td><td>L</td><td>L</td><td>L</td><td>L</td><td>L</td><td>L (all)</td></tr>
+      </tbody>
+    </table>
+    <p>Notable: <code>HISTORY</code> is <strong>insert-only</strong> from COBOL (<code>IBTRAN PROCOPT=I</code>) — reads come exclusively from the Java JMP layer.</p>
+    <h4>Why it matters</h4>
+    <p><strong>1. IMS is not a second-class citizen</strong><br>Bob read PSB assembly source and DBD assembly source, understood <code>SEQ=M</code> vs <code>SEQ=U</code>, and correctly identified that <code>PARENT=0</code> on both databases means no IMS hierarchy. This level of IMS fluency is rare even among experienced mainframe developers.</p>
+    <p><strong>2. The PSB is the security and access boundary</strong><br><code>PROCOPT=G</code> means IBGCUDAT cannot insert, update, or delete. The PSB is the IMS equivalent of a DB2 GRANT statement. No other AI tool reads PSB assembly source and interprets its security implications.</p>
+  </section>
+
+  <!-- A4 -->
+  <section id="a4" style="margin-top:1.5rem">
+    <h3><span class="step-badge appendix">A4</span> CICS COBOL Refactor: CRECUST Async Credit Check</h3>
+    <div class="best-used">📌 Best used: As a code-generation demo combining architectural thinking with precise mainframe implementation. Ideal for technical audiences who want to see real refactoring.</div>
+    <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Code</strong> mode. Open <code>src/base/cics/cobol/CRECUST.cbl</code> in the editor before running the prompt. See <code>bobz-demo/a4-crecust-async-refactor.md</code> for the full pre-captured output.</div>
+    <h4>Prompt</h4>
+    <div class="prompt-box">CRECUST is calling 5 credit agency programs with a fixed 3-second wait. I want to refactor the code to isolate the credit check logic into a separate program so the implementation complexity is not in the CRECUST code, and I can easily switch to an API call in the future. Show me the changes to be made only.</div>
+    <h4>What Bob produces</h4>
+    <p>Bob reads the full <code>CRECUST.cbl</code> (1,631 lines) and <code>CRECUST.cpy</code>, identifies the <code>CREDIT-CHECK</code> section as the extraction target (~530 lines, 604–1135), and produces three deliverables:</p>
+    <ol>
+      <li><strong>New copybook <code>CRCCVERI.cpy</code></strong> — a minimal COMMAREA contract (input: customer fields; output: credit score, review date, success, fail-code)</li>
+      <li><strong>New program <code>CRCCVERI.cbl</code></strong> — the extracted credit check program with all async dispatch logic; <code>GOBACK</code> used correctly (not <code>EXEC CICS RETURN</code>)</li>
+      <li><strong>Modified <code>CRECUST.cbl</code></strong> — ~530 lines → 30 lines in <code>CREDIT-CHECK</code>; 18 Working-Storage fields moved to CRCCVERI</li>
+    </ol>
+    <pre><code>CRECUST  ──LINK──▶  CRCCVERI  ──RUN/FETCH──▶  CRDTAGY1-5
+           COMMAREA               (async, delay, aggregate)
+         ◀──RETURN──
+         CREDIT-SCORE / CS-REVIEW-DATE / SUCCESS / FAIL-CODE</code></pre>
+    <h4>Why it matters</h4>
+    <p><strong>1. Separation of concerns — a real architectural improvement</strong><br>The async dispatch complexity is entirely removed from <code>CRECUST</code>. <code>CRECUST</code> now expresses business intent: "perform credit check, get score, continue." That is a meaningful improvement in readability and maintainability, not just a cosmetic reorganisation.</p>
+    <p><strong>2. Future-proof by design</strong><br>Changing the credit check mechanism requires zero changes to <code>CRECUST</code> — only <code>CRCCVERI.cbl</code> is replaced. The COMMAREA contract (<code>CRCCVERI.cpy</code>) is the stable interface boundary.</p>
+    <p><strong>3. <code>GOBACK</code> vs <code>EXEC CICS RETURN</code> — getting the CICS detail right</strong><br>A LINKed program returns control to its caller via <code>GOBACK</code>; <code>EXEC CICS RETURN</code> would return to CICS and end the task. This is a subtle but critical CICS correctness point that generic AI tools frequently get wrong.</p>
+  </section>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>Reference files: <code>bobz-demo/1x-bob-and-ppz-overview.md</code> · <code>2-multi-language-program-explanation.md</code> · <code>3-customer-audit-trail-analysis.md</code> · <code>4a-add-email-impact-analysis.md</code> · <code>4b-add-email-implementation-plan.md</code> · <code>4c-add-email-implementation-summary.md</code> · <code>5-zCodeScan-rule-review-before-commit.md</code> · <code>a1-bnkstmt-pli-analysis.md</code> · <code>a2-xfrfun-funds-transfer-analysis.md</code> · <code>a3-ims-ibgcudat-analysis.md</code> · <code>a4-crecust-async-refactor.md</code></p>
+</footer>
+
+</main>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('nav#sidebar a[href^="#"]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`nav#sidebar a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

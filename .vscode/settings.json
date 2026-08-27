@@ -9,6 +9,6 @@
         "dbbApplication": "Bank-of-Z"
     },
     "zopeneditor.zowe": {
-        "defaultCliProfile": "onDemand.rse"
+        "defaultCliProfile": "bank-of-z.rse"
     }
 }

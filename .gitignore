@@ -10,6 +10,9 @@ build.log
 /logs/
 .DS_Store
 src/base/ims/java/src/main/java/nazare/jmp/standalone/*
+src/base/ims/java/bin/*
+edt-unit-test/*
+.edt-unit-test/*
 /build/
 zowe.config.user.json
 /.host.yaml

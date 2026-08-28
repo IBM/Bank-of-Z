@@ -48,8 +48,7 @@ fi
 
 # Remove any stale server Liberty may have created under its own usr/ directory
 opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
-jcan P "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME})" 2>/dev/null || true
-sleep 2
+sleep 5
 
 # Create the server using Liberty's server command (creates under FRONTEND_LIBERTY_HOME/usr by default)
 "${FRONTEND_LIBERTY_HOME}/bin/server" create "${SERVER_NAME}" --template=defaultServer
@@ -126,13 +125,11 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-httpdispatcher -->
     <httpDispatcher enableWelcomePage="false"/>
 
-    <!-- Disable config polling to avoid idle CPU usage
-         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-config -->
-    <config updateTrigger="disabled"/>
+    <!-- config requires updateTrigger="mbean" for REFRESH command support -->
+    <config updateTrigger="mbean"/>
 
-    <!-- Disable dropins and polling to avoid idle CPU usage
-         https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-applicationmonitor -->
-    <applicationMonitor dropinsEnabled="false" updateTrigger="disabled"/>
+    <!-- applicationMonitor requires updateTrigger="mbean" for REFRESH command support -->
+    <applicationMonitor updateTrigger="mbean" dropinsEnabled="false"/>
 
     <!-- Security hardening: remove X-Powered-By header
          https://www.ibm.com/docs/en/was-liberty/core?topic=configuration-webcontainer -->
@@ -158,12 +155,10 @@ EOF
 # =========================
 print_info "Configuring RACF STARTED profile..."
 set +e
-opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null &
-sleep 5
 print_info "Defining RACF STARTED class..."
-tsocmd "RDEFINE STARTED FE${APP_SHORT_NAME}.* STDATA(USER(${FRONTEND_TASK_USER}) TRUSTED(YES))" 2>/dev/null
+run_tso "RDEFINE STARTED FE${APP_SHORT_NAME}.* STDATA(USER(${FRONTEND_TASK_USER}) TRUSTED(YES))" 2>/dev/null
 print_info "Refreshing RACF..."
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
+run_tso "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
 print_info "Removing old PROCLIB member..."
 mrm "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
@@ -173,8 +168,8 @@ print_info "Generating JCL proc..."
 # Generate server JCL proc
 # =========================
 # Create JCL with each line padded to exactly 80 characters for FB80 dataset
-rm -f "/tmp/FE${APP_SHORT_NAME}.jcl"
-cat > "/tmp/FE${APP_SHORT_NAME}.jcl" << EOF
+rm -f "/tmp/FE${APP_SHORT_NAME}-$$.jcl"
+cat > "/tmp/FE${APP_SHORT_NAME}-$$.jcl" << EOF
 //FE${APP_SHORT_NAME}  PROC PARMS='${SERVER_NAME}'
 //*
 //* WebSphere Liberty - Frontend Server
@@ -199,20 +194,21 @@ JVM_OPTIONS=-Xmx1024M
 EOF
 
 # Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/FE${APP_SHORT_NAME}.jcl"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/FE${APP_SHORT_NAME}-$$.jcl"
 
 # Copy to PROCLIB using dcp
 print_info "Copying JCL to ${FRONTEND_SYS_PROCLIB}..."
-dcp "/tmp/FE${APP_SHORT_NAME}.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME})"
+dcp "/tmp/FE${APP_SHORT_NAME}-$$.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME})"
 
 # Clean up temp files
-rm -f "/tmp/FE${APP_SHORT_NAME}.jcl"
+rm -f "/tmp/FE${APP_SHORT_NAME}-$$.jcl"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "proclib=${FRONTEND_SYS_PROCLIB}" --extraVar "task_name=FE${APP_SHORT_NAME}" \
     --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/FE${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/FE${APP_SHORT_NAME}J.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)"
+    --outputFile "/tmp/FE${APP_SHORT_NAME}J-$$.jcl"
+dcp "/tmp/FE${APP_SHORT_NAME}J-$$.jcl" "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)"
+rm -f "/tmp/FE${APP_SHORT_NAME}J-$$.jcl"
 
 # =========================
 # Create apps directory
@@ -255,7 +251,7 @@ if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
     print_info "  Stop:   opercmd 'C FE${APP_SHORT_NAME}'"
 else
     print_info "  Start:  jsub '${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)'"
-    print_info "  Stop:   jcan P 'FE${APP_SHORT_NAME}'"
+    print_info "  Stop:   opercmd 'C FE${APP_SHORT_NAME}'"
 fi
 
 print_info ""

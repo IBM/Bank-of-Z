@@ -7,23 +7,31 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
-  java_home: "/usr/local/sandboxes/tools/J21.0_64"
-  ims_java_home: "/usr/lpp/ims/imsjava"
-  db2_java_home: "/usr/lpp/db2d10"
+  ims_java_home: "/usr/local/sandboxes/tools/J21.0_64"
+  ims_java_dir: "/usr/lpp/ims/imsjava"
+  db2_java_dir: "/usr/lpp/db2d10"
   ims_target_user: IBMUSER
+  ims_ixvolser: "IMSV15"
+  debug_hlq: EQAW
+  ims_irlm_enablement: false
+  ims_database_lock_manager_server_name: "IRLM"
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"
   db2_hlq: "{{ vars.db2_hlq }}"
+  debug_hlq: "{{ vars.debug_hlq }}"
+  ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: "{{ vars.ims_target_user }}"
+  irlm:
+      irlmnm: "{{ vars.ims_database_lock_manager_server_name }}"
   # to avoid DFS208I LMSG D/S LIMIT REACHED.  MUST REBUILD.  IMS2
-  ims_lgmsg:                                                     
-      primary_space: 84                                          
-      secondary_space: 63                                        
-      unit: MB                                                   
+  ims_lgmsg:
+      primary_space: 84
+      secondary_space: 63
+      unit: MB
   ims_proclib:
     members:
     - member_name: DFSPBIMS
@@ -44,7 +52,7 @@ ims:
         extended_mcs_console_security_setting: true
         maximum_number_log_records_per_checkpoint_interval: 512K
         command_recognition_character: '@'
-        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 12K
+        common_storage_pool_size_for_program_scheduling_definition_files_when_using_database_server: 256K
         maximum_number_dedb_buffers: 100
         dedb_buffer_pool_page_free_option: '0'
         dedb_additional_buffers: 10
@@ -79,8 +87,8 @@ ims:
         dependent_region_scheduling_connection_id: "{{ vars.imsid }}"
         ims_identifier: "{{ vars.imsid }}"
         time_to_calculate_iovf_free_space_for_each_open_area: 7200
-        irlm_enablement: false
-        database_lock_manager_server_name: XRLM
+        irlm_enablement: "{{ vars.ims_irlm_enablement }}"
+        database_lock_manager_server_name: "{{ vars.ims_database_lock_manager_server_name }}"
         resource_access_security_checking_option: A
         long_message_record_size: 0
         number_of_distinct_updates_to_dedb_ci_before_combining_into_single_logrecord_of_entire_ci: 10
@@ -109,9 +117,9 @@ ims:
         program_isolation_getmain_size_increment: 64K
         program_isolation_maximum_table_size: 1M
         ims_proclib_reader_procedure_name: "{{ vars.imsid }}RDR"
-        suffix_of_the_program_preload_list_file: DC
-        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 12K
-        work_area_pool_size_for_program_scheduling_definition_files: 24K
+        #suffix_of_the_program_preload_list_file: DC
+        common_storage_pool_size_for_program_scheduling_definition_files_without_database_server: 256K
+        work_area_pool_size_for_program_scheduling_definition_files: 512K
         inital_number_of_application_and_system_tasks: 5
         security_mixed_case_password_option: R
         number_of_message_queue_buffers: 5
@@ -157,7 +165,7 @@ ims:
           retention:
             days: 40
             versions: 55
-          ixvolser: "{{ vars.ims_sys_hlq }}"
+          ixvolser: "{{ vars.ims_ixvolser }}"
           access: UPDATE
           acbmgmt: CATALOG
         common_service_layer:
@@ -208,36 +216,6 @@ ims:
         - dbd: IVPDB4
           nbrsegs: '6'
           page_fixed: true
-    - member_name: DFSMPLDC
-      config:
-        modules:
-        - CSQACLST
-        - CSQAMLST
-        - CSQAPRH
-        - CSQAVICM
-        - CSQFSALM
-        - CSQQDEFV
-        - CSQQCONN
-        - CSQQDISC
-        - CSQQTERM
-        - CSQQINIT
-        - CSQQBACK
-        - CSQQCMMT
-        - CSQQESMT
-        - CSQQPREP
-        - CSQQTTHD
-        - CSQQWAIT
-        - CSQQNORM
-        - CSQQSSOF
-        - CSQQSSON
-        - CSQFSTAB
-        - CSQQRESV
-        - CSQQSNOP
-        - CSQQCMND
-        - CSQQCVER
-        - CSQQTMID
-        - CSQQTRGI
-        - CSQQCON2
     - member_name: DFSYDTI
       config:
         descriptors:
@@ -367,26 +345,45 @@ ims:
           strg: 'ON'
     - member_name: CSLSI000
       config:
-        armrst: false
-        sciname: 2SCI1
+        use_zos_automatic_restart_manager_after_abend: false
+        imsplex_communications_server_name: 2SCI1
         imsplex:
-          name: "{{ vars.ims_plex }}"
+          imsplex_name_suffix: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
       config:
-        armrst: false
-        cmdlang: ENU
-        cmdsec: false
-        omname: 2OM1
+        use_zos_automatic_restart_manager_after_abend: false
+        ims_command_language: ENU
+        command_security_option: N
+        operations_server_name: 2OM1
         imsplex:
-          name: "{{ vars.ims_plex }}"
-          auditlog: SYSLOG.OM2Q01.LOG
-        cmdtextdsn: "{{ vars.ims_sys_hlq }}.SDFSDATA"
+          imsplex_name_suffix: "{{ vars.ims_plex }}"
+          #audit_log_stream_name_for_command_input_and_output: SYSLOG.OM2Q01.LOG
+        mvs_file_name_for_command_translation: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:
+        use_zos_automatic_restart_manager_after_abend: false
+        imsplex:
+          imsplex_name_suffix: "{{ vars.ims_plex }}"
+        resource_manager_server_name: 2RM1
+    - member_name: CSLDI000
+      config:
         armrst: false
+        odbmname: 2ODB1
         imsplex:
           name: "{{ vars.ims_plex }}"
-        rmname: 2RM1
+        rrs: false
+    - member_name: CSLDC000
+      config:
+        global_datastore_properties:
+          maxthrds: 10
+          minthrds: 2
+        local_datastore_properties:
+          odbm:
+            name: 2ODB1
+            datastore:
+              name: "{{ vars.imsid }}"
+              maxthrds: 5
+              minthrds: 1
     - member_name: HWSCFODB
       config:
         adapter:
@@ -407,7 +404,7 @@ ims:
           member: "{{ vars.imsid }}HWS"
           tmember: "{{ vars.ims_plex }}"
         odaccess:
-          odbmautoconn: false
+          odbmautoconn: true
           imsplex:
             member: HWS1
             tmember: "{{ vars.ims_plex }}"
@@ -419,26 +416,11 @@ ims:
           hostname: TCPIP
           portid:
           - '9977'
-          - LOCAL
           racfid: SYS1
           timeout: 5000
           ipv6: true
           maxsoc: 600
           exit:
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
-          - HWSIMSO0
-          - HWSIMSO1
-          - HWSSMPL0
-          - HWSSMPL1
-          - HWSCSLO0
-          - HWSCSLO1
-          - HWSIMSO0
-          - HWSIMSO1
           - HWSSMPL0
           - HWSSMPL1
           - HWSCSLO0
@@ -502,19 +484,16 @@ ims:
           type: TCPI
           level: HIGH
           pages: '100'
-        exitmbr:
-        - HWSEXIT0
-        - HWS
     - member_name: DFSJVMEV
       config:
         libpath:
-        - "{{ vars.java_home }}/lib"
-        - "{{ vars.java_home }}/lib/j9vm"
-        - "{{ vars.java_home }}/lib/default"
-        - "{{ vars.java_home }}/bin/j9vm"
-        - "{{ vars.java_home }}/bin/"
         - "{{ vars.ims_java_home }}/lib"
-        - "{{ vars.db2_java_home }}/jdbc/lib"
+        - "{{ vars.ims_java_home }}/lib/j9vm"
+        - "{{ vars.ims_java_home }}/lib/default"
+        - "{{ vars.ims_java_home }}/bin/j9vm"
+        - "{{ vars.ims_java_home }}/bin/"
+        - "{{ vars.ims_java_dir }}/lib"
+        - "{{ vars.db2_java_dir }}/jdbc/lib"
     - member_name: DFSJVMMS
       config:
         jvm_options:

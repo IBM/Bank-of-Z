@@ -74,7 +74,6 @@ fi
 # =========================
 set +e
 opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null
-jcan P "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 sleep 5
 mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
@@ -82,25 +81,22 @@ set -e
 # =========================
 # Configure RACF STARTED profile
 # =========================
-print_info "Configuring RACF STARTED profile..."
 set +e
 opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null &
 sleep 5
-print_info "Defining RACF STARTED class..."
-tsocmd "RDEFINE STARTED BAQ${APP_SHORT_NAME}.* STDATA(USER(${ZOSCONNECT_TASK_USER}) TRUSTED(YES))" 2>/dev/null
-print_info "Refreshing RACF..."
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-print_info "Removing old PROCLIB member..."
+print_info "Configuring RACF STARTED profile..."
+run_tso "RDEFINE STARTED BAQ${APP_SHORT_NAME}.* STDATA(USER(${ZOSCONNECT_TASK_USER}) TRUSTED(YES))"
+run_tso "SETROPTS RACLIST(STARTED) REFRESH"
 mrm "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})" 2>/dev/null || true
 set -e
-print_info "Generating JCL proc..."
 
 # =========================
 # Generate server JCL proc
 # =========================
 # Create JCL with each line padded to exactly 80 characters for FB80 dataset
-rm -f "/tmp/BAQ${APP_SHORT_NAME}.jcl" 
-cat > "/tmp/BAQ${APP_SHORT_NAME}.jcl" << EOF
+print_info "Generating JCL proc..."
+rm -f "/tmp/BAQ${APP_SHORT_NAME}-$$.jcl" 
+cat > "/tmp/BAQ${APP_SHORT_NAME}-$$.jcl" << EOF
 //BAQ${APP_SHORT_NAME}  PROC PARMS='${APP_BASE_NAME_LOWER}Server --clean'
 //*
 //* z/OS Connect Enterprise Edition 3.0.0
@@ -125,14 +121,14 @@ JVM_OPTIONS=-Xmx2048M
 EOF
 
 # Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_SHORT_NAME}.jcl"
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/BAQ${APP_SHORT_NAME}-$$.jcl"
 
 # Copy to PROCLIB using dcp
 print_info "Copying JCL to ${ZOSCONNECT_SYS_PROCLIB}..."
-dcp "/tmp/BAQ${APP_SHORT_NAME}.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})"
+dcp "/tmp/BAQ${APP_SHORT_NAME}-$$.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME})"
 
 # Clean up temp files
-rm -f "/tmp/BAQ${APP_SHORT_NAME}.jcl"
+rm -f "/tmp/BAQ${APP_SHORT_NAME}-$$.jcl"
 
 # =========================
 # Generate CICS connection config
@@ -281,8 +277,9 @@ rm -f /tmp/server.xml.tmp
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "proclib=${ZOSCONNECT_SYS_PROCLIB}" --extraVar "task_name=BAQ${APP_SHORT_NAME}" \
     --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/BAQ${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/BAQ${APP_SHORT_NAME}J.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"
+    --outputFile "/tmp/BAQ${APP_SHORT_NAME}J-$$.jcl"
+dcp "/tmp/BAQ${APP_SHORT_NAME}J-$$.jcl" "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"
+rm -f "/tmp/BAQ${APP_SHORT_NAME}J-$$.jcl"
 
 if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
     opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null
@@ -290,7 +287,7 @@ else
     jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null
 fi
 
-sleep 5
+sleep 10
 print_success "z/OS Connect server setup completed"
 print_info ""
 print_info "z/OS Connect Server Details:"
@@ -310,7 +307,7 @@ if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
     print_info "  Stop:   opercmd 'C BAQ${APP_SHORT_NAME}'"
 else
     print_info "  Start:  jsub '${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)'"
-    print_info "  Stop:   jcan P 'BAQ${APP_SHORT_NAME}'"
+    print_info "  Stop:   opercmd 'C BAQ${APP_SHORT_NAME}'"
 fi
 print_info ""
 

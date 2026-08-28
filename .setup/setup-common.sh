@@ -28,6 +28,11 @@ stage_stop_tasks() {
     # =========================
     # Stop IBM IMS regions
     # =========================
+    # Delete stale stop members so jsub fails silently rather than executing
+    # outdated JCL that may reference deleted datasets.
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
@@ -36,8 +41,6 @@ stage_stop_tasks() {
     jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
     jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
     sleep 5
-    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
-    sleep 1
     opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null
     sleep 1
     opercmd "C ${IMS_DATASTORE}OM" 2>/dev/null
@@ -45,6 +48,13 @@ stage_stop_tasks() {
     opercmd "C ${IMS_DATASTORE}RM" 2>/dev/null
     sleep 1
     opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null
+    sleep 1
+    # IMS Connect
+    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null
     
     # =========================
     # Stop IBM CICS regions
@@ -465,6 +475,34 @@ stage_setup_ims_region() {
 }
 
 #########################################################
+# STAGE: Setup DPS
+#########################################################
+stage_setup_debug_profile_service() {
+    print_stage "STAGE: Configure Debug Profile Service"
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-debug.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-debug.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Debug Profile Service setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-debug.sh"
+    cd "$BANK_DIR"
+    
+    
+    set -o pipefail
+    if .setup/setup/setup-debug.sh; then
+        print_success "Debug Profile Service setup completed successfully"
+    else
+        print_error "Failed to setup Debug Profile Service"
+        exit 1
+    fi
+}
+
+
+#########################################################
 # Main execution helpers
 #########################################################
 print_phase_next_step() {
@@ -488,14 +526,21 @@ print_usage() {
     echo "Usage: bash setup-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zconfig, DBB, wazi-deploy)"
-    echo "  environment       Initialize workspace and infrastructure prerequisites"
-    echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
+    echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
+    echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
+    echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
+    echo "  bash setup-common.sh verify-installation"
+    echo ""
+    echo "verify-installation environment variables:"
+    echo "  BASE_URL       z/OS Connect API base URL  (default: derived from config)"
+    echo "  FRONTEND_URL   Frontend Liberty base URL  (default: derived from config)"
+    echo "  IMS_DISABLED   Set to true to skip IMS-specific tests"
 }
 
 #########################################################
@@ -522,16 +567,16 @@ main_setup() {
         stage_setup_ims_bankz_regions
     fi
 
-    stage_setup_zosconnect_server
+    stage_setup_debug_profile_service
 
-    stage_setup_frontend_server
-
-    # Certificates run last so addcert.sh + gencert-eku.sh regenerate the
-    # RACF keyring cert after the server config is in place.
+    # Certificates
     if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then
         stage_setup_certificates
     fi
-    
+
+    stage_setup_zosconnect_server
+    stage_setup_frontend_server
+
     # Summary
     print_stage "SETUP COMPLETE"
     print_success "Environment setup completed successfully!"
@@ -578,6 +623,40 @@ main_validation() {
     print_phase_next_step "validation"
 }
 
+#########################################################
+# STAGE: Post-install verification tests
+#########################################################
+stage_verify_installation() {
+    print_stage "STAGE: Post-install Verification Tests"
+
+    local task="${SCRIPTS_DIR}/tasks/task-install-verification.sh"
+
+    if [ ! -f "$task" ]; then
+        print_error "Verification task not found: $task"
+        exit 1
+    fi
+
+    set -o pipefail
+    if bash "$task"; then
+        print_success "All verification tests passed"
+    else
+        print_error "One or more verification tests failed"
+        exit 1
+    fi
+}
+
+main_verify_installation() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_verify_installation
+
+    print_stage "VERIFICATION COMPLETE"
+    print_success "Installation verification completed successfully!"
+}
+
 main() {
     local phase="${1:-}"
 
@@ -602,6 +681,24 @@ main() {
             if [[ "$IMS_DISABLED" != "true" ]]; then
                 stage_populate_ims_database
             fi
+            
+            # Restart frontend and z/OS Connect servers (dropinsEnabled="false")
+            opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            sleep 5
+            if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+            fi
+            if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"  2>/dev/null || true
+            fi
+            ;;
+        verify-installation)
+            main_verify_installation
             ;;
         -h|--help|help|"")
             print_usage

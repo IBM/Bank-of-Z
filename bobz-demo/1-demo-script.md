@@ -1,5 +1,5 @@
 # AI That Speaks Mainframe: Accelerating Z Modernization with IBM Bob Premium Package for Z
-*Last updated: 2026-08-27*
+**Author:** Biao Hao (biaohao@us.ibm.com) | *Last updated: 2026-08-28*
 
 **Goal:** Show how IBM Bob Premium Package for Z (PPZ) accelerates understanding, analysis, and safe delivery of changes across a real multi-language mainframe application — and how it can be extended to fit any team's standards.
 
@@ -7,30 +7,30 @@
 ---
 
 ## Agenda
-Select from the full list of demo scenarios, depending on focus and time available.
+*Illustrative - select from the full list of demo scenarios, depending on focus and time available.*
 
 | Step | Topic | Time | Key message |
 |---|---|---|---|
-| 1 | Introduction — Bob, PPZ, Bank-of-Z | 5 min | *Bob starts from the same frontier model as Claude Code — PPZ is what makes it useful on Z.* |
-| 2 | Multi-language flow explanation | 10 min | *Five files, five languages, one coherent answer — no copy-paste.* |
-| 3 | Customer audit trail analysis | 8 min | *A compliance question answered in 60 seconds vs. a full day.* |
-| 4a | Add email — impact analysis | 8 min | *15 components. The hidden inline struct trap — caught before anyone wrote a line of code.* |
-| 4b | Add email — implementation plan | 5 min | *Exact byte positions in COMMAREA. Not 'here's what to change' — 'here's exactly how'.* |
-| 4c | Add email — code changes | 5 min | *Bob makes all the code changes across 30+ files — COBOL, BMS, z/OS Connect, Web UI. It also introduced and fixed 7 bugs, caught at compile, deploy, and runtime.* |
-| 4d | Add email — build, deploy & live UI | 5 min | *This field didn't exist this morning. It's live on Z now.* |
-| 5 | ZCodeScan pre-commit review | 5 min | *Your rules, enforced by AI, before the code ever reaches CICS.* |
-| 6 | Customizing Bob | 5 min | *Every other AI tool is a black box. Bob's behavior is version-controlled YAML.* |
-| 7 | Summary & next steps | 3 min | *Pick one change request. Run an impact analysis. Compare it to how long it takes today.* |
-| A1 | PL/I batch program analysis | 8 min | *PL/I is not an afterthought — explain and change a 912-line batch program in one prompt.* |
-| A2 | Funds transfer failure path analysis | 8 min | *Deadlock prevention, partial rollback, and abend codes — all traced from source.* |
-| A3 | IMS database analysis | 8 min | *IMS DL/I, PSBs, DBDs — Bob reads assembly source and explains the access boundary.* |
-| A4 | CRECUST async credit check refactor | 8 min | *530 lines extracted into a clean service interface. Ready to swap for an API call.* |
+| [1](#step-1--introduction-the-agent-and-the-app) | Introduction — Bob, PPZ, Bank-of-Z, Z Environment | 5 min | *Bob starts from the same frontier model as Claude Code — PPZ is what makes it useful on Z.* |
+| [2](#step-2--multi-language-program-explanation) | Multi-language flow explanation | 10 min | *Five files, five languages, one coherent answer — no copy-paste.* |
+| [3](#step-3--customer-audit-trail-analysis) | Customer audit trail analysis | 8 min | *A compliance question answered in 60 seconds vs. a full day.* |
+| [4a](#4a--impact-analysis) | Add email — impact analysis | 8 min | *15 components. The hidden inline struct trap — caught before anyone wrote a line of code.* |
+| [4b](#4b--implementation-plan) | Add email — implementation plan | 5 min | *Exact byte positions in COMMAREA. Not 'here's what to change' — 'here's exactly how'.* |
+| [4c](#4c--code-changes) | Add email — code changes | 5 min | *Bob makes all the code changes across 30+ files — COBOL, BMS, z/OS Connect, Web UI. It also introduced and fixed 7 bugs, caught at compile, deploy, and runtime.* |
+| [4d](#4d--build-deploy-and-demo) | Add email — build, deploy & live UI | 5 min | *This field didn't exist this morning. It's live on Z now.* |
+| [5](#step-5--zcodescan-custom-rule-enforcement-before-commit) | ZCodeScan pre-commit review | 5 min | *Your rules, enforced by AI, before the code ever reaches CICS.* |
+| [6](#step-6--customizing-bob) | Customizing Bob | 5 min | *Every other AI tool is a black box. Bob's behavior is version-controlled YAML.* |
+| [7](#step-7--summary-and-next-steps) | Summary & next steps | 3 min | *Pick one change request. Run an impact analysis. Compare it to how long it takes today.* |
+| [A1](#a1--pli-batch-program-analysis--code-change) | PL/I batch program analysis | 8 min | *PL/I is not an afterthought — explain and change a 912-line batch program in one prompt.* |
+| [A2](#a2--cobol-funds-transfer-program-logic--failure-path-analysis) | Funds transfer failure path analysis | 8 min | *Deadlock prevention, partial rollback, and abend codes — all traced from source.* |
+| [A3](#a3--ims-database-analysis-ibgcudat-segments-and-customercustaccs-relationship) | IMS database analysis | 8 min | *IMS DL/I, PSBs, DBDs — Bob reads assembly source and explains the access boundary.* |
+| [A4](#a4--cics-cobol-refactor-crecust-async-credit-check) | CRECUST async credit check refactor | 8 min | *530 lines extracted into a clean service interface. Ready to swap for an API call.* |
 
+[↓ Acknowledgements](#acknowledgements)
 
 ---
 
 ## Step 1 — Introduction: The Agent and the App
-*⏱ ~5 minutes*
 
 > **Presenter note:** See `bobz-demo/1x-bob-and-ppz-overview.md` for the full product overview, comparison table, and talking points.
 
@@ -221,10 +221,11 @@ For the full program-level detail, open `bobz-demo/1x-bank-of-z-architecture.md`
 
 Every scenario you'll see today involves real code from this application — real cross-language tracing, real impact analysis, real code changes deployed on Z. Nothing is mocked or pre-computed.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 2 — Multi-Language Program Explanation
-*⏱ ~10 minutes*
 
 > **Presenter note:** Switch to **Z Architect** mode. See `bobz-demo/2-multi-language-program-explanation.md` for the full pre-captured output.
 
@@ -262,10 +263,11 @@ The question specifically asked about the timeout path. Bob traced the exact div
 **4. Grounded — never speculates**
 Bob is configured to never speculate about code it has not read directly. Every claim in the output is traceable to a specific line in a specific file. This is auditable.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 3 — Customer Audit Trail Analysis
-*⏱ ~8 minutes*
 
 > **Presenter note:** Switch to **Z Architect** mode. See `bobz-demo/3-customer-audit-trail-analysis.md` for the full pre-captured output.
 
@@ -302,10 +304,11 @@ Bob didn't just say "these programs have no PROCTRAN write." It assessed *why* �
 **4. Demonstrate the "10× faster compliance audit" story**  
 This scenario is the most direct translation of AI value into a business metric: a task that took a senior developer a day now takes 60 seconds. Regulators care about this.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 4 — Add Email to Customer Info (End-to-End Change Delivery)
-*⏱ ~23 minutes total (5–8 min per sub-step)*
 
 This step is in four sub-parts, from analysis to plan to implementation to deployment. Show as much as time allows.
 
@@ -317,7 +320,7 @@ This step is in four sub-parts, from analysis to plan to implementation to deplo
 
 #### Prompt
 
-> I want to add an email address field to the customer data model. The field should be optional, max 50 characters, stored in the CUSTOMER DB2 table as CUSTOMER_EMAIL CHAR(50). Also, place the email field right after phone number. Please do a full impact analysis: identify every file that needs to change, explain why, and flag any risks — especially around COMMAREA sizing and z/OS Connect provider files.
+> I want to add an email address field to the customer data model. The field should be optional, max 50 characters, stored in the CUSTOMER DB2 table as CUSTOMER_EMAIL CHAR(50). Also, place the email field right after phone number. Please do a full impact analysis: identify every file that needs to change, explain why, and flag any risks — especially around COMMAREA sizing and z/OS Connect provider files. Use the Z Understand project.
 
 #### What Bob produces
 
@@ -336,6 +339,8 @@ Bob flagged `BNK1DCS.cbl` as having an inline COMMAREA struct with no COPY state
 
 **3. Deployment order is a first-class output**  
 The impact analysis doesn't just say "these files change." It says *in what order* to deploy them, and *why* the order matters (DDL before DBRM bind; COBOL before z/OS Connect provider files). This is the difference between a useful analysis and a list.
+
+[↑ Agenda](#agenda)
 
 ---
 
@@ -373,6 +378,8 @@ The appendix specifies exact byte offsets in four COMMAREAs. Bob computed these 
 
 **3. Rollback is first-class**  
 The plan includes a rollback matrix: what to do if DDL is deployed but programs aren't yet bound, if programs are bound but defects are found, if z/OS Connect is deployed and broken, and if the Web UI needs reversion. Rollback is an afterthought in most AI-generated plans.
+
+[↑ Agenda](#agenda)
 
 ---
 
@@ -416,6 +423,8 @@ Bob introduced 7 bugs and fixed all of them — some at compile, some after depl
 **3. Cross-stack consistency**
 The same AI that wrote the COBOL also updated the JSONata mapping, the OpenAPI schema, and the HTML form. No handoff, no translation error between layers.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ### 4d — Build, Deploy, and Demo
@@ -447,10 +456,11 @@ The build runs **DBB** on z/OS. The deploy runs **Wazi Deploy** to a live CICS r
 
 This email field didn't exist in the codebase this morning. An AI agent reasoned about a 30-year-old COBOL application, produced a safe implementation plan with exact byte positions, made the changes, caught 7 bugs, and it's running on Z. What change request would you want to try this on?
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 5 — ZCodeScan: Custom Rule Enforcement Before Commit
-*⏱ ~5 minutes*
 
 > **Presenter note:** Switch to **Z Code** mode. See `bobz-demo/5-zCodeScan-rule-review-before-commit.md` for the full pre-captured output.
 
@@ -489,10 +499,11 @@ The output is sorted by risk — HIGH first, then ordered by fix effort. A devel
 **4. Transition into the customization story**  
 Segue naturally: *"The rules Bob just applied — those came from a YAML file your team controls. Let's talk about what else you can customize."*
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 6 — Customizing Bob
-*⏱ ~5 minutes*
 
 ### What to cover
 
@@ -541,10 +552,11 @@ When a senior developer encodes their review checklist as a ZCodeScan rule or a 
 **3. Governance story**  
 For regulated industries (banking, insurance, government): the ability to define, version-control, and audit the rules Bob applies is a compliance differentiator. "Our AI agent applies our standards" is a much stronger audit answer than "we used a generic AI assistant."
 
+[↑ Agenda](#agenda)
+
 ---
 
 ## Step 7 — Summary and Next Steps
-*⏱ ~3 minutes*
 
 ### Recap what we just demonstrated:
 
@@ -564,11 +576,7 @@ For regulated industries (banking, insurance, government): the ability to define
 3. **Pick a real change request** — run an impact analysis on it and compare the result to how long it would have taken manually
 4. **Pilot with one team** — identify 2–3 developers who will use Bob daily and collect before/after time metrics
 
----
-**Author:** Biao Hao (biaohao@us.ibm.com)
-**Contact:** FSM Z Acceleration
-
-*Reference scenarios: `bobz-demo/1x-bob-and-ppz-overview.md` · `bobz-demo/2-multi-language-program-explanation.md` · `bobz-demo/3-customer-audit-trail-analysis.md` · `bobz-demo/4a-add-email-impact-analysis.md` · `bobz-demo/4b-add-email-implementation-plan.md` · `bobz-demo/4c-add-email-implementation-summary.md` · `bobz-demo/5-zCodeScan-rule-review-before-commit.md` · `bobz-demo/a1-bnkstmt-pli-analysis.md` · `bobz-demo/a2-xfrfun-funds-transfer-analysis.md` · `bobz-demo/a3-ims-ibgcudat-analysis.md` · `bobz-demo/a4-crecust-async-refactor.md`*
+[↑ Agenda](#agenda)
 
 ---
 
@@ -579,6 +587,7 @@ These scenarios are **not part of the core flow** but are ready to use for exten
 ---
 
 ### A1 — PL/I Batch Program Analysis + Code Change
+*⏱ ~8 minutes*
 
 **Best used:** After Step 2 (multi-language explanation), or as a standalone PL/I deep-dive for audiences with batch/PL/I workloads
 
@@ -621,9 +630,12 @@ The 132-character `REPORT_LINE` limit was never mentioned in the prompt. Bob ide
 **4. "No other files change" is an output**
 Bob explicitly stated: *"No DB2 schema change, no cursor change, no host variable additions, no copybook changes, no JCL changes."* A confident, verifiable blast-radius statement — not a vague "this might affect other things."
 
+[↑ Agenda](#agenda)
+
 ---
 
 ### A2 — COBOL Funds Transfer Program: Logic + Failure Path Analysis
+*⏱ ~8 minutes*
 
 **Best used:** After Step 2 (multi-language explanation) or as a standalone CICS deep-dive for audiences interested in transaction integrity and error handling
 
@@ -676,9 +688,12 @@ Bob flagged the "no overdraft checking" constraint — not as a bug, but as an i
 **4. The PROCTRAN write failure scenario**  
 The prompt only asked about the account update partial failure. Bob went further and described what happens if the PROCTRAN INSERT fails *after both accounts are already updated* — abend codes `'WPCD'` (FROM row) and `'WPCT'` (TO row), both causing CICS to roll back the UOW including the account updates. The freeform abend string explicitly notes: *"Data inconsistency, data UPDATED on ACCOUNT file"* — a signal to operations that the abend description itself is a diagnostic artefact.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ### A3 — IMS Database Analysis: IBGCUDAT Segments and CUSTOMER/CUSTACCS Relationship
+*⏱ ~8 minutes*
 
 **Best used:** For audiences with IMS workloads, or after Step 2 to demonstrate that Bob's cross-language reasoning extends to IMS hierarchical databases — not just CICS/DB2
 
@@ -729,9 +744,12 @@ Bob explained that `PROCOPT=G` means IBGCUDAT cannot insert, update, or delete. 
 **4. The ecosystem view — from one question**  
 The prompt was about one program and two databases. Bob delivered a 9-database × 8-PSB access matrix, identified that `HISTORY` is write-only from COBOL, noted that three reference databases (`TTYPE`, `CUSTTYPE`, `TSTATTYP`) are never accessed at runtime, and confirmed that `IBGCUDAT` is the most narrowly scoped PSB in the entire IMS subsystem. None of this was asked — all of it is useful.
 
+[↑ Agenda](#agenda)
+
 ---
 
 ### A4 — CICS COBOL Refactor: CRECUST Async Credit Check
+*⏱ ~8 minutes*
 
 **Best used:** As a code-generation demo combining architectural thinking with precise mainframe implementation. Shows how Bob isolates complexity, designs a clean interface, and produces ready-to-apply code. Ideal for technical audiences who want to see real refactoring — not just explanation.
 
@@ -814,3 +832,13 @@ The prompt said "show me the changes to be made only." Bob produced the new file
 
 **5. `GOBACK` vs `EXEC CICS RETURN` — getting the CICS detail right**
 In the extracted `CRCCVERI.cbl`, Bob used `GOBACK` rather than `EXEC CICS RETURN`. A LINKed program returns control to its caller via `GOBACK`; `EXEC CICS RETURN` would return to CICS and end the task. This is a subtle but critical CICS correctness point that generic AI tools frequently get wrong.
+
+[↑ Agenda](#agenda)
+
+---
+
+## Acknowledgements
+
+This demo was created by the IBM US FSM Z Acceleration team, under **Eric Watson**'s leadership. Special thanks to **Kathryn McAvoy** for her leadership, and to **Sailesh Jalakam, Colin Henderson, Adarius Isaac, Frank Hernandez, John Gustavson, and Joe Pesot** — without their effort, this would not have been possible.
+
+[↑ Agenda](#agenda)

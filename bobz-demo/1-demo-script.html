@@ -244,6 +244,8 @@
     <li class="appendix"><a href="#a2">A2 — Funds Transfer Analysis</a></li>
     <li class="appendix"><a href="#a3">A3 — IMS Database Analysis</a></li>
     <li class="appendix"><a href="#a4">A4 — CRECUST Refactor</a></li>
+    <li class="section-header"><a href="#">Info</a></li>
+    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ul>
 </nav>
 
@@ -255,7 +257,7 @@
   <h1>AI That Speaks Mainframe: Accelerating Z Modernization with IBM Bob Premium Package for Z</h1>
   <div class="meta">
     <span><strong>Author:</strong> Biao Hao (biaohao@us.ibm.com)</span>
-    <span><strong>Last updated:</strong> 2026-08-27</span>
+    <span><strong>Last updated:</strong> 2026-08-28</span>
   </div>
   <p style="margin-top:0.75rem;font-size:0.9rem;color:#525252;"><strong>Goal:</strong>Show how IBM Bob Premium Package for Z (PPZ) accelerates understanding, analysis, and safe delivery of changes across a real multi-language mainframe application — and how it can be extended to fit any team's standards.</p>
 </div>
@@ -263,11 +265,11 @@
 <!-- ══════════════════ AGENDA ══════════════════ -->
 <section id="agenda">
   <h2>Agenda</h2>
-  <p style="font-size:0.88rem;color:#525252;margin-bottom:0.75rem;">Select from the full list of demo scenarios, depending on focus and time available.</p>
+  <p style="font-size:0.88rem;color:#525252;margin-bottom:0.75rem;"><em>Illustrative — select from the full list of demo scenarios, depending on focus and time available.</em></p>
   <table class="agenda-table">
     <thead><tr><th>Step</th><th>Topic</th><th>Time</th><th>Key message</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Introduction — Bob, PPZ, Bank-of-Z</td><td>5 min</td><td><em>Bob starts from the same frontier model as Claude Code — PPZ is what makes it useful on Z.</em></td></tr>
+      <tr><td>1</td><td>Introduction — Bob, PPZ, Bank-of-Z, Z Environment</td><td>5 min</td><td><em>Bob starts from the same frontier model as Claude Code — PPZ is what makes it useful on Z.</em></td></tr>
       <tr><td>2</td><td>Multi-language flow explanation</td><td>10 min</td><td><em>Five files, five languages, one coherent answer — no copy-paste.</em></td></tr>
       <tr><td>3</td><td>Customer audit trail analysis</td><td>8 min</td><td><em>A compliance question answered in 60 seconds vs. a full day.</em></td></tr>
       <tr><td>4a</td><td>Add email — impact analysis</td><td>8 min</td><td><em>15 components. The hidden inline struct trap — caught before anyone wrote a line of code.</em></td></tr>
@@ -287,7 +289,7 @@
 
 <!-- ══════════════════ STEP 1 ══════════════════ -->
 <section id="step1">
-  <h2><span class="step-badge">Step 1</span> Introduction: The Agent and the App <span class="timing">⏱ ~5 min</span></h2>
+  <h2><span class="step-badge">Step 1</span> Introduction: The Agent and the App</h2>
   <div class="presenter-note"><strong>Presenter note:</strong> See <code>bobz-demo/1x-bob-and-ppz-overview.md</code> for the full product overview, comparison table, and talking points.</div>
 
   <h3>1a — What Is IBM Bob?</h3>
@@ -408,7 +410,7 @@ graph TB
 
 <!-- ══════════════════ STEP 2 ══════════════════ -->
 <section id="step2">
-  <h2><span class="step-badge">Step 2</span> Multi-Language Program Explanation <span class="timing">⏱ ~10 min</span></h2>
+  <h2><span class="step-badge">Step 2</span> Multi-Language Program Explanation</h2>
   <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/2-multi-language-program-explanation.md</code> for the full pre-captured output.</div>
 
   <h3>Prompt</h3>
@@ -429,7 +431,6 @@ graph TB
     <li>An explanation of the CICS async child task pattern (<code>PUT CONTAINER</code> / <code>RUN TRANSID</code> / <code>FETCH ANY NOSUSPEND</code>)</li>
     <li>The exact timeout path: what <code>COMM-FAIL-CODE = 'G'</code> means, which paragraphs are skipped, and what the web UI shows the user</li>
     <li>A <strong>Mermaid flow diagram</strong> of the complete path</li>
-    <li>Cyclomatic complexity per paragraph (CREDIT-CHECK scores 19 — the dominant risk)</li>
   </ul>
 
   <h3>Why it matters</h3>
@@ -447,7 +448,7 @@ graph TB
 
 <!-- ══════════════════ STEP 3 ══════════════════ -->
 <section id="step3">
-  <h2><span class="step-badge">Step 3</span> Customer Audit Trail Analysis <span class="timing">⏱ ~8 min</span></h2>
+  <h2><span class="step-badge">Step 3</span> Customer Audit Trail Analysis</h2>
   <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Architect</strong> mode. See <code>bobz-demo/3-customer-audit-trail-analysis.md</code> for the full pre-captured output.</div>
 
   <h3>Prompt</h3>
@@ -476,9 +477,7 @@ graph TB
   The result includes <code>BNKSTMT.pli</code> — a PL/I batch program. Z Understand (and therefore Bob) indexes all supported languages in one project. A tool that only understands COBOL would miss it.</p>
   <p><strong>3. Risk nuance, not just a list</strong><br>
   Bob didn't just say "these programs have no PROCTRAN write." It assessed <em>why</em> — identifying <code>UPDCUST</code> as a genuine compliance gap requiring remediation, distinguishing it from a compliant read-only inquiry (<code>INQCUST</code>) and a legitimate production risk in <code>BANKDATA</code>.</p>
-  <p><strong>4. Follow-on suggestion included</strong><br>
-  Bob proactively suggested: <em>"Run the same audit trail check against the ACCOUNT table."</em> The analyst didn't have to think of that — it's the natural next step.</p>
-  <p><strong>5. The "10× faster compliance audit" story</strong><br>
+  <p><strong>4. Demonstrate the "10× faster compliance audit" story</strong><br>
   This scenario is the most direct translation of AI value into a business metric: a task that took a senior developer a day now takes 60 seconds. Regulators care about this.</p>
 </section>
 
@@ -486,7 +485,7 @@ graph TB
 
 <!-- ══════════════════ STEP 4 ══════════════════ -->
 <section id="step4">
-  <h2><span class="step-badge">Step 4</span> Add Email to Customer Info (End-to-End Change Delivery) <span class="timing">⏱ ~23 min total</span></h2>
+  <h2><span class="step-badge">Step 4</span> Add Email to Customer Info (End-to-End Change Delivery)</h2>
   <p>This step is in four sub-parts, from analysis to plan to implementation to deployment. Show as much as time allows.</p>
 
   <!-- 4a -->
@@ -607,7 +606,7 @@ graph TB
 
 <!-- ══════════════════ STEP 5 ══════════════════ -->
 <section id="step5">
-  <h2><span class="step-badge scan">Step 5</span> ZCodeScan: Custom Rule Enforcement Before Commit <span class="timing">⏱ ~5 min</span></h2>
+  <h2><span class="step-badge scan">Step 5</span> ZCodeScan: Custom Rule Enforcement Before Commit</h2>
   <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Code</strong> mode. See <code>bobz-demo/5-zCodeScan-rule-review-before-commit.md</code> for the full pre-captured output.</div>
 
   <h3>Prompt</h3>
@@ -645,7 +644,7 @@ graph TB
 
 <!-- ══════════════════ STEP 6 ══════════════════ -->
 <section id="step6">
-  <h2><span class="step-badge">Step 6</span> Customizing Bob <span class="timing">⏱ ~5 min</span></h2>
+  <h2><span class="step-badge">Step 6</span> Customizing Bob</h2>
   <p>This step combines <strong>live demo + talking points</strong>. Use the prompts below to show customization live — don't just describe it.</p>
 
   <h3>6a — Adding a new Mode</h3>
@@ -681,7 +680,7 @@ graph TB
 
 <!-- ══════════════════ STEP 7 ══════════════════ -->
 <section id="step7">
-  <h2><span class="step-badge">Step 7</span> Summary and Next Steps <span class="timing">⏱ ~3 min</span></h2>
+  <h2><span class="step-badge">Step 7</span> Summary and Next Steps</h2>
 
   <h3>Recap what we just demonstrated</h3>
   <table>
@@ -768,7 +767,8 @@ graph TB
     <h4>Why it matters</h4>
     <p><strong>1. "How does it handle X?" is answered from the actual code</strong><br>Bob traced all four code paths from source, named the exact <code>COMM-FAIL-CODE</code> value for each, and identified which used explicit <code>SYNCPOINT ROLLBACK</code> vs CICS task abend. No guessing.</p>
     <p><strong>2. The locking order insight</strong><br>The deadlock prevention strategy at lines 378–904 is architectural knowledge that lives only in the code. Bob identified it as such and explained <em>why</em> it works. A developer new to this program would take hours to reach the same understanding.</p>
-    <p><strong>3. Design gaps surfaced proactively</strong><br>Bob flagged the "no overdraft checking" constraint — not as a bug, but as an intentional design decision that the calling layer must account for.</p>
+    <p><strong>3. Design gaps surfaced proactively</strong><br>Bob flagged the "no overdraft checking" constraint — not as a bug, but as an intentional design decision that the calling layer must account for. A risk a new developer would miss; Bob catches it from a one-line comment in the program header.</p>
+    <p><strong>4. The PROCTRAN write failure scenario</strong><br>The prompt only asked about the account update partial failure. Bob went further and described what happens if the PROCTRAN INSERT fails <em>after both accounts are already updated</em> — abend codes <code>'WPCD'</code> (FROM row) and <code>'WPCT'</code> (TO row), both causing CICS to roll back the UOW including the account updates. The freeform abend string explicitly notes: <em>"Data inconsistency, data UPDATED on ACCOUNT file"</em> — a signal to operations that the abend description itself is a diagnostic artefact.</p>
   </section>
 
   <!-- A3 -->
@@ -796,7 +796,9 @@ graph TB
     <p>Notable: <code>HISTORY</code> is <strong>insert-only</strong> from COBOL (<code>IBTRAN PROCOPT=I</code>) — reads come exclusively from the Java JMP layer.</p>
     <h4>Why it matters</h4>
     <p><strong>1. IMS is not a second-class citizen</strong><br>Bob read PSB assembly source and DBD assembly source, understood <code>SEQ=M</code> vs <code>SEQ=U</code>, and correctly identified that <code>PARENT=0</code> on both databases means no IMS hierarchy. This level of IMS fluency is rare even among experienced mainframe developers.</p>
-    <p><strong>2. The PSB is the security and access boundary</strong><br><code>PROCOPT=G</code> means IBGCUDAT cannot insert, update, or delete. The PSB is the IMS equivalent of a DB2 GRANT statement. No other AI tool reads PSB assembly source and interprets its security implications.</p>
+    <p><strong>2. The correct answer is counter-intuitive</strong><br>The prompt specifically asked about parent-child relationship. Bob gave the correct, counter-intuitive answer: there <em>isn't</em> one. A less rigorous tool would have speculated that CUSTACCS is a child segment of CUSTOMER based on naming. Bob went to the source — <code>PARENT=0</code> in <code>CUSTACCS.asm</code> — and explained <em>why</em> the design chose cross-reference databases over hierarchical segments.</p>
+    <p><strong>3. The PSB is the security and access boundary</strong><br><code>PROCOPT=G</code> means IBGCUDAT cannot insert, update, or delete. The PSB is the IMS equivalent of a DB2 GRANT statement. No other AI tool reads PSB assembly source and interprets its security implications.</p>
+    <p><strong>4. The ecosystem view — from one question</strong><br>The prompt was about one program and two databases. Bob delivered a 9-database × 8-PSB access matrix, identified that <code>HISTORY</code> is write-only from COBOL, noted that three reference databases (<code>TTYPE</code>, <code>CUSTTYPE</code>, <code>TSTATTYP</code>) are never accessed at runtime, and confirmed that <code>IBGCUDAT</code> is the most narrowly scoped PSB in the entire IMS subsystem. None of this was asked — all of it is useful.</p>
   </section>
 
   <!-- A4 -->
@@ -818,10 +820,18 @@ graph TB
          ◀──RETURN──
          CREDIT-SCORE / CS-REVIEW-DATE / SUCCESS / FAIL-CODE</code></pre>
     <h4>Why it matters</h4>
-    <p><strong>1. Separation of concerns — a real architectural improvement</strong><br>The async dispatch complexity is entirely removed from <code>CRECUST</code>. <code>CRECUST</code> now expresses business intent: "perform credit check, get score, continue." That is a meaningful improvement in readability and maintainability, not just a cosmetic reorganisation.</p>
-    <p><strong>2. Future-proof by design</strong><br>Changing the credit check mechanism requires zero changes to <code>CRECUST</code> — only <code>CRCCVERI.cbl</code> is replaced. The COMMAREA contract (<code>CRCCVERI.cpy</code>) is the stable interface boundary.</p>
-    <p><strong>3. <code>GOBACK</code> vs <code>EXEC CICS RETURN</code> — getting the CICS detail right</strong><br>A LINKed program returns control to its caller via <code>GOBACK</code>; <code>EXEC CICS RETURN</code> would return to CICS and end the task. This is a subtle but critical CICS correctness point that generic AI tools frequently get wrong.</p>
+    <p><strong>1. Separation of concerns — a real architectural improvement</strong><br>The async dispatch complexity (channels, containers, child tokens, NOSUSPEND fetch loop, score aggregation) is entirely removed from <code>CRECUST</code>. <code>CRECUST</code> now expresses business intent: "perform credit check, get score, continue." That is a meaningful improvement in readability and maintainability, not just a cosmetic reorganisation.</p>
+    <p><strong>2. Future-proof by design</strong><br>The prompt explicitly asked for "easy to switch to an API call." Bob designed the interface so that changing the credit check mechanism requires zero changes to <code>CRECUST</code> — only <code>CRCCVERI.cbl</code> is replaced. The COMMAREA contract (<code>CRCCVERI.cpy</code>) is the stable interface boundary. This is a design decision, not just a code move.</p>
+    <p><strong>3. Precise field-scope analysis</strong><br>Bob identified the one field (<code>WS-CREDIT-CHECK-ERROR</code>) that crosses the boundary — set inside <code>CREDIT-CHECK</code>, tested in <code>P010</code> — and kept it in <code>CRECUST</code>. The other 18 Working-Storage fields were confirmed as exclusively used inside <code>CREDIT-CHECK</code> and moved. This required reading the full program, not just the section being extracted.</p>
+    <p><strong>4. "Changes only" is a first-class capability</strong><br>The prompt said "show me the changes to be made only." Bob produced the new files and exact edits without regenerating the unchanged sections of <code>CRECUST.cbl</code>. Precise, reviewable, safe to apply.</p>
+    <p><strong>5. <code>GOBACK</code> vs <code>EXEC CICS RETURN</code> — getting the CICS detail right</strong><br>In the extracted <code>CRCCVERI.cbl</code>, Bob used <code>GOBACK</code> rather than <code>EXEC CICS RETURN</code>. A LINKed program returns control to its caller via <code>GOBACK</code>; <code>EXEC CICS RETURN</code> would return to CICS and end the task. This is a subtle but critical CICS correctness point that generic AI tools frequently get wrong.</p>
   </section>
+</section>
+
+<!-- ══════════════════ ACKNOWLEDGEMENTS ══════════════════ -->
+<section id="acknowledgements" style="margin-top:2rem">
+  <h2>Acknowledgements</h2>
+  <p>This demo was created by the IBM US FSM Z Acceleration team, under <strong>Eric Watson</strong>'s leadership. Special thanks to <strong>Kathryn McAvoy</strong> for her leadership, and to <strong>Sailesh Jalakam, Colin Henderson, Adarius Isaac, Frank Hernandez, John Gustavson, and Joe Pesot</strong> — without their effort, this would not have been possible.</p>
 </section>
 
 <!-- Footer -->

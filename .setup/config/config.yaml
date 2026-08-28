@@ -67,11 +67,11 @@ global:
   
   # IMS
   ims_disabled: "true"
-  ims_sys_hlq: "IMSV15"
-  ims_java_dir: "/usr/lpp/ims/imsjava"
+  ims_sys_hlq: "DFSF10"
+  ims_java_dir: "/usr/lpp/ims/ims15/imsjava"
   ims_datastore: "IMS2"
-  ims_dfsplex: "PLEX2"
-  ims_ixvolser: "IMSV15"
+  ims_dfsplex: "CSLPLEX1"
+  ims_ixvolser: "DFSF10"
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
   

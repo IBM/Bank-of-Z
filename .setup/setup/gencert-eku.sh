@@ -86,11 +86,8 @@ fi
 # -----------------------------------------------------------------------
 # Guard: verify IP and DNS can be determined
 # -----------------------------------------------------------------------
-ipaddr=$(netstat -h 2>/dev/null |
-  awk '
-    /IntfName:[[:space:]]*(TCPIPLINK|OSA[0-9]+)/ { intf=$2 }
-    /Address:/ && intf { print $2; exit }
-  ')
+
+ipaddr=$(get_ipaddr)
 dnsname=$(hostname 2>/dev/null)
 
 if [ -z "$ipaddr" ] || [ -z "$dnsname" ]; then

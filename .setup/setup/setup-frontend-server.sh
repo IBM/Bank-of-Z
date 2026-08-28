@@ -79,7 +79,7 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
     <!-- Enable features -->
     <featureManager>
         <feature>servlet-6.0</feature>
-        <feature>jsp-3.1</feature>
+        <feature>pages-3.1</feature>
         <feature>transportSecurity-1.0</feature>
         <feature>ssl-1.0</feature>
     </featureManager>

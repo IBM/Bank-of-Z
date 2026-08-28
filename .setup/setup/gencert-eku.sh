@@ -77,10 +77,11 @@ elif [ -x /usr/lpp/IBM/zoautil/bin/dcp ]; then
 fi
 DCP=$(command -v dcp 2>/dev/null) || { print_error "dcp (ZOAU) not found on PATH"; exit 1; }
 
-_TOOLS_DIR="${SANDBOX_DIR}/../tools"
-BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
-if [ -z "$BCJAR" ]; then
-  print_error "bcprov-*.jar not found under $_TOOLS_DIR"; exit 1
+BCJAR="/usr/lpp/mqm/V9R2M0/java/lib/bcprov-jdk18on.jar"
+if [ ! -f "$BCJAR" ]; then
+  print_error "bcprov-jdk18on.jar not found at $BCJAR"
+  print_error "Ensure IBM MQ V9R2 is installed or update the BCJAR path in gencert-eku.sh"
+  exit 1
 fi
 
 # -----------------------------------------------------------------------
@@ -88,8 +89,10 @@ fi
 # -----------------------------------------------------------------------
 ipaddr=$(netstat -h 2>/dev/null |
   awk '
-    /IntfName:[[:space:]]*(TCPIPLINK|OSA[0-9]+)/ { intf=$2 }
-    /Address:/ && intf { print $2; exit }
+    /Address:[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ {
+      ip = $2
+      if (ip != "127.0.0.1") { print ip; exit }
+    }
   ')
 dnsname=$(hostname 2>/dev/null)
 

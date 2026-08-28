@@ -15,6 +15,7 @@ vars:
   db2_ssid: "DBD1"
 
 cics_region:
+  volumes: "VPMVSE"
   applid: "{{ vars.applid }}"
   sysid: "{{ vars.sysid }}"
 
@@ -38,8 +39,9 @@ cics_region:
   region_hlq: "{{ vars.region_hlq }}.{{ vars.applid }}"
 
   region_jcl:
-    type: JOB
-    job_parameters:
+    type: PROC
+    dsn: "VENDOR.PROCLIB(CICS{{ vars.applid | replace('CICS', '') }})"
+    cics_exec_step_parameters:
       region: 0M
     dfhrpl:
       top_data_sets:
@@ -51,7 +53,7 @@ cics_region:
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
-        - "{{ vars.db2_hlq }}.SDSNEXIT"
+        - "{{ vars.db2_hlq }}.SDSNLOD2"
 
   sit_parameters:
     start: INITIAL
@@ -60,7 +62,6 @@ cics_region:
     gmtran: CESL
     sec: "{{ vars.cics_sec }}"
     db2conn: "YES"
-    securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
     resoverrides: resourceOverrides.cicsoverrides.yaml
     xtran: "NO"

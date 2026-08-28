@@ -38,6 +38,15 @@ import com.ibm.dbb.task.TaskConstants
 log.info("ImsJavaBuilder: Starting IMS Java build for Bank-of-Z")
 
 // -------------------------------------------------------------------------
+// IMS_DISABLED guard - skip entirely on CICS-only systems
+// -------------------------------------------------------------------------
+def imsDisabled = System.getenv("IMS_DISABLED")
+if (imsDisabled != null && imsDisabled.trim().equalsIgnoreCase("true")) {
+    log.info("ImsJavaBuilder: IMS_DISABLED=true - skipping IMS Java build")
+    return 0
+}
+
+// -------------------------------------------------------------------------
 // Context variables - same as VanillaFrontend
 // -------------------------------------------------------------------------
 def workspace       = context.getVariable(TaskConstants.WORKSPACE)

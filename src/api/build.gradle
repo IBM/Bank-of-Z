@@ -16,10 +16,13 @@ limitations under the License.
 */
 
 plugins {
-    id 'com.ibm.zosconnect.gradle' version '1.5.1'
+    id 'com.ibm.zosconnect.gradle' version '1.6.0'
 }
 
 repositories {
+     maven {
+        url = uri("${System.getenv('SANDBOX_DIR') ?: '/u/ibmuser/sandboxes/bank-of-z'}/../bank-of-z/gradleLibs")
+    }
     mavenCentral()
 }
 

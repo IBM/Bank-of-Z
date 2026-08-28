@@ -151,14 +151,26 @@ print_result "[BUILD-LIST] ${DBB_LOG_FOLDER}/buildList.txt"
 # Skip packaging if nothing processed
 # =========================
 set +e
+grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
+NOTHING_PROCESSED=$?
+
+# DBB Package task writes its tar to logs/package/<name>-<timestamp>.tar
+# relative to $DBB_CWD.  The "mv logs/*.*" glob only matches top-level files
+# (dots required) and never recurses into subdirectories, so the tar would be
+# silently deleted by "rm -rf logs" without this explicit rescue step.
+if [ -d "$PWD/logs/package" ]; then
+    cp -p "$PWD/logs/package"/*-*.tar "${DBB_LOG_FOLDER}/" 2>/dev/null || true
+fi
+
+# Move remaining top-level log files then clean up the DBB logs tree
 mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
 rm -rf "$PWD/logs"
-grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
-if [ $? -eq 0 ]; then
+set -e
+
+if [ $NOTHING_PROCESSED -eq 0 ]; then
     print_result "[TAR-PATH] NONE"
     exit 0
 fi
-set -e
 
 # =========================
 # Collect tar file
@@ -170,7 +182,7 @@ if [ -z "$SRC_TAR" ]; then
         print_result "[TAR-PATH] NONE"
         exit 0
     else
-        print_error "No tar file found in ${DBB_LOG_FOLDER}/$SRC_TAR"
+        print_error "No tar file found in ${DBB_LOG_FOLDER}/ - Package task may have failed silently"
         exit 1
     fi
 fi

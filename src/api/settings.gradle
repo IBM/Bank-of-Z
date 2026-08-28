@@ -1,6 +1,11 @@
 
 pluginManagement {
    repositories {
-      gradlePluginPortal()
-   }
+        maven {
+            url = uri("${System.getenv('SANDBOX_DIR') ?: '/u/ibmuser/sandboxes/bank-of-z'}/../bank-of-z/gradleLibs")
+        }
+        gradlePluginPortal()
+    }
 }
+
+rootProject.name = 'api'

@@ -251,10 +251,6 @@ CORS_DEST="${OVERRIDES_DIR}/cors.xml"
 cat > "${CORS_DEST}" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <server description="CORS configuration for frontend server">
-    <featureManager>
-        <feature>cors-1.0</feature>
-    </featureManager>
-
     <!-- Allow requests from frontend Liberty server (HTTP and HTTPS ports) -->
     <cors domain="/api"
           allowedOrigins="http://*:${FRONTEND_HTTP_PORT}, https://*:${FRONTEND_HTTPS_PORT}"

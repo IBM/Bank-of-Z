@@ -28,13 +28,12 @@ jar {
     destinationDirectory = file(outputDir)
 }
 
-repositories {
-    mavenCentral()
+dependencies {
+     implementation files(
+        '/usr/lpp/ims/ims15/imsjava/imsudb.jar',
+        '/usr/lpp/java/J8.0_64/lib/ext/ibmjzos.jar',
+        '/usr/lpp/IBM/zosconnect/v3r0/runtime/lib/jaxb-api-2.2.12.jar',
+        '/usr/lpp/IBM/aln/v3r2/core/iml-library/library/db2jcc/db2jcc4.jar'
+    )
 }
 
-dependencies {
-    implementation 'com.ibm.db2:jcc:12.1.5.0'
-    implementation 'com.ibm.ims:udb:15.166'
-    implementation 'com.ibm.jzos:ibmjzos:2.4.11.3'
-    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-}

@@ -71,9 +71,17 @@ if [[ "$DB2_SSID" != "DBD1" ]]; then
     if [ ! -f "$BACKUP_FILE" ]; then
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
-    cp "$DEFINITION_FILE" "/tmp/bank-of-z-definitions.yaml"
-    cat "/tmp/bank-of-z-definitions.yaml" | sed "s/DBD1/${DB2_SSID}/"  > "$DEFINITION_FILE"
-    rm -f "/tmp/bank-of-z-definitions.yaml"
+    # Use binary read/write via python3 to avoid _BPXK_AUTOCVT corrupting
+    # the YAML file's encoding tag when writing through a shell redirect.
+    _BPXK_AUTOCVT=OFF python3 - "$DEFINITION_FILE" "$DB2_SSID" <<'PYEOF'
+import sys, re
+path, ssid = sys.argv[1], sys.argv[2]
+with open(path, 'rb') as f:
+    data = f.read()
+data = data.replace(b'DBD1', ssid.encode('latin-1'))
+with open(path, 'wb') as f:
+    f.write(data)
+PYEOF
 fi
 
 # =========================
@@ -131,7 +139,7 @@ rm -rf "$uss_config_dir"
 mkdir -p "$uss_config_dir/resourceoverrides"
 
 cat > "$uss_config_dir/resourceoverrides/resourceOverrides.cicsoverrides.yaml" <<EOF
-schemaVersion: resourceOverrides/1.200
+schemaVersion: resourceOverrides/1.0
 resourceOverrides:
   - tcpipservice:
     - selector:
@@ -212,6 +220,8 @@ print_info "Configuring RACF STARTED profile..."
 set +e
 print_info "Defining RACF STARTED class..."
 tsocmd "RDEFINE STARTED CICS${APP_SHORT_NAME}.* STDATA(USER(${CICS_USER}) TRUSTED(YES))" 2>/dev/null
+print_info "Altering RACF STARTED class (update if already exists)..."
+tsocmd "RALTER STARTED CICS${APP_SHORT_NAME}.* STDATA(USER(${CICS_USER}) TRUSTED(YES))" 2>/dev/null
 print_info "Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
 print_info "Removing old PROCLIB member..."
@@ -222,64 +232,71 @@ chown -R "$CICS_USER" "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
 set -e
 
 # =========================
-# Stage 6: Generate CICS proc
+# # Stage 6: Grant RACF access to credit-check transactions (OCR1-OCR5)
+# CRECUST runs these asynchronously via EXEC CICS RUN TRANSID.
+# With SEC=YES, CICS CSMI performs a FASTAUTH check against ACICSPCT
+# for each child transaction even when XTRAN=NO. Without these permits
+# the RUN TRANSID call fails with RESP=NOTAUTH(70), causing every
+# Create Customer request to return a 400.
+# No CICS region restart is required — SETROPTS RACLIST REFRESH is
+# picked up immediately by the running region.
 # =========================
-# Create JCL with each line padded to exactly 80 characters for FB80 dataset
-rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-cat > "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" << EOF
-//CICS${APP_SHORT_NAME}  PROC
-//*
-//* Bank of Z CICS started task
-//*
-//SUBMIT   EXEC PGM=IEBGENER
-//SYSPRINT DD SYSOUT=*
-//SYSIN    DD DUMMY
-//SYSUT1   DD DISP=SHR,DSN=${APP_HLQ}.CICS${APP_SHORT_NAME}.DFHSTART
-//SYSUT2   DD SYSOUT=(,INTRDR)
-//         PEND
-EOF
-
-# Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-
-# Copy to PROCLIB using dcp
-print_info "Copying JCL to ${CICS_SYS_PROCLIB}..."
-dcp "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
-
-# Clean up temp files
-rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "proclib=${CICS_SYS_PROCLIB}" --extraVar "task_name=CICS${APP_SHORT_NAME}" \
-    --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/CICS${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/CICS${APP_SHORT_NAME}J.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
+print_stage "Stage 6: Grant RACF access to credit-check transactions (OCR1-OCR5)"
+set +e
+for TXN in OCR1 OCR2 OCR3 OCR4 OCR5; do
+    print_info "Defining ACICSPCT profile for ${TXN}..."
+    tsocmd "RDEFINE ACICSPCT ${TXN} UACC(NONE)" 2>/dev/null
+    print_info "Permitting CICSUSER to run ${TXN}..."
+    tsocmd "PERMIT ${TXN} CLASS(ACICSPCT) ID(CICSUSER) ACCESS(READ)" 2>/dev/null
+done
+print_info "Refreshing ACICSPCT RACLIST..."
+tsocmd "SETROPTS RACLIST(ACICSPCT) REFRESH" 2>/dev/null
+set -e
+print_success "RACF access granted for OCR1-OCR5 to CICSUSER"
 
 # =========================
-# Stage 7: Start CICS region
+# Stage 7: Define MVS log streams for CICS journal
+# zconfig creates the CICS PROC in VENDOR.PROCLIB; we just need
+# the DASD-only log streams that CICS requires before starting.
 # =========================
-print_stage "STAGE 5: Start CICS region"
-if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-    opercmd "S CICS${APP_SHORT_NAME}"
-else
-    jsub "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)" 2>/dev/null
-fi
+print_stage "Stage 7: Define MVS log streams"
+LOGSTREAM_USER=$(echo "${CICS_USER}" | tr '[:lower:]' '[:upper:]')
+rm -f "/tmp/LOGSTREAM-$$.jcl"
+cat > "/tmp/LOGSTREAM-$$.jcl" <<LOGEOF
+//LOGSTRM  JOB (0),'LOG STREAMS',CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
+//DEFINE   EXEC PGM=IXCMIAPU
+//SYSPRINT DD   SYSOUT=*
+//SYSIN    DD   *
+  DATA TYPE(LOGR) REPORT(NO)
+  DEFINE LOGSTREAM NAME(${LOGSTREAM_USER}.CICS${APP_SHORT_NAME}.DFHLOG)
+    DASDONLY(YES) STG_SIZE(1024) LS_SIZE(1024) AUTODELETE(NO)
+  DEFINE LOGSTREAM NAME(${LOGSTREAM_USER}.CICS${APP_SHORT_NAME}.DFHSHUNT)
+    DASDONLY(YES) STG_SIZE(512) LS_SIZE(512) AUTODELETE(NO)
+/*
+LOGEOF
+
+a2e -f ISO8859-1 -t IBM-1047 "/tmp/LOGSTREAM-$$.jcl"
+run_job_and_wait "/tmp/LOGSTREAM-$$.jcl" || true
+rm -f "/tmp/LOGSTREAM-$$.jcl"
+
+# =========================
+# # Stage 8: Start CICS region
+# zconfig wrote the PROC to VENDOR.PROCLIB — start it directly.
+# =========================
+print_stage "Stage 8: Start CICS region"
+print_stage "STAGE 9: Start CICS region"
+opercmd "S CICS${APP_SHORT_NAME}"
 sleep 5
 print_info "CICS Region Job Started"
 sleep 10
 print_info ""
 print_info "To manage the region:"
-if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-    print_info "  Start:  opercmd 'S CICS${APP_SHORT_NAME}'"
-    print_info "  Stop:   opercmd 'C CICS${APP_SHORT_NAME}'"
-else
-    print_info "  Start:  jsub '${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)'"
-    print_info "  Stop:   jcan P 'CICS${APP_SHORT_NAME}'"
-fi
+print_info "  Start:  opercmd 'S CICS${APP_SHORT_NAME}'"
+print_info "  Stop:   opercmd 'C CICS${APP_SHORT_NAME}'"
 print_info ""
 
 # =========================
-# Stage 8: Cleanup
+# Stage 9: Cleanup
 # =========================
 rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 print_success "CICS Bank of Z setup completed"

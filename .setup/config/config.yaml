@@ -10,7 +10,7 @@ version: "1.0.0"
 global:
 
   # Sandbox
-  sandbox_root: "/usr/local/sandboxes"
+  sandbox_root: "/u/ibmuser/sandboxes"
 
   # Application
   app_base_name: "BANKZ"
@@ -21,33 +21,33 @@ global:
   app_modification: "0"
 
   # Tools
-  java_home: "{{ sandbox.root }}/tools/J21.0_64"
-  python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoau"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
-  zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
-  zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
-  dbb_home: "{{ global.sandbox_root }}/tools/dbb"
-  gradle_home:  "{{ global.sandbox_root }}/tools/gradle-9.5.1"
-  zcodescan_home: "/global/opt/pyenv/akf"
-  wazideploy_home: "/global/opt/pyenv/gdp"
-  zosconnect_home: "/usr/lpp/IBM/zosconnect"
+  java_home: "/usr/lpp/java/J21.0_64"
+  python_home: "/usr/lpp/IBM/python/v3r14/pyz"
+  zoau_home: "/u/ibmuser/zoautil"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
+  zconfig_home: "/u/ibmuser/zconfvenv"
+  zcb_home: "/u/ibmuser/cics-resource-builder-1.0.6"
+  dbb_home: "/usr/lpp/IBM/dbb"
+  gradle_home:  "/u/ibmuser/gradle-9.5.1"
+  zcodescan_home: "/u/ibmuser/zcodescan"
+  wazideploy_home: "/u/ibmuser/wazivenv"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect/v3r0"
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
   # z/OS System
   zos_admin_user: "${USER}"
   zos_current_user: "${USER}"
   zos_ca_label: "VSICA"
-  zos_keyring: "BOZRING"
+  zos_keyring: "ADCD-COMMON-CA"
   zos_create_certs: True
-  sys_proclib: "SYS1.PROCLIB"
+  sys_proclib: "VENDOR.PROCLIB"
   tcpip_hlq: "TCPIP"
-  igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
-  igy_hlq: "IGY.V6R5M0"
-  fel_hlq: "FEL"
-  ipv_hlq: "IPV"
-  pli_hlq: "PLI.V6R2M0"
-  debug_hlq: "EQAW"
-  asm_hlq: "ASM"
+  igzxjni2: "/usr/lpp/IBM/cobol/igyv6r4/lib/igzxjni2.x"
+  igy_hlq: "IGY640"
+  fel_hlq: "ISM501"
+  ipv_hlq: "ISM501"
+  pli_hlq: "IEL610"
+  debug_hlq: "ISM501"
+  asm_hlq: "HLA"
 
   # GUI
   zosconnect_http_port: 9090
@@ -61,8 +61,8 @@ global:
 
 
   # CICS
-  cics_hlq: "CICSTS63"
-  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_hlq: "CICSTS61"
+  cics_uss_dir: "/usr/lpp/cicsts/cicsts61"
   cics_sec: "YES"
   
   # IMS
@@ -76,10 +76,10 @@ global:
   ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
-  db2_hlq: "DB2V13"
+  db2_hlq: "DSND10"
   db2_dsntep: "DSNTEP13"
-  db2_ssid: "DBD1"
-  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
+  db2_ssid: "DBDG"
+  db2_runlib: "DSND10.DBDG.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:

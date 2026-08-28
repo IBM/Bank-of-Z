@@ -7,9 +7,7 @@
 //LOAD     EXEC PGM=DSNUTILB,REGION=0M,PARM='{{ db2.ssid }}'
 //SYSUT1   DD SPACE=(CYL,(50,5)),UNIT=SYSDA
 //SORTOUT  DD SPACE=(CYL,(50,5)),UNIT=SYSDA
-//STEPLIB  DD  DISP=SHR,DSN={{ db2.sdsnexit }}
-//         DD  DISP=SHR,DSN={{ db2.sdsnload }}
-//*         DD  DISP=SHR,DSN={{ db2.runlib }}
+//STEPLIB  DD  DISP=SHR,DSN={{ db2.sdsnload }}
 //SYSTSPRT DD  SYSOUT=*
 //SYSPRINT DD  SYSOUT=*
 //SYSUDUMP DD  SYSOUT=*

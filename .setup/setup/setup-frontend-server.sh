@@ -137,6 +137,13 @@ cat > "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" << EOF
 
 </server>
 EOF
+iconv -f IBM-1047 -t UTF-8 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml" \
+  > /tmp/server-xml-$$.utf8
+cp /tmp/server-xml-$$.utf8 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+chtag -tc UTF-8 "${WLP_USER_DIR}/servers/${SERVER_NAME}/server.xml"
+rm -f /tmp/server-xml-$$.utf8
+
+
 
 # =========================
 # Create bootstrap.properties

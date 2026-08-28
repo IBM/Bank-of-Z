@@ -36,8 +36,8 @@ global:
   # z/OS System
   zos_admin_user: "${USER}"
   zos_current_user: "${USER}"
-  zos_ca_label: "VSICA"
-  zos_keyring: "ADCD-COMMON-CA"
+  zos_ca_label: "ADCD-COMMON-CA"
+  zos_keyring: "BOZRING"
   zos_create_certs: True
   sys_proclib: "VENDOR.PROCLIB"
   tcpip_hlq: "TCPIP"

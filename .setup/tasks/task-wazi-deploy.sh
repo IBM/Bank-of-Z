@@ -4,8 +4,8 @@ set -eu
 # Script  : task-wazi-deploy.sh
 # Summary : Wazi Deploy Generate + Deploy
 #
-# - Initializes execution environment
-# - Loads Wazi Deploy configuration from setenv.sh
+# - Relies on environment exported by pipeline-common.sh / setup-common.sh
+# - Loads Wazi Deploy configuration from inherited environment variables
 # - Creates timestamped output and evidence directories
 # - Executes wazideploy-generate
 # - Executes wazideploy-deploy
@@ -18,7 +18,8 @@ set -eu
 # Source library scripts
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPTS_DIR/../config/setenv.sh"
+source "$SCRIPTS_DIR/../lib/utilities.sh"
+source "$SCRIPTS_DIR/../lib/colors.sh"
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"

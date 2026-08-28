@@ -259,6 +259,18 @@ main() {
     else
         # Detect Execution Mode
         detect_bank_of_z_location
+
+        # Re-anchor DBB and tool paths to the resolved repo location.
+        # setenv.sh bakes these in from config.yaml using the static sandbox
+        # path; when running in a pipeline workspace the resolved BANK_DIR
+        # differs from that static path, so we override them here.
+        export DBB_CWD="${BANK_DIR}/"
+        export DBB_APP_CONF="${BANK_DIR}/dbb-app.yaml"
+        export SCAN_SOURCE_FOLDER="${BANK_DIR}/src/base"
+        export SCAN_RULE_FILE="${BANK_DIR}/zcodescan/zcodescan-rules.yaml"
+        export DEPLOY_DEPLOYMENT_METHOD="${BANK_DIR}/.setup/deploy/deployment-method.yml"
+        export DEPLOY_ENV_FILE="${BANK_DIR}/.setup/deploy/Development.yml"
+        export DEPLOY_TYPES_MAPPING_FILES="${BANK_DIR}/.setup/deploy/types_pattern_mapping.yml"
     fi
     
     case "$phase" in

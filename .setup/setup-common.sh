@@ -671,6 +671,20 @@ main() {
             main_setup
             ;;
         install-bank-of-z)
+            # Extract z/OS Connect Gradle dependencies to local Maven repo if not already present
+            GRADLE_LIBS_DIR="$(dirname "$SANDBOX_DIR")/bank-of-z/gradleLibs"
+            DEPS_ZIP="${ZOSCONNECT_HOME}/dependencies.zip"
+            if [ ! -d "$GRADLE_LIBS_DIR/com" ] && [ -f "$DEPS_ZIP" ]; then
+                print_info "Extracting z/OS Connect Gradle dependencies to $GRADLE_LIBS_DIR..."
+                mkdir -p "$GRADLE_LIBS_DIR"
+                cd "$GRADLE_LIBS_DIR" && jar xf "$DEPS_ZIP" && cd -
+                print_success "Gradle dependencies extracted successfully"
+            elif [ ! -d "$GRADLE_LIBS_DIR/com" ]; then
+                print_error "gradleLibs not found and $DEPS_ZIP does not exist"
+                print_error "Manually extract dependencies.zip from the z/OS Connect installation to $GRADLE_LIBS_DIR"
+                exit 1
+            fi
+
             if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then
                 print_success "Remote pipeline completed successfully"
             else

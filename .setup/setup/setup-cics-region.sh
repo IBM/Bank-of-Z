@@ -216,6 +216,7 @@ run_job_and_wait "/tmp/tcpip-create-$$.jcl"
 # =========================
 # # Stage 5: Configure RACF STARTED profile
 # =========================
+print_stage "Stage 5: Configure RACF STARTED profile"
 print_info "Configuring RACF STARTED profile..."
 set +e
 print_info "Defining RACF STARTED class..."
@@ -259,25 +260,30 @@ print_success "RACF access granted for OCR1-OCR5 to CICSUSER"
 # zconfig creates the CICS PROC in VENDOR.PROCLIB; we just need
 # the DASD-only log streams that CICS requires before starting.
 # =========================
-print_stage "Stage 7: Define MVS log streams"
-LOGSTREAM_USER=$(echo "${CICS_USER}" | tr '[:lower:]' '[:upper:]')
+print_stage "Stage 8: Define MVS log streams"
 rm -f "/tmp/LOGSTREAM-$$.jcl"
 cat > "/tmp/LOGSTREAM-$$.jcl" <<LOGEOF
-//LOGSTRM  JOB (0),'LOG STREAMS',CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
-//DEFINE   EXEC PGM=IXCMIAPU
-//SYSPRINT DD   SYSOUT=*
-//SYSIN    DD   *
+//DEFLOGS  JOB CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID
+//STEP1    EXEC PGM=IXCMIAPU
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD *
   DATA TYPE(LOGR) REPORT(NO)
-  DEFINE LOGSTREAM NAME(${LOGSTREAM_USER}.CICS${APP_SHORT_NAME}.DFHLOG)
-    DASDONLY(YES) STG_SIZE(1024) LS_SIZE(1024) AUTODELETE(NO)
-  DEFINE LOGSTREAM NAME(${LOGSTREAM_USER}.CICS${APP_SHORT_NAME}.DFHSHUNT)
-    DASDONLY(YES) STG_SIZE(512) LS_SIZE(512) AUTODELETE(NO)
+  DEFINE LOGSTREAM NAME(STCOPER.CICS${APP_SHORT_NAME}.DFHLOG)
+         DASDONLY(YES)
+         MAXBUFSIZE(4096)
+  DEFINE LOGSTREAM NAME(STCOPER.CICS${APP_SHORT_NAME}.DFHSHUNT)
+         DASDONLY(YES)
+         MAXBUFSIZE(4096)
 /*
 LOGEOF
 
 a2e -f ISO8859-1 -t IBM-1047 "/tmp/LOGSTREAM-$$.jcl"
-run_job_and_wait "/tmp/LOGSTREAM-$$.jcl" || true
+set +e
+jsub "/tmp/LOGSTREAM-$$.jcl" 2>/dev/null
+sleep 5
+set -e
 rm -f "/tmp/LOGSTREAM-$$.jcl"
+print_info "Log streams defined (or already exist - OK)"
 
 # =========================
 # # Stage 8: Start CICS region

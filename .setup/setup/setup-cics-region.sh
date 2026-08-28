@@ -224,8 +224,8 @@ print_info "Altering RACF STARTED class (update if already exists)..."
 tsocmd "RALTER STARTED CICS${APP_SHORT_NAME}.* STDATA(USER(${CICS_USER}) TRUSTED(YES))" 2>/dev/null
 print_info "Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-print_info "Removing old PROCLIB member..."
-mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})" 2>/dev/null || true
+#print_info "Removing old PROCLIB member..."
+#mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})" 2>/dev/null || true
 chmod 777 "$SANDBOX_DIR"
 chmod -R 777 "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
 chown -R "$CICS_USER" "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"

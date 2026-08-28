@@ -61,7 +61,7 @@ global:
 
 
   # CICS
-  cics_hlq: "CICSTS61"
+  cics_hlq: "DFH630"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts61"
   cics_sec: "YES"
   

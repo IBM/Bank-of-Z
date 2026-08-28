@@ -40,7 +40,7 @@ cics_region:
 
   region_jcl:
     type: PROC
-    dsn: "VENDOR.PROCLIB(CICS{{ vars.applid | replace('CICS', '') }})"
+    dsn: "VENDOR.PROCLIB(CICS{{ vars.sysid }})"
     cics_exec_step_parameters:
       region: 0M
     dfhrpl:

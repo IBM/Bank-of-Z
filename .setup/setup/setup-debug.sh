@@ -83,7 +83,12 @@ fi
 print_stage "Stage 3: Modify eqaprof.env to customize for BANKZ IMS"
 
 EQADREST_ENV="/etc/debug/eqadrest.env"
-cp "${EQADREST_ENV}" "${EQAPROF_CONF_DIR}/eqadrest.env"
+
+if [ -f "${EQADREST_ENV}" ]; then
+    cp "${EQADREST_ENV}" "${EQAPROF_CONF_DIR}/eqadrest.env"
+else
+    print_warning "${EQADREST_ENV} does not exists (maybe not installed)."
+fi
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "ims_hlq=${IMS_APP_HLQ}" \

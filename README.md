@@ -1,4 +1,4 @@
-# Bank of Z
+# Bank of Z 1
 
 Bank of Z is a hybrid banking application that demonstrates modern IBM Z development practices. It routes transactions through CICS or IMS depending on customer ID, with z/OS Connect as the API gateway between the browser-based UI and the z/OS transactional applications.
 

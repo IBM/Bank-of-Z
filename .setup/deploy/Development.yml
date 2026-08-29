@@ -27,6 +27,7 @@ deploy_cfg_home: "{{  extra_vars.deploy_cfg_home if extra_vars.deploy_cfg_home i
 # This contains the 
 # Environment specific settings according to the parent folder name
 #################################################################################
+# Batch
 
 # CICS
 default_cics_user: "{{ cics.user }}"

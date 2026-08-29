@@ -23,7 +23,7 @@
 //*
 //*  Customer statement output
 //*
-//STMTRPT  DD  DISP=(NEW,CATLG,DELETE),
+//STMTRPT  DD  DISP=(MOD,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNKCSTMT.REPORT2,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(5,5),RLSE),

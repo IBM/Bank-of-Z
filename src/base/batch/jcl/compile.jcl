@@ -2,6 +2,8 @@
 //    MSGCLASS=H,MSGLEVEL=1,TIME=(20,0),
 //    REGION=0M,NOTIFY=&SYSUID
 //*
+//* NOTE: This JCL is not required - the code is being built by DBB
+//* 
 //********************************************************************
 //* BNKSTMTC - Compile, Link-Edit and DB2 Bind for BNK1STMT
 //*

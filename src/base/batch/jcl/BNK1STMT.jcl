@@ -20,7 +20,7 @@
 //*
 //*  Savings Account Statement report
 //*
-//SAVRPT   DD  DISP=(NEW,CATLG,DELETE),
+//SAVRPT   DD  DISP=(MOD,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.SAV.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),
@@ -28,7 +28,7 @@
 //*
 //*  ISA Account Statement report
 //*
-//ISARPT   DD  DISP=(NEW,CATLG,DELETE),
+//ISARPT   DD  DISP=(MOD,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.ISA.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),
@@ -36,7 +36,7 @@
 //*
 //*  Current Account Statement report
 //*
-//CURRPT   DD  DISP=(NEW,CATLG,DELETE),
+//CURRPT   DD  DISP=(MOD,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.CUR.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),

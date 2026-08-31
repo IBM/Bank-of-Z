@@ -67,13 +67,18 @@ if [[ "$APP_HLQ" != "BANKZ" ]]; then
     cat "$DEBUG_BACKUP" | sed "s/BANKZ.CICSBOZ/${APP_HLQ}.CICS${APP_SHORT_NAME}/" > "$DEBUG_FILE"
 fi
 
-if [[ "$DB2_SSID" != "DBD1" ]]; then
+# CICS TS Resource Builder receives the definitions file directly and does not
+# render zconfig's {{ vars.* }} expressions. Resolve the Db2 connection name
+# here before Resource Builder validates the definitions.
+if grep -q '{{ vars.db2_ssid }}' "$DEFINITION_FILE" || [[ "$DB2_SSID" != "DBD1" ]]; then
     if [ ! -f "$BACKUP_FILE" ]; then
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
-    cp "$DEFINITION_FILE" "/tmp/bank-of-z-definitions.yaml"
-    cat "/tmp/bank-of-z-definitions.yaml" | sed "s/DBD1/${DB2_SSID}/"  > "$DEFINITION_FILE"
-    rm -f "/tmp/bank-of-z-definitions.yaml"
+    sed \
+        -e "s/{{ vars.db2_ssid }}/${DB2_SSID}/g" \
+        -e "s/DBD1/${DB2_SSID}/g" \
+        "$DEFINITION_FILE" > "/tmp/bank-of-z-definitions.yaml"
+    mv "/tmp/bank-of-z-definitions.yaml" "$DEFINITION_FILE"
 fi
 
 # =========================

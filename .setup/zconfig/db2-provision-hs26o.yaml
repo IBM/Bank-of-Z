@@ -1,59 +1,59 @@
 db2:
   ## h26o
   class: A
-  ssid: DBD2
-  hlq: DB2V13
-  insdspre: "{{ db2.hlq }}.{{ db2.ssid }}"
+  ssid: "{{ vars.db2_ssid }}"
+  hlq: "{{ vars.db2_hlq }}"
+  insdspre: "{{ vars.db2_hlq }}.{{ vars.db2_ssid }}"
   ## user catalog
-  userscat: CATALOG.VS01.DB2V13
-  userlcat: CATALOG.VS01.DB2V13
+  userscat: "{{ vars.db2_user_catalog }}"
+  userlcat: "{{ vars.db2_user_catalog }}"
   db2_authorization_ids:
-    authid: IBMUSER
-    sysadm: IBMUSER
-    sysam2: IBMUSER
-    sysopr1: IBMUSER
-    sysopr2: IBMUSER
-    secadm1: IBMUSER
-    secadm2: IBMUSER
-    secdefid: IBMUSER
-    inssqlid: IBMUSER
-    ivpsqlid: IBMUSER
-    rtm05pko: IBMUSER
+    authid: "{{ vars.db2_authid }}"
+    sysadm: "{{ vars.db2_authid }}"
+    sysam2: "{{ vars.db2_authid }}"
+    sysopr1: "{{ vars.db2_authid }}"
+    sysopr2: "{{ vars.db2_authid }}"
+    secadm1: "{{ vars.db2_authid }}"
+    secadm2: "{{ vars.db2_authid }}"
+    secdefid: "{{ vars.db2_authid }}"
+    inssqlid: "{{ vars.db2_authid }}"
+    ivpsqlid: "{{ vars.db2_authid }}"
+    rtm05pko: "{{ vars.db2_authid }}"
   volumes_and_sms_classes:
     ## SMS volume for user catalog
-    volexit: DB2V13
+    volexit: "{{ vars.db2_volume }}"
     ## STOR CLASS for creating user catalog
-    storcls: ARCH0A
+    storcls: "{{ vars.db2_storage_class }}"
     ## DATA CLASS for creating user catalog
-    datacls: DCDB2EXT
+    datacls: "{{ vars.db2_data_class }}"
     ##Manager class : STANDEF
-    storcls3: ARCH0A
-    datacls3: DCDB2EXT
-    storcls6: ARCH0A
-    datacls6: DCDB2EXT
-    volsdat6: DB2V13
-    storcls7: ARCH0A
-    datacls7: DCDB2EXT
-    volsdat7: DB2V13
-    catddacl: DCDB2EXT
-    catdstcl: ARCH0A
-    catxdacl: DCDB2EXT
-    catxstcl: ARCH0A
+    storcls3: "{{ vars.db2_storage_class }}"
+    datacls3: "{{ vars.db2_data_class }}"
+    storcls6: "{{ vars.db2_storage_class }}"
+    datacls6: "{{ vars.db2_data_class }}"
+    volsdat6: "{{ vars.db2_volume }}"
+    storcls7: "{{ vars.db2_storage_class }}"
+    datacls7: "{{ vars.db2_data_class }}"
+    volsdat7: "{{ vars.db2_volume }}"
+    catddacl: "{{ vars.db2_data_class }}"
+    catdstcl: "{{ vars.db2_storage_class }}"
+    catxdacl: "{{ vars.db2_data_class }}"
+    catxstcl: "{{ vars.db2_storage_class }}"
   db2_java_properties:
-    javahome: "/usr/lpp/java/java21/current_64"
+    javahome: "{{ vars.db2_java_home }}"
     claspath: "/usr/include/java_classes"
     libpath: "/usr/lib/java_runtime64"
-    jccsid: IBMUSER
+    jccsid: "{{ vars.db2_authid }}"
     jvmamode: 64
-    javaenv: DB2A.DSN1WLMJ.JAVAENV
-    javaenvv: "/u/ibmuser/db2aenvfile.txt"
-    jvmprops: "/u/ibmuser/db2ajvmsp"
+    javaenv: "{{ vars.db2_javaenv }}"
+    javaenvv: "{{ vars.db2_javaenvv }}"
+    jvmprops: "{{ vars.db2_jvmprops }}"
   db2_decp_parameters:
     asccsid: 1252
   db2_smpe_target_libraries:
-    dsnexit: DB2V13.DB2A.SDSNEXIT
+    dsnexit: "{{ vars.db2_sdsnexit }}"
   other_libraries:
-    cicsmod: CICSTS63.CICS.SDFHLOAD
-    cicscob: CICSTS63.CICS.SDFHCOB
-    cicspli: CICSTS63.CICS.SDFHPL1
-    cicsexci: CICSTS63.CICS.SDFHEXCI
+    cicsmod: "{{ vars.cics_hlq }}.CICS.SDFHLOAD"
+    cicscob: "{{ vars.cics_hlq }}.CICS.SDFHCOB"
+    cicspli: "{{ vars.cics_hlq }}.CICS.SDFHPL1"
+    cicsexci: "{{ vars.cics_hlq }}.CICS.SDFHEXCI"

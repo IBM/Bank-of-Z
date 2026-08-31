@@ -84,6 +84,22 @@ global:
   db2_grants:
   - "CICSUSER"
 
+# Db2 subsystem provisioning attributes. These defaults match the supplied
+# ZDVT image; review and change every environment-specific value before
+# setting global.db2_provision to "true".
+db2_provisioning:
+  user_catalog: "CATALOG.VS01.DB2V13"
+  authid: "{{ global.zos_admin_user }}"
+  volume: "DB2V13"
+  storage_class: "ARCH0A"
+  data_class: "DCDB2EXT"
+  java_home: "{{ global.java_home }}"
+  javaenv: "DB2A.DSN1WLMJ.JAVAENV"
+  javaenvv: "/u/{{ global.zos_admin_user | lower }}/db2aenvfile.txt"
+  jvmprops: "/u/{{ global.zos_admin_user | lower }}/db2ajvmsp"
+  sdsnexit: "DB2V13.DB2A.SDSNEXIT"
+  start_timeout_seconds: 180
+
 
 # Application properties
 app:

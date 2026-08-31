@@ -163,6 +163,17 @@ DB2_PROVISION="${DB2_PROVISION:-$(get_section_value 'global' 'db2_provision')}"
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"
+DB2_PROVISION_USER_CATALOG="${DB2_PROVISION_USER_CATALOG:-$(get_section_value 'db2_provisioning' 'user_catalog')}"
+DB2_PROVISION_AUTHID="${DB2_PROVISION_AUTHID:-$(get_section_value 'db2_provisioning' 'authid')}"
+DB2_PROVISION_VOLUME="${DB2_PROVISION_VOLUME:-$(get_section_value 'db2_provisioning' 'volume')}"
+DB2_PROVISION_STORAGE_CLASS="${DB2_PROVISION_STORAGE_CLASS:-$(get_section_value 'db2_provisioning' 'storage_class')}"
+DB2_PROVISION_DATA_CLASS="${DB2_PROVISION_DATA_CLASS:-$(get_section_value 'db2_provisioning' 'data_class')}"
+DB2_PROVISION_JAVA_HOME="${DB2_PROVISION_JAVA_HOME:-$(get_section_value 'db2_provisioning' 'java_home')}"
+DB2_PROVISION_JAVAENV="${DB2_PROVISION_JAVAENV:-$(get_section_value 'db2_provisioning' 'javaenv')}"
+DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV:-$(get_section_value 'db2_provisioning' 'javaenvv')}"
+DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS:-$(get_section_value 'db2_provisioning' 'jvmprops')}"
+DB2_PROVISION_SDSNEXIT="${DB2_PROVISION_SDSNEXIT:-$(get_section_value 'db2_provisioning' 'sdsnexit')}"
+DB2_PROVISION_START_TIMEOUT_SECONDS="${DB2_PROVISION_START_TIMEOUT_SECONDS:-$(get_section_value 'db2_provisioning' 'start_timeout_seconds')}"
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE=$(get_section_value 'zowe' 'rse_profile')

@@ -336,26 +336,25 @@ ims:
           strg: 'ON'
     - member_name: CSLSI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
-        imsplex_communications_server_name: 2SCI1
+        armrst: false
+        sciname: 2SCI1
         imsplex:
           name: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
-        ims_command_language: ENU
-        command_security_option: N
-        operations_server_name: 2OM1
+        armrst: false
+        cmdlang: ENU
+        cmdsec: false
+        omname: 2OM1
         imsplex:
           name: "{{ vars.ims_plex }}"
-          #audit_log_stream_name_for_command_input_and_output: SYSLOG.OM2Q01.LOG
-        mvs_file_name_for_command_translation: "{{ vars.ims_sys_hlq }}.SDFSDATA"
+        cmdtextdsn: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
+        armrst: false
         imsplex:
           name: "{{ vars.ims_plex }}"
-        resource_manager_server_name: 2RM1
+        rmname: 2RM1
     - member_name: CSLDI000
       config:
         armrst: false

@@ -75,14 +75,20 @@ if grep -q '{{ vars.db2_ssid }}' "$DEFINITION_FILE" || [[ "$DB2_SSID" != "DBD1" 
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
 
-    # Prevent USS automatic conversion from making sed write EBCDIC bytes.
-    # CICS TS Resource Builder requires its YAML input to be UTF-8.
+    # Prevent USS automatic conversion from changing the bytes in this UTF-8
+    # file. CICS TS Resource Builder requires its YAML input to be UTF-8.
     chtag -b "$DEFINITION_FILE"
-    sed \
-        -e "s/{{ vars.db2_ssid }}/${DB2_SSID}/g" \
-        -e "s/DBD1/${DB2_SSID}/g" \
-        "$DEFINITION_FILE" > "/tmp/bank-of-z-definitions.yaml"
-    mv "/tmp/bank-of-z-definitions.yaml" "$DEFINITION_FILE"
+    "$PYTHON_HOME/bin/python3" - "$DEFINITION_FILE" "$DB2_SSID" <<'PYTHON'
+from pathlib import Path
+import sys
+
+definition_file = Path(sys.argv[1])
+db2_ssid = sys.argv[2]
+contents = definition_file.read_text(encoding="utf-8")
+contents = contents.replace("{{ vars.db2_ssid }}", db2_ssid)
+contents = contents.replace("DBD1", db2_ssid)
+definition_file.write_text(contents, encoding="utf-8")
+PYTHON
     chtag -tc UTF-8 "$DEFINITION_FILE"
 fi
 

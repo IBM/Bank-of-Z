@@ -364,9 +364,6 @@ ims:
         rrs: false
     - member_name: CSLDC000
       config:
-        global_datastore_properties:
-          maxthrds: 10
-          minthrds: 2
         local_datastore_properties:
           odbm:
             name: 2ODB1

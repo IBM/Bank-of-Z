@@ -14,6 +14,7 @@ vars:
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
+  ims_hlq: "{{ vars.ims_hlq }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: "{{ vars.ims_target_user }}"

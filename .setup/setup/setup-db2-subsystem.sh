@@ -52,16 +52,31 @@ print_info "YAML: db2-provision-hs26o.yaml"
 print_info "Db2 SSID: ${DB2_SSID}"
 print_info "Db2 HLQ:  ${DB2_HLQ}"
 
-zconfig apply \
+if opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -q "${DB2_SSID}MSTR"; then
+    print_error "Db2 subsystem ${DB2_SSID} is already active; refusing to provision over it"
+    print_info "Use an unused SSID, or set DB2_PROVISION=false to use the existing subsystem"
+    deactivate
+    exit 1
+fi
+
+if zconfig apply \
     -e db2_ssid="${DB2_SSID}" \
     -e db2_hlq="${DB2_HLQ}" \
-    db2-provision-hs26o.yaml -v
-
-RC=$?
-if [ "$RC" -eq 0 ]; then
+    -e db2_user_catalog="${DB2_PROVISION_USER_CATALOG}" \
+    -e db2_authid="${DB2_PROVISION_AUTHID}" \
+    -e db2_volume="${DB2_PROVISION_VOLUME}" \
+    -e db2_storage_class="${DB2_PROVISION_STORAGE_CLASS}" \
+    -e db2_data_class="${DB2_PROVISION_DATA_CLASS}" \
+    -e db2_java_home="${DB2_PROVISION_JAVA_HOME}" \
+    -e db2_javaenv="${DB2_PROVISION_JAVAENV}" \
+    -e db2_javaenvv="${DB2_PROVISION_JAVAENVV}" \
+    -e db2_jvmprops="${DB2_PROVISION_JVMPROPS}" \
+    -e db2_sdsnexit="${DB2_PROVISION_SDSNEXIT}" \
+    -e cics_hlq="${CICS_HLQ}" \
+    db2-provision-hs26o.yaml -v; then
     print_success "zconfig Db2 provisioning completed successfully!"
 else
-    print_error "zconfig failed with return code: $RC"
+    print_error "zconfig Db2 provisioning failed"
     print_info "Check logs in: $SCRIPTS_DIR/logs"
     deactivate
     exit 1
@@ -74,20 +89,18 @@ deactivate
 # =========================
 print_stage "STAGE 2: Verify Db2 subsystem is active"
 
-print_info "Waiting for Db2 subsystem ${DB2_SSID} to initialise..."
-sleep 15
+print_info "Waiting up to ${DB2_PROVISION_START_TIMEOUT_SECONDS}s for Db2 subsystem ${DB2_SSID} to initialise..."
+elapsed=0
+until opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -q "${DB2_SSID}MSTR"; do
+    if [ "$elapsed" -ge "$DB2_PROVISION_START_TIMEOUT_SECONDS" ]; then
+        print_error "Db2 subsystem ${DB2_SSID} did not become active within ${DB2_PROVISION_START_TIMEOUT_SECONDS}s"
+        exit 1
+    fi
+    sleep 5
+    elapsed=$((elapsed + 5))
+done
 
-set +e
-opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -q "${DB2_SSID}MSTR"
-ACTIVE=$?
-set -e
-
-if [ "$ACTIVE" -eq 0 ]; then
-    print_success "Db2 subsystem ${DB2_SSID} (${DB2_SSID}MSTR) is active"
-else
-    print_warning "Could not confirm Db2 subsystem ${DB2_SSID} is active"
-    print_info "The subsystem may still be initialising — check with: opercmd 'D A,${DB2_SSID}MSTR'"
-fi
+print_success "Db2 subsystem ${DB2_SSID} (${DB2_SSID}MSTR) is active"
 
 print_success "Db2 subsystem setup completed"
 print_info "Subsystem ID: ${DB2_SSID}"

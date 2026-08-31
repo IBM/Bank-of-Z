@@ -74,11 +74,16 @@ if grep -q '{{ vars.db2_ssid }}' "$DEFINITION_FILE" || [[ "$DB2_SSID" != "DBD1" 
     if [ ! -f "$BACKUP_FILE" ]; then
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
+
+    # Prevent USS automatic conversion from making sed write EBCDIC bytes.
+    # CICS TS Resource Builder requires its YAML input to be UTF-8.
+    chtag -b "$DEFINITION_FILE"
     sed \
         -e "s/{{ vars.db2_ssid }}/${DB2_SSID}/g" \
         -e "s/DBD1/${DB2_SSID}/g" \
         "$DEFINITION_FILE" > "/tmp/bank-of-z-definitions.yaml"
     mv "/tmp/bank-of-z-definitions.yaml" "$DEFINITION_FILE"
+    chtag -tc UTF-8 "$DEFINITION_FILE"
 fi
 
 # =========================

@@ -5,20 +5,16 @@ vars:
   ims_hlq: BANKZ.IMS2
   ims_sys_hlq: IMSV15
   ims_plex: PLEX2
-  db2_hlq: DB2V13
   db2_ssid: DBD1
   ims_java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_dir: "/usr/lpp/ims/imsjava"
   db2_java_dir: "/usr/lpp/db2d10"
   ims_target_user: IBMUSER
   ims_ixvolser: "IMSV15"
-  debug_hlq: EQAW
 ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"
-  db2_hlq: "{{ vars.db2_hlq }}"
-  debug_hlq: "{{ vars.debug_hlq }}"
   ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA

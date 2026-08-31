@@ -95,7 +95,7 @@ The `type: "zOpenDebug"` and `request: "launch"` combination tells Z Open Debug 
 
 ## Step 3 — Create an IMS Isolation Debug Profile
 
-The IMS Isolation profile tells the DPS which IMS subsystem to target, which MPR job to clone, and which transaction to intercept. You create it through the IBM Z Open Debug view in VS Code.
+The IMS Isolation profile tells the DPS which IMS subsystem to target and which transaction to intercept. You create it through the **Z/OS Debugger Profiles** view in VS Code.
 
 **Step 3.1:** In the VS Code Activity Bar, open the **Zowe Explorer** panel.
 
@@ -116,7 +116,7 @@ Select **Save**. The profile is registered with the DPS on z/OS.
 
 When the profile is activated, the DPS instructs IMS Transaction Isolation to clone the named MPR into a private region owned by your user ID. Any invocation of `IBACSUM` under `IMSUSER` is then routed to the private MPR and parked until VS Code attaches.
 
-> **_NOTE:_** Activating an IMS Isolation profile submits a job to clone the target MPR. Allow a few seconds for the private region to start before triggering the transaction. You can verify the private MPR is running by checking the IMS log or the system job queue for a job whose name matches the pattern from the `Region Name` field, e.g. `@IBMUSER`.
+> **_NOTE:_** Activating an IMS Isolation profile submits a job to clone the target MPR. Allow a few seconds for the private region to start before triggering the transaction. You can verify the private MPR is running by checking the IMS log or the system job queue for a job whose name matches the pattern from the **Region Name** field, e.g. `@IBMUSER`.
 
 ## Step 4 — Trigger the IMS Transaction
 
@@ -151,7 +151,7 @@ In the **Variables** panel you can inspect working-storage fields such as `INPUT
 | Symptom | Likely cause | Resolution |
 |---------|-------------|------------|
 | VS Code cannot connect to a parked session | Transaction ran and completed before F5 was pressed; profile was not active | Ensure the IMS Isolation profile is activated and the private MPR is running before triggering the transaction, then trigger again |
-| IMS Isolation profile activation fails | DPS cannot submit the MPR clone job; RACF permissions missing | Verify that `STCDBG` has `UPDATE` access to `BPX.SERVER` in the `FACILITY` class and `READ` access to `BPX.SRV.**` in the `SURROGAT` class, as configured by `setup-debug.sh` |
+| IMS Isolation profile activation fails | DPS cannot submit the MPR clone job; RACF permissions missing | Verify that `STCDBG` has `UPDATE` access to `BPX.SERVER` in the `FACILITY` class and `READ` access to `BPX.SRV.**` in the `SURROGAT` class, as configured by `setup-debug.sh`; verify that Java library used by DPS (`debug.eqaprof_java_home`) has Program Control bit ON.  |
 | Private MPR does not start | `imsiso_dd_eqatipsb` points to wrong `SEQAMOD` load library | Check the `eqaprof.env` `imsiso_dd_eqatipsb` entry; the `SEQAMOD` dataset must match the one used by the running `EQAPROF` started task |
 | Source not shown — only assembler disassembly | Listing file not found or `.zdx.json` path is wrong | Verify the USS listing path in `.zdx.json`; confirm the build produced a `.dbg` side file for `IBACSUM` |
 | Transaction routed to shared MPR instead of private MPR | IMS Isolation profile is not activated, or the user ID in the profile does not match the submitting user | Confirm the profile shows the active (green dot) icon and that the `userId` field matches the TSO user ID used by z/OS Connect or the terminal session |

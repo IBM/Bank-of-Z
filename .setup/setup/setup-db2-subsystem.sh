@@ -54,7 +54,7 @@ print_info "Db2 HLQ:  ${DB2_HLQ}"
 
 _opercmd_out=$(opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null || true)
 print_info "opercmd output: ${_opercmd_out}"
-if echo "${_opercmd_out}" | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; then
+if echo "${_opercmd_out}" | grep -v "NOT FOUND" | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; then
     print_error "Db2 subsystem ${DB2_SSID} is already active; refusing to provision over it"
     print_info "Use an unused SSID, or set DB2_PROVISION=false to use the existing subsystem"
     deactivate
@@ -93,7 +93,7 @@ print_stage "STAGE 2: Verify Db2 subsystem is active"
 
 print_info "Waiting up to ${DB2_PROVISION_START_TIMEOUT_SECONDS}s for Db2 subsystem ${DB2_SSID} to initialise..."
 elapsed=0
-until opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; do
+until opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -v "NOT FOUND" | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; do
     if [ "$elapsed" -ge "$DB2_PROVISION_START_TIMEOUT_SECONDS" ]; then
         print_error "Db2 subsystem ${DB2_SSID} did not become active within ${DB2_PROVISION_START_TIMEOUT_SECONDS}s"
         exit 1

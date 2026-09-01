@@ -17,7 +17,7 @@ The project can be used to:
 - Explore application modernization approaches
 - Demonstrate enterprise application capabilities
 - Evaluate build and deployment automation
-- Experiment with modern IBM Z development capabilities
+- Experiment with modern development capabilities and IBM Z tooling
 - Extend and customize a sample banking application
 
 Bank of Z is intended for educational, demonstration, and proof-of-concept purposes.

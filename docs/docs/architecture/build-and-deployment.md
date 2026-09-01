@@ -5,11 +5,11 @@ title: Build and Deployment Architecture
 
 # Build and Deployment Architecture
 
-This page describes how Bank of Z source code is transformed into deployable artifacts and how those artifacts are provisioned across the CICS and IMS runtime environments. The build and deployment process is automated through integrated build, provisioning, deployment, and API configuration capabilities.
+This page describes how Bank of Z source code is transformed into deployable artifacts and how those artifacts are provisioned across the CICS and IMS runtime environments. The automated delivery pipeline orchestrates build, provisioning, and deployment activities, providing a foundation for future implementation of continuous feedback and progressive quality gates across the software delivery lifecycle.
 
 ## Build pipeline
 
-The build process uses IBM Dependency Based Build (DBB) to provide automated build capabilities that compile and package application source into deployable artifacts.
+The build process is responsible for automating the compilation of application source changes and dependencies to create deployable artifacts. These artifacts are subsequently packaged, versioned, and managed through the delivery pipeline.
 
 ![Bank of Z build process](images/build-boz-app.png)
 
@@ -39,8 +39,7 @@ A full build compiles all application components, packages the complete applicat
 
 An incremental build rebuilds and deploys only the application components affected by source code changes. This workflow is intended for day-to-day development activities, such as implementing enhancements or fixing defects, and avoids rebuilding the entire application or reprovisioning the existing runtime environment.
 
-After the initial deployment, you can perform an incremental build and deploy using the
-`pipeline-remote.sh script`. The build process automatically detects modified source files, rebuilds the affected components, packages the updated artifacts, and deploys them to the existing runtime environment.
+After the initial deployment, the pipeline automatically detects modified source files, rebuilds only the impacted components, packages the updated artifacts, and deploys them to the existing runtime environment.
 
 **Note**: An incremental build requires an existing Bank of Z environment that has already been deployed successfully. Use a full build and deployment when setting up a new environment or when infrastructure changes require a complete redeployment.
 
@@ -60,15 +59,4 @@ After the build completes, Wazi Deploy installs the generated artifacts into the
 
 *Figure 3. IMS TM/DB, Db2, and z/OS Connect deployment workflow.*
 
-## Build and deployment capabilities
 
-Bank of Z uses the following technologies to automate the build, provisioning, deploment, and API configuration processes.
-
-| Technology | Purpose |
-|---|---|
-| IBM DBB | Compiles and packages all application source |
-| Wazi Deploy | Deploys the build archive to CICS and IMS |
-| zconfig | Provisions CICS and IMS runtim environment |
-| z/OS Connect CLI | Configures and starts z/OS Connect APIs |
-
-For a description of what each deployment stage does at runtime, see [Deploying Bank of Z](../installation-and-setup/deploying.html).

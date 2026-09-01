@@ -86,10 +86,13 @@ fi
 # -----------------------------------------------------------------------
 # Guard: verify IP and DNS can be determined
 # -----------------------------------------------------------------------
-# TCP/IP NETSTAT HOME output differs between z/OS levels.  Select the first
-# non-loopback IPv4 address rather than relying on a particular table layout.
-ipaddr=$(netstat -h 2>/dev/null |
-  awk '$1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $1 != "127.0.0.1" { print $1; exit }')
+ipaddr=$(get_ipaddr)
+# TCP/IP NETSTAT HOME output differs between z/OS levels.  Retain a generic
+# fallback when the interface-specific lookup above cannot identify an address.
+if [ -z "$ipaddr" ]; then
+  ipaddr=$(netstat -h 2>/dev/null |
+    awk '$1 ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $1 != "127.0.0.1" { print $1; exit }')
+fi
 dnsname=$(hostname 2>/dev/null)
 
 if [ -z "$ipaddr" ] || [ -z "$dnsname" ]; then

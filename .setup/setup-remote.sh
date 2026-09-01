@@ -119,11 +119,7 @@ main() {
     
     # Purge all ended jobs
     opercmd '$POJQ,JM=*' > /dev/null 2>&1 || true &
-    ipaddr=$(netstat -h 2>/dev/null |
-      awk '
-        /IntfName:[[:space:]]*(TCPIPLINK|OSA[0-9]+)/ { intf=$2 }
-        /Address:/ && intf { print $2; exit }
-      ')
+    ipaddr=$(get_ipaddr)
     echo ""
     print_info "The Bank of Z interface is available at:"
     print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"

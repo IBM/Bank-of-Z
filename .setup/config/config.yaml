@@ -72,6 +72,8 @@ global:
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
   ims_ixvolser: "IMSV15"
+  ims_irlm_enablement: false
+  ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
   db2_provision: "false"   # set to "true" to provision a new Db2 subsystem with zconfig
@@ -187,6 +189,10 @@ wazideploy:
 debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
+  eqaprof_conf_dir: "{{ sandbox.path }}/debug"
+  eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
+  eqaprof_port: 8192
+  eqaprof_port_shutdown: 8105
 
 # z/OS Connect (API exposure only)
 # Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.
@@ -264,6 +270,8 @@ ims:
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
   dfs_imsplex: "{{ global.ims_dfsplex }}"
   ixvolser: "{{ global.ims_ixvolser }}"
+  irlm_enablement: "{{ global.ims_irlm_enablement }}"
+  database_lock_manager_server_name: "{{ global.ims_database_lock_manager_server_name }}"
   regions:
   - with_db2: yes
     use_pseudo_wfi: no

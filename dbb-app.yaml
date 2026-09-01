@@ -29,6 +29,10 @@ application:
             - "Bank-of-Z/src/base"
             - "Bank-of-Z/src/api/src/main/api"
             - "Bank-of-Z/src/frontend"
+        select:
+           - condition: "${LIFECYCLE} == 'user'"
+             value:
+                - "Bank-of-Z/src/base"
 
     - task: ScannerInit
       variables:

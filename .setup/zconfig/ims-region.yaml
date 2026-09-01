@@ -16,7 +16,6 @@ vars:
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
 ims:
-  volumes: "VPMVSF"
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"

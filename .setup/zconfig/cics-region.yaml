@@ -15,7 +15,6 @@ vars:
   db2_ssid: "DBD1"
 
 cics_region:
-  volumes: "VPMVSE"
   applid: "{{ vars.applid }}"
   sysid: "{{ vars.sysid }}"
 

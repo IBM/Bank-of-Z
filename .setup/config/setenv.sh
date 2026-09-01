@@ -45,11 +45,11 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${B
 # Global
 _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
-ZOS_CURRENT_USER=$(get_section_value 'global' 'zos_current_user')
-ZOS_ADMIN_USER=$(get_section_value 'global' 'zos_admin_user')
-ZOS_CA_LABEL=$(get_section_value 'global' 'zos_ca_label')
-ZOS_KEYRING=$(get_section_value 'global' 'zos_keyring')
-ZOS_CREATE_CERTS=$(get_section_value 'global' 'zos_create_certs')
+ZOS_CURRENT_USER=$(get_section_value 'cfg' 'zos_current_user')
+ZOS_ADMIN_USER=$(get_section_value 'cfg' 'zos_admin_user')
+ZOS_CA_LABEL=$(get_section_value 'cfg' 'zos_ca_label')
+ZOS_KEYRING=$(get_section_value 'cfg' 'zos_keyring')
+ZOS_CREATE_CERTS=$(get_section_value 'cfg' 'zos_create_certs')
 
  # Application
 APP_BASE_NAME=$(get_section_value 'app' 'base_name')
@@ -162,7 +162,7 @@ DEBUG_TCPIP_HQL=$(get_section_value 'debug' 'tcpip_hlq')
 EQAPROF_CONF_DIR=$(get_section_value 'debug' 'eqaprof_conf_dir')
 
 # Db2
-DB2_PROVISION="${DB2_PROVISION:-$(get_section_value 'global' 'db2_provision')}"
+DB2_PROVISION="${DB2_PROVISION:-$(get_section_value 'cfg' 'db2_provision')}"
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"

@@ -7,10 +7,26 @@
 //BNKSTMTX JOB 'BATCH',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
 //          MSGLEVEL=(1,1),REGION=0M
 //*
-//* Step 1 - Execute
+//* Step 1 - Delete output datasets
+//*
+//DELRPT   EXEC PGM=IEFBR14
+//SAVRPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.SAV.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
+//ISARPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.ISA.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
+//CURRPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.CUR.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
+//*
+//* Step 2 - Execute
 //*
 //BNK1STMT EXEC PGM=IKJEFT01,DYNAMNBR=20
-//STEPLIB  DD  DISP=SHR,DSN=BANKZ.V0R1M0.LOAD
+//STEPLIB  DD  DISP=SHR,DSN=BANKZ.V0R1M0.LOADLIB
 //         DD  DISP=SHR,DSN=DB2V13.SDSNEXIT
 //         DD  DISP=SHR,DSN=DB2V13.SDSNLOAD
 //         DD  DISP=SHR,DSN=DBD1.RUNLIB.LOAD
@@ -20,7 +36,7 @@
 //*
 //*  Savings Account Statement report
 //*
-//SAVRPT   DD  DISP=(MOD,CATLG,DELETE),
+//SAVRPT   DD  DISP=(NEW,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.SAV.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),
@@ -28,7 +44,7 @@
 //*
 //*  ISA Account Statement report
 //*
-//ISARPT   DD  DISP=(MOD,CATLG,DELETE),
+//ISARPT   DD  DISP=(NEW,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.ISA.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),
@@ -36,7 +52,7 @@
 //*
 //*  Current Account Statement report
 //*
-//CURRPT   DD  DISP=(MOD,CATLG,DELETE),
+//CURRPT   DD  DISP=(NEW,CATLG,DELETE),
 //             DSN=BANKZ.V0R1M0.BNK1STMT.CUR.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(10,10),RLSE),
@@ -49,6 +65,6 @@
  DSN SYSTEM(DBD1)
  RUN PROGRAM(BNK1STMT) -
  PLAN(BANKZPLN) -
- LIB('BANKZ.V0R1M0.LOAD')
+ LIB('BANKZ.V0R1M0.LOADLIB')
  END
 /*

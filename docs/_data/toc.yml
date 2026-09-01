@@ -42,6 +42,8 @@
     url: /docs/installation-and-setup/local-tools/grub-setup.html
   - title: Verification
     url: /docs/installation-and-setup/verification.html
+  - title: Operations Context and Repeatable Deployment
+    url: /docs/installation-and-setup/operations-context.html
 - title: Tutorials
   url: /docs/tutorials/
   children:
@@ -79,4 +81,3 @@
  
 
  
-

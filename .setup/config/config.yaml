@@ -81,7 +81,7 @@ global:
   db2_dsntep: "DSNTEP13"
   # Existing Db2 subsystem on this environment (DB2_PROVISION=false).
   db2_ssid: "DBD2"
-  db2_runlib: "DB2V13.DBD2.RUNLIB.LOAD"
+  db2_runlib: "{{ global.db2_hlq }}.{{ global.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:

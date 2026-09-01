@@ -96,7 +96,7 @@ db2_provisioning:
   volume: "DB2V13"
   storage_class: "ARCH0A"
   data_class: "DCDB2EXT"
-  java_home: "{{ global.java_home }}"
+  java_home: "{{ global.db2_java_dir }}"
   javaenv: "{{ global.db2_ssid }}.DSN1WLMJ.JAVAENV"
   javaenvv: "/u/{{ global.zos_admin_user | lower }}/{{ global.db2_ssid | lower }}envfile.txt"
   jvmprops: "/u/{{ global.zos_admin_user | lower }}/{{ global.db2_ssid | lower }}jvmsp"

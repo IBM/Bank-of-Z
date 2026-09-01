@@ -52,7 +52,9 @@ print_info "YAML: db2-provision.yaml"
 print_info "Db2 SSID: ${DB2_SSID}"
 print_info "Db2 HLQ:  ${DB2_HLQ}"
 
-if opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; then
+_opercmd_out=$(opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null || true)
+print_info "opercmd output: ${_opercmd_out}"
+if echo "${_opercmd_out}" | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; then
     print_error "Db2 subsystem ${DB2_SSID} is already active; refusing to provision over it"
     print_info "Use an unused SSID, or set DB2_PROVISION=false to use the existing subsystem"
     deactivate

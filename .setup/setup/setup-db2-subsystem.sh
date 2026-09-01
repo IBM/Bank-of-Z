@@ -6,7 +6,7 @@ set -eu
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
 # - Activates the zconfig virtual environment
-# - Runs zconfig apply against db2-provision-hs26o.yaml
+# - Runs zconfig apply against db2-provision.yaml
 # - Verifies the subsystem is active
 # =============================================================================
 
@@ -48,7 +48,7 @@ print_stage "STAGE 1: Provision Db2 subsystem with zconfig"
 cd "$SCRIPTS_DIR/../zconfig"
 
 print_info "Applying Db2 provisioning configuration..."
-print_info "YAML: db2-provision-hs26o.yaml"
+print_info "YAML: db2-provision.yaml"
 print_info "Db2 SSID: ${DB2_SSID}"
 print_info "Db2 HLQ:  ${DB2_HLQ}"
 
@@ -73,7 +73,7 @@ if zconfig apply \
     -e db2_jvmprops="${DB2_PROVISION_JVMPROPS}" \
     -e db2_sdsnexit="${DB2_PROVISION_SDSNEXIT}" \
     -e cics_hlq="${CICS_HLQ}" \
-    db2-provision-hs26o.yaml -v; then
+    db2-provision.yaml -v; then
     print_success "zconfig Db2 provisioning completed successfully!"
 else
     print_error "zconfig Db2 provisioning failed"

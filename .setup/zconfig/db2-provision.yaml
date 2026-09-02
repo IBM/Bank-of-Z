@@ -1,3 +1,20 @@
+# Variable defaults — all values are overridden at runtime by the -e flags
+# passed from setup-db2-subsystem.sh via `zconfig apply -e key=value ...`
+vars:
+  db2_ssid: ""
+  db2_hlq: ""
+  db2_user_catalog: ""
+  db2_authid: ""
+  db2_volume: ""
+  db2_storage_class: ""
+  db2_data_class: ""
+  db2_java_home: ""
+  db2_javaenv: ""
+  db2_javaenvv: ""
+  db2_jvmprops: ""
+  db2_sdsnexit: ""
+  cics_hlq: ""
+
 db2:
   ## h26o
   class: A

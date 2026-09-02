@@ -27,10 +27,31 @@ const zlib = require('zlib');
 const { execSync, spawn } = require('child_process');
 
 // Extensions to install — extensionId is publisher.name (case-insensitive match used by marketplace)
+// Extensions are listed in dependency order.
+// Zowe Explorer must be first — nearly every other extension depends on it.
+// Zowe CICS Explorer must precede the IBM CICS IA extension which extends it.
+// The IDzEE Extension Pack is intentionally excluded; all its members are listed
+// individually here so --force guarantees every extension is updated to latest.
 const EXTENSIONS = [
   {
-    name: 'IDzEE Extension Pack',
-    extensionId: 'IBM.developer-for-zos-on-vscode-extension-pack'
+    name: 'Zowe Explorer',
+    extensionId: 'Zowe.vscode-extension-for-zowe'
+  },
+  {
+    name: 'Zowe CICS Explorer',
+    extensionId: 'Zowe.cics-extension-for-zowe'
+  },
+  {
+    name: 'IBM Z Open Editor',
+    extensionId: 'IBM.zopeneditor'
+  },
+  {
+    name: 'IBM Z Open Debug',
+    extensionId: 'IBM.zopendebug'
+  },
+  {
+    name: 'IBM Compiled Code Coverage',
+    extensionId: 'IBM.compiledcodecoverage'
   },
   {
     name: 'CICS Interdependency Analyzer Extension for Zowe Explorer',
@@ -260,16 +281,13 @@ function pipeToFile(response, outputDir, fallbackName) {
 }
 
 /**
- * Sort VSIX paths so extension packs are installed first
+ * Returns VSIX paths in their original order, which reflects the dependency-ordered
+ * EXTENSIONS list above. No reordering needed now that the extension pack is excluded.
  * @param {string[]} vsixFiles
  * @returns {string[]}
  */
 function sortVsixFiles(vsixFiles) {
-  const packs = vsixFiles.filter(f => {
-    const n = path.basename(f).toLowerCase();
-    return n.includes('extension-pack') || n.includes('extensionpack');
-  });
-  return [...packs, ...vsixFiles.filter(f => !packs.includes(f))];
+  return vsixFiles;
 }
 
 /**
@@ -282,7 +300,7 @@ function installVsix(vsixPath) {
     const filename = path.basename(vsixPath);
     console.log(`  Installing: ${filename}`);
 
-    const proc = spawn('bobide', ['--install-extension', vsixPath], { stdio: 'pipe' });
+    const proc = spawn('bobide', ['--install-extension', vsixPath, '--force'], { stdio: 'pipe' });
 
     let output = '';
     let errorOutput = '';

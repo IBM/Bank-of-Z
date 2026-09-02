@@ -26,11 +26,31 @@ const { URL } = require('url');
 const zlib = require('zlib');
 const { execSync, spawn } = require('child_process');
 
-// VSIX download URLs
+// Extensions are listed in dependency order.
+// Zowe Explorer must be first — nearly every other extension depends on it.
+// Zowe CICS Explorer must precede the IBM CICS IA extension which extends it.
+// The IDzEE Extension Pack is intentionally excluded; all its members are listed
+// individually here so --force guarantees every extension is updated to latest.
 const VSIX_URLS = [
   {
-    name: 'IDzEE Extension Pack',
-    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage'
+    name: 'Zowe Explorer',
+    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Zowe/vsextensions/vscode-extension-for-zowe/latest/vspackage'
+  },
+  {
+    name: 'Zowe CICS Explorer',
+    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Zowe/vsextensions/cics-extension-for-zowe/latest/vspackage'
+  },
+  {
+    name: 'IBM Z Open Editor',
+    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/zopeneditor/latest/vspackage'
+  },
+  {
+    name: 'IBM Z Open Debug',
+    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/zopendebug/latest/vspackage'
+  },
+  {
+    name: 'IBM Compiled Code Coverage',
+    url: 'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/compiledcodecoverage/latest/vspackage'
   },
   {
     name: 'CICS Interdependency Analyzer Extension for Zowe Explorer',
@@ -176,17 +196,13 @@ function downloadFile(url, outputDir, fallbackName) {
 }
 
 /**
- * Sort VSIX files so extension packs are installed first
+ * Returns VSIX paths in their original order, which reflects the dependency-ordered
+ * VSIX_URLS list above. No reordering needed now that the extension pack is excluded.
  * @param {string[]} vsixFiles
  * @returns {string[]}
  */
 function sortVsixFiles(vsixFiles) {
-  const extensionPacks = vsixFiles.filter(f => {
-    const name = path.basename(f).toLowerCase();
-    return name.includes('extension-pack') || name.includes('extensionpack');
-  });
-  const others = vsixFiles.filter(f => !extensionPacks.includes(f));
-  return [...extensionPacks, ...others];
+  return vsixFiles;
 }
 
 /**
@@ -199,7 +215,7 @@ function installVsix(vsixPath) {
     const filename = path.basename(vsixPath);
     console.log(`  Installing: ${filename}`);
 
-    const proc = spawn('code', ['--install-extension', vsixPath], { stdio: 'pipe' });
+    const proc = spawn('code', ['--install-extension', vsixPath, '--force'], { stdio: 'pipe' });
 
     let output = '';
     let errorOutput = '';

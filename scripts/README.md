@@ -96,12 +96,31 @@ chmod +x scripts/setup-vscode.js
 ./scripts/setup-vscode.js
 ```
 
+### Extensions Installed
+
+Extensions are installed in dependency order so each extension's prerequisites are already present before it is installed:
+
+| # | Extension | Publisher |
+| - | --------- | --------- |
+| 1 | Zowe Explorer | Zowe |
+| 2 | Zowe CICS Explorer | Zowe |
+| 3 | IBM Z Open Editor | IBM |
+| 4 | IBM Z Open Debug | IBM |
+| 5 | IBM Compiled Code Coverage | IBM |
+| 6 | CICS Interdependency Analyzer Extension for Zowe Explorer | IBM |
+| 7 | IBM IMS Explorer for VS Code | IBM |
+| 8 | IBM Db2 for z/OS Developer Extension | IBM |
+| 9 | IBM z/OS Connect development tools | IBM |
+| 10 | IBM TAZ Early Development Testing | IBM |
+
+> **Note:** The IDzEE Extension Pack is not installed as a bundle. All member extensions are installed individually with `--force` to guarantee each is updated to the latest version. Installing via the pack would silently skip updates for any member already present.
+
 ### What It Does
 
 1. Checks that the `code` command is available
 2. Creates the output directory if it does not exist
 3. Downloads each `.vsix` file with progress indicators
-4. Installs each extension using `code --install-extension`
+4. Installs each extension in dependency order using `code --install-extension --force`
 5. Displays a summary of successful and failed downloads/installations
 
 ### Example Output
@@ -110,30 +129,30 @@ chmod +x scripts/setup-vscode.js
 VS Code Extension Setup
 
 ============================================================
-Downloading 6 extensions...
+Downloading 10 extensions...
 
-IDzEE Extension Pack
+Zowe Explorer
   Downloading: https://marketplace.visualstudio.com/...
   Progress: 100%
-  Saved to: ./vsix-extensions/idzee-extension-pack.vsix
+  Saved to: ./vsix-extensions/zowe.vscode-extension-for-zowe-latest.vsix
 
 ...
 
 ============================================================
 
-Installing 6 extension(s) into VS Code...
+Installing 10 extension(s) into VS Code...
 
-[1/6]
-  Installing: idzee-extension-pack.vsix
-  ✓ Installed: idzee-extension-pack.vsix
+[1/10]
+  Installing: zowe.vscode-extension-for-zowe-latest.vsix
+  ✓ Installed: zowe.vscode-extension-for-zowe-latest.vsix
 
 ...
 
 ============================================================
 Summary:
 
-  Downloaded: 6 / 6
-  ✓ Installed: 6
+  Downloaded: 10 / 10
+  ✓ Installed: 10
   ✗ Failed:    0
 ============================================================
 
@@ -180,14 +199,34 @@ chmod +x scripts/setup-bobide.js
 ./scripts/setup-bobide.js
 ```
 
+### Extensions Installed
+
+Extensions are installed in dependency order so each extension's prerequisites are already present before it is installed:
+
+| # | Extension | Publisher |
+| - | --------- | --------- |
+| 1 | Zowe Explorer | Zowe |
+| 2 | Zowe CICS Explorer | Zowe |
+| 3 | IBM Z Open Editor | IBM |
+| 4 | IBM Z Open Debug | IBM |
+| 5 | IBM Compiled Code Coverage | IBM |
+| 6 | CICS Interdependency Analyzer Extension for Zowe Explorer | IBM |
+| 7 | IBM IMS Explorer for VS Code | IBM |
+| 8 | IBM Db2 for z/OS Developer Extension | IBM |
+| 9 | IBM z/OS Connect development tools | IBM |
+| 10 | IBM TAZ Early Development Testing | IBM |
+
+> **Note:** The IDzEE Extension Pack is not installed as a bundle. All member extensions are installed individually with `--force` to guarantee each is updated to the latest version. Installing via the pack would silently skip updates for any member already present.
+
 ### What It Does
 
 1. Checks that the `bobide` command is available
 2. Creates the output directory if it does not exist
 3. Downloads each `.vsix` file with progress indicators
-4. Sorts files so extension packs are installed first (avoids dependency errors)
-5. Installs each extension using `bobide --install-extension`
-6. Displays a summary of successful and failed downloads/installations
+4. Installs each extension in dependency order using `bobide --install-extension --force`
+5. Patches `extensions.json` so extensions appear correctly in the Extensions tab
+6. Clears stale UI cache and removes installed extensions from the disabled list
+7. Displays a summary of successful and failed downloads/installations
 
 ### Example Output
 
@@ -195,30 +234,30 @@ chmod +x scripts/setup-bobide.js
 Bob IDE Extension Setup
 
 ============================================================
-Downloading 6 extensions...
+Downloading 10 extensions...
 
-IDzEE Extension Pack
+Zowe Explorer
   Downloading: https://marketplace.visualstudio.com/...
   Progress: 100%
-  Saved to: ./vsix-extensions/idzee-extension-pack.vsix
+  Saved to: ./vsix-extensions/zowe.vscode-extension-for-zowe-latest.vsix
 
 ...
 
 ============================================================
 
-Installing 6 extension(s) into Bob IDE...
+Installing 10 extension(s) into Bob IDE...
 
-[1/6]
-  Installing: idzee-extension-pack.vsix
-  ✓ Installed: idzee-extension-pack.vsix
+[1/10]
+  Installing: zowe.vscode-extension-for-zowe-latest.vsix
+  ✓ Installed: zowe.vscode-extension-for-zowe-latest.vsix
 
 ...
 
 ============================================================
 Summary:
 
-  Downloaded: 6 / 6
-  ✓ Installed: 6
+  Downloaded: 10 / 10
+  ✓ Installed: 10
   ✗ Failed:    0
 ============================================================
 

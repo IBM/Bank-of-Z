@@ -41,6 +41,26 @@ DB2_DEPROVISION_CONFIRM=<ssid> .setup/setup-common.sh deprovision-db2
 
 Do not use this workflow for a Db2 subsystem not managed by zconfig.
 
+### zconfig DSNTIJRT job-time limitation
+
+On the tested ZDVT image, the zconfig Db2 `DSNTIJRT` template emits a JOB card
+without a `TIME=` value. JES class A can then cancel the supplied-routines
+installation job with `S222` before it completes. The symptom in the zconfig
+summary is `DSNTIJRT FAILED`; the JES job output identifies `S222`.
+
+Until zconfig provides a configurable job-time value, the local workaround is
+to add `TIME=1440` to the second JOB-card line in its installed template:
+
+```jcl
+//         MSGLEVEL=(1,1),REGION=0M,TIME=1440
+```
+
+The template is typically located under
+`$ZCONFIG_HOME/lib/python*/site-packages/zconfig/utils/db2/job_templates/DSNTIJRT.j2`.
+This is not a Bank of Z source change and can be overwritten when zconfig is
+upgraded; treat it as an environment-specific workaround and track the
+underlying fix with zconfig.
+
 ## Normal application redeploy
 
 Use this after application source changes. Do not run the full `environment` phase unless the middleware environment must be recreated.

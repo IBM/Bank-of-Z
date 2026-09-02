@@ -73,6 +73,17 @@ def normalize_config(config):
     return replace_legacy_reference(result)
 
 
+def expand_env_vars_deep(node):
+    """Recursively expand ${VAR} env references in all string values."""
+    if isinstance(node, dict):
+        return {k: expand_env_vars_deep(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [expand_env_vars_deep(v) for v in node]
+    if isinstance(node, str):
+        return expand_env_vars(node)
+    return node
+
+
 def render_config(data):
     def expand_tree(node):
         if isinstance(node, dict):
@@ -97,7 +108,10 @@ def render_config(data):
             if isinstance(node, str):
                 rendered = node
                 if "{{" in rendered:
-                    rendered = Template(rendered).render(**result)
+                    # Expand env vars in the context first so filters like
+                    # | lower operate on resolved values (e.g. IBMUSER not ${USER})
+                    context = expand_env_vars_deep(result)
+                    rendered = Template(rendered).render(**context)
                 rendered = expand_env_vars(rendered)
                 if rendered != node:
                     changed = True

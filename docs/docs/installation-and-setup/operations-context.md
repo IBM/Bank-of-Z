@@ -65,6 +65,16 @@ being absent after a partial provision. This makes the intentional destructive
 zconfig no longer reports the Db2 configuration and that its Db2 master address
 space is not active before treating teardown as successful.
 
+### Db2 Java WLM runtime
+
+`db2_provisioning.java_home` supplies the Java runtime for Db2's
+`<SSID>WLM_JAVA` application environment. It must reference a Java installation
+(by default, `cfg.java_home`), not `db2_java_dir`, which is the Db2 installation
+directory containing JDBC and Db2 Java classes. If `DSNTIJRV` reports that the
+Java WLM environment is unavailable, inspect its `DBD2WLMJ` (or equivalent)
+started-task output. `CEE3501S The module libjvm.so was not found` indicates an
+invalid Java runtime path.
+
 ## Normal application redeploy
 
 Use this after application source changes. Do not run the full `environment` phase unless the middleware environment must be recreated.

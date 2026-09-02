@@ -134,6 +134,7 @@ CICS_USS_DIR="${CICS_USS_DIR:-{{ cics.uss_dir }}}"
 CICS_SEC="${CICS_SEC:-{{ cics.cics_sec }}}"
 CICS_SYS_PROCLIB="{{ cics.sys_proclib }}"
 CICS_HOST="${CICS_HOST:-{{ cics.host }}}"
+CICS_AUTO_REPLY_GO="${CICS_AUTO_REPLY_GO:-{{ cics.auto_reply_go }}}"
 
 # IMS
 IMS_DISABLED="${IMS_DISABLED:-{{ ims.disabled }}}"

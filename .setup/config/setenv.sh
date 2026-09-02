@@ -138,6 +138,7 @@ CICS_SEC="${CICS_SEC:-{{ cics.cics_sec }}}"
 CICS_SYS_PROCLIB="{{ cics.sys_proclib }}"
 CICS_HOST="${CICS_HOST:-{{ cics.host }}}"
 CICS_AUTO_REPLY_GO="${CICS_AUTO_REPLY_GO:-{{ cics.auto_reply_go }}}"
+CICS_CMCI_START_TIMEOUT_SECONDS="${CICS_CMCI_START_TIMEOUT_SECONDS:-{{ cics.cmci_start_timeout_seconds }}}"
 
 # IMS
 IMS_DISABLED="${IMS_DISABLED:-{{ ims.disabled }}}"

@@ -66,27 +66,23 @@ netstat -a | grep 9081
 
 Then run `install-bank-of-z` and `verify-installation` as in the normal redeploy procedure.
 
-## Known CICS startup issue
+## CICS CMCI readiness
 
-On the validated environment, CICS can pause during startup with:
+CICS must complete startup and expose CMCI on port `27100` before the install phase begins. The CICS TCP/IP sample PLT program `EZACIC20` is not required by Bank of Z and is intentionally not started; it can pause startup when its optional dynamic-routing resource is absent.
 
-```text
-DFHSI1580D CICSBOZ PLT program EZACIC20 has abended, code ACRI. Reply GO or CANCEL.
-```
-
-Until the CICS startup configuration is corrected, CMCI port `27100` will not listen and `install-bank-of-z` will fail during CICS NEWCOPY. Display outstanding replies:
+Always confirm CMCI readiness before `install-bank-of-z`:
 
 ```bash
-opercmd 'D R,L'
+netstat -a | grep 27100
 ```
 
-For the reply associated with this exact CICS message, respond `GO` using the reply number displayed by the system. The reply number varies; do not copy a number from another run.
+The command must show a listening port.
 
-```bash
-opercmd 'R <reply-number>,GO'
-```
+## Running setup from a Mac
 
-Wait for port `27100` to listen before starting the install phase. This is a temporary workaround, not a permanent operational procedure.
+`setup-local.sh` runs on the Mac and uses the configured Zowe RSE API profile to start the same setup phases on z/OS. It requires the Zowe CLI plus the Python packages PyYAML and Jinja2 on the Mac. The script checks these prerequisites before it accesses the configuration.
+
+Direct SSH setup and `setup-local.sh` use the same remote scripts and remote `config.yaml`; each target environment must set its own Db2 and middleware values before deployment.
 
 ## Certificates
 

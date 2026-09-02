@@ -16,6 +16,19 @@ set -e  # Exit on error
 # Source library scripts
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# setup-local.sh reads the YAML configuration before it can issue remote
+# commands. Check its Mac-side dependencies first so the failure is clear.
+if ! command -v zowe >/dev/null 2>&1; then
+    echo "[ERROR] Zowe CLI is required to run setup-local.sh."
+    exit 1
+fi
+if ! python3 -c 'import yaml, jinja2' >/dev/null 2>&1; then
+    echo "[ERROR] Python packages PyYAML and Jinja2 are required to run setup-local.sh."
+    echo "[INFO] Install them with: python3 -m pip install --user PyYAML Jinja2"
+    exit 1
+fi
+
 source "$SCRIPTS_DIR/config/setenv.sh"
 
 #########################################################

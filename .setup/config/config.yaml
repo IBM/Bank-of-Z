@@ -23,7 +23,7 @@ global:
   # Tools
   java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoautil"
+  zoau_home: "/usr/lpp/IBM/zoau"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
   zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
   zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
   dbb_home: "{{ global.sandbox_root }}/tools/dbb"
@@ -33,10 +33,12 @@ global:
   zosconnect_home: "/usr/lpp/IBM/zosconnect"
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
-
   # z/OS System
-  zos_admin_user: "IBMUSER"
-  zos_current_user: "${ZOS_CURRENT_USER}"
+  zos_admin_user: "${USER}"
+  zos_current_user: "${USER}"
+  zos_ca_label: "VSICA"
+  zos_keyring: "BOZRING"
+  zos_create_certs: True
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
   igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
@@ -45,15 +47,16 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
-  
+  asm_hlq: "ASM"
+
   # GUI
   zosconnect_http_port: 9080
-  zosconnect_https_port: 9443
+  zosconnect_https_port: 9444
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
-  # Frontend
+  # Frontend (separate Liberty server - FE<APP_SHORT_NAME> on port 9445)
   frontend_http_port: 9081
-  frontend_https_port: 9444
+  frontend_https_port: 9445
   frontend_task_user: "{{ global.zos_admin_user}}"
 
 
@@ -65,9 +68,12 @@ global:
   # IMS
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
-  ims_java_home: "/usr/lpp/ims/imsjava"
+  ims_java_dir: "/usr/lpp/ims/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
+  ims_ixvolser: "IMSV15"
+  ims_irlm_enablement: false
+  ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
   db2_hlq: "DB2V13"
@@ -75,7 +81,7 @@ global:
   db2_ssid: "DBD1"
   db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
-  db2_java_home: "/usr/lpp/db2d10"
+  db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
 
@@ -165,11 +171,17 @@ wazideploy:
 debug:
   debug_hlq: "{{ global.debug_hlq }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
+  eqaprof_conf_dir: "{{ sandbox.path }}/debug"
+  eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
+  eqaprof_port: 8192
+  eqaprof_port_shutdown: 8105
 
-# z/OS Connect (API exposure)
+# z/OS Connect (API exposure only)
+# Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.
 zosconnect:
   zosconnect_home: "{{ global.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"
+  server_name: "bankOfZServer"
   http_port: "{{ global.zosconnect_http_port }}"
   https_port: "{{ global.zosconnect_https_port }}"
   task_user: "{{ global.zosconnect_task_user }}"
@@ -179,6 +191,7 @@ zosconnect:
 frontend:
   liberty_home: "{{ global.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"
+  server_name: "bankz-frontend"
   http_port: "{{ global.frontend_http_port }}"
   https_port: "{{ global.frontend_https_port }}"
   sys_proclib: "{{ global.sys_proclib }}"
@@ -201,7 +214,8 @@ cics:
 ims:
   disabled: "{{ global.ims_disabled }}"
   ims_sys_hlq: "{{ global.ims_sys_hlq }}"
-  ims_java_home: "{{ global.ims_java_home }}"
+  ims_java_dir: "{{ global.ims_java_dir }}"
+  ims_java_home: "{{ global.java_home }}"
   datastore: "{{ global.ims_datastore }}"
   host: "localhost"
   port: 9977
@@ -209,7 +223,6 @@ ims:
   password: "${IMS_PASSWORD}"
   ims_hlq: "{{app.app_hlq}}.{{ims.datastore}}"
   ims_home: "/usr/lpp/ims/ims15"
-  dfs_ds_volume_1: "{{ ims.ims_sys_hlq }}"
   ims_connect:
     hostname: "localhost"
     port: 9977
@@ -220,13 +233,13 @@ ims:
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  asm_lib_hlq: "ASM.SASMMOD1"
+  asm_hlq: "{{ global.asm_hlq }}"
   dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
   dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
   dfs_recon3: "{{ ims.ims_hlq }}.RECON3"
   dfs_ims_ssid: "{{ ims.datastore }}"
   use_pseudo_wfi: no
-  dfs_auth_lib_hlq1: "{{ app.base_name }}"
+  dfs_auth_lib_hlq1: "{{ app.app_hlq }}"
   dfs_auth_lib_hlq2: "{{ ims.dfs_ims_ssid }}"
   dfs_auth_lib_syshlq1: "{{ ims.ims_sys_hlq }}"
   dsnexit: "{{ db2.sdsnexit }}"
@@ -238,6 +251,9 @@ ims:
   dfs_ims_userid: "${IMS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
   dfs_imsplex: "{{ global.ims_dfsplex }}"
+  ixvolser: "{{ global.ims_ixvolser }}"
+  irlm_enablement: "{{ global.ims_irlm_enablement }}"
+  database_lock_manager_server_name: "{{ global.ims_database_lock_manager_server_name }}"
   regions:
   - with_db2: yes
     use_pseudo_wfi: no
@@ -287,4 +303,4 @@ db2:
   sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  db2_java_home: "{{ global.db2_java_home }}"
+  db2_java_dir: "{{ global.db2_java_dir }}"

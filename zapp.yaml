@@ -7,6 +7,7 @@ description: >-
   details:
   https://ibm.github.io/zopeneditor-about/Docs/setting_propertygroup.html
 author: IBM Z Open Editor
+
 propertyGroups:
   - name: search-all
     libraries:
@@ -34,3 +35,20 @@ profiles:
         - type: local
           locations:
             - "zcodescan/zcodescan-rules.yaml"
+
+  - name: zBuilder-userbuild
+    type: dbb
+    settings:
+      command: "$DBB_HOME/bin/dbb build"
+      lifecycle: user
+      lifecycleArgs:
+        - "--hlq ${dbbHlq}"
+        - "--errPrefix ${errPrefix}" # Requires advanced capabilities
+        - "--verbose"
+      additionalDependencies:
+        - "dbb-app.yaml"
+        - "dbb-app_ub.yaml"
+      logFilePatterns:
+        - "*.log" # Fetch build logs
+        - "*.json" # Fetch Runtime.json and BuildReport.json
+        - "*.html" # Fetch BuildReport.html

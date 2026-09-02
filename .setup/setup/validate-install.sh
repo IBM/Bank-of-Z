@@ -22,7 +22,7 @@ cd "$SCRIPTS_DIR"
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue
-    printf "${CYAN}[VALIDATE]${NC} %s\n" "${line}"
+    printf "${CYAN}[VALIDATE]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
 # =========================

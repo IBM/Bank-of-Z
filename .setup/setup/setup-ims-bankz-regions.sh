@@ -18,7 +18,7 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue
-    printf "${CYAN}[IMS-REGIONS]${NC} %s\n" "${line}"
+    printf "${CYAN}[IMS-REGIONS]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
 
 # =========================
@@ -27,8 +27,8 @@ done) 2>&1
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
-rm -f /tmp/IMS-*
-rm -f /tmp/Ims-*
+rm -f /tmp/IMS-* 2>/dev/null || true
+rm -f /tmp/Ims-* 2>/dev/null || true
 
 # =========================
 # Stop IBM BOZ regions
@@ -201,7 +201,7 @@ sleep 5
 jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)"  2>/dev/null
 sleep 5
 
-rm -f /tmp/IMS-*
-rm -f /tmp/Ims-*
+rm -f /tmp/IMS-* 2>/dev/null || true
+rm -f /tmp/Ims-* 2>/dev/null || true
 
 exit 0

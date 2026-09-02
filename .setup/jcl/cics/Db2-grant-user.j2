@@ -1,5 +1,26 @@
 //DB2GRANT JOB 'DB2',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
 //          MSGLEVEL=(1,1),REGION=4M
+//*********************************************************************
+//BIND    EXEC PGM=IKJEFT01
+//STEPLIB  DD  DISP=SHR,DSN={{ db2.sdsnexit }}
+//         DD  DISP=SHR,DSN={{ db2.sdsnload }}
+//SYSPRINT DD  SYSOUT=*
+//SYSTSPRT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//SYSTSIN DD *
+  DSN SYSTEM({{ db2.ssid }})
+  BIND PLAN({{ db2.plan }}) -
+     OWNER({{ db2.sqlid }}) -
+     ISOLATION(UR) -
+    PKLIST( NULLID.*,{{ db2.package }}.* )
+  BIND PLAN ({{ ims.db2_plan_ibtran }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+  BIND PLAN ({{ ims.db2_plan_ibghist }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+  BIND PLAN ({{ ims.db2_plan_ibshist }}) KEEPDYNAMIC(YES) -
+    ACTION(REPLACE) PKLIST(NULLID.*)
+  END
+/*
 //DB2GRANT EXEC PGM=IKJEFT01,REGION=0M
 //STEPLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNEXIT
 //         DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
@@ -21,14 +42,15 @@
   GRANT USE OF BUFFERPOOL BP1 TO {{ db2_user }};
 
   GRANT BINDADD TO {{ db2_user }};
-
+  GRANT BIND ON PLAN {{ db2.plan }} TO  {{ db2_user }};
+  GRANT BIND ON PLAN IBTRAN, IBGHIST, IBSHIST TO {{ db2_user }};
+  
   GRANT CREATEIN ON SCHEMA BANKZ TO {{ db2_user }};
+  GRANT CREATEIN ON SCHEMA {{ ims.db2_database }} TO {{ db2_user }};
 
   GRANT CREATE IN COLLECTION {{ db2.package }} TO {{ db2_user }};
   GRANT PACKADM ON COLLECTION {{ db2.package }} TO {{ db2_user }};
-  
-  GRANT DBADM ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
-  GRANT CREATEIN ON SCHEMA {{ ims.db2_database }} TO {{ db2_user }};
-  GRANT CREATETAB ON DATABASE {{ ims.db2_database }} TO {{ db2_user }};
+  COMMIT;
+
 
 /*

@@ -29,6 +29,10 @@ application:
             - "Bank-of-Z/src/base"
             - "Bank-of-Z/src/api/src/main/api"
             - "Bank-of-Z/src/frontend"
+        select:
+           - condition: "${LIFECYCLE} == 'user'"
+             value:
+                - "Bank-of-Z/src/base"
 
     - task: ScannerInit
       variables:
@@ -289,7 +293,8 @@ application:
           value: "bank-frontend-vanilla.war"
         - name: zosConnectHttpPort
           value: "${ZOSCONNECT_HTTP_PORT}"
-   
+        - name: zosConnectHttpsPort
+          value: "${ZOSCONNECT_HTTPS_PORT}"
 
     # ----------------------------------------------------------
     # ServerXmlPackager task

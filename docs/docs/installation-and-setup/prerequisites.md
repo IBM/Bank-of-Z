@@ -80,6 +80,33 @@ Appropriate security definitions must also be configured in RACF or an equivalen
 
 > **Note:** Access to z/OS environments, middleware, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding.
 
+## External tools requirements
+
+The following external tools and libraries are required to build and deploy Bank of Z.
+
+### Python libraries
+
+Install the required Python libraries by running the following commands:
+
+```bash
+pip install pyyaml
+pip install jinja2
+```
+
+### Gradle
+
+Download the latest supported Gradle binary distribution from the [Gradle releases](https://gradle.org/releases/) page.
+
+After downloading the archive, install Gradle on z/OS USS by running the following commands:
+
+```bash
+jar xf gradle-9.5.1-bin.zip
+chmod +x gradle-9.5.1/bin/gradle
+chtag -tc UTF-8 gradle-9.5.1/bin/gradle
+```
+
+>**Note:** Update the version number in the commands if you download a different Gradle release.
+
 ## Verify prerequisites
 
 After your system administrator has confirmed the above are in place, run the prerequisite validation from USS to confirm the build and deploy tooling is correctly installed:

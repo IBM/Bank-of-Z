@@ -1,0 +1,59 @@
+name: boz-install
+on:
+    workflow_call:
+        secrets:
+            githubAccessToken:
+                required: true
+
+env:
+    uniqueWorkspaceId: ${{ vars.ZOS_SANDBOX_DIR }}/setup/${{ github.repository }}/${{ github.ref_name }}/setup_s${{ github.run_number }}
+    branch: ${{ github.ref_name }}
+    application: ${{ github.event.repository.name }}
+    zosHost: ${{ vars.ZOS_HOST }}
+    bozFrontendUrl: http://9.47.80.84:9081
+
+
+jobs:
+    setup:
+        runs-on: self-hosted
+        name: parameters
+        steps:
+          - name: pipeline-parameters
+            run: |
+                echo " "
+                echo "Following are the CI-CD pipeline parameters"
+                echo "*******************************************"
+                echo "uniqueWorkspaceId                  = ${{ env.uniqueWorkspaceId}}"
+                echo "branch                             = ${{ env.branch}}"
+                echo "application                        = ${{ env.application}}"
+                echo "zosHost                            = ${{ env.zosHost}}"
+
+          - name: clone-repository-to-uss
+            run: ssh ${{ env.zosHost }} ". ./.profile && gitClone.sh -w ${{ env.uniqueWorkspaceId }} -r https://${{ secrets.githubAccessToken }}@github.com/${{ github.repository }}.git -b ${{ env.branch }}"
+
+    install:
+        needs: setup
+        runs-on: self-hosted
+        steps:
+          - name: full-install-procedure
+            run: |
+              ssh ${{ env.zosHost }} "
+                . ./.profile &&
+                cd ${{ env.uniqueWorkspaceId }} &&
+                if [ -d ${{ env.application }} ]; then cd ${{ env.application }}; fi &&
+                bash .setup/setup-remote.sh
+              "
+
+    verify-installation:
+        needs: install
+        runs-on: self-hosted
+        steps:
+          - name: run-installation-verification-tests
+            run: |
+              ssh ${{ env.zosHost }} "
+                . ./.profile &&
+                cd ${{ env.uniqueWorkspaceId }} &&
+                if [ -d ${{ env.application }} ]; then cd ${{ env.application }}; fi &&
+                bash .setup/setup-common.sh verify-installation
+              "
+

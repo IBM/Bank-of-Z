@@ -74,7 +74,7 @@ cics_region:
     tcpip: "YES"
 
   startup_programs:
-    third_phase:
+    second_phase:
       - EZACIC20
       - EQA0CPLT
 

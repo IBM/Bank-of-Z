@@ -75,6 +75,30 @@ Java WLM environment is unavailable, inspect its `DBD2WLMJ` (or equivalent)
 started-task output. `CEE3501S The module libjvm.so was not found` indicates an
 invalid Java runtime path.
 
+### ZDVT lifecycle-test checkpoint
+
+The repeatable lifecycle test on the ZDVT image uses `DBD2` with
+`cfg.db2_provision: "true"` and `cfg.db2_reprovision: "true"`. The following
+environment-specific zconfig behaviors were observed:
+
+- zconfig 0.8.0.dev1 must use a Db2 job timeout above 40 seconds; see the
+  zconfig job-time limitation above.
+- zconfig `rm --ie` is required for repeatable cleanup when a prior partial
+  provision leaves an already-absent resource.
+- CICS can bring CMCI port `27100` online after the original 120-second wait;
+  use the configurable 300-second default and confirm the port is listening.
+- IMS startup procedures are generated in `BANKZ.IMS2.PROCLIB`. The system
+  procedure library must contain the required members before `S IMS2SCI` can
+  work. If zconfig reports it cannot update `SYS1.PROCLIB` and the start command
+  returns `IEE122I START COMMAND JCL ERROR`, a system administrator must copy
+  the generated IMS procedure members into the JES-searchable procedure library
+  or add `BANKZ.IMS2.PROCLIB` to that concatenation.
+
+Do not begin `setup-local.sh` to `setup-remote.sh` orchestration testing until
+the remote `environment` phase completes successfully. Once it does, test that
+path separately so any transport failure is not confused with subsystem
+provisioning failures.
+
 ## Normal application redeploy
 
 Use this after application source changes. Do not run the full `environment` phase unless the middleware environment must be recreated.

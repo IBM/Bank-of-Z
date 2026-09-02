@@ -46,7 +46,8 @@ if ! zconfig ls 2>/dev/null | grep -Fq "$target_id"; then
     exit 1
 fi
 
-if ! zconfig rm "$target_id" -v; then
+print_info "Using zconfig --ie so an already-absent Db2 resource does not block repeatable teardown"
+if ! zconfig rm "$target_id" -v --ie; then
     print_error "zconfig failed to remove ${target_id}"
     deactivate
     exit 1

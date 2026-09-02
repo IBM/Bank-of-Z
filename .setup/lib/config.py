@@ -48,7 +48,29 @@ def expand_env_vars(value):
 
 def load_config(config_file):
     with open(config_file, "r", encoding="utf-8") as fd:
-        return yaml.safe_load(fd)
+        config = yaml.safe_load(fd)
+    return normalize_config(config)
+
+
+def normalize_config(config):
+    """Support the legacy ``global`` section during the cfg migration."""
+    if not isinstance(config, dict):
+        return config
+
+    result = deepcopy(config)
+    if "cfg" not in result and isinstance(result.get("global"), dict):
+        result["cfg"] = deepcopy(result["global"])
+
+    def replace_legacy_reference(node):
+        if isinstance(node, dict):
+            return {key: replace_legacy_reference(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [replace_legacy_reference(value) for value in node]
+        if isinstance(node, str):
+            return node.replace("global.", "cfg.")
+        return node
+
+    return replace_legacy_reference(result)
 
 
 def render_config(data):

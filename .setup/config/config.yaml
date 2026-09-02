@@ -79,8 +79,7 @@ cfg:
   db2_provision: "false"   # set to "true" to provision a new Db2 subsystem with zconfig
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
-  # Existing Db2 subsystem on this environment (DB2_PROVISION=false).
-  db2_ssid: "DBD2"
+  db2_ssid: "DBD1"
   db2_runlib: "{{ cfg.db2_hlq }}.{{ cfg.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ cfg.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"

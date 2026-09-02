@@ -123,7 +123,7 @@ Then run `install-bank-of-z` and `verify-installation` as in the normal redeploy
 
 ## CICS CMCI readiness
 
-CICS must complete startup and expose CMCI on port `27100` before the install phase begins. Some ZDVT images pause at the `EZACIC20` PLT prompt. Set `cics.auto_reply_go: "true"` only when it is appropriate for the target environment; setup will reply `GO` and wait for CMCI automatically.
+CICS must complete startup and expose CMCI on port `27100` before the install phase begins. Some ZDVT images pause at the `EZACIC20` PLT prompt. Set `cics.auto_reply_go: "true"` only when it is appropriate for the target environment; setup will reply `GO` and wait for CMCI automatically. `cics.cmci_start_timeout_seconds` defaults to 300 seconds and can be increased for slower images.
 
 Always confirm CMCI readiness before `install-bank-of-z`:
 

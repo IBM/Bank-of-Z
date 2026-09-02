@@ -26,21 +26,20 @@ The normal `environment` phase does not remove or recreate Db2 when
 `cfg.db2_provision` is `false`; it only recreates Bank of Z middleware and
 its application database objects on the existing subsystem.
 
-To test a zconfig-managed Db2 subsystem lifecycle, first set
-`cfg.db2_provision: "true"` and ensure `cfg.db2_ssid` identifies the intended
-subsystem. Db2 removal is destructive and must be invoked explicitly with an
-exact confirmation value:
+To make every environment iteration run the complete Db2 lifecycle, set both
+`cfg.db2_provision: "true"` and `cfg.db2_reprovision: "true"`, and ensure
+`cfg.db2_ssid` identifies the intended subsystem. `environment` then stops
+Bank of Z consumers, removes the zconfig-managed Db2 subsystem, provisions it
+again, and continues with the Bank of Z rebuild.
+
+Db2 removal is destructive. The standalone command remains available for
+manual recovery and requires an exact confirmation value:
 
 ```bash
 DB2_DEPROVISION_CONFIRM=<ssid> .setup/setup-common.sh deprovision-db2
 ```
 
-The command stops Bank of Z consumers first, then removes the zconfig-tracked
-Db2 subsystem.
-
-After a successful removal, run `environment` to provision the configured
-subsystem again. Do not use this workflow for a Db2 subsystem not managed by
-zconfig.
+Do not use this workflow for a Db2 subsystem not managed by zconfig.
 
 ## Normal application redeploy
 

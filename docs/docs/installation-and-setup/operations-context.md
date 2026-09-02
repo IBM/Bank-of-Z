@@ -157,11 +157,53 @@ netstat -a | grep 27100
 
 The command must show a listening port.
 
+### CICS SIT-override failure during isolated-workspace testing
+
+On the tested ZDVT image, a long isolated workspace path caused the generated
+CICS startup input to split a `JVMPROFILEDIR` value. CICS then issued
+`DFHPA1912`, reporting the trailing path fragment (for example,
+`TEST/CICSBOZ/JVM`) as an unrecognized SIT override. This is not a CMCI
+readiness timeout.
+
+`DFHPA1912` requires a corrected SIT override. Do not reply `GO`: CICS treats
+`GO` as another invalid override and repeats the prompt. To bypass the invalid
+override and the remaining entries for the current startup attempt, reply
+`.END` to the current reply number, for example:
+
+```bash
+opercmd 'R <reply-number>,.END'
+```
+
+The Bank of Z `auto_reply_go` logic only matches the distinct `EZACIC20` PLT
+prompt and must remain limited to that message. The SIT split is an
+environment/zconfig-generated CICS startup limitation to investigate separately.
+For this ZDVT orchestration test, use a short isolated workspace path such as
+`/usr/local/sandboxes/boz2`.
+
+After bypassing the SIT sequence, the tested CICS spool also reported
+`DFHAM4851E` when installing `DB2CONN DBD2` and `DFHSI8442` for the Db2
+connection. CMCI did not listen on port 27100. Treat this as a separate CICS
+Db2 security/connection investigation; increasing the CMCI timeout does not
+resolve it.
+
 ## Running setup from a Mac
 
 `setup-local.sh` runs on the Mac and uses the configured Zowe RSE API profile to start the same setup phases on z/OS. It requires the Zowe CLI plus the Python packages PyYAML and Jinja2 on the Mac. The script checks these prerequisites before it accesses the configuration.
 
 Direct SSH setup and `setup-local.sh` use the same remote scripts and remote `config.yaml`; each target environment must set its own Db2 and middleware values before deployment.
+
+For a Mac that reaches the ZDVT through a bastion and whose z/OS SSH daemon
+prohibits TCP forwarding, tunnel the RSE API through the bastion directly:
+
+```bash
+ssh -L 8195:<zos-host>:8195 <bastion-user>@<bastion-host> -N
+```
+
+Point the Zowe RSE profile at `localhost:8195`, authenticate with the IBM RSE
+API plug-in before starting `setup-local.sh`, and verify a read-only USS list
+operation first. The initial RSE workspace-existence check is noninteractive;
+without a saved profile credential or token it can incorrectly fall through to
+workspace creation and report that an existing directory cannot be overwritten.
 
 ## Certificates
 

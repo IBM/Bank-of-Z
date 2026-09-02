@@ -56,6 +56,15 @@ is to change `TIMEOUT: int = 40` to a suitable value such as `TIMEOUT: int =
 600` in the installed zconfig file. The change is outside Bank of Z and can be
 overwritten by a zconfig upgrade; track the underlying fix with zconfig.
 
+### Repeatable Db2 deprovisioning
+
+The Bank of Z Db2 teardown uses zconfig `rm --ie`. The `--ie` option is the
+zconfig-supported way to continue past cleanup errors, such as an alias already
+being absent after a partial provision. This makes the intentional destructive
+`cfg.db2_reprovision: "true"` workflow repeatable. Bank of Z still verifies that
+zconfig no longer reports the Db2 configuration and that its Db2 master address
+space is not active before treating teardown as successful.
+
 ## Normal application redeploy
 
 Use this after application source changes. Do not run the full `environment` phase unless the middleware environment must be recreated.

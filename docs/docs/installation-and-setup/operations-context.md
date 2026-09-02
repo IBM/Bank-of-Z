@@ -43,23 +43,19 @@ Do not use this workflow for a Db2 subsystem not managed by zconfig.
 
 ### zconfig DSNTIJRT job-time limitation
 
-On the tested ZDVT image, the zconfig Db2 `DSNTIJRT` template emits a JOB card
-without a `TIME=` value. JES class A can then cancel the supplied-routines
-installation job with `S222` before it completes. The symptom in the zconfig
-summary is `DSNTIJRT FAILED`; the JES job output identifies `S222`.
+On the tested ZDVT image, zconfig Db2 step `DSNTIJRT` can be cancelled with
+`S222` after about 42 seconds. The zconfig summary reports `DSNTIJRT FAILED`;
+the JES output identifies `DSNTRIN - ABEND=S222`.
 
-Until zconfig provides a configurable job-time value, the local workaround is
-to add `TIME=1440` to the second JOB-card line in its installed template:
+Adding `TIME=1440` to the generated JOB card was verified not to override the
+limit. This points to a JES class, service-class, or account policy enforced by
+the target system rather than a Bank of Z setting. A z/OS system administrator
+must provide a job or service class with enough execution time for DSNTIJRT.
 
-```jcl
-//         MSGLEVEL=(1,1),REGION=0M,TIME=1440
-```
-
-The template is typically located under
+The installed zconfig template is typically under
 `$ZCONFIG_HOME/lib/python*/site-packages/zconfig/utils/db2/job_templates/DSNTIJRT.j2`.
-This is not a Bank of Z source change and can be overwritten when zconfig is
-upgraded; treat it as an environment-specific workaround and track the
-underlying fix with zconfig.
+Do not treat a local template edit as a Bank of Z fix; it can be overwritten by
+a zconfig upgrade and cannot override a system-enforced limit.
 
 ## Normal application redeploy
 

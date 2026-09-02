@@ -12,13 +12,32 @@ This note records the operational sequence verified on the Bank of Z z/OS enviro
 Bank of Z can use an existing Db2 subsystem; it does not provision one during setup unless explicitly configured to do so.
 
 ```yaml
-global:
+cfg:
   db2_provision: "false"
   db2_ssid: "<your-existing-ssid>"
   db2_runlib: "<your-runlib-data-set>"
 ```
 
 The Db2 master address space must be active before setup or deployment. The Db2 provisioning configuration is generic (`.setup/zconfig/db2-provision.yaml`) and receives environment-specific values from `config.yaml`.
+
+## Db2 lifecycle test
+
+The normal `environment` phase does not remove or recreate Db2 when
+`cfg.db2_provision` is `false`; it only recreates Bank of Z middleware and
+its application database objects on the existing subsystem.
+
+To test a zconfig-managed Db2 subsystem lifecycle, first set
+`cfg.db2_provision: "true"` and ensure `cfg.db2_ssid` identifies the intended
+subsystem. Db2 removal is destructive and must be invoked explicitly with an
+exact confirmation value:
+
+```bash
+DB2_DEPROVISION_CONFIRM=<ssid> .setup/setup-common.sh deprovision-db2
+```
+
+After a successful removal, run `environment` to provision the configured
+subsystem again. Do not use this workflow for a Db2 subsystem not managed by
+zconfig.
 
 ## Normal application redeploy
 
@@ -68,7 +87,7 @@ Then run `install-bank-of-z` and `verify-installation` as in the normal redeploy
 
 ## CICS CMCI readiness
 
-CICS must complete startup and expose CMCI on port `27100` before the install phase begins. The CICS TCP/IP sample PLT program `EZACIC20` is not required by Bank of Z and is intentionally not started; it can pause startup when its optional dynamic-routing resource is absent.
+CICS must complete startup and expose CMCI on port `27100` before the install phase begins. Some ZDVT images pause at the `EZACIC20` PLT prompt. Set `cics.auto_reply_go: "true"` only when it is appropriate for the target environment; setup will reply `GO` and wait for CMCI automatically.
 
 Always confirm CMCI readiness before `install-bank-of-z`:
 

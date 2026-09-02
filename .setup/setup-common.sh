@@ -646,6 +646,11 @@ main_setup() {
     stage_stop_tasks
 
     if [[ "${DB2_PROVISION}" == "true" ]]; then
+        if [[ "${DB2_REPROVISION,,}" == "true" ]]; then
+            print_warning "DB2_REPROVISION=true: removing ${DB2_SSID} before provisioning it again"
+            export DB2_DEPROVISION_CONFIRM="${DB2_SSID}"
+            stage_deprovision_db2_subsystem
+        fi
         stage_setup_db2_subsystem
     else
         print_info "Skipping Db2 provisioning (DB2_PROVISION=false) — using pre-existing subsystem ${DB2_SSID}"

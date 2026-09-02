@@ -60,7 +60,16 @@ def render_config(config):
     """
     Recursively resolve Jinja expressions inside YAML.
     """
-    result = deepcopy(config)
+    def expand_tree(node):
+        if isinstance(node, dict):
+            return {key: expand_tree(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [expand_tree(value) for value in node]
+        return expand_env_vars(node)
+
+    # Resolve ${VAR} before Jinja filters are applied. In particular, applying
+    # | lower to ${USER} would turn it into ${user} and discard the value.
+    result = expand_tree(deepcopy(config))
 
     env = Environment(undefined=StrictUndefined)
 

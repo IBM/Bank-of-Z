@@ -1,20 +1,3 @@
-# Variable defaults — all values are overridden at runtime by the -e flags
-# passed from setup-db2-subsystem.sh via `zconfig apply -e key=value ...`
-vars:
-  db2_ssid: ""
-  db2_hlq: ""
-  db2_user_catalog: ""
-  db2_authid: ""
-  db2_volume: ""
-  db2_storage_class: ""
-  db2_data_class: ""
-  db2_java_home: ""
-  db2_javaenv: ""
-  db2_javaenvv: ""
-  db2_jvmprops: ""
-  db2_sdsnexit: ""
-  cics_hlq: ""
-
 db2:
   ## h26o
   class: A
@@ -38,24 +21,24 @@ db2:
     rtm05pko: "{{ vars.db2_authid }}"
   volumes_and_sms_classes:
     ## SMS volume for user catalog
-    volexit: "{{ vars.db2_volume | default('') }}"
+    volexit: "{{ vars.db2_volume }}"
     ## STOR CLASS for creating user catalog
-    storcls: "{{ vars.db2_storage_class | default('') }}"
+    storcls: "{{ vars.db2_storage_class }}"
     ## DATA CLASS for creating user catalog
-    datacls: "{{ vars.db2_data_class | default('') }}"
+    datacls: "{{ vars.db2_data_class }}"
     ##Manager class : STANDEF
-    storcls3: "{{ vars.db2_storage_class | default('') }}"
-    datacls3: "{{ vars.db2_data_class | default('') }}"
-    storcls6: "{{ vars.db2_storage_class | default('') }}"
-    datacls6: "{{ vars.db2_data_class | default('') }}"
-    volsdat6: "{{ vars.db2_volume | default('') }}"
-    storcls7: "{{ vars.db2_storage_class | default('') }}"
-    datacls7: "{{ vars.db2_data_class | default('') }}"
-    volsdat7: "{{ vars.db2_volume | default('') }}"
-    catddacl: "{{ vars.db2_data_class | default('') }}"
-    catdstcl: "{{ vars.db2_storage_class | default('') }}"
-    catxdacl: "{{ vars.db2_data_class | default('') }}"
-    catxstcl: "{{ vars.db2_storage_class | default('') }}"
+    storcls3: "{{ vars.db2_storage_class }}"
+    datacls3: "{{ vars.db2_data_class }}"
+    storcls6: "{{ vars.db2_storage_class }}"
+    datacls6: "{{ vars.db2_data_class }}"
+    volsdat6: "{{ vars.db2_volume }}"
+    storcls7: "{{ vars.db2_storage_class }}"
+    datacls7: "{{ vars.db2_data_class }}"
+    volsdat7: "{{ vars.db2_volume }}"
+    catddacl: "{{ vars.db2_data_class }}"
+    catdstcl: "{{ vars.db2_storage_class }}"
+    catxdacl: "{{ vars.db2_data_class }}"
+    catxstcl: "{{ vars.db2_storage_class }}"
   db2_java_properties:
     javahome: "{{ vars.db2_java_home }}"
     claspath: "/usr/include/java_classes"

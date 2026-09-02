@@ -653,7 +653,7 @@ main_setup() {
         fi
         stage_setup_db2_subsystem
     else
-        print_info "Skipping Db2 provisioning (DB2_PROVISION=false) — using pre-existing subsystem ${DB2_SSID}"
+        print_info "Skipping Db2 provisioning (DB2_PROVISION=false) - using pre-existing subsystem ${DB2_SSID}"
     fi
 
     stage_setup_database

@@ -27,7 +27,10 @@ else
     export REPO_NAME="Bank-of-Z"
 fi
 if command -v chtag >/dev/null 2>&1; then
-    chtag -t -c ISO8859-1 "$CONFIG_FILE"
+    # config.yaml is parsed explicitly as UTF-8 by the setup utilities.
+    # Keep the USS tag consistent with its on-disk encoding so direct z/OS
+    # use and Python/YAML readers do not see converted garbage.
+    chtag -t -c UTF-8 "$CONFIG_FILE"
 fi
 set -e
 

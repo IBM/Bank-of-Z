@@ -9,13 +9,13 @@ This note records the operational sequence verified on the Bank of Z z/OS enviro
 
 ## Verified Db2 configuration
 
-This environment uses an existing Db2 subsystem; it does not provision one during Bank of Z setup.
+Bank of Z can use an existing Db2 subsystem; it does not provision one during setup unless explicitly configured to do so.
 
 ```yaml
 global:
   db2_provision: "false"
-  db2_ssid: "DBD2"
-  db2_runlib: "DB2V13.DBD2.RUNLIB.LOAD"
+  db2_ssid: "<your-existing-ssid>"
+  db2_runlib: "<your-runlib-data-set>"
 ```
 
 The Db2 master address space must be active before setup or deployment. The Db2 provisioning configuration is generic (`.setup/zconfig/db2-provision.yaml`) and receives environment-specific values from `config.yaml`.

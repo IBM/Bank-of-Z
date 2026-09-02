@@ -131,6 +131,7 @@ CICS_PASSWORD=${CICS_PASSWORD:-$(get_section_value 'cics' 'password')} #pragma: 
 CICS_IPIC_PORT=$(get_section_value 'cics' 'ipic_port')
 CICS_CMCI_PORT=${CICS_CMCI_PORT:-$(get_section_value 'cics' 'cmci_port')}
 CICS_AUTO_REPLY_GO=${CICS_AUTO_REPLY_GO:-$(get_section_value 'cics' 'auto_reply_go')}
+CICS_CMCI_START_TIMEOUT_SECONDS=${CICS_CMCI_START_TIMEOUT_SECONDS:-$(get_section_value 'cics' 'cmci_start_timeout_seconds')}
 CICS_DEBUG_PORT=${CICS_DEBUG_PORT:-$(get_section_value 'cics' 'debug_port')}
 CICS_HLQ=${CICS_HLQ:-$(get_section_value 'cics' 'cics_hlq')}
 CICS_USS_DIR=${CICS_USS_DIR:-$(get_section_value 'cics' 'uss_dir')}

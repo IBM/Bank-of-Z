@@ -232,6 +232,8 @@ cics:
   # Some ZDVT images pause CICS startup at the EZACIC20 PLT prompt.
   # Set to "true" only when automatically replying GO is appropriate.
   auto_reply_go: "false"
+  # CICS can take several minutes to bring CMCI online after startup.
+  cmci_start_timeout_seconds: 300
   ipic_port: 4320
   debug_port: 27103
   sys_proclib: "{{ cfg.sys_proclib }}"

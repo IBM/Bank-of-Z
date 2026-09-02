@@ -478,7 +478,7 @@ wait_for_cics_cmci() {
     local reply_id=""
 
     print_info "Waiting for CICS CMCI port ${CICS_CMCI_PORT}..."
-    while (( elapsed < 120 )); do
+    while (( elapsed < CICS_CMCI_START_TIMEOUT_SECONDS )); do
         if netstat -a 2>/dev/null | grep -qi ":${CICS_CMCI_PORT}.*listen"; then
             print_success "CICS CMCI is listening on port ${CICS_CMCI_PORT}"
             return 0
@@ -501,7 +501,7 @@ wait_for_cics_cmci() {
         ((elapsed += 5))
     done
 
-    print_error "CICS CMCI did not listen on port ${CICS_CMCI_PORT} within 120 seconds"
+    print_error "CICS CMCI did not listen on port ${CICS_CMCI_PORT} within ${CICS_CMCI_START_TIMEOUT_SECONDS} seconds"
     return 1
 }
 

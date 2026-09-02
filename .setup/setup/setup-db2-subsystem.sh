@@ -61,17 +61,14 @@ if echo "${_opercmd_out}" | grep -v "NOT FOUND" | grep -v "D A,${DB2_SSID}MSTR" 
     exit 1
 fi
 
-ZCONFIG_EXTRA_ARGS=()
-[[ -n "${DB2_PROVISION_VOLUME}" ]] && ZCONFIG_EXTRA_ARGS+=(-e "db2_volume=${DB2_PROVISION_VOLUME}")
-[[ -n "${DB2_PROVISION_STORAGE_CLASS}" ]] && ZCONFIG_EXTRA_ARGS+=(-e "db2_storage_class=${DB2_PROVISION_STORAGE_CLASS}")
-[[ -n "${DB2_PROVISION_DATA_CLASS}" ]] && ZCONFIG_EXTRA_ARGS+=(-e "db2_data_class=${DB2_PROVISION_DATA_CLASS}")
-
 if zconfig apply \
     -e db2_ssid="${DB2_SSID}" \
     -e db2_hlq="${DB2_HLQ}" \
     -e db2_user_catalog="${DB2_PROVISION_USER_CATALOG}" \
     -e db2_authid="${DB2_PROVISION_AUTHID}" \
-    "${ZCONFIG_EXTRA_ARGS[@]}" \
+    -e db2_volume="${DB2_PROVISION_VOLUME}" \
+    -e db2_storage_class="${DB2_PROVISION_STORAGE_CLASS}" \
+    -e db2_data_class="${DB2_PROVISION_DATA_CLASS}" \
     -e db2_java_home="${DB2_PROVISION_JAVA_HOME}" \
     -e db2_javaenv="${DB2_PROVISION_JAVAENV}" \
     -e db2_javaenvv="${DB2_PROVISION_JAVAENVV}" \

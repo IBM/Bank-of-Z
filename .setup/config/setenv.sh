@@ -171,6 +171,7 @@ DB2_REPROVISION="${DB2_REPROVISION:-$(get_section_value 'cfg' 'db2_reprovision')
 DB2_HLQ="${DB2_HLQ:-$(get_section_value 'db2' 'db2_hlq')}"
 DB2_SSID="${DB2_SSID:-$(get_section_value 'db2' 'ssid')}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-$(get_section_value 'db2' 'db2_java_dir')}"
+DB2_PROVISION_JOB_CLASS="${DB2_PROVISION_JOB_CLASS:-$(get_section_value 'db2_provisioning' 'job_class')}"
 DB2_PROVISION_USER_CATALOG="${DB2_PROVISION_USER_CATALOG:-$(get_section_value 'db2_provisioning' 'user_catalog')}"
 DB2_PROVISION_AUTHID="${DB2_PROVISION_AUTHID:-$(get_section_value 'db2_provisioning' 'authid')}"
 DB2_PROVISION_VOLUME="${DB2_PROVISION_VOLUME:-$(get_section_value 'db2_provisioning' 'volume')}"

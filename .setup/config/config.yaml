@@ -94,6 +94,9 @@ cfg:
 # ZDVT image; review and change every environment-specific value before
 # setting cfg.db2_provision to "true".
 db2_provisioning:
+  # JES job class used by zconfig's Db2 installation jobs. Keep the default
+  # unless your z/OS administrator directs you to a class with a longer limit.
+  job_class: "A"
   user_catalog: "CATALOG.VS01.DB2V13"
   authid: "{{ cfg.zos_admin_user }}"
   volume: "DB2V13"

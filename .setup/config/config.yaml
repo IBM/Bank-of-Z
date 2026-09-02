@@ -223,6 +223,9 @@ cics:
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
   cmci_port: 27100
+  # Some ZDVT images pause CICS startup at the EZACIC20 PLT prompt.
+  # Set to "true" only when automatically replying GO is appropriate.
+  auto_reply_go: "false"
   ipic_port: 4320
   debug_port: 27103
   sys_proclib: "{{ cfg.sys_proclib }}"

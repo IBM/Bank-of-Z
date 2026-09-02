@@ -15,7 +15,7 @@
 //SYSIN DD *
  SET CURRENT SQLID = '{{ db2.sqlid }}';
 
-{% for db2_user in global.db2_grants %}
+{% for db2_user in cfg.db2_grants %}
  GRANT EXECUTE ON PLAN {{ db2.plan }} TO {{ db2_user }};
 
  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE

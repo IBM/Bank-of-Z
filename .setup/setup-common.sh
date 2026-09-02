@@ -445,6 +445,27 @@ stage_setup_db2_subsystem() {
     fi
 }
 
+stage_deprovision_db2_subsystem() {
+    print_stage "Deprovision Db2 subsystem with zconfig"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
+        exit 1
+    fi
+
+    print_info "Running Db2 subsystem deprovisioning script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
+    cd "$BANK_DIR"
+
+    set -o pipefail
+    if .setup/setup/deprovision-db2-subsystem.sh; then
+        print_success "Db2 subsystem deprovisioning completed successfully"
+    else
+        print_error "Failed to deprovision Db2 subsystem"
+        exit 1
+    fi
+}
+
 #########################################################
 # STAGE: Setup CICS region
 #########################################################
@@ -589,12 +610,14 @@ print_usage() {
     echo "Phases:"
     echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
     echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  deprovision-db2     Remove the configured zconfig-managed Db2 subsystem"
     echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
     echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
+    echo "  DB2_DEPROVISION_CONFIRM=<ssid> bash setup-common.sh deprovision-db2"
     echo "  bash setup-common.sh install-bank-of-z"
     echo "  bash setup-common.sh verify-installation"
     echo ""
@@ -736,6 +759,9 @@ main() {
             ;;
         environment)
             main_setup
+            ;;
+        deprovision-db2)
+            stage_deprovision_db2_subsystem
             ;;
         install-bank-of-z)
             if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then

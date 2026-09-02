@@ -99,7 +99,9 @@ db2_provisioning:
   volume: "DB2V13"
   storage_class: "ARCH0A"
   data_class: "DCDB2EXT"
-  java_home: "{{ cfg.db2_java_dir }}"
+  # Java runtime for the Db2 Java WLM environment. This must be a Java home,
+  # not the Db2 installation directory used for JDBC and Db2 Java classes.
+  java_home: "{{ cfg.java_home }}"
   javaenv: "{{ cfg.db2_ssid }}.DSN1WLMJ.JAVAENV"
   javaenvv: "/u/{{ cfg.zos_admin_user | lower }}/{{ cfg.db2_ssid | lower }}envfile.txt"
   jvmprops: "/u/{{ cfg.zos_admin_user | lower }}/{{ cfg.db2_ssid | lower }}jvmsp"

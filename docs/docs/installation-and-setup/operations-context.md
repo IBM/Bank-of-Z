@@ -35,6 +35,9 @@ exact confirmation value:
 DB2_DEPROVISION_CONFIRM=<ssid> .setup/setup-common.sh deprovision-db2
 ```
 
+The command stops Bank of Z consumers first, then removes the zconfig-tracked
+Db2 subsystem.
+
 After a successful removal, run `environment` to provision the configured
 subsystem again. Do not use this workflow for a Db2 subsystem not managed by
 zconfig.

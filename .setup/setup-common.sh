@@ -453,6 +453,9 @@ stage_deprovision_db2_subsystem() {
         exit 1
     fi
 
+    # Stop Bank of Z consumers before removing the subsystem they use.
+    stage_stop_tasks
+
     print_info "Running Db2 subsystem deprovisioning script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
     cd "$BANK_DIR"

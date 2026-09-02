@@ -75,7 +75,6 @@ cics_region:
 
   startup_programs:
     second_phase:
-      - EZACIC20
       - EQA0CPLT
 
   extensions:

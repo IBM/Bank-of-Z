@@ -1,6 +1,6 @@
 db2:
   ## h26o
-  class: "{{ vars.db2_job_class }}"
+  class: A
   ssid: "{{ vars.db2_ssid }}"
   hlq: "{{ vars.db2_hlq }}"
   insdspre: "{{ vars.db2_hlq }}.{{ vars.db2_ssid }}"

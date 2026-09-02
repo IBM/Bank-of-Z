@@ -43,23 +43,18 @@ Do not use this workflow for a Db2 subsystem not managed by zconfig.
 
 ### zconfig DSNTIJRT job-time limitation
 
-On the tested ZDVT image, zconfig Db2 step `DSNTIJRT` can be cancelled with
-`S222` after about 42 seconds. The zconfig summary reports `DSNTIJRT FAILED`;
-the JES output identifies `DSNTRIN - ABEND=S222`.
+On the tested ZDVT image, zconfig 0.8.0.dev1 cancels Db2 installation jobs
+after approximately 40 seconds. `Configuration.TIMEOUT` is hard-coded to 40
+in zconfig's installed `utils/db2/base/configuration.py`; zconfig then invokes
+`jcan` to cancel the job. The cancelled job can report `S222`, and the zconfig
+summary reports the affected step as failed (for example, `RACF` or
+`DSNTIJRT`). This is not a JES class limit and adding `TIME=1440` to the JOB
+card does not resolve it.
 
-Adding `TIME=1440` to the generated JOB card was verified not to override the
-limit. This points to a JES class, service-class, or account policy enforced by
-the target system rather than a Bank of Z setting. A z/OS system administrator
-must provide a job or service class with enough execution time for DSNTIJRT.
-After the administrator identifies that class, set
-`db2_provisioning.job_class` in `.setup/config/config.yaml` to its one-letter
-JES class (the default remains `A`). Bank of Z passes this value to zconfig for
-all Db2 installation jobs.
-
-The installed zconfig template is typically under
-`$ZCONFIG_HOME/lib/python*/site-packages/zconfig/utils/db2/job_templates/DSNTIJRT.j2`.
-Do not treat a local template edit as a Bank of Z fix; it can be overwritten by
-a zconfig upgrade and cannot override a system-enforced limit.
+Until zconfig exposes this timeout as configuration, the local ZDVT workaround
+is to change `TIMEOUT: int = 40` to a suitable value such as `TIMEOUT: int =
+600` in the installed zconfig file. The change is outside Bank of Z and can be
+overwritten by a zconfig upgrade; track the underlying fix with zconfig.
 
 ## Normal application redeploy
 

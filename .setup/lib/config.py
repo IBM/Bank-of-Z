@@ -74,7 +74,17 @@ def normalize_config(config):
 
 
 def render_config(data):
-    result = deepcopy(data)
+    def expand_tree(node):
+        if isinstance(node, dict):
+            return {key: expand_tree(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [expand_tree(value) for value in node]
+        return expand_env_vars(node)
+
+    # Expand environment variables before resolving Jinja. Otherwise a
+    # construct such as {{ cfg.zos_admin_user | lower }} receives ${USER},
+    # lowers it to ${user}, and loses the value on case-sensitive systems.
+    result = expand_tree(deepcopy(data))
     for _ in range(20):
         changed = False
 

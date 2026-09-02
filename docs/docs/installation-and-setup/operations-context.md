@@ -51,6 +51,10 @@ Adding `TIME=1440` to the generated JOB card was verified not to override the
 limit. This points to a JES class, service-class, or account policy enforced by
 the target system rather than a Bank of Z setting. A z/OS system administrator
 must provide a job or service class with enough execution time for DSNTIJRT.
+After the administrator identifies that class, set
+`db2_provisioning.job_class` in `.setup/config/config.yaml` to its one-letter
+JES class (the default remains `A`). Bank of Z passes this value to zconfig for
+all Db2 installation jobs.
 
 The installed zconfig template is typically under
 `$ZCONFIG_HOME/lib/python*/site-packages/zconfig/utils/db2/job_templates/DSNTIJRT.j2`.

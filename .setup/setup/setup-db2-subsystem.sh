@@ -64,6 +64,7 @@ fi
 if zconfig apply \
     -e db2_ssid="${DB2_SSID}" \
     -e db2_hlq="${DB2_HLQ}" \
+    -e db2_catalog="${DB2_PROVISION_CATALOG}" \
     -e db2_user_catalog="${DB2_PROVISION_USER_CATALOG}" \
     -e db2_authid="${DB2_PROVISION_AUTHID}" \
     -e db2_volume="${DB2_PROVISION_VOLUME}" \

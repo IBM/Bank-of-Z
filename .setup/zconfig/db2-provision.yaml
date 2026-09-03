@@ -4,6 +4,8 @@ db2:
   ssid: "{{ vars.db2_ssid }}"
   hlq: "{{ vars.db2_hlq }}"
   insdspre: "{{ vars.db2_hlq }}.{{ vars.db2_ssid }}"
+  ## override the catalog HLQ used for all Db2 VSAM clusters (CATALOG = "{SSID}SYS" by default)
+  catalog: "{{ vars.db2_catalog }}"
   ## user catalog
   userscat: "{{ vars.db2_user_catalog }}"
   userlcat: "{{ vars.db2_user_catalog }}"

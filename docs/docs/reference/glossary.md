@@ -33,11 +33,16 @@ This glossary defines common terms and technologies used throughout the Bank of 
 | **RSE API** | Remote System Explorer API. A service used by Zowe CLI and development tools to interact with z/OS resources. |
 | **USS** | UNIX System Services. The POSIX-compliant environment within z/OS used to host source code, scripts, build artifacts, and application assets. |
 | **VS Code** | Visual Studio Code. A development environment commonly used to develop, build, and manage Bank of Z assets. |
+| **VSIX** | Visual Studio Extension package. A packaged extension format used to install IDE extensions into supported development environments. |
 | **Wazi Deploy** | IBM deployment automation tooling used to deploy application artifacts and configuration changes. |
-| **Workflow** | A defined development process used to build, deploy, test, and validate application changes. Bank of Z supports VS Code and GRUB workflows. |
+| **Workflow** | A defined development process used to build, deploy, test, and validate application changes. Bank of Z supports Zowe CLI workflow and the GRUB workflow. |
+| **Workspace** | The local or z/OS USS directory that contains the Bank of Z source code, configuration files, and build assets used during development. |
+| **YAML** | A human-readable data serialization format used for configuration files such as `config.yaml`. |
 | **zBuilder** | A build framework used with DBB to automate compilation, linking, and build orchestration for z/OS applications. |
 | **ZCodeScan** | A static analysis tool used to analyze source code quality and identify potential issues. |
-| **zconfig** | z/OS Middleware Configuration Tool is a command-line tool to configure and create artifacts for CICS® Transaction Server for z/OS (CICS TS), Db2® for z/OS (Db2), Information Management System (IMS), and z/OS Connect introducing configuration as code to z/OS middleware.
+| **zconfig** | z/OS Middleware Configuration Tool is a command-line tool to configure and create artifacts for CICS® Transaction Server for z/OS (CICS TS), Db2® for z/OS (Db2), Information Management System (IMS), and z/OS Connect introducing configuration as code to z/OS middleware. |
+| **z/OS** | IBM’s enterprise operating system that provides the runtime environment for Bank of Z applications and middleware. |
 | **z/OS Connect** | An API framework that enables REST-based access to z/OS applications and services. In Bank of Z, it provides the interface between the web application and the CICS and IMS transaction environments. |
+| **z/OSMF** | z/OS Management Facility. A web-based management interface used by Zowe CLI to communicate with z/OS systems. |
 | **ZOAU** | IBM Z Open Automation Utilities. A collection of utilities and APIs used to automate z/OS administration and development tasks. |
 | **Zowe CLI** | A command-line interface used to interact with z/OS systems, services, datasets, USS files, and development workflows. |

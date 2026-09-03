@@ -128,7 +128,7 @@ The `app` section defines application naming conventions used for datasets, reso
 ### DBB configuration
 The `dbb` section identifies the IBM Dependency Based Build (DBB) installation.
 
-Depending on your environment and tooling requirements, additional configuration sections can be defined.
+Depending on your environment and deployment requirements, additional configuration sections can be defined.
 
 ### Repository configuration
 Defines repositories that are cloned during setup.
@@ -165,7 +165,7 @@ dbb:
   dbb_build: ${sandbox.path}/Bank-of-Z/.setup/build
 ```
 
-Variables are resolved during setup processing.
+Variables are resolved automatically during setup.
 
 Environment variables can also be referenced:
 
@@ -179,7 +179,7 @@ cics:
 
 ## Validation rules
 
-The setup process validates configuration values before run.
+The setup process validates the configuration before it runs.
 
 Validation includes:
 

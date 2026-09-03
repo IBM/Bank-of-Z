@@ -5,7 +5,7 @@ title: Zowe CLI Setup
 
 # Zowe CLI Setup
 
-Zowe CLI is used by the Bank of Z deployment scripts to communicate with z/OS USS. It creates workspace directories, clones the repository on USS, and runs remote setup commands. This is required for the [Zowe CLI deployment workflow](../deploy-zowe-cli.html).
+Zowe CLI is used by the Bank of Z deployment workflow to communicate with z/OS USS. It creates workspace directories, clones the repository to USS, and runs the remote setup commands. This is required for the [Zowe CLI deployment workflow](../deploy-zowe-cli.html).
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ zowe --version
 
 ## Install the IBM RSE API plug-in
 
-The IBM RSE API plug-in is required for `setup-local.sh` to run USS commands and manage files on the target z/OS system.
+The IBM RSE API plug-in is required by `setup-local.sh` to run commands on z/OS USS and manage files during the deployment process.
 
 ```bash
 zowe plugins install @ibm/rse-api-for-zowe-cli

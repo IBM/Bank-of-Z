@@ -38,7 +38,7 @@ cd Bank-of-Z
 
 ## 3. Edit the configuration file
 
-Open the configuration file in your USS editor and update it for your environment:
+Open the configuration file by using your preferred text editor on USS and update it for your environment:
 
 ```bash
 vi .setup/config/config.yaml
@@ -74,7 +74,7 @@ Provisions the complete application runtime, including Db2 tables, a CICS region
 .setup/setup-common.sh install-bank-of-z
 ```
 
-Runs a complete DBB build, packages the outputs, deploys via Wazi Deploy, and populates Db2 and IMS with test data. The initial build and deployment typically take 15 to 20 minutes.
+Performs a full application build by using IBM Dependency Based Build (DBB), packages the generated artifacts, deploys them by using Wazi Deploy, and populates the Db2 and IMS databases with sample data. The initial build and deployment typically take 15 to 20 minutes.
 
 > **Note:** Warnings related to the YAML scanner and `chown` failures are expected and do not indicate a problem.
 

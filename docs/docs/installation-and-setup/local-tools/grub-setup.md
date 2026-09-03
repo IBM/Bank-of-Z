@@ -5,13 +5,13 @@ title: GRUB Setup
 
 # GRUB Setup
 
-GRUB (Git Remote User Build) syncs local file changes directly to z/OS USS without requiring a Git commit, then runs a configured post-sync script on USS. Bank of Z uses this capability to run the setup and deployment scripts automatically after each sync.
+GRUB (Git Remote User Build) synchronizes local file changes directly to z/OS USS without requiring a Git commit, then runs a configured post-sync script on USS. Bank of Z uses this capability to run the setup and deployment scripts automatically after each sync.
 
 This is required for the [GRUB deployment workflow](../deploy-grub.html).
 
 ## Install GRUB
 
-Follow the GRUB installation instructions for your environment. GRUB is available from the IBM Z development tooling portfolio.
+Follow the GRUB installation instructions for your environment. 
 
 ## Configure GRUB for Bank of Z
 
@@ -31,9 +31,9 @@ Refer to the GRUB documentation for the configuration procedure specific to your
 
 When you trigger a GRUB sync:
 
-1. GRUB computes a patch that contains the local changes since the previous sync. No commit is required.
+1. GRUB computes a patch that contains the local changes since the previous synchronization. No commit is required.
 2. The patch is applied to the Bank of Z directory on z/OS USS.
 3. The post-sync hook runs `setup-remote.sh` on z/OS USS.
-4. `setup-remote.sh` detects that it is running inside the Bank-of-Z repository and automatically runs all three setup stages.
+4. `setup-remote.sh` detects that it is running from the Bank-of-Z repository and automatically runs the three setup stages.
 
-After the initial deployment, subsequent syncs are typically fast because only changed files are transferred.
+After the initial deployment, subsequent synchronizations are typically faster because only changed files are transferred.

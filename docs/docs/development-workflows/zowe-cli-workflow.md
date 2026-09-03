@@ -5,14 +5,16 @@ title: Zowe CLI Workflow
 
 # Zowe CLI Workflow
 
-The Zowe CLI workflow supports Git-based development by using `setup-local.sh` and `pipeline-local.sh` to coordinate build and deployment activities between your local machine and z/OS USS. No SSH access to USS is required.
+The Zowe CLI workflow supports Git-based development by coordinating build and deployment activities between your local machine and z/OS USS. It enables you to build, deploy, and validate application changes without requiring. direct SSH access to z/OS USS.
 
-Before using this workflow, complete [Deploy Using Zowe CLI](../installation-and-setup/deploy-zowe-cli.md) to set up your environment.
+Before using this workflow, complete [Deploy Using Zowe CLI](../installation-and-setup/deploy-zowe-cli.md) to configure your environment.
 
 ## Full and incremental build and deploy
 
-Bank of Z supports both full and incremental build workflows. Use a full build when setting up a new environment or when infrastructure changes require a complete redeployment.
-After the initial deployment, most day-to-day development can be completed using an incremental build and deploy, which rebuilds and deploys only the application components affected by your changes.
+Bank of Z supports both full and incremental build workflows. 
+
+- Use a full build when setting up a new environment or when infrastructure changes require a complete redeployment.
+- After the initial deployment, use an incremental build and deploy workflow for day-to-day development. This workflow rebuilds and deploys only the application components affected by your changes, reducing build time and enabling faster iteration.
 
 Run:
 
@@ -34,7 +36,7 @@ Modify application source code in your local workspace. Common changes include:
 
 ### 2. Commit and push
 
-Changes must be pushed to the remote repository before triggering a build — the script clones your branch from GitHub on USS, so unpushed commits will not be included.
+Changes must be pushed to the remote repository before triggering a build because the workflow clones your current branch from Github to z/OS USS. Local commits that have not been pushed are not included.
 
 ```bash
 git add .
@@ -42,9 +44,14 @@ git commit -m "Your change description"
 git push origin your-branch
 ```
 
-### 3. Run the setup or pipeline task
+### 3. Run the workflow
 
-**From the command line:**
+Run one of the following scripts, depending on the type of deployment you need to perform:
+
+- `setup-local.sh` - Performs a full environment setup. Use this when deploying Bank of Z for the first time or after infrastructure changes.
+
+- `pipeline-local.sh` - Performs an incremental build and deploy for day-to-day development by rebuilding and deploying only the application components affected by your changes.
+
 ```bash
 # Full environment setup (first time or after infrastructure changes)
 bash .setup/setup-local.sh
@@ -53,7 +60,7 @@ bash .setup/setup-local.sh
 bash .setup/pipeline-local.sh
 ```
 
-**From VS Code:** Command Palette → **Tasks: Run Task** → select the appropriate task.
+If you are using Visual Studio Code, you can also run the provided workspace task from **Command Palette → **Tasks: Run Task** → select the appropriate task.
 
 The VS Code task is defined in `.vscode/tasks.json`:
 

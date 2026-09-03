@@ -5,7 +5,7 @@ title: IDE Setup
 
 # IDE Setup
 
-An IDE is required to browse, edit, and manage Bank of Z source code. For the best experience and to follow the tutorials in the documentation, use IBM Bob Premium Package for Z. Alternatively, you can use Visual Studio Code.
+An IDE is required to browse, edit, and manage Bank of Z source code. Bank of Z supports IBM Bob Premium Package for Z and Visual Studio Code. Both environments support the development workflows described in the documentation.
 
 IDE setup is independent of your chosen deployment workflow. Complete this setup before continuing your deployment tooling.
 
@@ -21,13 +21,13 @@ java -version
 
 ## Required extensions
 
-Install the following extensions in your IDE.
+Install the following extensions required for Bank of Z development.
 
 **Note:** If you are using IBM Bob Premium Package for Z and an extension is unavailable in the Open VSX Marketplace, download the VSIX package and install it manually.
 
 | Extension | Description | VS Code Marketplace | Open VSX | VSIX |
 |-----------|-------------|---------------------|----------|------|
-| IBM® Developer for z/OS® Enterprise Edition (IDzEE) Extension Pack | Core IBM Z development extensions including IBM Z Open Editor, IBM Z Open Debug, IBM Compiled Code Coverage, Zowe Explorer, and Zowe Explorer for IBM CICS. | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack) | [Link](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage) |
+| IBM® Developer for z/OS® Enterprise Edition (IDzEE) Extension Pack | This is factual documentation describing what's inside the extension pack. | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.developer-for-zos-on-vscode-extension-pack) | [Link](https://open-vsx.org/extension/IBM/developer-for-zos-on-vscode-extension-pack) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/developer-for-zos-on-vscode-extension-pack/latest/vspackage) |
 | IBM CICS Interdependency Analyzer Extension for Zowe Explorer | CICS application and resource analysis. | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.cics-ia-extension-for-zowe) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/cics-ia-extension-for-zowe/latest/vspackage) |
 | IBM IMS Explorer for VS Code | IMS application development support. | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.ims-explorer-for-vscode) | N/A | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/ims-explorer-for-vscode/latest/vspackage) |
 | IBM Db2 for z/OS Developer Extension | Db2 development and SQL tooling. | [Link](https://marketplace.visualstudio.com/items?itemName=IBM.db2forzosdeveloperextension) | [Link](https://open-vsx.org/extension/IBM/db2forzosdeveloperextension) | [Link](https://marketplace.visualstudio.com/_apis/public/gallery/publishers/IBM/vsextensions/db2forzosdeveloperextension/latest/vspackage) |
@@ -85,7 +85,7 @@ For more information, see [`scripts/README.md`](../../../../scripts/README.md).
 
 After completing the installation:
 
-1. Launch the IDE.
+1. Launch your development environment.
 2. Confirm all required extensions are installed and enabled.
 3. Open the Bank of Z repository and confirm that the workspace tasks are available from **Terminal** → **Run Task**.
 

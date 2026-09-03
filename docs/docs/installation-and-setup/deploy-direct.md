@@ -38,7 +38,7 @@ cd Bank-of-Z
 
 ## 3. Edit the configuration file
 
-Open the configuration file in your USS editor and update it for your environment:
+Open the configuration file by using your preferred text editor on USS and update it for your environment:
 
 ```bash
 vi .setup/config/config.yaml
@@ -74,7 +74,7 @@ Provisions the complete application runtime, including Db2 tables, a CICS region
 .setup/setup-common.sh install-bank-of-z
 ```
 
-Runs a complete DBB build, packages the outputs, deploys via Wazi Deploy, and populates Db2 and IMS with test data. The initial build and deployment typically take 15 to 20 minutes.
+Performs a full application build by using IBM Dependency Based Build (DBB), packages the generated artifacts, deploys them by using Wazi Deploy, and populates the Db2 and IMS databases with sample data. The initial build and deployment typically take 15 to 20 minutes.
 
 > **Note:** Warnings related to the YAML scanner and `chown` failures are expected and do not indicate a problem.
 
@@ -84,6 +84,26 @@ Runs a complete DBB build, packages the outputs, deploys via Wazi Deploy, and po
 
 Open the Bank of Z frontend in a browser:
 
+**HTTP**
+
+```bash
+http://<your-zos-host>:9081/admin.html
 ```
-http://<your-zos-host>:9080/bank-frontend-vanilla
+
+**HTTPS**
+
+```bash
+https://<your-zos-host>:9445/admin.html
 ```
+
+For HTTPS access and certificate configuration, see [Accessing Bank of Z over HTTPS](https://github.com/IBM/Bank-of-Z/blob/main/README.md).
+
+---
+
+## 8. Run post-install verification tests
+
+```bash
+.setup/setup-common.sh verify-installation
+```
+
+Runs the integration test suite in `tests/` against the deployed application. The tests exercise the CICS and IMS API paths and report a pass/fail result for each. All tests must pass before the installation is considered complete.

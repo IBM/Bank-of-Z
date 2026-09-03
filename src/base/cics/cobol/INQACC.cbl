@@ -227,7 +227,7 @@
       *
 
            IF ACCOUNT-TYPE = SPACES OR LOW-VALUES
-              MOVE 'N' TO INQACC-SUCCESS
+              MOVE 'Y' TO INQACC-SUCCESS
            ELSE
               MOVE ACCOUNT-EYE-CATCHER       TO INQACC-EYE
               MOVE ACCOUNT-CUST-NO           TO INQACC-CUSTNO

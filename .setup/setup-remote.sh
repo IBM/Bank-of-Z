@@ -118,19 +118,12 @@ main() {
     print_success "Remote environment setup completed successfully!"
     
     # Purge all ended jobs
-    opercmd '$POJQ,JM=*' 2>&1 > /dev/null || true
-    
+    opercmd '$POJQ,JM=*' > /dev/null 2>&1 || true &
+    ipaddr=$(get_ipaddr)
     echo ""
-    echo "Next steps:"
-    echo "  1. Review the setup on remote USS: $BANK_OF_Z_WORK_DIR"
-    echo "  2. Check the Bank of Z installation"
-    echo "  3. Connect to CICS using x3270:"
-    echo "     - Enter 'logon applid(CICSBOZ)'"
-    echo "     - Enter 'OMEN' as transaction name"
-    echo "     - Enter 1 then 1234 as customer"
-    echo "  4. Run pipeline builds from VSCode tasks"
-    echo ""
-    print_info "Remote setup logs available at: /tmp/remote-setup.log"
+    print_info "The Bank of Z interface is available at:"
+    print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
+    print_info "(Please allow about 20s for the interface to become available)"
     echo ""
 }
 

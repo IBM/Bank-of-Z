@@ -5,7 +5,7 @@ title: Commands Reference
 
 # Commands Reference
 
-This section provides a quick reference for commonly used commands when setting up, configuring, and developing Bank of Z.
+This section provides a quick reference for commonly used commands used to set up, configure, verify, and develop Bank of Z.
 
 ## Zowe CLI commands
 
@@ -178,16 +178,16 @@ The following scripts are used by the Bank of Z automation workflows.
 
 | Script | Purpose |
 |----------|----------|
-| setup-local.sh | Initiates setup activities from the developer workstation |
+| setup-local.sh | Initiates setup activities from the local development environment |
 | setup-common.sh | Performs environment setup on z/OS USS |
-| pipeline-local.sh | Initiates build and deployment processing |
+| pipeline-local.sh | Initiates build and deployment processing from the local development environment |
 | pipeline-remote.sh | Runs build and deployment activities on z/OS USS |
 
 ## Zowe CLI workflow commands
 
-The Zowe CLI workflow is completed through a VS Code task or by running `setup-local.sh` directly.
+The Zowe CLI workflow can be started by running the workspace setup task in a supported development environment or by running `setup-local.sh` directly.
 
-Run the **Setup Bank of Z Environment** task from the Command Palette:
+Run the **Setup Bank of Z Environment** workspace task from the Command Palette:
 
 1. Open the Command Palette.
 2. Run **Tasks: Run Task**.
@@ -197,6 +197,6 @@ For detailed workflow instructions, see [Zowe CLI Workflow](../development-workf
 
 ## GRUB workflow commands
 
-The GRUB workflow synchronizes local changes to USS and runs the Bank of Z setup process.
+The GRUB workflow synchronizes local changes to z/OS USS and runs the required setup and deployment activities.
 
-See to [GRUB Workflow](../development-workflows/grub-workflow.md) for environment-specific configuration and run procedures.
+See [GRUB Workflow](../development-workflows/grub-workflow.md) for environment-specific configuration and run procedures.

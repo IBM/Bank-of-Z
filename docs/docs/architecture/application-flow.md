@@ -5,7 +5,7 @@ title: Installation Overview
 
 # Application Flow
 
-Bank of Z uses a hybrid architecture that combines a modern web interface with IBM Z transaction-processing systems. Banking requests are submitted through a browser-based application and processed by either CICS or IMS Transaction Manager (IMS TM), depending on the customer identifier.
+Bank of Z uses a hybrid architecture that combines a modern web interface with IBM Z transaction-processing systems. Banking requests are submitted through a browser-based application and processed by either CICS or IMS Transaction Manager (IMS TM), based on the customer identifier.
 
 The following diagram illustrates the flow of requests through the Bank of Z application.
 

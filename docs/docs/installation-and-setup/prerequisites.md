@@ -54,7 +54,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | CICS TS Resource Builder | 1.0.6 | `zconfig.zcb_home` |
 | Git | Current supported version | Must be available in PATH on USS |
 
-**Note:** Bank of Z uses zconfig to provision and configure CICS resources, IMS resources, and the z/OS Connect runtime during the environment setup phase.
+**Note:** Bank of Z uses zconfig to provision and configure the CICS resources, IMS resources, and z/OS Connect runtime during the environment setup.
 
 ### USS access requirements
 
@@ -80,6 +80,33 @@ Appropriate security definitions must also be configured in RACF or an equivalen
 
 > **Note:** Access to z/OS environments, middleware, USS directories, and dataset resources is typically provisioned by your system administrator. If you do not have the required access, contact your administrator before proceeding.
 
+## External tools requirements
+
+The following external tools and libraries are required to build and deploy Bank of Z.
+
+### Python libraries
+
+Install the required Python libraries by running the following commands:
+
+```bash
+pip install pyyaml
+pip install jinja2
+```
+
+### Gradle
+
+Download the latest supported Gradle binary distribution from the [Gradle releases](https://gradle.org/releases/) page.
+
+After downloading the archive, install Gradle on z/OS USS by running the following commands:
+
+```bash
+jar xf gradle-9.5.1-bin.zip
+chmod +x gradle-9.5.1/bin/gradle
+chtag -tc UTF-8 gradle-9.5.1/bin/gradle
+```
+
+>**Note:** Update the version number in the commands if you download a different Gradle release.
+
 ## Verify prerequisites
 
 After your system administrator has confirmed the above are in place, run the prerequisite validation from USS to confirm the build and deploy tooling is correctly installed:
@@ -88,7 +115,7 @@ After your system administrator has confirmed the above are in place, run the pr
 .setup/setup-common.sh validate-prereqs
 ```
 
-This checks versions of DBB, ZOAU, zconfig, and Wazi Deploy, and verifies Git availability and network connectivity to GitHub. For a full description of each check, see [Deploy Using Direct USS Access](deploy-direct.html).
+This validates that the required build and deployment technologies are installed correctly by checking versions of DBB, ZOAU, zconfig, and Wazi Deploy, and by verifying Git availability and network connectivity to GitHub. For a complete description of each check, see [Deploy Using Direct USS Access](deploy-direct.html).
 
 ## Next steps
 

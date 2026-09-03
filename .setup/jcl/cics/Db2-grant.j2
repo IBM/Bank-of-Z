@@ -15,32 +15,35 @@
 //SYSIN DD *
  SET CURRENT SQLID = '{{ db2.sqlid }}';
 
-{% for cics_user in global.db2_grants %}
- GRANT EXECUTE ON PLAN {{ db2.plan }} TO {{ cics_user }};
+{% for db2_user in global.db2_grants %}
+ GRANT EXECUTE ON PLAN {{ db2.plan }} TO {{ db2_user }};
 
  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.ACCOUNT TO {{ cics_user }};
+     BANKZ.ACCOUNT TO {{ db2_user }};
 
  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.PROCTRAN TO {{ cics_user }};
+     BANKZ.PROCTRAN TO {{ db2_user }};
 
  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.CONTROL TO {{ cics_user }};
+     BANKZ.CONTROL TO {{ db2_user }};
 
  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-     BANKZ.CUSTOMER TO {{ cics_user }};
+     BANKZ.CUSTOMER TO {{ db2_user }};
      
-  GRANT CREATEDBA TO {{ cics_user }};
-  GRANT CREATESG TO {{ cics_user }};
+  GRANT CREATEDBA TO {{ db2_user }};
+  GRANT CREATESG TO {{ db2_user }};
 
-  GRANT USE OF BUFFERPOOL BP0 TO {{ cics_user }};
-  GRANT USE OF BUFFERPOOL BP1 TO {{ cics_user }};
+  GRANT USE OF BUFFERPOOL BP0 TO {{ db2_user }};
+  GRANT USE OF BUFFERPOOL BP1 TO {{ db2_user }};
 
-  GRANT BINDADD TO {{ cics_user }};
+  GRANT BINDADD TO {{ db2_user }};
 
-  GRANT CREATEIN ON SCHEMA BANKZ TO {{ cics_user }};
+  GRANT CREATEIN ON SCHEMA BANKZ TO {{ db2_user }};
 
-  GRANT CREATE IN COLLECTION {{ db2.package }} TO {{ cics_user }};
-  GRANT PACKADM ON COLLECTION {{ db2.package }} TO {{ cics_user }};
+  GRANT CREATE IN COLLECTION {{ db2.package }} TO {{ db2_user }};
+  GRANT PACKADM ON COLLECTION {{ db2.package }} TO {{ db2_user }};
+  
+   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
+     {{ ims.db2_database }}.{{ ims.db2_table }} TO {{ db2_user }};
 {% endfor %}
 /*

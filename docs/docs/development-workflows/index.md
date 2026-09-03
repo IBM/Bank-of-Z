@@ -7,7 +7,7 @@ title: Workflow Overview
 
 This section describes the development workflows supported by Bank of Z. These workflows enable developers to modify application assets, build and validate changes, and deploy updates to the target z/OS environment.
 
-Bank of Z supports modern Git-based development practices while leveraging enterprise z/OS technologies such as Db2, CICS, IMS, z/OS Connect, IBM Dependency Based Build (DBB), and Wazi Deploy.
+Bank of Z supports modern Git-based development practices while leveraging enterprise z/OS technologies and automated build and deployment capabilities.
 
 ## Development workflow
 
@@ -31,7 +31,7 @@ A typical Bank of Z development workflow consists of the following activities:
 ### 4. Review results
 
 - Review build logs, reports, and generated artifacts.
-- Address any build, dependency, or deployment issues identified during pipeline run.
+- Address any build, dependency, or deployment issues identified during the pipeline run.
 
 ### 5. Deploy changes
 
@@ -49,7 +49,7 @@ Bank of Z supports multiple development approaches.
 
 ### Zowe CLI workflow
 
-A task-based workflow that uses Zowe CLI to clone your branch on z/OS USS and run the setup and pipeline scripts. Can be triggered from the command line or from a VS Code task.
+A task-based workflow that uses Zowe CLI to clone your branch on z/OS USS and run the setup and pipeline scripts. Can be triggered from the command line or from supported development environment tasks.
 
 ### GRUB workflow
 

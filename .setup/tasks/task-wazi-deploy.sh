@@ -4,8 +4,8 @@ set -eu
 # Script  : task-wazi-deploy.sh
 # Summary : Wazi Deploy Generate + Deploy
 #
-# - Initializes execution environment
-# - Loads Wazi Deploy configuration from setenv.sh
+# - Relies on environment exported by pipeline-common.sh / setup-common.sh
+# - Loads Wazi Deploy configuration from inherited environment variables
 # - Creates timestamped output and evidence directories
 # - Executes wazideploy-generate
 # - Executes wazideploy-deploy
@@ -18,7 +18,8 @@ set -eu
 # Source library scripts
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPTS_DIR/../config/setenv.sh"
+source "$SCRIPTS_DIR/../lib/utilities.sh"
+source "$SCRIPTS_DIR/../lib/colors.sh"
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -172,9 +173,9 @@ fi
 
 # Resolve environment varaiables in config file.
 export TMPL_CONFIG_FILE="/tmp/config.yaml"
-cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2"
+cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2.$$"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --templateFile "$TMPL_CONFIG_FILE.j2"  --outputFile "$TMPL_CONFIG_FILE"
+    --templateFile "$TMPL_CONFIG_FILE.j2.$$"  --outputFile "$TMPL_CONFIG_FILE"
 
 rm -rf "${DEPLOY_LOG_FOLDER}/work-bankz"
 
@@ -216,6 +217,7 @@ fi
 
 print_success "Deployment completed successfully"
 print_success "BankZ deployment completed successfully"
+
 
 # =========================
 # Cleanup

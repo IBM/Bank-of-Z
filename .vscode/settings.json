@@ -1,5 +1,14 @@
 {
   "grub.buildCommand": "./.setup/pipeline-common.sh",
   "grub.serverRoot": "/usr/local/sandboxes/bank-of-z",
-  "java.compile.nullAnalysis.mode": "disabled"
+  "java.compile.nullAnalysis.mode": "disabled",
+  "zopeneditor.userbuild.userSettings": {
+        "dbbDefaultZappProfile": "zBuilder-userbuild",
+        "dbbHlq": "IBMUSER.BOZ.UB",
+        "dbbWorkspace": "/u/ibmuser/userBuild_boz",
+        "dbbApplication": "Bank-of-Z"
+    },
+    "zopeneditor.zowe": {
+        "defaultCliProfile": "bank-of-z.rse"
+    }
 }

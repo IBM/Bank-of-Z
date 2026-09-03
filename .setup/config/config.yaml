@@ -175,7 +175,6 @@ debug:
   eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
   eqaprof_port: 8192
   eqaprof_port_shutdown: 8105
-  eqaprof_java_home: /usr/lpp/java/java21/current_64/
 
 # z/OS Connect (API exposure only)
 # Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.

@@ -11,7 +11,7 @@ Bank of Z consists of several application and infrastructure components that wor
 
 The Bank of Z user interface provides a browser-based experience for performing banking operations. You can manage customer information, accounts, and transactions through a single application interface without needing to know which backend system processes the request.
 
-## z/OS connect
+## z/OS Connect
 
 z/OS Connect provides the API layer between the user interface and the backend transaction-processing systems. It exposes services that enable the Bank of Z UI to communicate with CICS and IMS applications through REST APIs.
 

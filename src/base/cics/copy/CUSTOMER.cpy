@@ -25,7 +25,7 @@
                  07 CUSTOMER-CITY                    PIC X(50).
                  07 CUSTOMER-POSTCODE                PIC X(10).
                  07 CUSTOMER-COUNTRY                 PIC X(50).
-              05 CUSTOMER-STATUS                     PIC X(10).
+              05 CUSTOMER-STATUS                     PIC X(1).
                  88 CUSTOMER-STATUS-ACTIVE           VALUE 'ACTIVE'.
                  88 CUSTOMER-STATUS-INACTIVE         VALUE 'INACTIVE'.
                  88 CUSTOMER-STATUS-SUSPENDED        VALUE 'SUSPENDED'.

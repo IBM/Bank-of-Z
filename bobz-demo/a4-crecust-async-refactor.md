@@ -4,6 +4,15 @@
 **File:** `src/base/cics/cobol/CRECUST.cbl`  
 **Language:** COBOL (CICS Async API)
 
+---
+
+## Setup
+
+> ⚠️ **Before running the prompt below, open the source file in the editor:**
+> `src/base/cics/cobol/CRECUST.cbl`
+
+> 💡 **Alternative:** Instead of using the prompt below, you can invoke the Bob PPZ built-in workflow **Refactor COBOL or PL/I program** for this demo step. Start the workflow from the Bob chat panel and follow the guided steps.
+
 ## Prompt
 
 > CRECUST is calling 5 credit agency programs with a fixed 3-second wait. I want to refactor the code to isolate the credit check logic into a separate program so the implementation complexity is not in the CRECUST code, and I can easily switch to an API call in the future. Show me the changes to be made only.

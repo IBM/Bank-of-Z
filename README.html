@@ -244,7 +244,6 @@
     <li class="appendix"><a href="#a2">A2 — Funds Transfer Analysis</a></li>
     <li class="appendix"><a href="#a3">A3 — IMS Database Analysis</a></li>
     <li class="appendix"><a href="#a4">A4 — CRECUST Refactor</a></li>
-    <li class="section-header"><a href="#">Info</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ul>
 </nav>
@@ -259,7 +258,7 @@
     <span><strong>Author:</strong> Biao Hao (biaohao@us.ibm.com)</span>
     <span><strong>Last updated:</strong> 2026-08-28</span>
   </div>
-  <p style="margin-top:0.75rem;font-size:0.9rem;color:#525252;"><strong>Goal:</strong>Show how IBM Bob Premium Package for Z (PPZ) accelerates understanding, analysis, and safe delivery of changes across a real multi-language mainframe application — and how it can be extended to fit any team's standards.</p>
+  <p style="margin-top:0.75rem;font-size:0.9rem;color:#525252;"><strong>Goal: </strong>Show how IBM Bob Premium Package for Z (PPZ) accelerates understanding, analysis, and safe delivery of changes across a real multi-language mainframe application — and how it can be extended to fit any team's standards.</p>
 </div>
 
 <!-- ══════════════════ AGENDA ══════════════════ -->
@@ -309,7 +308,7 @@
 
   <h3>1b — What Is Bob Premium Package for Z (PPZ)?</h3>
   <p><strong>Bob Premium Package for Z</strong> — or Bob PPZ — adds the Z-specific capability layer that turns Bob from a general-purpose AI SDLC partner into a mainframe-aware AI engineer. It ships as extensions to Bob IDE and Bob Shell across four pillars: Workflows, Application Analysis (Z Understand), Code Capabilities, and Integrations.</p>
-  <p><img src="1x-bob4Z-architecture-SaaS.svg" alt="Bob Premium Package for Z — Solution Architecture" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"><br><small>Source: <a href="https://www.ibm.com/docs/en/bobz/3.0.0?topic=overview-solution-architecture" target="_blank">IBM Docs — Bob PPZ 3.0 Solution Architecture</a></small></p>
+  <p><img src="bobz-demo/1x-bob4Z-architecture-SaaS.svg" alt="Bob Premium Package for Z — Solution Architecture" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"><br><small>Source: <a href="https://www.ibm.com/docs/en/bobz/3.0.0?topic=overview-solution-architecture" target="_blank">IBM Docs — Bob PPZ 3.0 Solution Architecture</a></small></p>
   <p><strong>Components in the architecture diagram:</strong></p>
   <ol>
     <li><strong>Architect and Developer</strong> work in <strong>Bob IDE</strong> or <strong>Bob Shell</strong>; the local mainframe codebase is read directly</li>
@@ -592,7 +591,7 @@ graph TB
       <li>Create a new customer with an email address, submit</li>
       <li>Navigate to <strong>Customer Details</strong> for that customer — email is displayed and editable</li>
     </ul>
-    <p><img src="4d-add-email-deployment.png" alt="Customer Details — email field live" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"></p>
+    <p><img src="bobz-demo/4d-add-email-deployment.png" alt="Customer Details — email field live" style="max-width:100%;border-radius:6px;border:1px solid #e0e0e0;margin:0.5rem 0;"></p>
     <h4>Why it matters</h4>
     <p><strong>1. The "wow" moment — end-to-end in one session</strong><br>
     From a blank workspace to a live feature running on Z. Impact analysis → plan → code changes → build → deploy → demo. A change that typically takes a sprint was delivered in conversations.</p>
@@ -806,6 +805,7 @@ graph TB
     <h3><span class="step-badge appendix">A4</span> CICS COBOL Refactor: CRECUST Async Credit Check</h3>
     <div class="best-used">📌 Best used: As a code-generation demo combining architectural thinking with precise mainframe implementation. Ideal for technical audiences who want to see real refactoring.</div>
     <div class="presenter-note"><strong>Presenter note:</strong> Switch to <strong>Z Code</strong> mode. Open <code>src/base/cics/cobol/CRECUST.cbl</code> in the editor before running the prompt. See <code>bobz-demo/a4-crecust-async-refactor.md</code> for the full pre-captured output.</div>
+    <div class="presenter-note"><strong>Alternative:</strong> Instead of using the prompt below, you can invoke the Bob PPZ built-in workflow <strong>Refactor COBOL or PL/I program</strong> for this demo step. Start the workflow from the Bob chat panel and follow the guided steps.</div>
     <h4>Prompt</h4>
     <div class="prompt-box">CRECUST is calling 5 credit agency programs with a fixed 3-second wait. I want to refactor the code to isolate the credit check logic into a separate program so the implementation complexity is not in the CRECUST code, and I can easily switch to an API call in the future. Show me the changes to be made only.</div>
     <h4>What Bob produces</h4>
@@ -831,7 +831,7 @@ graph TB
 <!-- ══════════════════ ACKNOWLEDGEMENTS ══════════════════ -->
 <section id="acknowledgements" style="margin-top:2rem">
   <h2>Acknowledgements</h2>
-  <p>This demo was created by the IBM US FSM Z Acceleration team, under <strong>Eric Watson</strong>'s leadership. Special thanks to <strong>Kathryn McAvoy</strong> for her leadership, and to <strong>Sailesh Jalakam, Colin Henderson, Adarius Isaac, Frank Hernandez, John Gustavson, and Joe Pesot</strong> — without their effort, this would not have been possible.</p>
+  <p>This demo was created by the IBM US FSM Z Acceleration team, under <strong>Eric Watson</strong>'s leadership. Special thanks to <strong>Kathryn McAvoy</strong> for her leadership, <strong>Tolga Oral</strong> for his advice, and <strong>Sailesh Jalakam, Colin Henderson, Adarius Isaac, Frank Hernandez, John Gustavson, and Joe Pesot</strong> — without their effort, this would not have been possible.</p>
 </section>
 
 <!-- Footer -->

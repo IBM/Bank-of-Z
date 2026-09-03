@@ -227,19 +227,21 @@ set +a
 # caller override can already be cached there while its dependent values still
 # reflect the original configuration.
 _BANKZ_CONFIG_DB2_SSID="$(get_section_value 'cfg' 'db2_ssid')"
+_BANKZ_CONFIG_DB2_SSID_LOWER="$(printf '%s' "$_BANKZ_CONFIG_DB2_SSID" | tr '[:upper:]' '[:lower:]')"
 for _bankz_override in "${_BANKZ_CALLER_OVERRIDES[@]}"; do
     export "$_bankz_override"
 done
 
 if [[ "$_BANKZ_CALLER_DB2_SSID_SET" == true ]] && [[ "$DB2_SSID" != "$_BANKZ_CONFIG_DB2_SSID" ]]; then
+    _BANKZ_CALLER_DB2_SSID_LOWER="$(printf '%s' "$DB2_SSID" | tr '[:upper:]' '[:lower:]')"
     if [[ "$_BANKZ_CALLER_DB2_PROVISION_JAVAENV_SET" == false ]]; then
         DB2_PROVISION_JAVAENV="${DB2_PROVISION_JAVAENV//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
     fi
     if [[ "$_BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET" == false ]]; then
-        DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
+        DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV//$_BANKZ_CONFIG_DB2_SSID_LOWER/$_BANKZ_CALLER_DB2_SSID_LOWER}"
     fi
     if [[ "$_BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET" == false ]]; then
-        DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
+        DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS//$_BANKZ_CONFIG_DB2_SSID_LOWER/$_BANKZ_CALLER_DB2_SSID_LOWER}"
     fi
     if [[ "$_BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET" == false ]]; then
         DB2_PROVISION_SDSNEXIT="${DB2_PROVISION_SDSNEXIT//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
@@ -251,7 +253,8 @@ unset _BANKZ_CALLER_OVERRIDES _BANKZ_CALLER_DB2_SSID_SET \
     _BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET \
     _BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET \
     _BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET \
-    _BANKZ_CONFIG_DB2_SSID _bankz_override _bankz_var
+    _BANKZ_CONFIG_DB2_SSID _BANKZ_CONFIG_DB2_SSID_LOWER \
+    _BANKZ_CALLER_DB2_SSID_LOWER _bankz_override _bankz_var
 
 # List of variables to check
 VARS_TO_CHECK=(

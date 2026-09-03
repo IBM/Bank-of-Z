@@ -21,7 +21,7 @@
              05 INQCUST-CITY              PIC X(50).
              05 INQCUST-POSTCODE          PIC X(10).
              05 INQCUST-COUNTRY           PIC X(50).
-          03 INQCUST-STATUS               PIC X(10).
+          03 INQCUST-STATUS               PIC X(1).
           03 INQCUST-CREATED-DATE.
              05 INQCUST-CREATED-DD        PIC 99 DISPLAY.
              05 INQCUST-CREATED-MM        PIC 99 DISPLAY.

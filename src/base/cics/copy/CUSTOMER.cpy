@@ -25,10 +25,10 @@
                  07 CUSTOMER-CITY                    PIC X(50).
                  07 CUSTOMER-POSTCODE                PIC X(10).
                  07 CUSTOMER-COUNTRY                 PIC X(50).
-              05 CUSTOMER-STATUS                     PIC X(1).
-                 88 CUSTOMER-STATUS-ACTIVE           VALUE 'A'.
-                 88 CUSTOMER-STATUS-INACTIVE         VALUE 'I'.
-                 88 CUSTOMER-STATUS-SUSPENDED        VALUE 'S'.
+              05 CUSTOMER-STATUS                     PIC X(10).
+                 88 CUSTOMER-STATUS-ACTIVE           VALUE 'ACTIVE'.
+                 88 CUSTOMER-STATUS-INACTIVE         VALUE 'INACTIVE'.
+                 88 CUSTOMER-STATUS-SUSPENDED        VALUE 'SUSPENDED'.
               05 CUSTOMER-CREATED-DATE.
                  07 CUSTOMER-CREATED-DAY             PIC 99 DISPLAY.
                  07 CUSTOMER-CREATED-MONTH           PIC 99 DISPLAY.

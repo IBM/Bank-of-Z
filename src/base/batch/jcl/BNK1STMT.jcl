@@ -9,19 +9,19 @@
 //*
 //* Step 1 - Delete output datasets
 //*
-//*DELRPT   EXEC PGM=IEFBR14
-//*SAVRPT   DD  DISP=(MOD,DELETE,DELETE),
-//*             DSN=BANKZ.V0R1M0.BNK1STMT.SAV.REPORT,
-//*             UNIT=SYSALLDA,
-//*             SPACE=(TRK,0)
-//*ISARPT   DD  DISP=(MOD,DELETE,DELETE),
-//*             DSN=BANKZ.V0R1M0.BNK1STMT.ISA.REPORT,
-//*             UNIT=SYSALLDA,
-//*             SPACE=(TRK,0)
-//*CURRPT   DD  DISP=(MOD,DELETE,DELETE),
-//*             DSN=BANKZ.V0R1M0.BNK1STMT.CUR.REPORT,
-//*             UNIT=SYSALLDA,
-//*             SPACE=(TRK,0)
+//DELRPT   EXEC PGM=IEFBR14
+//SAVRPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.SAV.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
+//ISARPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.ISA.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
+//CURRPT   DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNK1STMT.CUR.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
 //*
 //* Step 2 - Execute
 //*
@@ -32,7 +32,6 @@
 //         DD  DISP=SHR,DSN=DBD1.RUNLIB.LOAD
 //         DD  DISP=SHR,DSN=CEE.SCEERUN
 //         DD  DISP=SHR,DSN=CEE.SCEERUN2
-//         DD  DISP=SHR,DSN=EQAW.SEQAMOD
 //*
 //*  Savings Account Statement report
 //*

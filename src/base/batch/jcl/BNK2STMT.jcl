@@ -6,12 +6,11 @@
 //BNKCSTTX JOB 'BATCH',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
 //          MSGLEVEL=(1,1),REGION=0M
 //*
-//*DELRPT   EXEC PGM=IEFBR14
-//*STMTRPT  DD  DISP=(MOD,DELETE,DELETE),
-//*             DSN=BANKZ.V0R1M0.BNKCSTMT.REPORT,
-//*             UNIT=SYSALLDA,
-//*             SPACE=(TRK,0)
-//*
+//DELRPT   EXEC PGM=IEFBR14
+//STMTRPT  DD  DISP=(MOD,DELETE,DELETE),
+//             DSN=BANKZ.V0R1M0.BNKCSTMT.REPORT,
+//             UNIT=SYSALLDA,
+//             SPACE=(TRK,0)
 //BNKCSTMT EXEC PGM=IKJEFT01,DYNAMNBR=20
 //STEPLIB  DD  DISP=SHR,DSN=BANKZ.V0R1M0.LOAD
 //         DD  DISP=SHR,DSN=DB2V13.SDSNEXIT
@@ -19,7 +18,6 @@
 //         DD  DISP=SHR,DSN=DBD1.RUNLIB.LOAD
 //         DD  DISP=SHR,DSN=CEE.SCEERUN
 //         DD  DISP=SHR,DSN=CEE.SCEERUN2
-//         DD  DISP=SHR,DSN=EQAW.SEQAMOD
 //*
 //*  Customer number input - change 0000000001 to desired customer
 //*
@@ -29,7 +27,7 @@
 //*
 //*  Customer statement output
 //*
-//STMTRPT  DD  DISP=(MOD,CATLG,CATLG),
+//STMTRPT  DD  DISP=(NEW,CATLG,CATLG),
 //             DSN=BANKZ.V0R1M0.BNKCSTMT.REPORT,
 //             UNIT=SYSALLDA,
 //             SPACE=(TRK,(5,5),RLSE),

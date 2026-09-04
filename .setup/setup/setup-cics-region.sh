@@ -67,13 +67,29 @@ if [[ "$APP_HLQ" != "BANKZ" ]]; then
     cat "$DEBUG_BACKUP" | sed "s/BANKZ.CICSBOZ/${APP_HLQ}.CICS${APP_SHORT_NAME}/" > "$DEBUG_FILE"
 fi
 
-if [[ "$DB2_SSID" != "DBD1" ]]; then
+# CICS TS Resource Builder receives the definitions file directly and does not
+# render zconfig's {{ vars.* }} expressions. Resolve the Db2 connection name
+# here before Resource Builder validates the definitions.
+if grep -q '{{ vars.db2_ssid }}' "$DEFINITION_FILE" || [[ "$DB2_SSID" != "DBD1" ]]; then
     if [ ! -f "$BACKUP_FILE" ]; then
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
-    cp "$DEFINITION_FILE" "/tmp/bank-of-z-definitions.yaml"
-    cat "/tmp/bank-of-z-definitions.yaml" | sed "s/DBD1/${DB2_SSID}/"  > "$DEFINITION_FILE"
-    rm -f "/tmp/bank-of-z-definitions.yaml"
+
+    # Prevent USS automatic conversion from changing the bytes in this UTF-8
+    # file. CICS TS Resource Builder requires its YAML input to be UTF-8.
+    chtag -b "$DEFINITION_FILE"
+    "$PYTHON_HOME/bin/python3" - "$DEFINITION_FILE" "$DB2_SSID" <<'PYTHON'
+from pathlib import Path
+import sys
+
+definition_file = Path(sys.argv[1])
+db2_ssid = sys.argv[2]
+contents = definition_file.read_text(encoding="utf-8")
+contents = contents.replace("{{ vars.db2_ssid }}", db2_ssid)
+contents = contents.replace("DBD1", db2_ssid)
+definition_file.write_text(contents, encoding="utf-8")
+PYTHON
+    chtag -tc UTF-8 "$DEFINITION_FILE"
 fi
 
 # =========================

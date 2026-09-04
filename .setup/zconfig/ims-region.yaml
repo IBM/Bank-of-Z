@@ -5,7 +5,6 @@ vars:
   ims_hlq: BANKZ.IMS2
   ims_sys_hlq: IMSV15
   ims_plex: PLEX2
-  db2_hlq: DB2V13
   db2_ssid: DBD1
   ims_java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_dir: "/usr/lpp/ims/imsjava"
@@ -19,9 +18,6 @@ ims:
   ims_id: "{{ vars.imsid }}"
   ims_sys_hlq: "{{ vars.ims_sys_hlq }}"
   ims_hlq: "{{ vars.ims_hlq }}"
-  db2_hlq: "{{ vars.db2_hlq }}"
-  debug_hlq: "{{ vars.debug_hlq }}"
-  ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA
   ims_target_user: "{{ vars.ims_target_user }}"
@@ -345,26 +341,25 @@ ims:
           strg: 'ON'
     - member_name: CSLSI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
-        imsplex_communications_server_name: 2SCI1
+        armrst: false
+        sciname: 2SCI1
         imsplex:
-          imsplex_name_suffix: "{{ vars.ims_plex }}"
+          name: "{{ vars.ims_plex }}"
     - member_name: CSLOI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
-        ims_command_language: ENU
-        command_security_option: N
-        operations_server_name: 2OM1
+        armrst: false
+        cmdlang: ENU
+        cmdsec: false
+        omname: 2OM1
         imsplex:
-          imsplex_name_suffix: "{{ vars.ims_plex }}"
-          #audit_log_stream_name_for_command_input_and_output: SYSLOG.OM2Q01.LOG
-        mvs_file_name_for_command_translation: "{{ vars.ims_sys_hlq }}.SDFSDATA"
+          name: "{{ vars.ims_plex }}"
+        cmdtextdsn: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:
-        use_zos_automatic_restart_manager_after_abend: false
+        armrst: false
         imsplex:
-          imsplex_name_suffix: "{{ vars.ims_plex }}"
-        resource_manager_server_name: 2RM1
+          name: "{{ vars.ims_plex }}"
+        rmname: 2RM1
     - member_name: CSLDI000
       config:
         armrst: false
@@ -374,9 +369,6 @@ ims:
         rrs: false
     - member_name: CSLDC000
       config:
-        global_datastore_properties:
-          maxthrds: 10
-          minthrds: 2
         local_datastore_properties:
           odbm:
             name: 2ODB1

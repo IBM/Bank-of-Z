@@ -1,0 +1,61 @@
+db2:
+  ## h26o
+  class: A
+  ssid: "{{ vars.db2_ssid }}"
+  hlq: "{{ vars.db2_hlq }}"
+  insdspre: "{{ vars.db2_hlq }}.{{ vars.db2_ssid }}"
+  ## override the catalog HLQ used for all Db2 VSAM clusters (CATALOG = "{SSID}SYS" by default)
+  catalog: "{{ vars.db2_catalog }}"
+  ## user catalog
+  userscat: "{{ vars.db2_user_catalog }}"
+  userlcat: "{{ vars.db2_user_catalog }}"
+  db2_authorization_ids:
+    authid: "{{ vars.db2_authid }}"
+    sysadm: "{{ vars.db2_authid }}"
+    sysam2: "{{ vars.db2_authid }}"
+    sysopr1: "{{ vars.db2_authid }}"
+    sysopr2: "{{ vars.db2_authid }}"
+    secadm1: "{{ vars.db2_authid }}"
+    secadm2: "{{ vars.db2_authid }}"
+    secdefid: "{{ vars.db2_authid }}"
+    inssqlid: "{{ vars.db2_authid }}"
+    ivpsqlid: "{{ vars.db2_authid }}"
+    rtm05pko: "{{ vars.db2_authid }}"
+  volumes_and_sms_classes:
+    ## SMS volume for user catalog
+    volexit: "{{ vars.db2_volume }}"
+    ## STOR CLASS for creating user catalog
+    storcls: "{{ vars.db2_storage_class }}"
+    ## DATA CLASS for creating user catalog
+    datacls: "{{ vars.db2_data_class }}"
+    ##Manager class : STANDEF
+    storcls3: "{{ vars.db2_storage_class }}"
+    datacls3: "{{ vars.db2_data_class }}"
+    storcls6: "{{ vars.db2_storage_class }}"
+    datacls6: "{{ vars.db2_data_class }}"
+    volsdat6: "{{ vars.db2_volume }}"
+    storcls7: "{{ vars.db2_storage_class }}"
+    datacls7: "{{ vars.db2_data_class }}"
+    volsdat7: "{{ vars.db2_volume }}"
+    catddacl: "{{ vars.db2_data_class }}"
+    catdstcl: "{{ vars.db2_storage_class }}"
+    catxdacl: "{{ vars.db2_data_class }}"
+    catxstcl: "{{ vars.db2_storage_class }}"
+  db2_java_properties:
+    javahome: "{{ vars.db2_java_home }}"
+    claspath: "/usr/include/java_classes"
+    libpath: "/usr/lib/java_runtime64"
+    jccsid: "{{ vars.db2_authid }}"
+    jvmamode: 64
+    javaenv: "{{ vars.db2_javaenv }}"
+    javaenvv: "{{ vars.db2_javaenvv }}"
+    jvmprops: "{{ vars.db2_jvmprops }}"
+  db2_decp_parameters:
+    asccsid: 1252
+  db2_smpe_target_libraries:
+    dsnexit: "{{ vars.db2_sdsnexit }}"
+  other_libraries:
+    cicsmod: "{{ vars.cics_hlq }}.CICS.SDFHLOAD"
+    cicscob: "{{ vars.cics_hlq }}.CICS.SDFHCOB"
+    cicspli: "{{ vars.cics_hlq }}.CICS.SDFHPL1"
+    cicsexci: "{{ vars.cics_hlq }}.CICS.SDFHEXCI"

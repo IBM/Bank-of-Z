@@ -60,7 +60,16 @@ def render_config(config):
     """
     Recursively resolve Jinja expressions inside YAML.
     """
-    result = deepcopy(config)
+    def expand_tree(node):
+        if isinstance(node, dict):
+            return {key: expand_tree(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [expand_tree(value) for value in node]
+        return expand_env_vars(node)
+
+    # Resolve ${VAR} before Jinja filters are applied. In particular, applying
+    # | lower to ${USER} would turn it into ${user} and discard the value.
+    result = expand_tree(deepcopy(config))
 
     env = Environment(undefined=StrictUndefined)
 
@@ -116,7 +125,28 @@ def load_config(filename):
     with open(filename, "r", encoding="utf-8") as fd:
         config = yaml.safe_load(fd)
 
-    return render_config(config)
+    return render_config(normalize_config(config))
+
+
+def normalize_config(config):
+    """Support the legacy ``global`` section during the cfg migration."""
+    if not isinstance(config, dict):
+        return config
+
+    result = deepcopy(config)
+    if "cfg" not in result and isinstance(result.get("global"), dict):
+        result["cfg"] = deepcopy(result["global"])
+
+    def replace_legacy_reference(node):
+        if isinstance(node, dict):
+            return {key: replace_legacy_reference(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [replace_legacy_reference(value) for value in node]
+        if isinstance(node, str):
+            return node.replace("global.", "cfg.")
+        return node
+
+    return replace_legacy_reference(result)
 
 
 def render_template(template_file, variables):
@@ -162,6 +192,7 @@ def main():
     with open(args.configFile, "r", encoding="utf-8") as fd:
         config = yaml.safe_load(fd)
 
+    config = normalize_config(config)
     config.update(extra_vars)
 
     config = render_config(config)

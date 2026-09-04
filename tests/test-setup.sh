@@ -2,7 +2,7 @@
 # Shared environment setup for Bank-of-Z integration tests.
 # Source this file from every test script; do not execute it directly.
 #
-# Environment variables (all optional — defaults shown below):
+# Environment variables (all optional - defaults shown below):
 #   BASE_URL           Base URL of the z/OS Connect API server  (default: derived from ZOSCONNECT_HTTP_PORT)
 #   FRONTEND_URL       Base URL of the Frontend Liberty server   (default: derived from FRONTEND_HTTP_PORT)
 #   BASE_HTTPS_URL     HTTPS URL of the z/OS Connect API server (default: derived from ZOSCONNECT_HTTPS_PORT)
@@ -38,7 +38,7 @@ if [[ -z "$FRONTEND_URL" ]]; then
     FRONTEND_URL="http://localhost:${FRONTEND_HTTP_PORT}"
 fi
 
-# HTTPS URLs — optional; empty string when the HTTPS port is not configured
+# HTTPS URLs - optional; empty string when the HTTPS port is not configured
 if [[ -z "${BASE_HTTPS_URL:-}" ]]; then
     if [[ -n "${ZOSCONNECT_HTTPS_PORT:-}" ]]; then
         BASE_HTTPS_URL="https://localhost:${ZOSCONNECT_HTTPS_PORT}/api"

@@ -25,7 +25,9 @@ profiles:
         procLib:
           - SYS1.PROCLIB # Required: Procedure libraries
         userLibraries:
-          - ${USERHLQ}.BOZ.BLD.LOAD # Application load libraries
+          # - BANKZ.V0R1M0.LOAD # Application load libraries
+          - BANKZ.V0R1M0.LOADLIB
+          - BANKZ.V0R1M0.LOAD
           
   # Custom ZCodeScan rules example
   - name: zcodescan
@@ -35,20 +37,3 @@ profiles:
         - type: local
           locations:
             - "zcodescan/zcodescan-rules.yaml"
-
-  - name: zBuilder-userbuild
-    type: dbb
-    settings:
-      command: "$DBB_HOME/bin/dbb build"
-      lifecycle: user
-      lifecycleArgs:
-        - "--hlq ${dbbHlq}"
-        - "--errPrefix ${errPrefix}" # Requires advanced capabilities
-        - "--verbose"
-      additionalDependencies:
-        - "dbb-app.yaml"
-        - "dbb-app_ub.yaml"
-      logFilePatterns:
-        - "*.log" # Fetch build logs
-        - "*.json" # Fetch Runtime.json and BuildReport.json
-        - "*.html" # Fetch BuildReport.html

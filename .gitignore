@@ -3,6 +3,7 @@
 /.bob/*.json
 /.setup/.env
 .env
+
 provisioning/
 /.pydevproject
 build.log
@@ -29,3 +30,4 @@ scripts/update-frontend-file-zos.sh
 **/.taz-edt/
 **/datasets.yaml
 .gradle/
+.bobz

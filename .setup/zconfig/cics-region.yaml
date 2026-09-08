@@ -72,11 +72,16 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
+    initparm: "EQA0CPLT='NWP,NLE,DTR'"
 
   startup_programs:
     second_phase:
       - EZACIC20
       - EQA0CPLT
+
+  shutdown_programs:
+    first_phase:
+      - EZACIC20
 
   extensions:
     cics_cmci:

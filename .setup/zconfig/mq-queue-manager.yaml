@@ -11,20 +11,13 @@ vars:
 mq_zconfig_schema_version: '1.0.0'
 queue_managers:
 - name: '{{ vars.mq_qmgr_name }}'
-  version: '9.4.5'
+  version: '9.4.5'                                   # TODO version 10 available now
   language: 'E'
   license: 'MQ'
   cpf: '{{ vars.mq_cpf }}'
-  dataset_hlq: '{{ vars.mq_qmgr_hlq }}'
+  qmgr_dataset_hlq: '{{ vars.mq_qmgr_hlq }}'
   system_proclib: '{{ vars.mq_proclib }}'
-  mq_installation:
-    hlq: '{{ vars.mq_install_hlq }}'                 # TODO: why?
-    scsqauth: '{{ vars.mq_install_hlq }}.SCSQAUTH'
-    scsqanle: '{{ vars.mq_install_hlq }}.SCSQANLE'
-    scsqproc: '{{ vars.mq_install_hlq }}.SCSQPROC'
-    scsqlink: '{{ vars.mq_install_hlq }}.SCSQLINK'
-    scsqload: '{{ vars.mq_install_hlq }}.SCSQLOAD'
-    scsqmacs: '{{ vars.mq_install_hlq }}.SCSQMACS'
+  mq_installation_hlq: '{{ vars.mq_install_hlq }}'
   mstr:
     storage:
       region: '0M'

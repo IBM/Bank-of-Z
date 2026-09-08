@@ -36,6 +36,8 @@ log.info("Output Directory: ${outputDirectory}")
 // Get vanilla frontend path from config variable (relative to workspace/appDirName)
 def vanillaFrontendRelativePath = config.getVariable('vanillaFrontendPath') ?: 'src/frontend'
 def vanillaFrontendPath = "${workspace}/${appDirName}/${vanillaFrontendRelativePath}"
+def zosConnectHttpPort = config.getVariable('zosConnectHttpPort') ?: '9080'
+def zosConnectHttpsPort = config.getVariable('zosConnectHttpsPort') ?: '9444'
 
 log.info("Vanilla frontend relative path: ${vanillaFrontendRelativePath}")
 log.info("Vanilla frontend directory: ${vanillaFrontendPath}")
@@ -121,9 +123,9 @@ try {
     
     log.info("Frontend files copied successfully")
     
-    // Step 3: Remove unnecessary files (package.json, server.js, README, .gitignore, node_modules if any)
+    // Step 3: Remove unnecessary files (README, .gitignore)
     log.info("Step 3: Cleaning up unnecessary files")
-    def cleanupFiles = ['package.json', 'server.js', 'README.md', '.gitignore', 'node_modules']
+    def cleanupFiles = ['README.md', '.gitignore']
     cleanupFiles.each { filename ->
         def fileToRemove = new File(tempWarDir, filename)
         if (fileToRemove.exists()) {
@@ -134,12 +136,34 @@ try {
         }
     }
     
-    // Step 4: Create WAR file using jar command
-    log.info("Step 4: Creating WAR file")
+    // Step 4: Change the z/OS Connect hard coded port
+    log.info("Step 4: Change the z/OS Connect hard coded port")
+    def modifyFiles = [ 'config.js' ]
+    modifyFiles.each { filename ->
+        def fileToModify = new File(tempWarDir, filename)
+        if (fileToModify.exists()) {
+            def content = fileToModify.getText('UTF-8')
+            // Replace only standalone occurrences of 9080 (word boundaries)
+            content = content.replaceAll(/\b9080\b/, zosConnectHttpPort.toString())
+            content = content.replaceAll(/\b9444\b/, zosConnectHttpsPort.toString())
+            fileToModify.setText(content, 'UTF-8')
+            log.info("Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
+            println("> Port replaced (9080 -> ${zosConnectHttpPort}) in: ${filename}")
+            log.info("Port replaced (9444 -> ${zosConnectHttpsPort}) in: ${filename}")
+            println("> Port replaced (9444 -> ${zosConnectHttpsPort}) in: ${filename}")
+        }
+    }
+    
+    // Step 5: Create WAR file using jar command
+    log.info("Step 5: Creating WAR file")
     def warFile = new File("${outputDirectory}/${warName}")
     
     // Change to temp directory and create WAR
-    def createWarCmd = "cd ${tempWarDir.absolutePath} && chtag -r assets/images/* && jar -cvf ${warFile.absolutePath} *"
+    // Tag text files as ISO8859-1 and binary files as binary so Liberty serves them correctly
+    def createWarCmd = "cd ${tempWarDir.absolutePath} && " +
+        "find . -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.yaml' -o -name '*.json' -o -name '*.xml' | xargs chtag -t -c ISO8859-1 2>/dev/null; " +
+        "find ./assets/images -type f | xargs chtag -b 2>/dev/null; " +
+        "jar -cvf ${warFile.absolutePath} *"
     def warProc = [shell, "-c", createWarCmd].execute(env, new File(workspace))
     warProc.waitFor()
     
@@ -152,13 +176,13 @@ try {
     
     log.info("WAR file created: ${warFile.absolutePath}")
     
-    // Step 5: Clean up temp directory
+    // Step 6: Clean up temp directory
     log.info("Step 5: Cleaning up temporary directory")
     def cleanupCmd = "rm -rf ${tempWarDir.absolutePath}"
     def cleanupProc = [shell, "-c", cleanupCmd].execute(env, new File(workspace))
     cleanupProc.waitFor()
     
-    // Step 6: Register WAR in build map for packaging
+    // Step 7: Register WAR in build map for packaging
     log.info("Step 6: Registering WAR in build map for packaging")
     
     // Get BuildGroup from context
@@ -217,3 +241,4 @@ try {
 return 0
 
 // Made with Bob
+

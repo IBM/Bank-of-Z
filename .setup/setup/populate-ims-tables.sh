@@ -15,6 +15,12 @@ set -e
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[POPULATE-IMS-TABLES]${NC} %s\n" "${line}" 2>/dev/null || true
+done) 2>&1
+
 # =========================
 # Environment
 # =========================

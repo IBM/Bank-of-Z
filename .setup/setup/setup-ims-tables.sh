@@ -21,26 +21,42 @@ source "$SCRIPTS_DIR/../config/setenv.sh"
 export PATH="$ZOAU_HOME/bin:$PATH"
 export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 
+exec > >(while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    printf "${CYAN}[SETUP-IMS-TABLES]${NC} %s\n" "${line}" 2>/dev/null || true
+done) 2>&1
+
 # =========================
 # Delele IMS tables
 # =========================
 set +e
-drm "BANKZ.${IMS_DATASTORE}.ACCOUNT.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.ACCTYPE.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.CUSTACCS.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/${IMS_DATASTORE}
-drm "BANKZ.${IMS_DATASTORE}.CUSTTYPE.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.HISTORY.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TSTAT.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TSTATTYP.DB" 2>/dev/null
-drm "BANKZ.${IMS_DATASTORE}.TTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.ACCOUNT.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.ACCTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTACCS.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTOMER.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.CUSTTYPE.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.HISTORY.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TSTAT.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TSTATTYP.DB" 2>/dev/null
+drm "${APP_HLQ}.${IMS_DATASTORE}.TTYPE.DB" 2>/dev/null
 set -e
 
 # =========================
 # IMS dynalloc
 # =========================
-rm -f "/tmp/IMS-table-*"
+rm -f "/tmp/IMS-dynalloc-*" 2>/dev/null || true
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "jobname=DYNALLOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-dynalloc.j2"  --outputFile "/tmp/IMS-table-$$.jcl"
-run_job_and_wait "/tmp/IMS-table-$$.jcl" 
+    --extraVar "jobname=DYNALLOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-dynalloc.j2"  --outputFile "/tmp/IMS-dynalloc-$$.jcl"
+run_job_and_wait "/tmp/IMS-dynalloc-$$.jcl" 
+
+# =========================
+# IMS SPOC
+# =========================
+rm -f "/tmp/IMS-spoc-*" 2>/dev/null || true
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=SPOC" --templateFile "$SCRIPTS_DIR/../jcl/ims/Ims-spoc.jcl.j2"  --outputFile "/tmp/IMS-spoc-$$.jcl"
+run_job_and_wait "/tmp/IMS-spoc-$$.jcl"  "8"
+
+
 exit $?

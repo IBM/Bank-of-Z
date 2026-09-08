@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.ibm.db2:jcc:12.1.4.0'
+    implementation 'com.ibm.db2:jcc:12.1.5.0'
     implementation 'com.ibm.ims:udb:15.166'
     implementation 'com.ibm.jzos:ibmjzos:2.4.11.3'
     implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'

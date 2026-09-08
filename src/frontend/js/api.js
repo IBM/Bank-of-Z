@@ -176,12 +176,15 @@ class CustomersApi extends BaseApi {
     }
 
     /**
-     * Delete customer (stub - not in OpenAPI spec)
-     * @param {string} customerNumber - Unique customer identifier
-     * @returns {Promise<Object>} Rejected promise
+     * Delete customer
+     * DELETE /customers/{customerId}
+     * @param {string} customerId - Unique customer identifier
+     * @returns {Promise<void>} No content on success
      */
-    async deleteCustomer(customerNumber) {
-        throw new Error('Customer deletion is not supported in the OpenBanking API specification');
+    async deleteCustomer(customerId) {
+        await this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
+            method: 'DELETE'
+        });
     }
 
     /**

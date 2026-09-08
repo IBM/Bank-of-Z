@@ -1,7 +1,7 @@
 ---
 version: "1.0"
 response_200.yaml:
-  condition: "$exists($zosAssetResponse.commarea.INQCUSTZ) or $not($exists($zosAssetResponse.abendCode))"
+  condition: "$zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-INQ-SUCCESS\" = 'Y'"
   httpStatusCode: 200
 response_400.yaml:
   httpStatusCode: 400
@@ -10,6 +10,7 @@ response_401.yaml:
 response_403.yaml:
   httpStatusCode: 403
 response_404.yaml:
+  condition: "$exists($zosAssetResponse.commarea.INQCUSTZ) and $zosAssetResponse.commarea.INQCUSTZ.\"INQCUST-INQ-SUCCESS\" != 'Y'"
   httpStatusCode: 404
 response_500.yaml:
   condition: true

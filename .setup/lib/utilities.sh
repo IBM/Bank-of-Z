@@ -141,13 +141,9 @@ submit_jcl() {
 run_job_and_wait() {
   local JCLFILE="$1"
   local MAXRC="${2:-4}"
-  local TMPJCL="/tmp/$(basename "$JCLFILE").$$"
 
-  sed "s/IBMUSER/${ZOS_USER}/g" "$JCLFILE" > "$TMPJCL"
-  echo "==> Submitting $JCLFILE via jsub ..."
-
-  OUT=$(jsub -f "$TMPJCL")
-  rm -f "$TMPJCL"
+  print_info "Submitting $JCLFILE via jsub ..."
+  OUT=$(jsub -f "$JCLFILE")
 
   JOBID=$(echo "$OUT" | awk '{
     for (i=1; i<=NF; i++) {
@@ -155,15 +151,15 @@ run_job_and_wait() {
     }
   }')
 
-  [ -z "$JOBID" ] && { echo "ERROR: no JOBID returned by jsub"; return 8; }
+  [ -z "$JOBID" ] && { print_error "no JOBID returned by jsub"; return 8; }
 
-  echo "==> Waiting for job $JOBID..."
+  print_info "Waiting for job $JOBID..."
 
   while :; do
     LINE=$(jls "$JOBID" 2>/dev/null | grep "$JOBID" | tail -1 || true)
-    [ -n "$LINE" ] && echo "$LINE"
+    [ -n "$LINE" ] && print_info "$LINE"
 
-    echo "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break 
+    print_info "$LINE" | grep -Eq "OUTPUT|CC |ABEND|JCLERR|CANCELED|SEC ERROR" && break 
 
     sleep 3
   done
@@ -186,10 +182,10 @@ run_job_and_wait() {
         ;;
     esac
   fi
-  echo "ERROR: Job failed: $JOBID"
-  echo "===== JESYSMSG ====="
-  pjdd "$JOBID" JES2 JESYSMSG 2>/dev/null || true
-return 8
+  print_error "Job failed: $JOBID"
+  print_info "===== JOB LOG ====="
+  pjdd "$JOBID" '*'
+  return 8
 }
 
 # ============================================================
@@ -230,7 +226,7 @@ load_config() {
 
     print_success "Configuration loaded successfully"
 
-    echo "  Workspace: $BANK_OF_Z_WORK_DIR"
+    print_info "Workspace: $BANK_OF_Z_WORK_DIR"
 }
 
 
@@ -293,4 +289,72 @@ detect_bank_of_z_location() {
     fi
     BANK_OF_Z_WORK_DIR=$(dirname $BANK_DIR)
     return 0
+}
+
+# Executes a TSO command and handles its return code.
+# The command output is temporarily stored in a log file.
+# In case of failure, a warning message and the log content are displayed.
+# The temporary log file is then removed, and the TSO command return code
+# is returned to the caller.
+run_tso() {
+    local was_e=0
+    case "$-" in
+        *e*) was_e=1 ;;
+    esac
+    set +e
+    local cmd="$1"
+    print_info "TSO Cmd: $cmd"
+    tsocmd "$cmd" > "/tmp/run_tso_$$.log" 2>&1
+    local rc=$?
+    if [ $rc -ne 0 ]; then
+        print_warning "TSO Command failed (rc=$rc): $cmd"
+        cat "/tmp/run_tso_$$.log"
+    fi
+    rm -f "/tmp/run_tso_$$.log"
+    if [ "$was_e" -eq 1 ]; then
+        set -e
+    fi
+    return $rc
+}
+
+# Retrieve the local IP address using DNS routing first,
+# then fall back to OSA and TCPIPLINK network interfaces.
+get_ipaddr() {
+    local ipaddr=""
+
+    ipaddr=$(python3 -c "
+import socket
+
+for dns_server in ('8.8.8.8', '9.9.9.9'):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(2)
+        s.connect((dns_server, 53))
+        ipaddr = s.getsockname()[0]
+        s.close()
+        if ipaddr:
+            print(ipaddr)
+            break
+    except OSError:
+        pass
+")
+
+    if [ -z "$ipaddr" ]; then
+        ipaddr=$(/bin/netstat -h 2>/dev/null |
+            awk '$1=="IntfName:" && $2 ~ /^OSA[0-9]+$/ {f=1; next}
+                 f && $1=="Address:" {print $2; exit}')
+    fi
+
+    if [ -z "$ipaddr" ]; then
+        ipaddr=$(/bin/netstat -h 2>/dev/null |
+            awk '$2 ~ /^OSA[0-9]+$/ {print $1; exit}')
+    fi
+
+    if [ -z "$ipaddr" ]; then
+        ipaddr=$(/bin/netstat -h 2>/dev/null |
+            awk '$1=="IntfName:" && $2=="TCPIPLINK" {f=1; next}
+                 f && $1=="Address:" {print $2; exit}')
+    fi
+
+    printf '%s\n' "$ipaddr"
 }

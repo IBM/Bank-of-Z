@@ -148,12 +148,12 @@ stage_execute_common_setup() {
     set -o pipefail
     if zowe rse-api-for-zowe-cli issue unix-shell "export BANK_OF_Z_WORK_DIR=$BANK_OF_Z_WORK_DIR && bash  $BANK_OF_Z_WORK_DIR/Bank-of-Z/.setup/setup-remote.sh" --cwd "$BANK_OF_Z_WORK_DIR" 2>&1 | tee /tmp/remote-setup.log; then
         # Check for errors in the log
-        if grep -i "error\|failed\|RC=[^0]\|return code [^0]" /tmp/remote-setup.log | grep -v -E "Failed to change files and directory owner with chown|BGZZB0021E" > /dev/null; then
+        if grep -q "install-bank-of-z completed successfully" /tmp/remote-setup.log > /dev/null; then
+            print_success "Remote setup completed successfully"
+        else
             print_error "Setup completed but some warnings were detected"
             print_info "Review /tmp/remote-setup.log for details"
             exit 1
-        else
-            print_success "Remote setup completed successfully"
         fi
     else
         print_error "Failed to execute setup on remote system"
@@ -189,21 +189,6 @@ main() {
     
     # Summary
     print_stage "ORCHESTRATION COMPLETE"
-    print_success "Remote environment setup completed successfully!"
-    
-    echo ""
-    echo "Next steps:"
-    echo "  1. Review the setup on remote USS: $BANK_OF_Z_WORK_DIR"
-    echo "  2. Check the Bank of Z installation"
-    echo "  3. Connect to CICS using x3270:"
-    echo "     - Enter 'logon applid(CICSBOZ)'"
-    echo "     - Enter 'OMEN' as transaction name"
-    echo "     - Enter 1 then 1234 as customer"
-    echo "  4. Run pipeline builds from VSCode tasks"
-    echo ""
-    print_info "Local environment details saved to: $SCRIPTS_DIR/.env"
-    print_info "Remote setup logs available at: /tmp/remote-setup.log"
-    echo ""
 }
 
 # Run main function

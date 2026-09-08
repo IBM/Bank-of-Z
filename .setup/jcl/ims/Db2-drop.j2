@@ -12,12 +12,14 @@
 //SYSUDUMP DD  SYSOUT=*
 //SYSTSIN  DD  *
   DSN SYSTEM({{ db2.ssid }})
-  RUN PROGRAM(DSNTEP2) PLAN(DSNTEP13) -
-       LIB('{{ db2.runlib }}')
+  RUN PROGRAM(DSNTEP2) PLAN({{ db2.dsntep }}) -
+       LIB('{{ db2.runlib }}')  PARMS('/ALIGN(MID)')
   END
 //SYSIN    DD  *
 SET CURRENT SQLID = '{{ db2.sqlid }}';
 
 DROP TABLE "{{ ims.db2_database }}"."{{ ims.db2_table}}";
 DROP DATABASE {{ ims.db2_database }} ;
+COMMIT;
+
 /*

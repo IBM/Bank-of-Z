@@ -1,0 +1,13 @@
+---
+layout: none
+---
+[
+  {% assign pages = site.pages | where_exp: "p", "p.title != nil" %}
+  {% for page in pages %}
+  {
+    "title": {{ page.title | jsonify }},
+    "url": {{ page.url | prepend: site.baseurl | jsonify }},
+    "content": {{ page.content | strip_html | strip_newlines | truncate: 5000 | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]

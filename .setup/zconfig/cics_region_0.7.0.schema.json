@@ -983,6 +983,34 @@
       "title": "JobParameters",
       "type": "object"
     },
+    "JvmProfileInput": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Path to the JVM profile file",
+          "title": "path",
+          "type": "string"
+        },
+        "liberty_server_xml": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Path to the Liberty server.xml file for this JVM profile",
+          "title": "liberty_server_xml"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "JvmProfileInput",
+      "type": "object"
+    },
     "LeDataSets": {
       "additionalProperties": false,
       "properties": {
@@ -1286,6 +1314,32 @@
           "$ref": "#/$defs/ConsoleAutoinstall",
           "description": "State of console autoinstall support",
           "title": "console_autoinstall"
+        },
+        "startup_programs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StartupProgramsConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Configure programs to run during CICS startup (PLTPI)",
+          "title": "startup_programs"
+        },
+        "shutdown_programs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShutdownProgramsConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Configure programs to run during CICS shutdown (PLTSD)",
+          "title": "shutdown_programs"
         },
         "sit_parameters": {
           "additionalProperties": false,
@@ -2796,9 +2850,9 @@
           "title": "extensions"
         },
         "jvm_profiles": {
-          "description": "List of JVM profile file paths to be created for this region",
+          "description": "List of JVM profiles, each with a path and an optional liberty_server_xml",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/JvmProfileInput"
           },
           "title": "jvm_profiles",
           "type": "array"
@@ -2849,32 +2903,6 @@
           "default": null,
           "description": "Resource overrides YAML file path to be created for this region",
           "title": "resource_definition_overrides"
-        },
-        "startup_programs": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StartupProgramsConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Configure programs to run during CICS startup (PLTPI)",
-          "title": "startup_programs"
-        },
-        "shutdown_programs": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/ShutdownProgramsConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Configure programs to run during CICS shutdown (PLTSD)",
-          "title": "shutdown_programs"
         }
       },
       "required": [

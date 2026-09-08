@@ -476,6 +476,14 @@
                                                     "basic",
                                                     "token"
                                                 ]
+                                            },
+                                            "ccsPort": {
+                                                "type": "number",
+                                                "description": "The port for the Code Coverage Service. If specified, this will override the port returned from the Attach request. This is useful when the external port differs from the internal port."
+                                            },
+                                            "ccsSecured": {
+                                                "type": "boolean",
+                                                "description": "Is Code Coverage Service running securely? If specified, this will override the default security setting."
                                             }
                                         }
                                     },

@@ -7,9 +7,9 @@ title: Troubleshooting
 
 This section describes common issues that you might encounter when setting up, configuring, building, or developing Bank of Z.
 
-## Zowe CLI Issues
+## Zowe CLI issues
 
-### Zowe CLI Not Found
+### Zowe CLI not found
 
 #### Symptom
 
@@ -19,7 +19,7 @@ Commands such as the following return a `command not found` error:
 zowe --version
 ```
 
-#### Possible Cause
+#### Possible cause
 
 Zowe CLI is not installed or is not available in your system path.
 
@@ -41,13 +41,13 @@ Ensure that the npm global installation directory is included in your system pat
 
 ---
 
-### Zowe Profile Not Found
+### Zowe profile not found
 
 #### Symptom
 
 Zowe commands fail because a profile cannot be located.
 
-#### Possible Cause
+#### Possible cause
 
 A z/OSMF profile has not been created or configured correctly.
 
@@ -67,13 +67,13 @@ zowe zosmf check status
 
 ---
 
-### Unable to Connect to z/OS
+### Unable to connect to z/OS
 
 #### Symptom
 
 Connection validation commands fail.
 
-#### Possible Cause
+#### Possible cause
 
 Incorrect host information, invalid credentials, network connectivity issues, or firewall restrictions.
 
@@ -87,15 +87,15 @@ zowe zosmf check status
 
 Confirm that the host, port, and credentials are correct and that the target system is accessible from your workstation.
 
-## Configuration Issues
+## Configuration issues
 
-### Configuration File Not Found
+### Configuration file not found
 
 #### Symptom
 
 Setup or build processes fail because the configuration file cannot be located.
 
-#### Possible Cause
+#### Possible cause
 
 The `config.yaml` file is missing or stored in an unexpected location.
 
@@ -111,13 +111,13 @@ Ensure that you are running commands from the correct repository location.
 
 ---
 
-### Variable Reference Cannot Be Resolved
+### Variable reference cannot be resolved
 
 #### Symptom
 
 Setup validation reports unresolved variables.
 
-#### Possible Cause
+#### Possible cause
 
 A referenced configuration value or environment variable does not exist.
 
@@ -136,13 +136,13 @@ Ensure that referenced sections and keys are defined in the configuration file.
 
 ---
 
-### Invalid Path Format
+### Invalid path format
 
 #### Symptom
 
 Setup validation fails when processing directory paths.
 
-#### Possible Cause
+#### Possible cause
 
 A required path is specified as a relative path.
 
@@ -157,15 +157,15 @@ sandbox:
   path: /usr/local/sandboxes/bank-of-z
 ```
 
-## Git and Repository Issues
+## Git and repository issues
 
-### Git Not Available on USS
+### Git not available on USS
 
 #### Symptom
 
 Repository cloning or synchronization fails on USS.
 
-#### Possible Cause
+#### Possible cause
 
 Git is not installed or is not available in the USS environment path.
 
@@ -182,13 +182,13 @@ If Git is not available, contact your z/OS administrator.
 
 ---
 
-### Unable to Clone Repositories
+### Unable to clone repositories
 
 #### Symptom
 
 Repository clone operations fail during setup.
 
-#### Possible Cause
+#### Possible cause
 
 Network restrictions, repository access issues, or authentication problems.
 
@@ -196,15 +196,15 @@ Network restrictions, repository access issues, or authentication problems.
 
 Verify repository access, network connectivity, and authentication settings. Confirm that the target z/OS environment can reach the repository hosting service.
 
-## USS Permission Issues
+## USS Permission issues
 
-### Permission Denied When Creating Workspace
+### Permission denied when creating workspace
 
 #### Symptom
 
 Setup scripts fail when creating directories or deploying artifacts.
 
-#### Possible Cause
+#### Possible cause
 
 Insufficient USS permissions.
 
@@ -214,15 +214,15 @@ Verify that you have write access to the configured sandbox directory.
 
 Review the configured `sandbox.path` value and contact your z/OS administrator if additional permissions are required.
 
-## Build and Setup Issues
+## Build and setup issues
 
-### Setup Completes with Errors
+### Setup completes with errors
 
 #### Symptom
 
 The setup process completes, but some stages report failures or warnings.
 
-#### Possible Cause
+#### Possible cause
 
 A prerequisite component is unavailable or incorrectly configured.
 
@@ -243,13 +243,13 @@ Correct the reported issue and rerun the setup process.
 
 ---
 
-### DBB Validation Fails
+### DBB Validation fails
 
 #### Symptom
 
 Build processes cannot locate DBB components.
 
-#### Possible Cause
+#### Possible cause
 
 The configured DBB installation path is incorrect.
 
@@ -265,7 +265,7 @@ Update the `dbb_home` setting if necessary.
 
 ---
 
-### Java Validation Fails
+### Java validation fails
 
 #### Symptom
 
@@ -285,7 +285,7 @@ $JAVA_HOME/bin/java -version
 
 Confirm that the configured `java_home` value points to a supported Java installation.
 
-## Getting Additional Help
+## Getting additional help
 
 If the issue cannot be resolved using the guidance in this section:
 

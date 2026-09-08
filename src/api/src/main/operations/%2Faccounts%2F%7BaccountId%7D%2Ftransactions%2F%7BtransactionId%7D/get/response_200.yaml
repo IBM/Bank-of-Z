@@ -1,0 +1,32 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - transactionId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQTRAND-COMMAREA\".\"INQTRAND-TRAN-ID\"\
+          }}"
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQTRAND-COMMAREA\".\"INQTRAND-ACCNO\"\
+          }}"
+    - amount:
+        required: true
+        nullable: false
+        expression: "$abs($zosAssetResponse.commarea.\"INQTRAND-COMMAREA\".\"INQTRAND-TRAN-AMOUNT\"\
+          )"
+    - currency:
+        required: true
+        nullable: false
+        template: "GBP"
+    - bookingDateTime:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.\"INQTRAND-COMMAREA\".\"INQTRAND-TRAN-DATE-GRP\"\
+          .\"INQTRAND-TRAN-DATE-YYYY\"}}-{{$zosAssetResponse.commarea.\"INQTRAND-COMMAREA\"\
+          .\"INQTRAND-TRAN-DATE-GRP\".\"INQTRAND-TRAN-DATE-MM\"}}-{{$zosAssetResponse.commarea.\"\
+          INQTRAND-COMMAREA\".\"INQTRAND-TRAN-DATE-GRP\".\"INQTRAND-TRAN-DATE-DD\"\
+          }}"

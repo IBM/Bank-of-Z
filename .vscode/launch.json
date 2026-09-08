@@ -6,11 +6,20 @@
   "configurations": [
     {
       "type": "zOpenDebug",
+      "request": "attach",
+      "name": "Z Open Debug: List parked debug sessions",
+      "connection": {
+        "type": "zowe",
+        "name": "bank-of-z.zOpenDebug"
+      }
+    },
+    {
+      "type": "zOpenDebug",
       "request": "launch",
       "name": "Z Open Debug: Connect to a parked debug session",
       "connection": {
         "type": "zowe",
-        "name": "bank-of-z.zOpenDebug"
+        "name": "bank-of-z.zOpenDebug",
       }
     },
   ]

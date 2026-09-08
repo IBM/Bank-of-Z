@@ -28,3 +28,4 @@ scripts/update-frontend-file.sh
 scripts/update-frontend-file-zos.sh
 **/.taz-edt/
 **/datasets.yaml
+.gradle/

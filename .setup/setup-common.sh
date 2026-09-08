@@ -24,10 +24,15 @@ source "$SCRIPTS_DIR/config/setenv.sh"
 #########################################################
 stage_stop_tasks() {
     set +e
-    print_stage "STAGE: Stop running tasks (if any)"
+    print_stage "STAGE: Stop Bank of Z running tasks (if any)"
     # =========================
     # Stop IBM IMS regions
     # =========================
+    # Delete stale stop members so jsub fails silently rather than executing
+    # outdated JCL that may reference deleted datasets.
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)" 2>/dev/null || true
+    mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
     jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
@@ -35,7 +40,22 @@ stage_stop_tasks() {
     jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
     jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
     jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
-
+    sleep 5
+    opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}OM" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}RM" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null
+    sleep 1
+    # IMS Connect
+    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null
+    sleep 1
+    opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null
+    
     # =========================
     # Stop IBM CICS regions
     # =========================
@@ -45,9 +65,9 @@ stage_stop_tasks() {
     # =========================
     # Stop IBM zconn servers
     # =========================
-    jcan P "BAQ${APP_BASE_NAME}"  2>/dev/null
-    jcan P "FE${APP_BASE_NAME}"  2>/dev/null
-
+    jcan P "BAQ${APP_SHORT_NAME}"  2>/dev/null
+    jcan P "FE${APP_SHORT_NAME}"  2>/dev/null
+    
     # =========================
     # Stop IMS1
     # =========================
@@ -62,8 +82,9 @@ stage_stop_tasks() {
     # Clean application datasets
     # ===========================
     sleep 5
-    drm "${APP_BASE_NAME}.${APP_ZOS_VERSION}.*" 2>/dev/null
-    drm "${APP_BASE_NAME}.*" 2>/dev/null
+    drm "${APP_HLQ}.${APP_ZOS_VERSION}.*" 2>/dev/null
+    drm "${APP_HLQ}.*" 2>/dev/null
+    dtouch "${APP_HLQ}.PROCLIB" 2> /dev/null
     rm -rf "${SANDBOX_DIR}/CICS${APP_SHORT_NAME}" 2>/dev/null
     rm -rf "${SANDBOX_DIR}/frontend" 2>/dev/null
     rm -rf "${SANDBOX_DIR}/jars" 2>/dev/null
@@ -97,17 +118,8 @@ stage_clone_accelerators() {
             rm -rf "$BANK_OF_Z_WORK_DIR/dbb"
             print_success "Existing dbb directory removed"
         else
-            print_warning "DBB directory already exists: $BANK_OF_Z_WORK_DIR/dbb"
-            read -p "Do you want to delete and re-clone it? (y/N): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                print_info "Removing existing dbb directory..."
-                rm -rf "$BANK_OF_Z_WORK_DIR/dbb"
-                print_success "Existing dbb directory removed"
-            else
-                print_info "Keeping existing dbb directory"
-                return 0
-            fi
+            print_info "Keeping existing dbb directory"
+            return 0
         fi
     fi
 
@@ -143,6 +155,8 @@ stage_copy_framework() {
     # Print datasets configuration info
     print_info "Datasets configuration from datasets.yaml:"
     echo ""
+    python "$SCRIPTS_DIR/lib/render_template.py" --configFile $CONFIG_FILE \
+        --templateFile "$SCRIPTS_DIR/build/datasets.yaml.j2"  --outputFile "$SCRIPTS_DIR/build/datasets.yaml"
     if [ -f "$ZBUILDER_SOURCE/datasets.yaml" ]; then
         grep -A 200 "^variables:" "$ZBUILDER_SOURCE/datasets.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20 || true
     else
@@ -168,17 +182,8 @@ stage_copy_framework() {
             rm -rf "$ZBUILDER_TARGET"
             print_success "Existing zBuilder directory removed"
         else
-            print_warning "zBuilder directory already exists: $ZBUILDER_TARGET"
-            read -p "Do you want to delete and re-copy it? (y/N): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                print_info "Removing existing zBuilder directory..."
-                rm -rf "$ZBUILDER_TARGET"
-                print_success "Existing zBuilder directory removed"
-            else
-                print_info "Keeping existing zBuilder directory, skipping copy"
-                return 0
-            fi
+            print_info "Keeping existing zBuilder directory, skipping copy"
+            return 0
         fi
     fi
 
@@ -243,7 +248,6 @@ stage_setup_ims_database() {
     cd "$BANK_DIR"
 
     set -o pipefail
-    chmod +x .setup/setup/setup-ims-tables.sh
     if .setup/setup/setup-ims-tables.sh; then
         print_success "Bank of Z application setup completed successfully"
     else
@@ -270,7 +274,6 @@ stage_setup_ims_bankz_regions() {
     cd "$BANK_DIR"
 
     set -o pipefail
-    chmod +x .setup/setup/setup-ims-bankz-regions.sh
     if .setup/setup/setup-ims-bankz-regions.sh; then
         print_success "Bank of Z application setup completed successfully"
     else
@@ -324,7 +327,6 @@ stage_populate_ims_database() {
     cd "$BANK_DIR"
 
     set -o pipefail
-    chmod +x .setup/setup/populate-ims-tables.sh
     if .setup/setup/populate-ims-tables.sh; then
         print_success "Bank of Z application populate completed successfully"
     else
@@ -334,6 +336,42 @@ stage_populate_ims_database() {
 
 }
 
+
+#########################################################
+# STAGE: Setup RACF certificates and keyring
+#########################################################
+stage_setup_certificates() {
+    print_stage "STAGE: Setup RACF certificates and keyring"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/clearcert.sh" ]; then
+        print_error "Certificate script not found: $BANK_DIR/.setup/setup/clearcert.sh"
+        exit 1
+    fi
+
+    if [ ! -f "$BANK_DIR/.setup/setup/addcert.sh" ]; then
+        print_error "Certificate script not found: $BANK_DIR/.setup/setup/addcert.sh"
+        exit 1
+    fi
+
+    cd "$BANK_DIR"
+    set -o pipefail
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/clearcert.sh"
+    if bash .setup/setup/clearcert.sh; then
+        print_success "RACF keyring teardown completed"
+    else
+        print_error "Failed to clear existing RACF certificates"
+        exit 1
+    fi
+
+    print_info "Executing: bash $BANK_DIR/.setup/setup/addcert.sh"
+    if bash .setup/setup/addcert.sh; then
+        print_success "RACF keyring and certificates created successfully"
+    else
+        print_error "Failed to setup RACF certificates"
+        exit 1
+    fi
+}
 
 #########################################################
 # STAGE: Setup zOS Connect server
@@ -431,10 +469,7 @@ stage_setup_cics_region() {
     cd "$BANK_DIR"
 
     set -o pipefail
-    .setup/setup/setup-cics-region.sh &
-    PID=$!
-    # Wait for cics setup to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if .setup/setup/setup-cics-region.sh; then
         print_success "CICS region setup completed successfully"
     else
         print_error "Failed to setup CICS region"
@@ -461,17 +496,41 @@ stage_setup_ims_region() {
 
 
     set -o pipefail
-    chmod +x .setup/setup/setup-ims-region.sh
-    .setup/setup/setup-ims-region.sh&
-    PID=$!
-    # Wait for cics setup to complete (ZOAU/ZOWE ISSUE)
-    if wait "$PID"; then
+    if .setup/setup/setup-ims-region.sh; then
         print_success "IMS region setup completed successfully"
     else
         print_error "Failed to setup IMS region"
         exit 1
     fi
 }
+
+#########################################################
+# STAGE: Setup DPS
+#########################################################
+stage_setup_debug_profile_service() {
+    print_stage "STAGE: Configure Debug Profile Service"
+
+    # Verify script exists
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-debug.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-debug.sh"
+        exit 1
+    fi
+    
+    # Run script
+    print_info "Running Debug Profile Service setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-debug.sh"
+    cd "$BANK_DIR"
+    
+    
+    set -o pipefail
+    if .setup/setup/setup-debug.sh; then
+        print_success "Debug Profile Service setup completed successfully"
+    else
+        print_error "Failed to setup Debug Profile Service"
+        exit 1
+    fi
+}
+
 
 #########################################################
 # Main execution helpers
@@ -497,14 +556,21 @@ print_usage() {
     echo "Usage: bash setup-common.sh <phase>"
     echo ""
     echo "Phases:"
-    echo "  validate-prereqs  Validate prerequisites (zConfig, DBB, wazi-deploy)"
-    echo "  environment       Initialize workspace and infrastructure prerequisites"
-    echo "  install-bank-of-z Build and deploy the Bank of Z baseline"
+    echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
+    echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
+    echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
     echo "  bash setup-common.sh install-bank-of-z"
+    echo "  bash setup-common.sh verify-installation"
+    echo ""
+    echo "verify-installation environment variables:"
+    echo "  BASE_URL       z/OS Connect API base URL  (default: derived from config)"
+    echo "  FRONTEND_URL   Frontend Liberty base URL  (default: derived from config)"
+    echo "  IMS_DISABLED   Set to true to skip IMS-specific tests"
 }
 
 #########################################################
@@ -527,15 +593,20 @@ main_setup() {
     stage_setup_mq_queue_manager
 
     stage_setup_cics_region
+    if [[ "$IMS_DISABLED" != "true" ]]; then
+        stage_setup_ims_region
+        stage_setup_ims_database
+        stage_setup_ims_bankz_regions
+    fi
 
-    stage_setup_ims_region
+    stage_setup_debug_profile_service
 
-    stage_setup_ims_database
-
-    stage_setup_ims_bankz_regions
+    # Certificates
+    if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then
+        stage_setup_certificates
+    fi
 
     stage_setup_zosconnect_server
-
     stage_setup_frontend_server
 
     # Summary
@@ -584,6 +655,40 @@ main_validation() {
     print_phase_next_step "validation"
 }
 
+#########################################################
+# STAGE: Post-install verification tests
+#########################################################
+stage_verify_installation() {
+    print_stage "STAGE: Post-install Verification Tests"
+
+    local task="${SCRIPTS_DIR}/tasks/task-install-verification.sh"
+
+    if [ ! -f "$task" ]; then
+        print_error "Verification task not found: $task"
+        exit 1
+    fi
+
+    set -o pipefail
+    if bash "$task"; then
+        print_success "All verification tests passed"
+    else
+        print_error "One or more verification tests failed"
+        exit 1
+    fi
+}
+
+main_verify_installation() {
+    echo ""
+    SYS=$(uname -Ia)
+    print_info "Running on: $SYS"
+    echo ""
+
+    stage_verify_installation
+
+    print_stage "VERIFICATION COMPLETE"
+    print_success "Installation verification completed successfully!"
+}
+
 main() {
     local phase="${1:-}"
 
@@ -598,18 +703,34 @@ main() {
             main_setup
             ;;
         install-bank-of-z)
-            chmod +x ${SCRIPTS_DIR}/pipeline-common.sh
-            bash ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full &
-            PID=$!
-            # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
-            if wait "$PID"; then
+            if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then
                 print_success "Remote pipeline completed successfully"
             else
                 print_error "Failed to execute pipeline on remote system"
                 exit 1
             fi
             stage_populate_database
-            stage_populate_ims_database
+            if [[ "$IMS_DISABLED" != "true" ]]; then
+                stage_populate_ims_database
+            fi
+            
+            # Restart frontend and z/OS Connect servers (dropinsEnabled="false")
+            opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            sleep 5
+            if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+            fi
+            if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+                opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            else
+                jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)"  2>/dev/null || true
+            fi
+            ;;
+        verify-installation)
+            main_verify_installation
             ;;
         -h|--help|help|"")
             print_usage

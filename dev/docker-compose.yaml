@@ -21,23 +21,19 @@ services:
       - "9443:9443"
       - "9080:9080"
     volumes:
-      - ./src/api:/workspace/project
-      - ./logs/:/logs/
-      # - ./certs:/config/resources/security/:ro
+      - ../src/api:/workspace/project
+      - ../logs/:/logs/
+      # - ../certs:/config/resources/security/:ro
     networks:
       - bank-network
 
   frontend:
-    image: node:24-alpine
-    working_dir: /app
-    command: node server.js
-    environment:
-      - PORT=3001
-      - API_BASE_URL=http://zosConnect:9080
+    image: nginx:alpine
     ports:
-      - "3001:3001"
+      - "3001:80"
     volumes:
-      - ./src/frontend:/app
+      - ../src/frontend:/usr/share/nginx/html:ro
+      - ./nginx.frontend.conf:/etc/nginx/templates/default.conf.template:ro
     depends_on:
       - zosConnect
     networks:

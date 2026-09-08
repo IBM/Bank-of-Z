@@ -47,6 +47,9 @@ export function createHeader(includeSideNav = false) {
                     <cds-side-nav-menu-item href="account-details.html">
                         View Account Details
                     </cds-side-nav-menu-item>
+                    <cds-side-nav-menu-item href="account-transactions.html">
+                        View Account Transactions
+                    </cds-side-nav-menu-item>
                 </cds-side-nav-menu>
                 
                 <cds-side-nav-menu title="Update Details">

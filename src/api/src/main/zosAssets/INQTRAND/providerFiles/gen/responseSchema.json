@@ -1,0 +1,233 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "abendCode" : {
+      "type" : "string"
+    },
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "INQTRAND-COMMAREA" : {
+          "type" : "object",
+          "properties" : {
+            "INQTRAND-EYE" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-EYE PIC X(4) USAGE DISPLAY.",
+                "name" : "INQTRAND-EYE"
+              }
+            },
+            "INQTRAND-SORTCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-SORTCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQTRAND-SORTCODE"
+              }
+            },
+            "INQTRAND-ACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-ACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRAND-ACCNO"
+              }
+            },
+            "INQTRAND-DATE" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-DATE PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRAND-DATE"
+              }
+            },
+            "INQTRAND-TIME" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TIME PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQTRAND-TIME"
+              }
+            },
+            "INQTRAND-REF" : {
+              "minimum" : 0,
+              "maximum" : 999999999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-REF PIC 9(12) USAGE DISPLAY.",
+                "name" : "INQTRAND-REF"
+              }
+            },
+            "INQTRAND-SUCCESS" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-SUCCESS PIC X USAGE DISPLAY.",
+                "name" : "INQTRAND-SUCCESS"
+              }
+            },
+            "INQTRAND-FOUND" : {
+              "maxLength" : 1,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-FOUND PIC X USAGE DISPLAY.",
+                "name" : "INQTRAND-FOUND"
+              }
+            },
+            "INQTRAND-TRAN-ID" : {
+              "maxLength" : 50,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-ID PIC X(50) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-ID"
+              }
+            },
+            "INQTRAND-TRAN-SORTCODE" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-SORTCODE PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-SORTCODE"
+              }
+            },
+            "INQTRAND-TRAN-ACCNO" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-ACCNO PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-ACCNO"
+              }
+            },
+            "INQTRAND-TRAN-DATE" : {
+              "minimum" : 0,
+              "maximum" : 99999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-DATE PIC 9(8) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-DATE"
+              }
+            },
+            "INQTRAND-TRAN-DATE-GRP" : {
+              "type" : "object",
+              "properties" : {
+                "INQTRAND-TRAN-DATE-YYYY" : {
+                  "minimum" : 0,
+                  "maximum" : 9999,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-DATE-YYYY PIC 9(4) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-DATE-YYYY"
+                  }
+                },
+                "INQTRAND-TRAN-DATE-MM" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-DATE-MM PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-DATE-MM"
+                  }
+                },
+                "INQTRAND-TRAN-DATE-DD" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-DATE-DD PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-DATE-DD"
+                  }
+                }
+              }
+            },
+            "INQTRAND-TRAN-TIME" : {
+              "minimum" : 0,
+              "maximum" : 999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-TIME PIC 9(6) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-TIME"
+              }
+            },
+            "INQTRAND-TRAN-TIME-GRP" : {
+              "type" : "object",
+              "properties" : {
+                "INQTRAND-TRAN-TIME-HH" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-TIME-HH PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-TIME-HH"
+                  }
+                },
+                "INQTRAND-TRAN-TIME-MM" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-TIME-MM PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-TIME-MM"
+                  }
+                },
+                "INQTRAND-TRAN-TIME-SS" : {
+                  "minimum" : 0,
+                  "maximum" : 99,
+                  "type" : "integer",
+                  "x-ibm-zcon-metadata" : {
+                    "type" : "05 INQTRAND-TRAN-TIME-SS PIC 9(2) USAGE DISPLAY.",
+                    "name" : "INQTRAND-TRAN-TIME-SS"
+                  }
+                }
+              }
+            },
+            "INQTRAND-TRAN-REF" : {
+              "minimum" : 0,
+              "maximum" : 999999999999,
+              "type" : "integer",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-REF PIC 9(12) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-REF"
+              }
+            },
+            "INQTRAND-TRAN-TYPE" : {
+              "maxLength" : 3,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-TYPE PIC X(3) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-TYPE"
+              }
+            },
+            "INQTRAND-TRAN-DESC" : {
+              "maxLength" : 40,
+              "type" : "string",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-DESC PIC X(40) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-DESC"
+              }
+            },
+            "INQTRAND-TRAN-AMOUNT" : {
+              "multipleOf" : 0.01,
+              "minimum" : -9.99999999999E9,
+              "maximum" : 9.99999999999E9,
+              "type" : "number",
+              "format" : "decimal",
+              "x-ibm-zcon-metadata" : {
+                "type" : "03 INQTRAND-TRAN-AMOUNT PIC S9(10)V9(2) USAGE DISPLAY.",
+                "name" : "INQTRAND-TRAN-AMOUNT"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset responses"
+}

@@ -83,7 +83,7 @@ export function parseCustomerId(input) {
  * Format customer ID with system prefix
  * @param {string} customerId - The numeric customer ID
  * @param {string} system - 'CICS' or 'IMS'
- * @returns {string} Formatted customer ID with prefix (e.g., 'C1234567' or 'I000000015')
+ * @returns {string} Formatted customer ID with prefix (e.g., 'C1234' or 'I000000015')
  */
 export function formatCustomerId(customerId, system) {
     if (!customerId) return '';

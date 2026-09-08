@@ -1,0 +1,28 @@
+name: pr-workflow
+on:
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
+
+jobs:
+    controller:
+        runs-on: self-hosted
+        steps:
+            - name: pr-summary
+              run: |
+                  echo " "
+                  echo "PR pipeline triggered"
+                  echo "*******************************************"
+                  echo "PR number    = ${{ github.event.pull_request.number }}"
+                  echo "Source branch = ${{ github.head_ref }}"
+                  echo "Target branch = ${{ github.base_ref }}"
+                  echo "Repository   = ${{ github.repository }}"
+
+    setup:
+        needs:
+            - controller
+        uses: ./.github/workflows/Setup.yml
+        secrets:
+            githubAccessToken: ${{ secrets.GH_ACTIONS_PAT }}

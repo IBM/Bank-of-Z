@@ -10,14 +10,16 @@
 export const config = {
     api: {
         // Base URL for API endpoints.
-        // - Docker (port 3001): use relative '/api' so requests go through the
-        //   Node server.js proxy, which forwards to z/OS Connect internally.
-        //   Direct cross-origin calls from 3001 → 9080 are blocked by CORS.
-        // - z/OS Liberty (port 9081): use absolute URL directly to z/OS Connect
-        //   on port 9080 (same hostname, CORS not an issue on z/OS).
+        // - Docker dev (port 3001): use relative '/api' so requests are proxied
+        //   by nginx to the zosConnect container at zosConnect:9080/api/*.
+        // - z/OS Liberty: frontend (FEBOZ) and API (BAQBOZ) are on separate
+        //   Liberty instances. Match the protocol used to load the frontend page:
+        //     https://host:9445 → https://host:9444/api
+        //     http://host:9081  → http://host:9080/api
         baseUrl: window.location.port === '3001'
             ? '/api'
-            : 'http://' + window.location.hostname + ':9080/api'
+            : window.location.protocol + '//' + window.location.hostname + ':' +
+              (window.location.protocol === 'https:' ? '9444' : '9080') + '/api'
     },
     defaults: {
         sortCode: '987654'

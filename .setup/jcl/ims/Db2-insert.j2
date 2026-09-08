@@ -17,12 +17,12 @@
   LOAD DATA REPLACE
   FORMAT DELIMITED COLDEL ',' CHARDEL '"' DECPT '.'
   INTO TABLE {{ ims.db2_database }}.{{ ims.db2_table }}
-  (TXID           INTEGER,
+  (TXID           BIGINT,
    TIMESTMP       TIMESTAMP EXTERNAL,
    TRANSTYP       CHAR,
    AMOUNT         DECIMAL,
-   REFTXID        INTEGER,
-   ACCID          INTEGER,
+   REFTXID        BIGINT,
+   ACCID          BIGINT,
    BALANCE        DECIMAL)
 /*
 //SYSREC   DD  *

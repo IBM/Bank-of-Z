@@ -51,6 +51,8 @@
     url: /docs/tutorials/cics-enhancement-scenario.html
   - title: Incremental Build
     url: /docs/tutorials/incremental-build.html
+  - title: IMS Enhancement with Bob
+    url: /docs/tutorials/ims-enhancement.html
 - title: Development Workflows
   url: /docs/development-workflows/
   children:

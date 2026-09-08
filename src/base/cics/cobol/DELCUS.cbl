@@ -513,7 +513,7 @@
                      ':' DELIMITED BY SIZE,
                      WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
                      ':' DELIMITED BY SIZE,
-                     WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
+                     WS-TIME-NOW-GRP-SS DELIMITED BY SIZE
                  INTO ABND-TIME
               END-STRING
 
@@ -669,7 +669,7 @@
                      ':' DELIMITED BY SIZE,
                      WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
                      ':' DELIMITED BY SIZE,
-                     WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
+                     WS-TIME-NOW-GRP-SS DELIMITED BY SIZE
                  INTO ABND-TIME
               END-STRING
 
@@ -832,7 +832,7 @@
                      ':' DELIMITED BY SIZE,
                      WS-TIME-NOW-GRP-MM DELIMITED BY SIZE,
                      ':' DELIMITED BY SIZE,
-                     WS-TIME-NOW-GRP-MM DELIMITED BY SIZE
+                     WS-TIME-NOW-GRP-SS DELIMITED BY SIZE
                  INTO ABND-TIME
               END-STRING
 

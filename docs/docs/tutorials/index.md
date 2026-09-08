@@ -23,3 +23,4 @@ By completing these tutorials, learn how to:
 | [**Deploy Bank of Z**](deploy-bank-of-z.html) | Perform a complete first-time deployment of Bank of Z. |
 | [**CICS Enhancement Scenario**](cics-enhancement-scenario.html) | Implement and deploy an enhancement to a CICS-based application. |
 | [**CICS Debugging Scenario**](debug-cics-transaction.html) | Debug a CICS transaction by using your supported development environment. |
+| [**IMS Debugging Scenario**](debug-ims-transaction.html) | Debug an IMS transaction in VS Code IDE using IMS Transaction Isolation. |

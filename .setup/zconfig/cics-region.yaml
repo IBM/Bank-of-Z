@@ -93,5 +93,5 @@ cics_region:
 
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
-    - "EYUSMSSJ.jvmprofile"
+    - path: "EYUSMSSJ.jvmprofile"
  

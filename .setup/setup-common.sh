@@ -441,7 +441,6 @@ stage_setup_mq_queue_manager() {
     cd "$BANK_DIR"
 
     set -o pipefail
-    chmod +x .setup/setup/setup-mq-queue-manager.sh
 
     if bash .setup/setup/setup-mq-queue-manager.sh; then
         print_success "MQ queue manager setup completed successfully"

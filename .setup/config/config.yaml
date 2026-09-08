@@ -302,5 +302,5 @@ db2:
   sdsnexit: "{{ db2.db2_hlq }}.SDSNEXIT"
   sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
-  jobcard: "//{{jobname if jobname is defined else '{{ app.short_name }}JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  runlib: "{{ db2.ssid }}.RUNLIB.LOAD"
+  jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
+  db2_java_dir: "{{ global.db2_java_dir }}"

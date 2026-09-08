@@ -406,7 +406,7 @@ application:
       variables:
         # Path to the Gradle executable on z/OS USS
         - name: gradlePath
-          value: "/usr/local/sandboxes/tools/gradle-9.5.1/bin/gradle"
+          value: "${GRADLE_HOME}/bin/gradle"
         # Shell used to invoke Gradle
         - name: shellEnvironment
           value: "/usr/lpp/IBM/foz/v1r1/bash/bash/bin/bash"

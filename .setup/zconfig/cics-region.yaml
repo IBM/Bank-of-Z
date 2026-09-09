@@ -72,7 +72,7 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
-    initparm: "EQA0CPLT='NWP,NLE,DTR'"
+    initparm: "(EQA0CPLT='NWP,NLE,DTR')"
 
   startup_programs:
     second_phase:

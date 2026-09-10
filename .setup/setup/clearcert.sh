@@ -19,6 +19,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[CLEARCERT]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 ## CUSTOMIZE ##
 userid=${ZOS_ADMIN_USER}

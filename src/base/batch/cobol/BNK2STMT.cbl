@@ -277,24 +277,24 @@
 
       *-----------------------------------------------------------------
        MAIN-CONTROL.
-           PERFORM OPEN-FILES
+           PERFORM OPEN-FILES THRU OF-EXIT
            IF WS-RETURN-CODE = 0
-               PERFORM READ-SYSIN
+               PERFORM READ-SYSIN THRU RS-EXIT
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-HEADER
+               PERFORM WRITE-HEADER THRU WH-EXIT
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM QUERY-CUSTOMER
+               PERFORM QUERY-CUSTOMER THRU QC-EXIT
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-CUSTOMER-SECTION
-               PERFORM OPEN-ACCOUNT-CURSOR
+               PERFORM WRITE-CUSTOMER-SECTION THRU WCS-EXIT
+               PERFORM OPEN-ACCOUNT-CURSOR THRU OAC-EXIT 
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-ACCOUNT-SECTION-HDR
+               PERFORM WRITE-ACCOUNT-SECTION-HDR THRU WASH-EXIT 
                PERFORM UNTIL WS-CURSOR-EOF = 'Y'
-                   PERFORM FETCH-ONE-ACCOUNT
+                   PERFORM FETCH-ONE-ACCOUNT THRU FOA-EXIT 
                END-PERFORM
            END-IF
            IF WS-CURSOR-OPEN = 'Y'
@@ -302,9 +302,9 @@
                MOVE 'N' TO WS-CURSOR-OPEN
            END-IF
            IF WS-RETURN-CODE = 0 OR WS-RETURN-CODE = 4
-               PERFORM WRITE-FINAL-SEPARATOR
+               PERFORM WRITE-FINAL-SEPARATOR THRU WFS-EXIT 
            END-IF
-           PERFORM CLOSE-FILES
+           PERFORM CLOSE-FILES THRU CF-EXIT 
            MOVE WS-RETURN-CODE TO RETURN-CODE
            STOP RUN.
 
@@ -662,7 +662,7 @@
 
            EVALUATE SQLCODE
                WHEN 0
-                   PERFORM FORMAT-ACCOUNT-LINE
+                   PERFORM FORMAT-ACCOUNT-LINE THRU FAL-EXIT 
                    MOVE WS-ACCT-LINE TO STMTRPT-RECORD
                    WRITE STMTRPT-RECORD
                    IF WS-STMTRPT-STATUS NOT = '00'

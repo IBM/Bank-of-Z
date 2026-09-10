@@ -7,14 +7,14 @@ version: "1.0.0"
 # Global properties
 # - Shared by middleware/tools 
 # - Subject to change with middleware/tools updates
-global:
+cfg:
 
   # Sandbox
   sandbox_root: "/usr/local/sandboxes"
 
   # Application
   app_base_name: "BANKZ"
-  app_hlq: "{{ global.app_base_name }}"
+  app_hlq: "{{ cfg.app_base_name }}"
   app_short_name: "BOZ" # Maximum 3 characters
   app_version: "0"
   app_release: "1"
@@ -24,10 +24,10 @@ global:
   java_home: "{{ sandbox.root }}/tools/J21.0_64"
   python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
   zoau_home: "/usr/lpp/IBM/zoau"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
-  zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
-  zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
-  dbb_home: "{{ global.sandbox_root }}/tools/dbb"
-  gradle_home:  "{{ global.sandbox_root }}/tools/gradle-9.5.1"
+  zconfig_home: "{{ cfg.sandbox_root }}/tools/zconfig"
+  zcb_home: "{{ cfg.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
+  dbb_home: "{{ cfg.sandbox_root }}/tools/dbb"
+  gradle_home:  "{{ cfg.sandbox_root }}/tools/gradle-9.5.1"
   zcodescan_home: "/global/opt/pyenv/akf"
   wazideploy_home: "/global/opt/pyenv/gdp"
   zosconnect_home: "/usr/lpp/IBM/zosconnect"
@@ -52,12 +52,12 @@ global:
   # GUI
   zosconnect_http_port: 9080
   zosconnect_https_port: 9444
-  zosconnect_task_user: "{{ global.zos_admin_user }}"
+  zosconnect_task_user: "{{ cfg.zos_admin_user }}"
 
   # Frontend (separate Liberty server - FE<APP_SHORT_NAME> on port 9445)
   frontend_http_port: 9081
   frontend_https_port: 9445
-  frontend_task_user: "{{ global.zos_admin_user}}"
+  frontend_task_user: "{{ cfg.zos_admin_user}}"
 
 
   # CICS
@@ -76,31 +76,58 @@ global:
   ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
+  db2_provision: "true"   # set to "true" to provision a new Db2 subsystem with zconfig
+  # When true, each environment run removes the zconfig-managed subsystem
+  # before provisioning it again. This is destructive and requires
+  # db2_provision: "true".
+  db2_reprovision: "false"
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
-  db2_ssid: "DBD1"
-  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
-  db2_sqlid: "{{ global.zos_current_user }}"
+  db2_ssid: "DBD2"
+  db2_runlib: "{{ cfg.db2_hlq }}.{{ cfg.db2_ssid }}.RUNLIB.LOAD"
+  db2_sqlid: "{{ cfg.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
 
+# Db2 subsystem provisioning attributes. These defaults match the supplied
+# ZDVT image; review and change every environment-specific value before
+# setting cfg.db2_provision to "true".
+db2_provisioning:
+  # catalog: overrides the HLQ used for all Db2 VSAM clusters.
+  # Db2 defaults this to "{SSID}SYS" (e.g. DBD1SYS). Set this to a
+  # single HLQ (e.g. "DBD1") to keep all datasets under one prefix.
+  catalog: "{{ cfg.db2_ssid }}"
+  user_catalog: "CATALOG.VS01.DB2V13"
+  authid: "{{ cfg.zos_admin_user }}"
+  volume: "DB2V13"
+  storage_class: "SGDB213"
+  data_class: "DCDB2EXT"
+  # Java runtime for the Db2 Java WLM environment. This must be a Java home,
+  # not the Db2 installation directory used for JDBC and Db2 Java classes.
+  java_home: "{{ cfg.java_home }}"
+  javaenv: "{{ cfg.db2_ssid }}.DSN1WLMJ.JAVAENV"
+  javaenvv: "/u/{{ cfg.zos_admin_user | lower }}/{{ cfg.db2_ssid | lower }}envfile.txt"
+  jvmprops: "/u/{{ cfg.zos_admin_user | lower }}/{{ cfg.db2_ssid | lower }}jvmsp"
+  sdsnexit: "{{ cfg.db2_hlq }}.{{ cfg.db2_ssid }}.SDSNEXIT"
+  start_timeout_seconds: 180
+
 
 # Application properties
 app:
-  base_name: "{{ global.app_base_name }}"
-  short_name: "{{ global.app_short_name }}"
-  app_hlq: "{{ global.app_hlq }}"
-  version: "{{ global.app_version }}"
-  release: "{{ global.app_release }}"
-  modification: "{{ global.app_modification }}"
+  base_name: "{{ cfg.app_base_name }}"
+  short_name: "{{ cfg.app_short_name }}"
+  app_hlq: "{{ cfg.app_hlq }}"
+  version: "{{ cfg.app_version }}"
+  release: "{{ cfg.app_release }}"
+  modification: "{{ cfg.app_modification }}"
   zos_version: "V{{app.version}}R{{app.release}}M{{app.modification}}"
   full_version: "{{app.version}}.{{app.release}}.{{app.modification}}"
   description: "Bank of Z a modern IBM Z development, build, deployment, and modernization practices"
 
 # Sandbox root directory (USS)
 sandbox:
-  root: "{{ global.sandbox_root }}"
+  root: "{{ cfg.sandbox_root }}"
   path: "{{ sandbox.root }}/bank-of-z"
 
 # Zowe CLI configuration
@@ -113,34 +140,34 @@ repositories:
 
 # Java Home
 java:
-  java_home: "{{ global.java_home }}"
+  java_home: "{{ cfg.java_home }}"
   
 # Python Home
 python:
-  python_home: "{{ global.python_home }}"
+  python_home: "{{ cfg.python_home }}"
 
 # ZOAU installation directory
 zoau:
-  zoau_home: "{{ global.zoau_home }}"
+  zoau_home: "{{ cfg.zoau_home }}"
 
 # Z configuration tools
 zconfig:
-  zconfig_home: "{{ global.zconfig_home }}"
-  zcb_home: "{{ global.zcb_home }}"
+  zconfig_home: "{{ cfg.zconfig_home }}"
+  zcb_home: "{{ cfg.zcb_home }}"
 
 # DBB (Dependency Based Build)
 dbb:
-  dbb_home: "{{ global.dbb_home }}"
+  dbb_home: "{{ cfg.dbb_home }}"
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
   dbb_log_dir: "{{sandbox.path}}/logs/dbb"
-  gradle_home:  "{{ global.gradle_home }}"
-  igzxjni2: "{{ global.igzxjni2 }}"
-  igy_hlq: "{{ global.igy_hlq }}"
-  fel_hlq: "{{ global.fel_hlq }}"
-  ipv_hlq: "{{ global.ipv_hlq }}"
-  pli_hlq: "{{ global.pli_hlq }}"
+  gradle_home:  "{{ cfg.gradle_home }}"
+  igzxjni2: "{{ cfg.igzxjni2 }}"
+  igy_hlq: "{{ cfg.igy_hlq }}"
+  fel_hlq: "{{ cfg.fel_hlq }}"
+  ipv_hlq: "{{ cfg.ipv_hlq }}"
+  pli_hlq: "{{ cfg.pli_hlq }}"
 
 # zBuilder framework configuration
 zbuilder:
@@ -149,7 +176,7 @@ zbuilder:
 
 # ZCodeScan (static analysis)
 zcodescan:
-  zcodescan_home: "{{ global.zcodescan_home }}"
+  zcodescan_home: "{{ cfg.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
   output_dir: "{{sandbox.path}}/zcodescan"
@@ -160,7 +187,7 @@ zcodescan:
 
 # Wazi Deploy (deployment automation)
 wazideploy:
-  wazideploy_home: "{{ global.wazideploy_home }}"
+  wazideploy_home: "{{ cfg.wazideploy_home }}"
   deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
@@ -169,8 +196,8 @@ wazideploy:
 
 # Debug
 debug:
-  debug_hlq: "{{ global.debug_hlq }}"
-  tcpip_hlq: "{{ global.tcpip_hlq }}"
+  debug_hlq: "{{ cfg.debug_hlq }}"
+  tcpip_hlq: "{{ cfg.tcpip_hlq }}"
   eqaprof_conf_dir: "{{ sandbox.path }}/debug"
   eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
   eqaprof_port: 8192
@@ -179,44 +206,49 @@ debug:
 # z/OS Connect (API exposure only)
 # Hosts api.war at /api. Frontend WAR is deployed to the separate Frontend Liberty server.
 zosconnect:
-  zosconnect_home: "{{ global.zosconnect_home }}"
+  zosconnect_home: "{{ cfg.zosconnect_home }}"
   server_dir: "{{sandbox.path}}/zosconnect-server"
   server_name: "bankOfZServer"
-  http_port: "{{ global.zosconnect_http_port }}"
-  https_port: "{{ global.zosconnect_https_port }}"
-  task_user: "{{ global.zosconnect_task_user }}"
-  sys_proclib: "{{ global.sys_proclib }}"
+  http_port: "{{ cfg.zosconnect_http_port }}"
+  https_port: "{{ cfg.zosconnect_https_port }}"
+  task_user: "{{ cfg.zosconnect_task_user }}"
+  sys_proclib: "{{ cfg.sys_proclib }}"
 
 # Frontend Liberty Server (separate from z/OS Connect)
 frontend:
-  liberty_home: "{{ global.liberty_home }}"
+  liberty_home: "{{ cfg.liberty_home }}"
   server_dir: "{{sandbox.path}}/frontend"
   server_name: "bankz-frontend"
-  http_port: "{{ global.frontend_http_port }}"
-  https_port: "{{ global.frontend_https_port }}"
-  sys_proclib: "{{ global.sys_proclib }}"
-  task_user: "{{ global.frontend_task_user }}"
+  http_port: "{{ cfg.frontend_http_port }}"
+  https_port: "{{ cfg.frontend_https_port }}"
+  sys_proclib: "{{ cfg.sys_proclib }}"
+  task_user: "{{ cfg.frontend_task_user }}"
 
 # CICS attributes
 cics:
-  cics_hlq: "{{ global.cics_hlq }}"
-  uss_dir: "{{ global.cics_uss_dir }}"
-  cics_sec: "{{ global.cics_sec }}"
+  cics_hlq: "{{ cfg.cics_hlq }}"
+  uss_dir: "{{ cfg.cics_uss_dir }}"
+  cics_sec: "{{ cfg.cics_sec }}"
   host: "localhost"
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
   cmci_port: 27100
+  # Some ZDVT images pause CICS startup at the EZACIC20 PLT prompt.
+  # Set to "true" only when automatically replying GO is appropriate.
+  auto_reply_go: "false"
+  # CICS can take several minutes to bring CMCI online after startup.
+  cmci_start_timeout_seconds: 300
   ipic_port: 4320
   debug_port: 27103
-  sys_proclib: "{{ global.sys_proclib }}"
+  sys_proclib: "{{ cfg.sys_proclib }}"
 
 # IMS attributes
 ims:
-  disabled: "{{ global.ims_disabled }}"
-  ims_sys_hlq: "{{ global.ims_sys_hlq }}"
-  ims_java_dir: "{{ global.ims_java_dir }}"
-  ims_java_home: "{{ global.java_home }}"
-  datastore: "{{ global.ims_datastore }}"
+  disabled: "{{ cfg.ims_disabled }}"
+  ims_sys_hlq: "{{ cfg.ims_sys_hlq }}"
+  ims_java_dir: "{{ cfg.ims_java_dir }}"
+  ims_java_home: "{{ cfg.java_home }}"
+  datastore: "{{ cfg.ims_datastore }}"
   host: "localhost"
   port: 9977
   user: "${IMS_USER}"
@@ -233,7 +265,7 @@ ims:
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  asm_hlq: "{{ global.asm_hlq }}"
+  asm_hlq: "{{ cfg.asm_hlq }}"
   dfs_recon1: "{{ ims.ims_hlq }}.RECON1"
   dfs_recon2: "{{ ims.ims_hlq }}.RECON2"
   dfs_recon3: "{{ ims.ims_hlq }}.RECON3"
@@ -250,10 +282,10 @@ ims:
   java_conf_path: "${HOME}/dfsjvmpr.props"
   dfs_ims_userid: "${IMS_USER}"
   dfs_reslib: "{{ ims.ims_hlq }}.SDFSRESL"
-  dfs_imsplex: "{{ global.ims_dfsplex }}"
-  ixvolser: "{{ global.ims_ixvolser }}"
-  irlm_enablement: "{{ global.ims_irlm_enablement }}"
-  database_lock_manager_server_name: "{{ global.ims_database_lock_manager_server_name }}"
+  dfs_imsplex: "{{ cfg.ims_dfsplex }}"
+  ixvolser: "{{ cfg.ims_ixvolser }}"
+  irlm_enablement: "{{ cfg.ims_irlm_enablement }}"
+  database_lock_manager_server_name: "{{ cfg.ims_database_lock_manager_server_name }}"
   regions:
   - with_db2: yes
     use_pseudo_wfi: no
@@ -290,12 +322,12 @@ ims:
 
 # DB2 configuration
 db2:
-  db2_hlq: "{{ global.db2_hlq }}"
-  dsntep: "{{ global.db2_dsntep }}"
-  ssid: "{{ global.db2_ssid }}"
-  runlib: "{{ global.db2_runlib }}"
+  db2_hlq: "{{ cfg.db2_hlq }}"
+  dsntep: "{{ cfg.db2_dsntep }}"
+  ssid: "{{ cfg.db2_ssid }}"
+  runlib: "{{ cfg.db2_runlib }}"
   hostname: "localhost"
-  sqlid: "{{ global.db2_sqlid}}"
+  sqlid: "{{ cfg.db2_sqlid}}"
   package: "BANKZPACK"
   plan: "BANKZPLN"
   location: "{{ db2.ssid }}LOC"
@@ -303,4 +335,4 @@ db2:
   sdsnload: "{{ db2.db2_hlq }}.SDSNLOAD"
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
-  db2_java_dir: "{{ global.db2_java_dir }}"
+  db2_java_dir: "{{ cfg.db2_java_dir }}"

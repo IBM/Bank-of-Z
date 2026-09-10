@@ -422,8 +422,89 @@ stage_setup_frontend_server() {
 
 
 #########################################################
+# STAGE: Setup Db2 subsystem
+#########################################################
+stage_setup_db2_subsystem() {
+    print_stage "STAGE: Provision Db2 subsystem with zconfig"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-db2-subsystem.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-db2-subsystem.sh"
+        exit 1
+    fi
+
+    print_info "Running Db2 subsystem provisioning script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-db2-subsystem.sh"
+    cd "$BANK_DIR"
+
+    set -o pipefail
+    if .setup/setup/setup-db2-subsystem.sh; then
+        print_success "Db2 subsystem provisioning completed successfully"
+    else
+        print_error "Failed to provision Db2 subsystem"
+        exit 1
+    fi
+}
+
+stage_deprovision_db2_subsystem() {
+    print_stage "Deprovision Db2 subsystem with zconfig"
+
+    if [ ! -f "$BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
+        exit 1
+    fi
+
+    # Stop Bank of Z consumers before removing the subsystem they use.
+    stage_stop_tasks
+
+    print_info "Running Db2 subsystem deprovisioning script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
+    cd "$BANK_DIR"
+
+    set -o pipefail
+    if .setup/setup/deprovision-db2-subsystem.sh; then
+        print_success "Db2 subsystem deprovisioning completed successfully"
+    else
+        print_error "Failed to deprovision Db2 subsystem"
+        exit 1
+    fi
+}
+
+#########################################################
 # STAGE: Setup CICS region
 #########################################################
+wait_for_cics_cmci() {
+    local cics_job="CICS${APP_SHORT_NAME}"
+    local elapsed=0
+    local reply_id=""
+
+    print_info "Waiting for CICS CMCI port ${CICS_CMCI_PORT}..."
+    while (( elapsed < CICS_CMCI_START_TIMEOUT_SECONDS )); do
+        if netstat -a 2>/dev/null | grep -qi ":${CICS_CMCI_PORT}.*listen"; then
+            print_success "CICS CMCI is listening on port ${CICS_CMCI_PORT}"
+            return 0
+        fi
+
+        if [[ -z "$reply_id" ]]; then
+            reply_id=$(opercmd 'D R,L' 2>/dev/null |
+                grep "DFHSI1580D ${cics_job} PLT program EZACIC20" |
+                awk '$2 == "R" && $1 ~ /^[0-9]+$/ { print $1; exit }' || true)
+            if [[ -n "$reply_id" ]]; then
+                print_info "Replying GO to CICS startup prompt ${reply_id}"
+                opercmd "R ${reply_id},GO" >/dev/null 2>&1 || {
+                    print_error "Unable to reply GO to CICS startup prompt ${reply_id}"
+                    return 1
+                }
+            fi
+        fi
+
+        sleep 5
+        ((elapsed += 5))
+    done
+
+    print_error "CICS CMCI did not listen on port ${CICS_CMCI_PORT} within ${CICS_CMCI_START_TIMEOUT_SECONDS} seconds"
+    return 1
+}
+
 stage_setup_cics_region() {
     print_stage "STAGE: Create CICS region with zconfig"
 
@@ -444,6 +525,10 @@ stage_setup_cics_region() {
     else
         print_error "Failed to setup CICS region"
         exit 1
+    fi
+
+    if [[ "${CICS_AUTO_REPLY_GO,,}" == "true" ]]; then
+        wait_for_cics_cmci || exit 1
     fi
 }
 
@@ -528,12 +613,14 @@ print_usage() {
     echo "Phases:"
     echo "  validate-prereqs    Validate prerequisites (zconfig, DBB, wazi-deploy)"
     echo "  environment         Initialize workspace and infrastructure prerequisites"
+    echo "  deprovision-db2     Remove the configured zconfig-managed Db2 subsystem"
     echo "  install-bank-of-z   Build and deploy the Bank of Z baseline"
     echo "  verify-installation Run post-install verification tests from tests/"
     echo ""
     echo "Examples:"
     echo "  bash setup-common.sh validate-prereqs"
     echo "  bash setup-common.sh environment"
+    echo "  DB2_DEPROVISION_CONFIRM=<ssid> bash setup-common.sh deprovision-db2"
     echo "  bash setup-common.sh install-bank-of-z"
     echo "  bash setup-common.sh verify-installation"
     echo ""
@@ -557,9 +644,20 @@ main_setup() {
 
     # infrastructure
     stage_stop_tasks
-    
+
+    if [[ "${DB2_PROVISION}" == "true" ]]; then
+        if [[ "${DB2_REPROVISION,,}" == "true" ]]; then
+            print_warning "DB2_REPROVISION=true: removing ${DB2_SSID} before provisioning it again"
+            export DB2_DEPROVISION_CONFIRM="${DB2_SSID}"
+            stage_deprovision_db2_subsystem
+        fi
+        stage_setup_db2_subsystem
+    else
+        print_info "Skipping Db2 provisioning (DB2_PROVISION=false) - using pre-existing subsystem ${DB2_SSID}"
+    fi
+
     stage_setup_database
-    
+
     stage_setup_cics_region
     if [[ "$IMS_DISABLED" != "true" ]]; then
         stage_setup_ims_region
@@ -669,6 +767,9 @@ main() {
             ;;
         environment)
             main_setup
+            ;;
+        deprovision-db2)
+            stage_deprovision_db2_subsystem
             ;;
         install-bank-of-z)
             if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then

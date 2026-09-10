@@ -48,11 +48,54 @@ def expand_env_vars(value):
 
 def load_config(config_file):
     with open(config_file, "r", encoding="utf-8") as fd:
-        return yaml.safe_load(fd)
+        config = yaml.safe_load(fd)
+    return normalize_config(config)
+
+
+def normalize_config(config):
+    """Support the legacy ``global`` section during the cfg migration."""
+    if not isinstance(config, dict):
+        return config
+
+    result = deepcopy(config)
+    if "cfg" not in result and isinstance(result.get("global"), dict):
+        result["cfg"] = deepcopy(result["global"])
+
+    def replace_legacy_reference(node):
+        if isinstance(node, dict):
+            return {key: replace_legacy_reference(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [replace_legacy_reference(value) for value in node]
+        if isinstance(node, str):
+            return node.replace("global.", "cfg.")
+        return node
+
+    return replace_legacy_reference(result)
+
+
+def expand_env_vars_deep(node):
+    """Recursively expand ${VAR} env references in all string values."""
+    if isinstance(node, dict):
+        return {k: expand_env_vars_deep(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [expand_env_vars_deep(v) for v in node]
+    if isinstance(node, str):
+        return expand_env_vars(node)
+    return node
 
 
 def render_config(data):
-    result = deepcopy(data)
+    def expand_tree(node):
+        if isinstance(node, dict):
+            return {key: expand_tree(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [expand_tree(value) for value in node]
+        return expand_env_vars(node)
+
+    # Expand environment variables before resolving Jinja. Otherwise a
+    # construct such as {{ cfg.zos_admin_user | lower }} receives ${USER},
+    # lowers it to ${user}, and loses the value on case-sensitive systems.
+    result = expand_tree(deepcopy(data))
     for _ in range(20):
         changed = False
 
@@ -65,7 +108,10 @@ def render_config(data):
             if isinstance(node, str):
                 rendered = node
                 if "{{" in rendered:
-                    rendered = Template(rendered).render(**result)
+                    # Expand env vars in the context first so filters like
+                    # | lower operate on resolved values (e.g. IBMUSER not ${USER})
+                    context = expand_env_vars_deep(result)
+                    rendered = Template(rendered).render(**context)
                 rendered = expand_env_vars(rendered)
                 if rendered != node:
                     changed = True

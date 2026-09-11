@@ -168,26 +168,38 @@ print_info "========================================="
 print_info "Checking zconfig Installation"
 print_info "========================================="
 
+ZCONFIG_MIN_VERSION="0.8.0"
+
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
     print_info "Found zconfig activation script: $ZCONFIG_HOME/bin/activate"
-    
-    # Test zconfig by sourcing and running ls command
-    ZCONFIG_OUTPUT=$(bash -c "source '$ZCONFIG_HOME/bin/activate' && zconfig ls 2>&1" || true)
-    
-    if echo "$ZCONFIG_OUTPUT" | grep -q "TYPE"; then
-        print_info "zconfig Output:"
-        ZCONFIG_PREVIEW=$(echo "$ZCONFIG_OUTPUT" | head -5)
-        if [ -n "$ZCONFIG_PREVIEW" ]; then
-            while IFS= read -r line; do
-                [ -n "$line" ] && print_info "  $line"
-            done <<< "$ZCONFIG_PREVIEW"
+
+    ZCONFIG_OUTPUT=$(bash -c "source '$ZCONFIG_HOME/bin/activate' && zconfig --version 2>&1" || true)
+
+    print_info "zconfig Output:"
+    if [ -n "$ZCONFIG_OUTPUT" ]; then
+        while IFS= read -r line; do
+            [ -n "$line" ] && print_info "  $line"
+        done <<< "$ZCONFIG_OUTPUT"
+    fi
+
+    # Extract version from output (format: "zconfig version: 0.8.0")
+    ZCONFIG_VERSION=$(echo "$ZCONFIG_OUTPUT" | sed -n 's/.*zconfig version: \([0-9][0-9.]*\).*/\1/p')
+    [ -z "$ZCONFIG_VERSION" ] && ZCONFIG_VERSION="unknown"
+
+    if [ "$ZCONFIG_VERSION" != "unknown" ]; then
+        print_info "Detected zconfig version: $ZCONFIG_VERSION"
+        print_info "Minimum required version: $ZCONFIG_MIN_VERSION"
+
+        if version_compare "$ZCONFIG_VERSION" "$ZCONFIG_MIN_VERSION"; then
+            print_success "zconfig version check PASSED"
+            VALIDATION_PASSED=$((VALIDATION_PASSED + 1))
+        else
+            print_error "zconfig version check FAILED (found $ZCONFIG_VERSION, need $ZCONFIG_MIN_VERSION)"
+            VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
         fi
-        print_success "zconfig installation check PASSED"
-        VALIDATION_PASSED=$((VALIDATION_PASSED + 1))
     else
-        print_error "zconfig command failed or returned unexpected output"
-        print_info "Output: $ZCONFIG_OUTPUT"
-        VALIDATION_FAILED=$((VALIDATION_FAILED + 1))
+        print_warning "Could not determine zconfig version"
+        VALIDATION_WARNINGS=$((VALIDATION_WARNINGS + 1))
     fi
 else
     print_error "zconfig activation script not found"

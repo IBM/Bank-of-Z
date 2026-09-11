@@ -130,14 +130,16 @@ application:
         # ----- Compiler parameters for IBTRAN (IMS Java bridge) -----
         # IBTRAN is a special IMS program that bridges 31-bit COBOL to 64-bit Java.
         # Critical parameters:
-        #   LP(32)           - 31-bit addressing mode
-        #   JAVAIOP(JAVA64)  - Enable 31-bit to 64-bit Java bridge via igzxjni2.x
+        #   THREAD           - Required for COBOL-Java OO interop in V6R2 (enables
+        #                      multi-threaded runtime and Java class support)
         #   DLL              - Create DLL-style load module
-        #   RENT             - Reentrant code required for IMS
+        #   RENT             - Reentrant code required for IMS and THREAD
         #   PGMNAME(LONGMIXED) - Mixed-case entry points for Java interop
+        # Note: LP(32) and JAVAIOP(JAVA64) are V6R5+ only; omitted for V6R2.
+        #       31-bit addressing is the default in V6R2.
         - name: compileParms
           forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
-          value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64),LIB
+          value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,THREAD,LIB
           append:
           - condition:
               exists: errPrefix

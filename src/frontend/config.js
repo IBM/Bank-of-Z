@@ -19,7 +19,7 @@ export const config = {
         baseUrl: window.location.port === '3001'
             ? '/api'
             : window.location.protocol + '//' + window.location.hostname + ':' +
-              (window.location.protocol === 'https:' ? '9444' : '9080') + '/api'
+            (window.location.protocol === 'https:' ? '23204' : '23203') + '/api'
     },
     defaults: {
         sortCode: '987654'

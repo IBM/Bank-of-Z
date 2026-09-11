@@ -567,7 +567,7 @@ main_setup() {
         stage_setup_ims_bankz_regions
     fi
 
-    stage_setup_debug_profile_service
+    # stage_setup_debug_profile_service
 
     # Certificates
     if [[ "${ZOS_CREATE_CERTS,,}" == "true" ]]; then

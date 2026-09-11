@@ -3,13 +3,13 @@ vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
   region_hlq: "BANKZ"
-  java_home: "/usr/lpp/java/java21/current_64"
+  java_home: "/u/ibmuser/J21.0_64"
   region_uss_dir: "/usr/local/sandboxes/bank-of-z"
   cmci_port: "27100"
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
-  eqaw_hlq: "EQAW.SEQAMOD"
+  debug_hlq: "EQA.V17R0M0"
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
   db2_ssid: "DBD1"
@@ -46,12 +46,15 @@ cics_region:
     cics_exec_step_parameters:
       region: 0M
     dfhrpl:
-      top_data_sets:
-        - "{{ vars.debug_hlq }}.SEQAMOD"
+      # top_data_sets:
+      #   - "{{ vars.debug_hlq }}.SEQAMOD"
       data_sets:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
-        - "{{ vars.tcpip_hlq }}.SEZATCP"
+        # - "{{ vars.tcpip_hlq }}.SEZATCP"
+    # dds:
+    #   - name: DFHTABLE
+    #     dsn: "{{ vars.region_hlq }}.{{ vars.applid }}.TABLES.SOURCE"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
@@ -63,6 +66,7 @@ cics_region:
     gmtext: SMSS Region provisioned with zconfig
     gmtran: CESL
     sec: "{{ vars.cics_sec }}"
+    # keyring: IBMUSER/HSS_KEYRING
     db2conn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
@@ -75,17 +79,17 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
-    initparm:
-      eqa0cplt: "NWP,NLE,DTR"
+    # initparm:
+    #   eqa0cplt: "NWP,NLE,DTR"
 
-  startup_programs:
-    second_phase:
-      - EZACIC20
-      - EQA0CPLT
+  # startup_programs:
+  #   second_phase:
+  #     - EZACIC20
+  #     - EQA0CPLT
 
-  shutdown_programs:
-    first_phase:
-      - EZACIC20
+  # shutdown_programs:
+  #   first_phase:
+  #     - EZACIC20
 
   extensions:
     cics_cmci:

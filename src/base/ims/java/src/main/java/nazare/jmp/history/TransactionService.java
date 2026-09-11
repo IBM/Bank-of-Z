@@ -24,7 +24,7 @@ public class TransactionService {
 
 	// DB2 location can be set via system property: -Ddb2.location=DBD1LOC
 	// Default to DBD1LOC if not specified
-	private static final String DB2_LOCATION = System.getProperty("db2.location", "DBD1LOC");
+	private static final String DB2_LOCATION = System.getProperty("db2.location", "DBC1LOC");
 
 	public List<TransactionDetail> getTransactionDetail(long accountNumber) {
 		List<TransactionDetail> tranList = null;

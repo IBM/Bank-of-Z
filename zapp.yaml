@@ -9,12 +9,20 @@ description: >-
 author: IBM Z Open Editor
 
 propertyGroups:
-  - name: search-all
+  - name: search-all-local
     libraries:
       - name: syslib
         type: local
         locations:
           - '**'
+  - name: remote-libraries
+    language: cobol
+    compilerOptions: options
+    libraries:
+        - name: syslib
+          type: mvs
+          locations:
+             - BANKZ.DBB.BMS.COPY    # default name when running bank-of-z setup
 
 profiles:
   # TAZ

@@ -13,6 +13,7 @@ vars:
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
   db2_ssid: "DBD1"
+  mq_install_hlq: "????"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -48,10 +49,14 @@ cics_region:
         - SYS1.SIEAMIGE
         - SYS1.MIGLIB
         - "{{ vars.tcpip_hlq }}.SEZATCP"
+        - "{{ vars.mq_install_hlq }}.SCSQLOAD"
+        - "{{ vars.mq_install_hlq }}.SCSQAUTH"
     steplib:
       top_data_sets:
         - "{{ vars.db2_hlq }}.SDSNLOAD"
         - "{{ vars.db2_hlq }}.SDSNEXIT"
+      data_sets:
+        - "{{ vars.mq_install_hlq }}.SCSQAUTH"
 
   sit_parameters:
     start: INITIAL
@@ -60,6 +65,7 @@ cics_region:
     gmtran: CESL
     sec: "{{ vars.cics_sec }}"
     db2conn: "YES"
+    mqconn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
     resoverrides: resourceOverrides.cicsoverrides.yaml
@@ -93,3 +99,4 @@ cics_region:
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - path: "EYUSMSSJ.jvmprofile"
+ 

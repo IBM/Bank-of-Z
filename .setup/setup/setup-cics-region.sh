@@ -144,6 +144,12 @@ resourceOverrides:
         group: EQA
       overrides:
         portnumber: $CICS_DEBUG_PORT
+  - mqconn:
+    - selector:
+        name: BOZMQCON
+        group: BANKZGRP
+      overrides:
+        mqname: $MQ_QMGR_NAME
 EOF
 
 print_success "Overrides file created successfully!"
@@ -176,6 +182,8 @@ zconfig apply \
   -e tcpip_hlq="${DEBUG_TCPIP_HQL}" \
   -e cics_sec="${CICS_SEC}" \
   -e db2_ssid="${DB2_SSID}" \
+  -e mq_qmgr_name="${MQ_QMGR_NAME}" \
+  -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   cics-region.yaml
 
 RC=$?

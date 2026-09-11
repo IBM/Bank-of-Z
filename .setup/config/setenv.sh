@@ -167,6 +167,15 @@ DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
 
+# MQ
+MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
+MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
+MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')
+MQ_CPF=$(get_section_value 'mq' 'cpf')
+MQ_PROCLIB=$(get_section_value 'mq' 'proclib')
+MQ_OTMA_GROUP=$(get_section_value 'mq' 'otma_group')
+MQ_OTMA_IMS=$(get_section_value 'mq' 'otma_ims')
+
 # Zowe Configuration
 ZOWE_RSE_PROFILE="{{ zowe.rse_profile }}"
 RSE_PROFILE_ARG="--rse-profile {{ zowe.rse_profile }}"
@@ -209,3 +218,4 @@ if [ "$(uname)" = "OS/390" ]; then
 fi
 
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH
+

@@ -5,12 +5,11 @@
 version: "1.0.0"
 
 # Global properties
-# - Shared by middleware/tools 
+# - Shared by middleware/tools
 # - Subject to change with middleware/tools updates
 global:
-
   # Sandbox
-  sandbox_root: "/usr/local/sandboxes"
+  sandbox_root: "/u/ibmuser"
 
   # Application
   app_base_name: "BANKZ"
@@ -21,16 +20,16 @@ global:
   app_modification: "0"
 
   # Tools
-  java_home: "{{ sandbox.root }}/tools/J21.0_64"
-  python_home: "/usr/lpp/IBM/cyp/v3r14/pyz"
-  zoau_home: "/usr/lpp/IBM/zoau"  # versioned installs: /usr/lpp/IBM/zoau/v1r4 or /usr/lpp/IBM/zoau/v1r3  pre-1.3: /usr/lpp/IBM/zoautil
-  zconfig_home: "{{ global.sandbox_root }}/tools/zconfig"
-  zcb_home: "{{ global.sandbox_root }}/tools/zrb/cics-resource-builder-1.0.6"
-  dbb_home: "{{ global.sandbox_root }}/tools/dbb"
-  gradle_home:  "{{ global.sandbox_root }}/tools/gradle-9.5.1"
+  java_home: "{{ global.sandbox_root }}/J21.0_64"
+  python_home: "{{ global.sandbox_root }}/python/usr/lpp/IBM/cyp/v3r14/pyz"
+  zoau_home: "{{ global.sandbox_root }}/zoautil"
+  zconfig_home: "{{ global.sandbox_root }}/zconfig"
+  zcb_home: "{{ global.sandbox_root }}/cics-resource-builder"
+  dbb_home: "{{ global.sandbox_root }}/dbb"
+  gradle_home: "{{ global.sandbox_root }}/gradle/gradle-9.6.1"
   zcodescan_home: "/global/opt/pyenv/akf"
-  wazideploy_home: "/global/opt/pyenv/gdp"
-  zosconnect_home: "/usr/lpp/IBM/zosconnect"
+  wazideploy_home: "{{ global.sandbox_root }}/wazideploy/gdp"
+  zosconnect_home: "/usr/lpp/IBM/zosconnect/v3r0"
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
   # z/OS System
@@ -41,50 +40,49 @@ global:
   zos_create_certs: True
   sys_proclib: "SYS1.PROCLIB"
   tcpip_hlq: "TCPIP"
-  igzxjni2: "/usr/lpp/IBM/cobol/igyv6r5/lib/igzxjni2.x"
+  igzxjni2: "/usr/lpp/IBM/cobol/V6R4M0/lib/igzxjni2.x"
   igy_hlq: "IGY.V6R5M0"
-  fel_hlq: "FEL"
-  ipv_hlq: "IPV"
-  pli_hlq: "PLI.V6R2M0"
+  fel_hlq: "FEL.V16R0M0"
+  ipv_hlq: "IPV.V1R9M0"
+  pli_hlq: "IBMZ.V6R2M0"
   debug_hlq: "EQAW"
   asm_hlq: "ASM"
 
   # GUI
-  zosconnect_http_port: 9080
-  zosconnect_https_port: 9444
+  zosconnect_http_port: 23203
+  zosconnect_https_port: 23204
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
-  # Frontend (separate Liberty server - FE<APP_SHORT_NAME> on port 9445)
-  frontend_http_port: 9081
-  frontend_https_port: 9445
+  # Frontend
+  frontend_http_port: 23205
+  frontend_https_port: 23206
   frontend_task_user: "{{ global.zos_admin_user}}"
 
-
   # CICS
-  cics_hlq: "CICSTS63"
-  cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
+  cics_hlq: "DFH.V6R3M0"
+  cics_uss_dir: "/usr/lpp/cicsts/dfh630"
   cics_sec: "YES"
-  
+
   # IMS
-  ims_disabled: "false"
-  ims_sys_hlq: "IMSV15"
+  ims_disabled: "true"
+  ims_sys_hlq: "DFS.V15R1M0"
   ims_java_dir: "/usr/lpp/ims/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
   ims_ixvolser: "IMSV15"
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
-  
+
+  ims_java_home: "/usr/lpp/ims/ims15/imsjava"
   # DB2
-  db2_hlq: "DB2V13"
-  db2_dsntep: "DSNTEP13"
-  db2_ssid: "DBD1"
-  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
+  db2_hlq: "DSN.V12R1M0"
+  db2_dsntep: "DSNTEP12"
+  db2_ssid: "DBC1"
+  db2_runlib: "DSN121.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
-  - "CICSUSER"
-
+    - "CICSUSER"
 
 # Application properties
 app:
@@ -114,7 +112,7 @@ repositories:
 # Java Home
 java:
   java_home: "{{ global.java_home }}"
-  
+
 # Python Home
 python:
   python_home: "{{ global.python_home }}"
@@ -135,7 +133,7 @@ dbb:
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
   dbb_log_dir: "{{sandbox.path}}/logs/dbb"
-  gradle_home:  "{{ global.gradle_home }}"
+  gradle_home: "{{ global.gradle_home }}"
   igzxjni2: "{{ global.igzxjni2 }}"
   igy_hlq: "{{ global.igy_hlq }}"
   fel_hlq: "{{ global.fel_hlq }}"
@@ -205,9 +203,9 @@ cics:
   host: "localhost"
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
-  cmci_port: 27100
-  ipic_port: 4320
-  debug_port: 27103
+  cmci_port: 23200
+  ipic_port: 23201
+  debug_port: 23202
   sys_proclib: "{{ global.sys_proclib }}"
 
 # IMS attributes
@@ -218,18 +216,18 @@ ims:
   ims_java_home: "{{ global.java_home }}"
   datastore: "{{ global.ims_datastore }}"
   host: "localhost"
-  port: 9977
+  port: 23207
   user: "${IMS_USER}"
   password: "${IMS_PASSWORD}"
   ims_hlq: "{{app.app_hlq}}.{{ims.datastore}}"
   ims_home: "/usr/lpp/ims/ims15"
   ims_connect:
     hostname: "localhost"
-    port: 9977
-    ssl_port: 9966
+    port: 23208
+    ssl_port: 23209
   db2_database: "IMSBANK"
   db2_table: "HISTORY"
-  db2_plan_ibtran: "IBTRAN" 
+  db2_plan_ibtran: "IBTRAN"
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
@@ -255,38 +253,38 @@ ims:
   irlm_enablement: "{{ global.ims_irlm_enablement }}"
   database_lock_manager_server_name: "{{ global.ims_database_lock_manager_server_name }}"
   regions:
-  - with_db2: yes
-    use_pseudo_wfi: no
-    region_num: 1
-    dfsmpr_name: "DFSMPR1"
-    dfs_tranclass1: '007'
-    dfs_tranclass2: '000'
-    dfs_tranclass3: '000'
-    dfs_tranclass4: '000'
-    dfs_ims_syaff: ''
-  - with_db2: no
-    use_pseudo_wfi: no
-    region_num: 2
-    dfsmpr_name: "DFSMPR2"
-    dfs_tranclass1: '005'
-    dfs_tranclass2: '000'
-    dfs_tranclass3: '000'
-    dfs_tranclass4: '000'
-    dfs_ims_syaff: ''
-  - zcloud_leruntime: "CEE.SCEERUN"
-    zcloud_csslib: "SYS1.CSSLIB"
-    dfs_ims_syaff: ''
-    dfs_workingdir:  "${HOME}"
-    dfs_tranclass: '006'
-    dfs_tranclass1: '006'
-    dfs_tranclass2: '000'
-    dfs_tranclass3: '000'
-    dfs_tranclass4: '000'
-    dfs_appname: "IMS1BANK"
-    replace_member: yes
-    dfs_max_heapsize: 128
-    dfs_min_heapsize: 64
-    dfs_optionsfilepath: "${HOME}"
+    - with_db2: yes
+      use_pseudo_wfi: no
+      region_num: 1
+      dfsmpr_name: "DFSMPR1"
+      dfs_tranclass1: "007"
+      dfs_tranclass2: "000"
+      dfs_tranclass3: "000"
+      dfs_tranclass4: "000"
+      dfs_ims_syaff: ""
+    - with_db2: no
+      use_pseudo_wfi: no
+      region_num: 2
+      dfsmpr_name: "DFSMPR2"
+      dfs_tranclass1: "005"
+      dfs_tranclass2: "000"
+      dfs_tranclass3: "000"
+      dfs_tranclass4: "000"
+      dfs_ims_syaff: ""
+    - zcloud_leruntime: "CEE.SCEERUN"
+      zcloud_csslib: "SYS1.CSSLIB"
+      dfs_ims_syaff: ""
+      dfs_workingdir: "${HOME}"
+      dfs_tranclass: "006"
+      dfs_tranclass1: "006"
+      dfs_tranclass2: "000"
+      dfs_tranclass3: "000"
+      dfs_tranclass4: "000"
+      dfs_appname: "IMS1BANK"
+      replace_member: yes
+      dfs_max_heapsize: 128
+      dfs_min_heapsize: 64
+      dfs_optionsfilepath: "${HOME}"
 
 # DB2 configuration
 db2:

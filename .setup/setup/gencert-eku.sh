@@ -32,6 +32,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[GENCERT]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 set -e  # Exit immediately on any non-zero return code
 

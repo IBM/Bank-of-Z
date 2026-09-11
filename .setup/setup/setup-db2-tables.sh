@@ -20,6 +20,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[SETUP-DB2-TABLES]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 # =========================
 # Environment

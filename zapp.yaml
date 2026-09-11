@@ -17,12 +17,13 @@ propertyGroups:
           - '**'
   - name: remote-libraries
     language: cobol
-    compilerOptions: options
+    compilerOptions: CICS
     libraries:
         - name: syslib
           type: mvs
           locations:
              - BANKZ.DBB.BMS.COPY    # default name when running bank-of-z setup
+             - CICSTS63.CICS.SDFHCOB
 
 profiles:
   # TAZ

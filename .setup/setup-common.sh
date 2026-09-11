@@ -25,54 +25,25 @@ source "$SCRIPTS_DIR/config/setenv.sh"
 stage_stop_tasks() {
     set +e
     print_stage "STAGE: Stop Bank of Z running tasks (if any)"
+
     # =========================
-    # Stop IBM IMS regions
+    # Stop all running servers
+    # (delegated to servers-stop.sh — no data deletion)
     # =========================
-    # Delete stale stop members so jsub fails silently rather than executing
-    # outdated JCL that may reference deleted datasets.
-    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)" 2>/dev/null || true
-    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)" 2>/dev/null || true
-    mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)" 2>/dev/null || true
-    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"  2>/dev/null
-    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"  2>/dev/null
-    jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null
-    sleep 5
-    jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null
-    jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null
-    jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null
-    sleep 5
-    opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null
-    sleep 1
-    opercmd "C ${IMS_DATASTORE}OM" 2>/dev/null
-    sleep 1
-    opercmd "C ${IMS_DATASTORE}RM" 2>/dev/null
-    sleep 1
-    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null
-    sleep 1
-    # IMS Connect
-    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null
-    sleep 1
-    opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null
-    sleep 1
-    opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null
-    
+    if [ ! -f "$BANK_DIR/.setup/setup/servers-stop.sh" ]; then
+        print_error "Stop script not found: $BANK_DIR/.setup/setup/servers-stop.sh"
+        exit 1
+    fi
+    print_info "Running servers stop script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/servers-stop.sh --all"
+    cd "$BANK_DIR"
+    bash .setup/setup/servers-stop.sh --all
+
     # =========================
-    # Stop IBM CICS regions
+    # Stop IMS1 (legacy / spare)
     # =========================
-    jcan P "CICS${APP_SHORT_NAME}"  2>/dev/null
-    opercmd "C CICS${APP_SHORT_NAME}"  2>/dev/null
-    
-    # =========================
-    # Stop IBM zconn servers
-    # =========================
-    jcan P "BAQ${APP_SHORT_NAME}"  2>/dev/null
-    jcan P "FE${APP_SHORT_NAME}"  2>/dev/null
-    
-    # =========================
-    # Stop IMS1
-    # =========================
-    jcan P "IMS1*" 2>/dev/null
-    
+    jcan P "IMS1*" 2>/dev/null || true
+
     # ===========================
     # Clean application datasets
     # ===========================

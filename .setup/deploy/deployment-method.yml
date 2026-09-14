@@ -483,7 +483,8 @@ activities:
         description: |
           Restores the war file to Unix System Services
         types:
-          - name: "war"
+          - name: "WAR"
+          - name: "zCEE3"
         tags:
           - zosconnect_copy
         is_artifact: True
@@ -504,13 +505,11 @@ activities:
                 value: "template"
               - key: "var_template_name"
                 value: "template_name_zosconnect_config"
-              - key: "path_filter"
-                value: '^(?!.*-frontend).*\.war$'
             loop:
               loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
               loop_var: "api_name"
             types:
-              - name: "war"
+              - name: "ZOSCONNECT-CONFIG"
             tags:
               - zosconnect_config
             is_artifact: True
@@ -529,22 +528,18 @@ activities:
               value: 'system_command'
             - key: 'var_system_command'
               value: 'system_command_refresh_config'
-            - key: "path_filter"
-              value: '^(?!.*-frontend).*\.war$'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
           - name: 'Refresh z/OS Application'
             properties:
             - key: 'template'
               value: 'system_command'
-            - key: "path_filter"
-              value: '^(?!.*-frontend).*\.war$'
             - key: 'var_system_command'
               value: 'system_command_refresh_apps'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
-       - name: 'war'
+       - name: 'zCEE3'
     is_artifact: True
     tags:
     - zosconnect_refresh
@@ -559,14 +554,12 @@ activities:
             properties:
             - key: 'template'
               value: 'system_command'
-            - key: "path_filter"
-              value: '.*-frontend.*\.war$'
             - key: 'var_system_command'
               value: 'system_command_refresh_frontend'
             when:
               - wd_query[[ length ( current_plan_step.artifacts) ]] != 0
     types:
-       - name: 'war'
+       - name: 'WAR'
     is_artifact: True
     tags:
     - frontend_refresh

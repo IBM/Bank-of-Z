@@ -504,12 +504,12 @@ activities:
               - key: "template"
                 value: "template"
               - key: "var_template_name"
-                value: "template_name_zosconnect_config"
+                value: "template_name_zosconnect_config_boz"
             loop:
               loop_query: "wd_query[[ current_plan_step.artifacts[].name ]]"
               loop_var: "api_name"
             types:
-              - name: "ZOSCONNECT-CONFIG"
+             - name: "zCEE3"
             tags:
               - zosconnect_config
             is_artifact: True

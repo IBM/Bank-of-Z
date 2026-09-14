@@ -25,6 +25,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[GRANT-USER]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 # =========================
 # Parameter validation

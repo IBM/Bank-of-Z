@@ -103,13 +103,13 @@ stop_cics() {
     set +e
 
     # Check whether the CICS region is currently active
-    if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep -q "CICS${APP_SHORT_NAME}"; then
+    if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
         print_info "CICS${APP_SHORT_NAME} is active — issuing graceful shutdown..."
         opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
         sleep 10
 
         # Cancel only if still active after graceful shutdown attempt
-        if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep -q "CICS${APP_SHORT_NAME}"; then
+        if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
             print_info "CICS${APP_SHORT_NAME} still active — issuing cancel..."
             opercmd "C CICS${APP_SHORT_NAME}" 2>/dev/null || true
             sleep 2
@@ -128,11 +128,6 @@ stop_cics() {
 stop_ims_regions() {
     print_stage "STAGE: Stop IMS application regions (MPP / JMP)"
     set +e
-
-    print_info "Removing stale STOPMPP1 / STOPMPP2 / STOPJMP members..."
-    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
-    mrm "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
-    mrm "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
 
     print_info "Submitting STOPMPP1 / STOPMPP2 / STOPJMP JCL..."
     jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
@@ -258,6 +253,46 @@ start_ims_regions() {
 }
 
 #########################################################
+# Verify IMS status (Control Region, Connect, Port)
+# #########################################################
+verify_ims() {
+    print_stage "STAGE: Verify IMS status"
+    set +e
+
+    print_info "Waiting for IMS regions to stabilize..."
+    sleep 15
+
+    # Check if IMS Control Region is running
+    print_info "Checking IMS Control Region status..."
+    if opercmd "D A,${IMS_DATASTORE}" 2>/dev/null | grep "${IMS_DATASTORE}" >/dev/null 2>&1; then
+        print_success "IMS Control Region (${IMS_DATASTORE}) is running"
+    else
+        print_warning "IMS Control Region (${IMS_DATASTORE}) status could not be verified"
+    fi
+
+    # Check if IMS Connect is running
+    print_info "Checking IMS Connect status..."
+    IMS_HWS_JOB="${IMS_DATASTORE}HWS"
+    if opercmd "D A,${IMS_HWS_JOB}" 2>/dev/null | grep "${IMS_HWS_JOB}" >/dev/null 2>&1; then
+        print_success "IMS Connect (${IMS_HWS_JOB}) is running"
+    else
+        print_warning "IMS Connect (${IMS_HWS_JOB}) status could not be verified"
+    fi
+
+    # Check if port is listening
+    print_info "Checking if IMS Connect port ${IMS_PORT} is listening..."
+    if netstat -a 2>/dev/null | grep ":${IMS_PORT}.*LISTEN" >/dev/null 2>&1; then
+        print_success "IMS Connect is listening on port ${IMS_PORT}"
+    else
+        print_warning "Port ${IMS_PORT} status could not be verified (may still be initializing)"
+    fi
+
+    print_info "IMS Datastore: ${IMS_DATASTORE}"
+    print_info "IMS Connect Port: ${IMS_PORT}"
+    set -e
+}
+
+#########################################################
 # Start CICS region
 #########################################################
 start_cics() {
@@ -346,6 +381,7 @@ do_start() {
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
                 start_ims_control
                 start_ims_regions
+                verify_ims
             else
                 print_info "IMS_DISABLED=true — skipping IMS start"
             fi
@@ -355,6 +391,7 @@ do_start() {
         ims)
             start_ims_control
             start_ims_regions
+            verify_ims
             ;;
         cics)
             start_cics

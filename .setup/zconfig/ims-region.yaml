@@ -13,6 +13,7 @@ vars:
   ims_target_user: IBMUSER
   ims_ixvolser: "IMSV15"
   debug_hlq: EQAW
+  debug_stc_user: STCDBG
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
 ims:

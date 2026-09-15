@@ -28,16 +28,16 @@ stage_stop_tasks() {
 
     # =========================
     # Stop all running servers
-    # (delegated to servers-stop.sh — no data deletion)
+    # (no data deletion)
     # =========================
-    if [ ! -f "$BANK_DIR/.setup/setup/servers-stop.sh" ]; then
-        print_error "Stop script not found: $BANK_DIR/.setup/setup/servers-stop.sh"
+    if [ ! -f "$BANK_DIR/.setup/runtime-manage.sh" ]; then
+        print_error "Runtime manage script not found: $BANK_DIR/.setup/runtime-manage.sh"
         exit 1
     fi
-    print_info "Running servers stop script..."
-    print_info "Executing: bash $BANK_DIR/.setup/setup/servers-stop.sh --all"
+    print_info "Stopping all servers..."
+    print_info "Executing: bash $BANK_DIR/.setup/runtime-manage.sh stop all"
     cd "$BANK_DIR"
-    bash .setup/setup/servers-stop.sh --all
+    bash .setup/runtime-manage.sh stop all
 
     # =========================
     # Stop IMS1 (legacy / spare)

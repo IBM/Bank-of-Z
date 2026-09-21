@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #########################################################
-# runtime-manage.sh — Bank of Z runtime lifecycle manager
+# runtime-manage.sh - Bank of Z runtime lifecycle manager
 # This script runs directly on z/OS USS (not remotely)
 #
 # Manages the lifecycle (stop / start / restart) of the
@@ -19,7 +19,7 @@
 #   start     Start servers
 #   restart   Stop then start servers
 #
-# Scopes (required — no default):
+# Scopes (required - no default):
 #   all        IMS + CICS + z/OS Connect + Frontend
 #   ims        IMS control tasks + IRLM + app regions
 #   cics       CICS region
@@ -107,18 +107,18 @@ stop_cics() {
 
     # Check whether the CICS region is currently active
     if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
-        print_info "CICS${APP_SHORT_NAME} is active — issuing graceful shutdown..."
+        print_info "CICS${APP_SHORT_NAME} is active - issuing graceful shutdown..."
         opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
         sleep 10
 
         # Cancel only if still active after graceful shutdown attempt
         if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
-            print_info "CICS${APP_SHORT_NAME} still active — issuing cancel..."
+            print_info "CICS${APP_SHORT_NAME} still active - issuing cancel..."
             opercmd "C CICS${APP_SHORT_NAME}" 2>/dev/null || true
             sleep 2
         fi
     else
-        print_info "CICS${APP_SHORT_NAME} is not active — skipping"
+        print_info "CICS${APP_SHORT_NAME} is not active - skipping"
     fi
 
     print_success "CICS region stopped"
@@ -149,7 +149,7 @@ stop_ims_regions() {
         opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP2" 2>/dev/null || true
         sleep 5
     else
-        print_warning "CTL WTOR not found — falling back to JCL-based region stop"
+        print_warning "CTL WTOR not found - falling back to JCL-based region stop"
         jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
         jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
         jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
@@ -170,11 +170,11 @@ stop_ims_regions() {
 # Stop IMS control tasks + IRLM
 #
 # Follows the IBM IMS 15.4 recommended shutdown sequence:
-#   1. /CHECKPOINT PURGE  — quiesce in-flight work on CTL
-#   2. F HWS,SHUTDOWN MEMBER — graceful IMS Connect shutdown
-#   3. C ODB / DRC        — stop ODBM and DRD (no clean cmd)
-#   4. F SCI,SHUTDOWN CSLPLEX — stop OM/RM/SCI together
-#   5. C/F IRLM           — release the database lock manager
+#   1. /CHECKPOINT PURGE  - quiesce in-flight work on CTL
+#   2. F HWS,SHUTDOWN MEMBER - graceful IMS Connect shutdown
+#   3. C ODB / DRC        - stop ODBM and DRD (no clean cmd)
+#   4. F SCI,SHUTDOWN CSLPLEX - stop OM/RM/SCI together
+#   5. C/F IRLM           - release the database lock manager
 #
 # Environment variables:
 #   IMS_COLD_START   Set to "true" to force a cold start on
@@ -196,7 +196,7 @@ stop_ims_control() {
         opercmd "${REPLID},/CHECKPOINT PURGE" 2>/dev/null || true
         sleep 5
     else
-        print_warning "CTL WTOR reply ID not found — skipping /CHECKPOINT PURGE"
+        print_warning "CTL WTOR reply ID not found - skipping /CHECKPOINT PURGE"
     fi
 
     # Step 2: Graceful IMS Connect shutdown
@@ -228,7 +228,7 @@ stop_ims_control() {
     opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
     sleep 2
 
-    # Step 5: IRLM — try graceful abend with nodump first, then cancel
+    # Step 5: IRLM - try graceful abend with nodump first, then cancel
     print_info "Stopping ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
     opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
     sleep 2
@@ -245,8 +245,8 @@ stop_ims_control() {
 # After CTL starts it issues a WTOR asking what type of
 # restart to perform.  This function polls for that WTOR
 # and automatically replies:
-#   /NRESTART         — warm restart (default)
-#   /NRE CHECKPOINT 0 — cold start (IMS_COLD_START=true)
+#   /NRESTART         - warm restart (default)
+#   /NRE CHECKPOINT 0 - cold start (IMS_COLD_START=true)
 #
 # Environment variables:
 #   IMS_COLD_START   Set to "true" to reply with a cold
@@ -289,7 +289,7 @@ start_ims_control() {
 
     if [[ -n "$REPLID" ]]; then
         if [[ "${IMS_COLD_START:-false}" == "true" ]]; then
-            print_info "IMS_COLD_START=true — replying with /NRE CHECKPOINT 0 (cold start)..."
+            print_info "IMS_COLD_START=true - replying with /NRE CHECKPOINT 0 (cold start)..."
             opercmd "${REPLID},/NRE CHECKPOINT 0" 2>/dev/null || true
         else
             print_info "Replying with /NRESTART (warm restart) to REPLID=${REPLID}..."
@@ -297,7 +297,7 @@ start_ims_control() {
         fi
         sleep 10
     else
-        print_warning "CTL WTOR not detected after 60s — IMS may have started automatically or failed"
+        print_warning "CTL WTOR not detected after 60s - IMS may have started automatically or failed"
     fi
 
     print_info "Starting ${IMS_DATASTORE}ODB..."
@@ -437,7 +437,7 @@ do_stop() {
                 stop_ims_regions
                 stop_ims_control
             else
-                print_info "IMS_DISABLED=true — skipping IMS stop"
+                print_info "IMS_DISABLED=true - skipping IMS stop"
             fi
             ;;
         ims)
@@ -466,7 +466,7 @@ do_start() {
                 start_ims_regions
                 verify_ims
             else
-                print_info "IMS_DISABLED=true — skipping IMS start"
+                print_info "IMS_DISABLED=true - skipping IMS start"
             fi
             start_cics
             start_frontend

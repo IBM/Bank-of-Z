@@ -544,6 +544,24 @@ print_usage() {
 }
 
 #########################################################
+# Logging setup
+#########################################################
+setup_logging() {
+    # Default log root: $BANK_OF_Z_WORK_DIR/setup-logs (falls back to $BANK_DIR/setup-logs)
+    local log_root="${BANK_OF_Z_WORK_DIR:-$BANK_DIR}/setup-logs"
+    mkdir -p "$log_root"
+
+    local timestamp
+    timestamp=$(date '+%Y%m%d-%H%M%S')
+    LOG_FILE="${log_root}/setup-${timestamp}.log"
+
+    # Tee stdout+stderr to the log file while keeping terminal output intact
+    exec > >(tee -a "$LOG_FILE") 2>&1
+
+    print_info "Logging output to: $LOG_FILE"
+}
+
+#########################################################
 # Main execution
 #########################################################
 main_setup() {
@@ -662,6 +680,9 @@ main() {
 
     # Detect Execution Mode
     detect_bank_of_z_location
+
+    # Redirect all output to a timestamped log file (teed to terminal)
+    [[ "$phase" != "-h" && "$phase" != "--help" && "$phase" != "help" && -n "$phase" ]] && setup_logging
 
     case "$phase" in
         validate-prereqs)

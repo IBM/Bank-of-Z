@@ -364,17 +364,17 @@
 
       *-----------------------------------------------------------------
        MAIN-CONTROL.
-           PERFORM OPEN-FILES
+           PERFORM OPEN-FILES THRU OF-EXIT 
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-ALL-HEADERS
+               PERFORM WRITE-ALL-HEADERS THRU WAH-EXIT 
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM PROCESS-ALL-ACCOUNTS
+               PERFORM PROCESS-ALL-ACCOUNTS THRU PAA-EXIT 
            END-IF
            IF WS-RETURN-CODE = 0 OR WS-RETURN-CODE = 4
-               PERFORM WRITE-ALL-TRAILERS
+               PERFORM WRITE-ALL-TRAILERS THRU WAT-EXIT 
            END-IF
-           PERFORM CLOSE-FILES
+           PERFORM CLOSE-FILES THRU CF-EXIT 
            MOVE WS-RETURN-CODE TO RETURN-CODE
            STOP RUN.
 
@@ -432,12 +432,12 @@
            MOVE WS-DATE-WORK TO WS-RUN-DATE
            MOVE WS-RUN-DATE  TO WS-DL-DATE
 
-           PERFORM WRITE-SAV-HEADER
+           PERFORM WRITE-SAV-HEADER THRU WSH-EXIT 
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-ISA-HEADER
+               PERFORM WRITE-ISA-HEADER THRU WIH-EXIT
            END-IF
            IF WS-RETURN-CODE = 0
-               PERFORM WRITE-CUR-HEADER
+               PERFORM WRITE-CUR-HEADER THRU WCH-EXIT
            END-IF.
 
        WAH-EXIT.
@@ -587,7 +587,7 @@
            MOVE 'Y' TO WS-CURSOR-OPEN
 
            PERFORM UNTIL WS-CURSOR-EOF = 'Y'
-               PERFORM FETCH-ONE-ROW
+               PERFORM FETCH-ONE-ROW THRU FOR-EXIT
            END-PERFORM
 
            EXEC SQL CLOSE STMT-CURSOR
@@ -639,14 +639,14 @@
 
            EVALUATE SQLCODE
                WHEN 0
-                   PERFORM FORMAT-DETAIL-LINE
+                   PERFORM FORMAT-DETAIL-LINE THRU FDL-EXIT 
                    EVALUATE TRUE
                        WHEN HV-ACC-TYPE(1:6) = 'SAVING'
-                           PERFORM ROUTE-TO-SAVRPT
+                           PERFORM ROUTE-TO-SAVRPT THRU RTS-EXIT 
                        WHEN HV-ACC-TYPE(1:3) = 'ISA'
-                           PERFORM ROUTE-TO-ISARPT
+                           PERFORM ROUTE-TO-ISARPT THRU RTI-EXIT 
                        WHEN HV-ACC-TYPE(1:7) = 'CURRENT'
-                           PERFORM ROUTE-TO-CURRPT
+                           PERFORM ROUTE-TO-CURRPT THRU RTC-EXIT
                        WHEN OTHER
                            CONTINUE
                    END-EVALUATE
@@ -787,9 +787,9 @@
       * Write trailers to all three report files
       *-----------------------------------------------------------------
        WRITE-ALL-TRAILERS.
-           PERFORM WRITE-SAV-TRAILER
-           PERFORM WRITE-ISA-TRAILER
-           PERFORM WRITE-CUR-TRAILER.
+           PERFORM WRITE-SAV-TRAILER THRU WST-EXIT 
+           PERFORM WRITE-ISA-TRAILER THRU WIT-EXIT 
+           PERFORM WRITE-CUR-TRAILER THRU WCT-EXIT.
 
        WAT-EXIT.
            EXIT.

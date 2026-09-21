@@ -430,7 +430,7 @@ do_stop() {
     local scope="$1"
     case "$scope" in
         all)
-            # Stop order: Frontend → CICS → IMS
+            # Stop order: Frontend -> CICS -> IMS
             stop_frontend
             stop_cics
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
@@ -460,7 +460,7 @@ do_start() {
     local scope="$1"
     case "$scope" in
         all)
-            # Start order: IMS → CICS → Frontend
+            # Start order: IMS -> CICS -> Frontend
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
                 start_ims_control
                 start_ims_regions

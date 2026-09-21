@@ -168,7 +168,7 @@ print_info "========================================="
 print_info "Checking zconfig Installation"
 print_info "========================================="
 
-ZCONFIG_MIN_VERSION="0.8.0"
+ZCONFIG_MIN_VERSION="0.9.0"
 
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
     print_info "Found zconfig activation script: $ZCONFIG_HOME/bin/activate"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Test Case: Get Customer Details (IMS path)
-# Customer ID : 000000015 (IMS customer — routed via /api/ims/)
+# Customer ID : 000000015 (IMS customer - routed via /api/ims/)
 # Endpoints   : GET /api/ims/customers/{customerId}
 #               GET /api/ims/customers/{customerId}/accounts
 #               GET /api/ims/accounts/{customerId}/balances

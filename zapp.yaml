@@ -4,7 +4,7 @@ description: >-
   https://ibm.github.io/zopeneditor-about/Docs/setting_propertygroup.html
 author: Bank of Z Team
 propertyGroups:
-  - name: search-all
+  - name: search-all-local
     libraries:
       - name: syslib
         type: local
@@ -15,6 +15,15 @@ propertyGroups:
         type: mvs
         locations:
           - ${DTE_COPYBOOK_DATASET}
+  - name: remote-libraries
+    language: cobol
+    compilerOptions: CICS
+    libraries:
+        - name: syslib
+          type: mvs
+          locations:
+             - BANKZ.DBB.BMS.COPY    # default name when running bank-of-z setup
+             - CICSTS63.CICS.SDFHCOB
 
 profiles:
   # TAZ

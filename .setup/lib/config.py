@@ -88,21 +88,35 @@ def get_value(config, section, key):
     return value
 
 
+def resolve_template(config, template_file):
+    with open(template_file, "r", encoding="utf-8") as fd:
+        template_text = fd.read()
+    return Template(template_text).render(config)
+
+
 def main():
     config_file = os.environ.get("CONFIG_FILE")
     if not config_file:
         print("CONFIG_FILE environment variable is not defined", file=sys.stderr)
         sys.exit(1)
+
+    config = load_config(config_file)
+    config = render_config(config)
+
+    if len(sys.argv) == 3 and sys.argv[1] == "--resolve-template":
+        print(resolve_template(config, sys.argv[2]))
+        return
+
     if len(sys.argv) != 3:
         print(
-            f"Usage: {sys.argv[0]} <section> <key>",
+            f"Usage: {sys.argv[0]} <section> <key>\n"
+            f"       {sys.argv[0]} --resolve-template <template_file>",
             file=sys.stderr,
         )
         sys.exit(1)
+
     section = sys.argv[1]
     key = sys.argv[2]
-    config = load_config(config_file)
-    config = render_config(config)
     value = get_value(config, section, key)
     print(value)
 

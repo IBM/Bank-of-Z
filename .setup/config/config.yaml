@@ -47,6 +47,7 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
+  debug_stc_user: "STCDBG"  # STC userid for the Debug Profile Service task
   asm_hlq: "ASM"
 
   # GUI
@@ -170,9 +171,10 @@ wazideploy:
 # Debug
 debug:
   debug_hlq: "{{ global.debug_hlq }}"
+  debug_stc_user: "{{ global.debug_stc_user }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
   eqaprof_conf_dir: "{{ sandbox.path }}/debug"
-  eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
+  eqaprof_keystore_file: "safkeyring://{{ global.debug_stc_user }}/EQAPROF_Ring"
   eqaprof_port: 8192
   eqaprof_port_shutdown: 8105
 

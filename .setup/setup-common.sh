@@ -556,7 +556,7 @@ setup_logging() {
     LOG_FILE="${log_root}/setup-${timestamp}.log"
 
     # Tee to terminal as-is; prepend a timestamp on every line written to the log file
-    exec > >(tee >(awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush() }' >> "$LOG_FILE")) 2>&1
+    exec > >(tee >(while IFS= read -r line; do printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done >> "$LOG_FILE")) 2>&1
 
     print_info "Logging output to: $LOG_FILE"
 }

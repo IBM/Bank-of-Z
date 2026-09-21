@@ -32,7 +32,9 @@
 #   bash runtime-manage.sh restart frontend
 #
 # Environment variables:
-#   IMS_DISABLED   Set to true to skip all IMS tasks (default: false)
+#   IMS_DISABLED    Set to true to skip all IMS tasks (default: false)
+#   IMS_COLD_START  Set to true to perform a cold start on the next IMS
+#                   restart instead of a warm restart (default: false)
 #########################################################
 
 set -e
@@ -72,7 +74,8 @@ print_usage() {
     echo "  bash runtime-manage.sh restart cics"
     echo ""
     echo "Environment variables:"
-    echo "  IMS_DISABLED   Set to true to skip all IMS tasks (default: false)"
+    echo "  IMS_DISABLED    Set to true to skip all IMS tasks (default: false)"
+    echo "  IMS_COLD_START  Set to true to cold-start IMS on next restart (default: false)"
 }
 
 #########################################################
@@ -124,16 +127,34 @@ stop_cics() {
 
 #########################################################
 # Stop IMS application regions (MPP / JMP)
+# Uses IMS console commands routed via the CTL WTOR reply
+# so that IMS can quiesce transactions before stopping.
 #########################################################
 stop_ims_regions() {
     print_stage "STAGE: Stop IMS application regions (MPP / JMP)"
     set +e
 
-    print_info "Submitting STOPMPP1 / STOPMPP2 / STOPJMP JCL..."
-    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
-    jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
-    jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
-    sleep 5
+    # Resolve the current WTOR reply ID for the CTL region so we can
+    # issue /STOP REGION commands through the IMS console.
+    local REPLID
+    REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+             | grep -i "IMS READY" | awk '{print $1}' | head -1)
+
+    if [[ -n "$REPLID" ]]; then
+        print_info "Stopping dependent regions via IMS console (REPLID=${REPLID})..."
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}JMP1" 2>/dev/null || true
+        sleep 2
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP1" 2>/dev/null || true
+        sleep 2
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP2" 2>/dev/null || true
+        sleep 5
+    else
+        print_warning "CTL WTOR not found — falling back to JCL-based region stop"
+        jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
+        jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
+        jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
+        sleep 5
+    fi
 
     print_info "Cancelling ${IMS_DATASTORE}JMP1 / MPP1 / MPP2 (if still active)..."
     jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null || true
@@ -147,15 +168,43 @@ stop_ims_regions() {
 
 #########################################################
 # Stop IMS control tasks + IRLM
+#
+# Follows the IBM IMS 15.4 recommended shutdown sequence:
+#   1. /CHECKPOINT PURGE  — quiesce in-flight work on CTL
+#   2. F HWS,SHUTDOWN MEMBER — graceful IMS Connect shutdown
+#   3. C ODB / DRC        — stop ODBM and DRD (no clean cmd)
+#   4. F SCI,SHUTDOWN CSLPLEX — stop OM/RM/SCI together
+#   5. C/F IRLM           — release the database lock manager
+#
+# Environment variables:
+#   IMS_COLD_START   Set to "true" to force a cold start on
+#                    the next restart (uses /NRE CHECKPOINT 0
+#                    reply instead of /NRESTART).
 #########################################################
 stop_ims_control() {
     print_stage "STAGE: Stop IMS control tasks + IRLM"
     set +e
 
-    print_info "Stopping ${IMS_DATASTORE}HWS..."
-    opercmd "C ${IMS_DATASTORE}HWS" 2>/dev/null || true
-    sleep 1
+    # Step 1: Quiesce CTL via /CHECKPOINT PURGE
+    # Resolve the IMS WTOR reply ID first.
+    local REPLID
+    REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+             | grep -i "IMS READY" | awk '{print $1}' | head -1)
 
+    if [[ -n "$REPLID" ]]; then
+        print_info "Issuing /CHECKPOINT PURGE via CTL WTOR (REPLID=${REPLID})..."
+        opercmd "${REPLID},/CHECKPOINT PURGE" 2>/dev/null || true
+        sleep 5
+    else
+        print_warning "CTL WTOR reply ID not found — skipping /CHECKPOINT PURGE"
+    fi
+
+    # Step 2: Graceful IMS Connect shutdown
+    print_info "Shutting down ${IMS_DATASTORE}HWS (IMS Connect) gracefully..."
+    opercmd "F ${IMS_DATASTORE}HWS,SHUTDOWN MEMBER" 2>/dev/null || true
+    sleep 3
+
+    # Step 3: Stop ODBM and DRD (no graceful IMS console command for these)
     print_info "Stopping ${IMS_DATASTORE}ODB..."
     opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null || true
     sleep 1
@@ -164,23 +213,25 @@ stop_ims_control() {
     opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null || true
     sleep 1
 
-    print_info "Stopping ${IMS_DATASTORE}CTL..."
+    # Step 4: Shut down IMSplex components (SCI orchestrates OM and RM)
+    print_info "Shutting down IMS CTL region..."
     opercmd "C ${IMS_DATASTORE}CTL" 2>/dev/null || true
+    sleep 3
+
+    print_info "Shutting down IMSplex (OM/RM/SCI) via /F SCI,SHUTDOWN CSLPLEX..."
+    opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
+    sleep 3
+
+    # Fallback: cancel OM/RM/SCI individually if still active
+    opercmd "C ${IMS_DATASTORE}OM"  2>/dev/null || true
+    opercmd "C ${IMS_DATASTORE}RM"  2>/dev/null || true
+    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
     sleep 2
 
-    print_info "Stopping ${IMS_DATASTORE}OM..."
-    opercmd "C ${IMS_DATASTORE}OM" 2>/dev/null || true
-    sleep 1
-
-    print_info "Stopping ${IMS_DATASTORE}RM..."
-    opercmd "C ${IMS_DATASTORE}RM" 2>/dev/null || true
-    sleep 1
-
-    print_info "Stopping ${IMS_DATASTORE}SCI..."
-    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
-    sleep 1
-
+    # Step 5: IRLM — try graceful abend with nodump first, then cancel
     print_info "Stopping ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
+    opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
+    sleep 2
     opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
     sleep 2
 
@@ -189,10 +240,20 @@ stop_ims_control() {
 }
 
 #########################################################
-# Start IMS control tasks + IRLM (warm restart)
+# Start IMS control tasks + IRLM
+#
+# After CTL starts it issues a WTOR asking what type of
+# restart to perform.  This function polls for that WTOR
+# and automatically replies:
+#   /NRESTART         — warm restart (default)
+#   /NRE CHECKPOINT 0 — cold start (IMS_COLD_START=true)
+#
+# Environment variables:
+#   IMS_COLD_START   Set to "true" to reply with a cold
+#                    start instead of a warm restart.
 #########################################################
 start_ims_control() {
-    print_stage "STAGE: Start IMS control tasks + IRLM (warm restart)"
+    print_stage "STAGE: Start IMS control tasks + IRLM"
     set +e
 
     print_info "Starting ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
@@ -214,8 +275,30 @@ start_ims_control() {
     print_info "Submitting ${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL) via jsub..."
     jsub "${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL)" 2>/dev/null || true
 
-    print_info "Waiting for IMS CTL and dependent regions to initialise (30s)..."
-    sleep 30
+    # Poll for the IMS WTOR reply ID (CTL will wait for a restart type reply).
+    # IMS issues message DFS989I or similar with a WTOR when it is ready.
+    print_info "Waiting for IMS CTL WTOR (up to 60s)..."
+    local REPLID=""
+    local waited=0
+    while [[ -z "$REPLID" && $waited -lt 60 ]]; do
+        sleep 5
+        waited=$((waited + 5))
+        REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+                 | grep -i "IMS READY" | awk '{print $1}' | head -1)
+    done
+
+    if [[ -n "$REPLID" ]]; then
+        if [[ "${IMS_COLD_START:-false}" == "true" ]]; then
+            print_info "IMS_COLD_START=true — replying with /NRE CHECKPOINT 0 (cold start)..."
+            opercmd "${REPLID},/NRE CHECKPOINT 0" 2>/dev/null || true
+        else
+            print_info "Replying with /NRESTART (warm restart) to REPLID=${REPLID}..."
+            opercmd "${REPLID},/NRESTART" 2>/dev/null || true
+        fi
+        sleep 10
+    else
+        print_warning "CTL WTOR not detected after 60s — IMS may have started automatically or failed"
+    fi
 
     print_info "Starting ${IMS_DATASTORE}ODB..."
     opercmd "S ${IMS_DATASTORE}ODB" 2>/dev/null || true

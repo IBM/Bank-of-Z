@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-all.sh — Run every test_*.sh in the tests/ directory and report results.
+# run-all.sh - Run every test_*.sh in the tests/ directory and report results.
 #
 # Environment variables forwarded to each test script:
 #   BASE_URL           z/OS Connect API base URL  (e.g. http://<host>:<port>/api)
@@ -43,7 +43,7 @@ run_test() {
 }
 
 echo "================================================================"
-echo " Bank of Z — Installation Verification Tests"
+echo " Bank of Z - Installation Verification Tests"
 echo "================================================================"
 echo "================================================================"
 

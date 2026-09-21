@@ -26,6 +26,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[WAZIDEPLOY]${NC} %s\n" "${line}"
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 cd $SCRIPTS_DIR
 # =========================

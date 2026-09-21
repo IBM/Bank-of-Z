@@ -555,8 +555,29 @@ setup_logging() {
     timestamp=$(date '+%Y%m%d-%H%M%S')
     LOG_FILE="${log_root}/setup-${timestamp}.log"
 
-    # Tee to terminal as-is; prepend a timestamp on every line written to the log file
-    exec > >(tee >(while IFS= read -r line; do printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"; done >> "$LOG_FILE")) 2>&1
+    # Save the original terminal fd so we can keep writing to it directly
+    exec 3>&1
+
+    # Named pipe lets the background timestamping loop drain the log copy
+    # asynchronously — the main script never blocks waiting for the log writer
+    _LOG_FIFO="${log_root}/.log-pipe-$$"
+    mkfifo "$_LOG_FIFO"
+
+    # Background loop: read from the FIFO, prepend timestamp, write to log file
+    while IFS= read -r line; do
+        printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"
+    done < "$_LOG_FIFO" >> "$LOG_FILE" &
+    _LOG_BG_PID=$!
+
+    # Remove the FIFO path immediately; the open fd keeps it alive until both
+    # ends close (works on z/OS USS)
+    rm -f "$_LOG_FIFO"
+
+    # Redirect stdout to a tee-like split: fd 3 (terminal) + FIFO (log worker)
+    exec > >(while IFS= read -r line; do
+        printf '%s\n' "$line" >&3
+        printf '%s\n' "$line" > "$_LOG_FIFO"
+    done) 2>&1
 
     print_info "Logging output to: $LOG_FILE"
 }

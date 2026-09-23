@@ -13,6 +13,9 @@ vars:
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
   db2_ssid: "DBD1"
+  proclib: "SYS1.PROCLIB"
+  cics_ipic_port: 4320
+  cics_debug_port: 27103
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -38,8 +41,9 @@ cics_region:
   region_hlq: "{{ vars.region_hlq }}.{{ vars.applid }}"
 
   region_jcl:
-    type: JOB
-    job_parameters:
+    type: PROC
+    dsn: "{{ vars.proclib }}({{ vars.applid }})"
+    cics_exec_step_parameters:
       region: 0M
     dfhrpl:
       top_data_sets:
@@ -62,7 +66,6 @@ cics_region:
     db2conn: "YES"
     securetcpip: "NO"
     ussconfig: "{{ vars.region_uss_dir }}/{{ vars.applid }}/config"
-    resoverrides: resourceOverrides.cicsoverrides.yaml
     xtran: "NO"
     xcmd: "NO"
     xdb2: "NO"

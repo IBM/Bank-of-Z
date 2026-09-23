@@ -1124,7 +1124,7 @@ resourceDefinitions:
       name: ZOSEE
       group: BANKZGRP
       description: ZOS CONNECT EE TCPIPS
-      portnumber: 1234
+      portnumber: "{{ vars.cics_ipic_port }}"
       protocol: IPIC
       urm: DFHISAIP
       transaction: CISS
@@ -1209,7 +1209,7 @@ resourceDefinitions:
       group: BANKZGRP
       description: "MQCONN for Bank of z"
       #Set from overrides
-      mqname: XXXX
+      mqname: "{{ vars.mq_qmgr_name }}"
       initqname: BOZ.CICS.INITQ
       resyncmember: YES
 

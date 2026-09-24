@@ -1,0 +1,16 @@
+JAVA_HOME={{ vars.java_home }}
+WORK_DIR={{ vars.region_uss_dir }}
+-Xms128M
+-Xmx1G
+-Xmso1M
+-Dfile.encoding=ISO-8859-1
+WLP_INSTALL_DIR={{ vars.cics_uss_dir }}/wlp
+STDOUT=//DD:JVMOUT
+STDERR=//DD:JVMERR
+JVMTRACE=//DD:JVMTRACE
+JVMLOG=//DD:JVMLOG
+-Xgcpolicy:gencon
+-Xscmx128M
+-Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
+_BPXK_DISABLE_SHLIB=YES
+-Dcom.ibm.tools.attach.enable=no

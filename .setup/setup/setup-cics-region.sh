@@ -68,14 +68,6 @@ if [[ "$APP_HLQ" != "BANKZ" ]]; then
     cat "$DEBUG_BACKUP" | sed "s/BANKZ.CICSBOZ/${APP_HLQ}.CICS${APP_SHORT_NAME}/" > "$DEBUG_FILE"
 fi
 
-if [[ "$DB2_SSID" != "DBD1" ]]; then
-    if [ ! -f "$BACKUP_FILE" ]; then
-        cp "$DEFINITION_FILE" "$BACKUP_FILE"
-    fi
-    cp "$DEFINITION_FILE" "/tmp/bank-of-z-definitions.yaml"
-    cat "/tmp/bank-of-z-definitions.yaml" | sed "s/DBD1/${DB2_SSID}/"  > "$DEFINITION_FILE"
-    rm -f "/tmp/bank-of-z-definitions.yaml"
-fi
 
 # =========================
 # Cleanup
@@ -86,6 +78,8 @@ sleep 10
 drm "${APP_HLQ}.${APP_ZOS_VERSION}.*" 2>/dev/null
 drm "${APP_HLQ}.CICS${APP_SHORT_NAME}.*"  2>/dev/null
 drm "${APP_HLQ}.DBB.*"  2>/dev/null
+mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})" 2>/dev/null || true
+mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
 sleep 5
 rm -rf "$SCRIPTS_DIR/logs"
 rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
@@ -94,65 +88,10 @@ set -e
 
 tsocmd "ALLOC DA('${APP_HLQ}.${APP_ZOS_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LIBRARY) DSORG(PO) RECFM(U) BLKSIZE(32760) SPACE(100,20) CYL"
 
-# =============================================
-# Stage 1: Create JVM profile file
-# =============================================
-print_stage "STAGE 1: Create JVM profile file"
-
-zconfig_dir="$SCRIPTS_DIR/../zconfig"
-
-cat > "$zconfig_dir/EYUSMSSJ.jvmprofile" <<EOF
-JAVA_HOME=$JAVA_HOME
-WORK_DIR=$SANDBOX_DIR
--Xms128M
--Xmx1G
--Xmso1M
--Dfile.encoding=ISO-8859-1
-WLP_INSTALL_DIR=${CICS_USS_DIR}/wlp
-STDOUT=//DD:JVMOUT
-STDERR=//DD:JVMERR
-JVMTRACE=//DD:JVMTRACE
-JVMLOG=//DD:JVMLOG
--Xgcpolicy:gencon
--Xscmx128M
--Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
-_BPXK_DISABLE_SHLIB=YES
--Dcom.ibm.tools.attach.enable=no
-EOF
-
-print_success "JVM profile file created successfully!"
-
-# =============================================
-# Stage 2: Create CICS resource overrides file
-# =============================================
-print_stage "STAGE 2: Create CICS resource overrides file"
-
-uss_config_dir="$SANDBOX_DIR/CICS$APP_SHORT_NAME/config"
-rm -rf "$uss_config_dir"
-mkdir -p "$uss_config_dir/resourceoverrides"
-
-cat > "$uss_config_dir/resourceoverrides/resourceOverrides.cicsoverrides.yaml" <<EOF
-schemaVersion: resourceOverrides/1.200
-resourceOverrides:
-  - tcpipservice:
-    - selector:
-        name: ZOSEE
-        group: BANKZGRP
-      overrides:
-        portnumber: $CICS_IPIC_PORT
-    - selector:
-        name: EQADTCN
-        group: EQA
-      overrides:
-        portnumber: $CICS_DEBUG_PORT
-EOF
-
-print_success "Overrides file created successfully!"
-
 # =========================
-# Stage 3: Create CICS instance with zconfig
+# Stage 1: Create CICS instance with zconfig
 # =========================
-print_stage "STAGE 3: Create CICS instance with zconfig"
+print_stage "STAGE 1: Create CICS instance with zconfig"
 
 export PATH="$ZCONFIG_ZCB_HOME/bin:$PATH"
 
@@ -178,6 +117,9 @@ zconfig apply \
   -e tcpip_hlq="${DEBUG_TCPIP_HQL}" \
   -e cics_sec="${CICS_SEC}" \
   -e db2_ssid="${DB2_SSID}" \
+  -e proclib="${CICS_SYS_PROCLIB}" \
+  -e cics_ipic_port="${CICS_IPIC_PORT}" \
+  -e cics_debug_port="${CICS_DEBUG_PORT}" \
   cics-region.yaml
 
 RC=$?
@@ -192,9 +134,9 @@ fi
 deactivate
 
 # =========================
-# Stage 4: Create DEBUG Items
+# Stage 2: Create DEBUG Items
 # =========================
-print_stage "Stage 4: Create DEBUG Items"
+print_stage "STAGE 2: Create DEBUG Items"
 export RIGHT='APPLID of CICS                       X'
 export LEFT='               APPLID=CICS'
 export SPACES=$((8-${#APP_SHORT_NAME} - 1))
@@ -208,63 +150,55 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 run_job_and_wait "/tmp/tcpip-create-$$.jcl"
 
 # =========================
-# # Stage 5: Configure RACF STARTED profile
+# Stage 3: Configure RACF profiles
 # =========================
-print_info "Configuring RACF STARTED profile..."
+print_stage "STAGE 3: Configure RACF profiles"
+print_info "Configuring RACF profiles..."
 set +e
 print_info "Defining RACF STARTED class..."
 tsocmd "RDEFINE STARTED CICS${APP_SHORT_NAME}.* STDATA(USER(${CICS_USER}) TRUSTED(YES))" 2>/dev/null
+
+print_info "Defining RACF ACICSPCT profiles and permissions..."
+for p in OCR1 OCR2 OCR3 OCR4 OCR5; do
+    tsocmd "RDEFINE ACICSPCT $p UACC(NONE)" 2>/dev/null
+    tsocmd "PERMIT $p CLASS(ACICSPCT) ID(${CICS_USER}) ACCESS(READ)" 2>/dev/null
+done
+
+print_info "Defining RACF DCICSDCT profiles and permissions..."
+tsocmd "RDEFINE DCICSDCT CESE UACC(NONE)" 2>/dev/null
+tsocmd "PERMIT CESE CLASS(DCICSDCT) ID(${CICS_USER}) ACCESS(UPDATE)" 2>/dev/null
+
 print_info "Refreshing RACF..."
-tsocmd "SETROPTS RACLIST(STARTED) REFRESH" 2>/dev/null
-print_info "Removing old PROCLIB member..."
-mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})" 2>/dev/null || true
+tsocmd "SETROPTS RACLIST(STARTED ACICSPCT DCICSDCT) REFRESH" 2>/dev/null
 chmod 777 "$SANDBOX_DIR"
 chmod -R 777 "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
 chown -R "$CICS_USER" "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
 set -e
 
 # =========================
-# Stage 6: Generate CICS proc
+# Stage 4: Start CICS region
 # =========================
-# Create JCL with each line padded to exactly 80 characters for FB80 dataset
-rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-cat > "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" << EOF
-//CICS${APP_SHORT_NAME}  PROC
-//*
-//* Bank of Z CICS started task
-//*
-//SUBMIT   EXEC PGM=IEBGENER
-//SYSPRINT DD SYSOUT=*
-//SYSIN    DD DUMMY
-//SYSUT1   DD DISP=SHR,DSN=${APP_HLQ}.CICS${APP_SHORT_NAME}.DFHSTART
-//SYSUT2   DD SYSOUT=(,INTRDR)
-//         PEND
-EOF
-
-# Convert to EBCDIC
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-
-# Copy to PROCLIB using dcp
-print_info "Copying JCL to ${CICS_SYS_PROCLIB}..."
-dcp "/tmp/CICS${APP_SHORT_NAME}-$$.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
-
-# Clean up temp files
-rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
-
-python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
-    --extraVar "proclib=${CICS_SYS_PROCLIB}" --extraVar "task_name=CICS${APP_SHORT_NAME}" \
-    --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/CICS${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/CICS${APP_SHORT_NAME}J.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
-
-# =========================
-# Stage 7: Start CICS region
-# =========================
-print_stage "STAGE 5: Start CICS region"
+print_stage "STAGE 4: Start CICS region"
 if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+    # PROC was written directly into the system PROCLIB by zconfig — start it as a started task
     opercmd "S CICS${APP_SHORT_NAME}"
 else
-    jsub "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)" 2>/dev/null
+    # App-owned PROCLIB is not in the system PROCLIB concatenation, so 'S' won't find the PROC.
+    # Build a JOB inline that sets JCLLIB to the app PROCLIB and EXECs the PROC, then submit it.
+    SUBMIT_JCL="/tmp/CICS${APP_SHORT_NAME}J-$$.jcl"
+    cat > "$SUBMIT_JCL" << EOF
+//CICS${APP_SHORT_NAME} JOB (${ZOS_CURRENT_USER}),MSGCLASS=X,CLASS=A,NOTIFY=&SYSUID,
+//  REGION=0M,USER=${ZOS_CURRENT_USER}
+//PROCLIB  JCLLIB  ORDER=${CICS_SYS_PROCLIB}
+//CICSSTEP EXEC PROC=CICS${APP_SHORT_NAME}
+/*
+EOF
+    a2e -f ISO8859-1 -t IBM-1047 "$SUBMIT_JCL"
+    print_info "Saving start JCL to ${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)..."
+    dcp "$SUBMIT_JCL" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
+    print_info "Submitting CICS start job via jsub..."
+    jsub -f "$SUBMIT_JCL"
+    rm -f "$SUBMIT_JCL"
 fi
 sleep 5
 print_info "CICS Region Job Started"
@@ -280,10 +214,6 @@ else
 fi
 print_info ""
 
-# =========================
-# Stage 8: Cleanup
-# =========================
-rm -f "$zconfig_dir/EYUSMSSJ.jvmprofile"
 print_success "CICS Bank of Z setup completed"
- 
+
 exit 0

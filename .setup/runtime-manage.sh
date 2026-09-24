@@ -95,6 +95,31 @@ is_task_running() {
 }
 
 #########################################################
+# Helper: Wait for a z/OS task to be up and running
+#########################################################
+wait_for_task_running() {
+    local task_name="$1"
+    local description="${2:-$task_name}"
+    local max_checks="${3:-6}"
+    local interval="${4:-5}"
+
+    print_info "Waiting for ${description} to start..."
+    local count=0
+    while ! is_task_running "${task_name}" && [[ $count -lt $max_checks ]]; do
+        sleep "$interval"
+        count=$((count + 1))
+    done
+
+    if is_task_running "${task_name}"; then
+        print_success "${description} (${task_name}) is running"
+        return 0
+    else
+        print_warning "${description} (${task_name}) status could not be verified"
+        return 1
+    fi
+}
+
+#########################################################
 # Stop z/OS Connect and Frontend Liberty servers
 #########################################################
 stop_frontend() {
@@ -412,18 +437,23 @@ start_ims_control() {
             print_info "Replying with /NRESTART (warm restart) to REPLID=${REPLID}..."
             opercmd "${REPLID},/NRESTART" 2>/dev/null || true
         fi
-        sleep 10
     else
         print_warning "CTL WTOR not detected after 60s - IMS may have started automatically or failed"
     fi
 
     print_info "Starting ${IMS_DATASTORE}ODB..."
     opercmd "S ${IMS_DATASTORE}ODB" 2>/dev/null || true
-    sleep 2
 
     print_info "Starting ${IMS_DATASTORE}HWS..."
     opercmd "S ${IMS_DATASTORE}HWS" 2>/dev/null || true
-    sleep 2
+
+    wait_for_task_running "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" "IRLM lock manager"
+    wait_for_task_running "${IMS_DATASTORE}SCI" "IMS SCI"
+    wait_for_task_running "${IMS_DATASTORE}OM" "IMS OM"
+    wait_for_task_running "${IMS_DATASTORE}RM" "IMS RM"
+    wait_for_task_running "${IMS_DATASTORE}CTL" "IMS CTL region"
+    wait_for_task_running "${IMS_DATASTORE}ODB" "IMS ODB"
+    wait_for_task_running "${IMS_DATASTORE}HWS" "IMS Connect (HWS)"
 
     print_success "IMS control tasks and IRLM started"
     set -e
@@ -447,6 +477,11 @@ start_ims_regions() {
     print_info "Submitting STARTJMP (JMP region)..."
     jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)" 2>/dev/null || true
     sleep 5
+
+
+    wait_for_task_running "${IMS_DATASTORE}MPP2" "IMS MPP2 region"
+    wait_for_task_running "${IMS_DATASTORE}MPP1" "IMS MPP1 region"
+    wait_for_task_running "${IMS_DATASTORE}JMP1" "IMS JMP region"
 
     print_success "IMS application regions started"
     set -e
@@ -512,6 +547,8 @@ start_cics() {
         print_success "CICS region start command issued"
     fi
 
+    wait_for_task_running "CICS${APP_SHORT_NAME}" "CICS region"
+
     set -e
 }
 
@@ -549,6 +586,9 @@ start_frontend() {
         sleep 3
         print_success "FE${APP_SHORT_NAME} (Frontend Liberty) start command issued"
     fi
+
+    wait_for_task_running "BAQ${APP_SHORT_NAME}" "z/OS Connect server"
+    wait_for_task_running "FE${APP_SHORT_NAME}" "Frontend Liberty server"
 
     set -e
 }

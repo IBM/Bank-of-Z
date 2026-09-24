@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./cics_region_0.7.0.schema.json
+# yaml-language-server: $schema=./cics_region_0.9.0.schema.json
 vars:
   applid: "CICSBOZ"
   sysid: "CBOZ"
@@ -72,7 +72,8 @@ cics_region:
     xtst: "NO"
     xdct: "NO"
     tcpip: "YES"
-    initparm: "(EQA0CPLT='NWP,NLE,DTR')"
+    initparm:
+      eqa0cplt: "NWP,NLE,DTR"
 
   startup_programs:
     second_phase:

@@ -639,9 +639,12 @@ main() {
             main_validation
             ;;
         environment)
+            main_validation
             main_setup
             ;;
         install-bank-of-z)
+            main_validation
+            
             if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then
                 print_success "Remote pipeline completed successfully"
             else

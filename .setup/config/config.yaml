@@ -50,13 +50,13 @@ global:
   asm_hlq: "ASM"
 
   # GUI
-  zosconnect_http_port: 23203
-  zosconnect_https_port: 23204
+  zosconnect_http_port: 21403
+  zosconnect_https_port: 21404
   zosconnect_task_user: "{{ global.zos_admin_user }}"
 
   # Frontend
-  frontend_http_port: 23205
-  frontend_https_port: 23206
+  frontend_http_port: 21405
+  frontend_https_port: 21406
   frontend_task_user: "{{ global.zos_admin_user}}"
 
   # CICS
@@ -205,9 +205,9 @@ cics:
   host: "localhost"
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
-  cmci_port: 23200
-  ipic_port: 23201
-  debug_port: 23202
+  cmci_port: 21400
+  ipic_port: 21401
+  debug_port: 21402
   sys_proclib: "{{ global.sys_proclib }}"
 
 # IMS attributes
@@ -218,15 +218,15 @@ ims:
   ims_java_home: "{{ global.java_home }}"
   datastore: "{{ global.ims_datastore }}"
   host: "localhost"
-  port: 23207
+  port: 21407
   user: "${IMS_USER}"
   password: "${IMS_PASSWORD}"
   ims_hlq: "{{app.app_hlq}}.{{ims.datastore}}"
   ims_home: "/usr/lpp/ims/ims15"
   ims_connect:
     hostname: "localhost"
-    port: 23208
-    ssl_port: 23209
+    port: 21408
+    ssl_port: 21409
   db2_database: "IMSBANK"
   db2_table: "HISTORY"
   db2_plan_ibtran: "IBTRAN"

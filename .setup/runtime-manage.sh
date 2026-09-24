@@ -18,6 +18,7 @@
 #   stop      Stop servers (no data deletion)
 #   start     Start servers
 #   restart   Stop then start servers
+#   verify    Verify if servers are running
 #
 # Scopes (required - no default):
 #   all        IMS + CICS + z/OS Connect + Frontend
@@ -30,6 +31,7 @@
 #   bash runtime-manage.sh start ims
 #   bash runtime-manage.sh restart cics
 #   bash runtime-manage.sh restart frontend
+#   bash runtime-manage.sh verify all
 #
 # Environment variables:
 #   IMS_DISABLED    Set to true to skip all IMS tasks (default: false)
@@ -61,6 +63,7 @@ print_usage() {
     echo "  stop      Stop servers (no data deletion)"
     echo "  start     Start servers"
     echo "  restart   Stop then start servers"
+    echo "  verify    Verify if servers are running"
     echo ""
     echo "Scopes (required):"
     echo "  all        IMS + CICS + z/OS Connect + Frontend"
@@ -72,6 +75,7 @@ print_usage() {
     echo "  bash runtime-manage.sh stop all"
     echo "  bash runtime-manage.sh start ims"
     echo "  bash runtime-manage.sh restart cics"
+    echo "  bash runtime-manage.sh verify all"
     echo ""
     echo "Environment variables:"
     echo "  IMS_DISABLED    Set to true to skip all IMS tasks (default: false)"
@@ -488,44 +492,48 @@ start_ims_regions() {
 }
 
 #########################################################
-# Verify IMS status (Control Region, Connect, Port)
-# #########################################################
+# Verify IMS status (Control, IRLM, CSL, Regions, Connect, Port)
+#########################################################
 verify_ims() {
     print_stage "STAGE: Verify IMS status"
     set +e
 
-    print_info "Waiting for IMS regions to stabilize..."
-    sleep 15
+    local ims_tasks=(
+        "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}:IRLM lock manager"
+        "${IMS_DATASTORE}SCI:IMS SCI"
+        "${IMS_DATASTORE}OM:IMS OM"
+        "${IMS_DATASTORE}RM:IMS RM"
+        "${IMS_DATASTORE}CTL:IMS Control Region"
+        "${IMS_DATASTORE}ODB:IMS ODB"
+        "${IMS_DATASTORE}HWS:IMS Connect (HWS)"
+        "${IMS_DATASTORE}MPP1:IMS MPP1 region"
+        "${IMS_DATASTORE}MPP2:IMS MPP2 region"
+        "${IMS_DATASTORE}JMP1:IMS JMP region"
+    )
 
-    # Check if IMS Control Region is running
-    print_info "Checking IMS Control Region status..."
-    if is_task_running "${IMS_DATASTORE}"; then
-        print_success "IMS Control Region (${IMS_DATASTORE}) is running"
-    else
-        print_warning "IMS Control Region (${IMS_DATASTORE}) status could not be verified"
-    fi
+    for entry in "${ims_tasks[@]}"; do
+        local task_name="${entry%%:*}"
+        local task_desc="${entry#*:}"
+        if is_task_running "${task_name}"; then
+            print_success "${task_desc} (${task_name}) is running"
+        else
+            print_warning "${task_desc} (${task_name}) is not running"
+        fi
+    done
 
-    # Check if IMS Connect is running
-    print_info "Checking IMS Connect status..."
-    IMS_HWS_JOB="${IMS_DATASTORE}HWS"
-    if is_task_running "${IMS_HWS_JOB}"; then
-        print_success "IMS Connect (${IMS_HWS_JOB}) is running"
-    else
-        print_warning "IMS Connect (${IMS_HWS_JOB}) status could not be verified"
-    fi
-
-    # Check if port is listening
+    # Check if IMS Connect port is listening
     print_info "Checking if IMS Connect port ${IMS_PORT} is listening..."
     if netstat -a 2>/dev/null | grep ":${IMS_PORT}.*LISTEN" >/dev/null 2>&1; then
         print_success "IMS Connect is listening on port ${IMS_PORT}"
     else
-        print_warning "Port ${IMS_PORT} status could not be verified (may still be initializing)"
+        print_warning "Port ${IMS_PORT} status could not be verified (not listening)"
     fi
 
     print_info "IMS Datastore: ${IMS_DATASTORE}"
     print_info "IMS Connect Port: ${IMS_PORT}"
     set -e
 }
+
 #########################################################
 # Start CICS region
 #########################################################
@@ -548,6 +556,22 @@ start_cics() {
     fi
 
     wait_for_task_running "CICS${APP_SHORT_NAME}" "CICS region"
+
+    set -e
+}
+
+#########################################################
+# Verify CICS status
+#########################################################
+verify_cics() {
+    print_stage "STAGE: Verify CICS status"
+    set +e
+
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
+        print_success "CICS region (CICS${APP_SHORT_NAME}) is running"
+    else
+        print_warning "CICS region (CICS${APP_SHORT_NAME}) is not running"
+    fi
 
     set -e
 }
@@ -589,6 +613,28 @@ start_frontend() {
 
     wait_for_task_running "BAQ${APP_SHORT_NAME}" "z/OS Connect server"
     wait_for_task_running "FE${APP_SHORT_NAME}" "Frontend Liberty server"
+
+    set -e
+}
+
+#########################################################
+# Verify z/OS Connect and Frontend Liberty servers
+#########################################################
+verify_frontend() {
+    print_stage "STAGE: Verify z/OS Connect and Frontend Liberty servers"
+    set +e
+
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_success "z/OS Connect server (BAQ${APP_SHORT_NAME}) is running"
+    else
+        print_warning "z/OS Connect server (BAQ${APP_SHORT_NAME}) is not running"
+    fi
+
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_success "Frontend Liberty server (FE${APP_SHORT_NAME}) is running"
+    else
+        print_warning "Frontend Liberty server (FE${APP_SHORT_NAME}) is not running"
+    fi
 
     set -e
 }
@@ -655,6 +701,33 @@ do_start() {
 }
 
 #########################################################
+# Dispatch verify by scope
+#########################################################
+do_verify() {
+    local scope="$1"
+    case "$scope" in
+        all)
+            if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
+                verify_ims
+            else
+                print_info "IMS_DISABLED=true - skipping IMS verification"
+            fi
+            verify_cics
+            verify_frontend
+            ;;
+        ims)
+            verify_ims
+            ;;
+        cics)
+            verify_cics
+            ;;
+        frontend)
+            verify_frontend
+            ;;
+    esac
+}
+
+#########################################################
 # Main
 #########################################################
 main() {
@@ -666,7 +739,7 @@ main() {
             print_usage
             exit 0
             ;;
-        stop|start|restart)
+        stop|start|restart|verify)
             ;;
         "")
             print_error "Action is required."
@@ -721,6 +794,12 @@ main() {
             do_start "$scope"
             print_stage "RESTART COMPLETE"
             print_success "All requested servers have been restarted."
+            ;;
+        verify)
+            print_stage "ACTION: Verify Bank of Z servers (scope: ${scope})"
+            do_verify "$scope"
+            print_stage "VERIFY COMPLETE"
+            print_success "Server status verification completed."
             ;;
     esac
 }

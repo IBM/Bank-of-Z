@@ -124,6 +124,21 @@ wait_for_task_running() {
 }
 
 #########################################################
+# Helper: Wait for a z/OS task to stop running
+#########################################################
+wait_for_task_termination() {
+    local task_name="$1"
+    local max_checks="${2:-6}"
+    local interval="${3:-5}"
+
+    local count=0
+    while is_task_running "${task_name}" && [[ $count -lt $max_checks ]]; do
+        sleep "$interval"
+        count=$((count + 1))
+    done
+}
+
+#########################################################
 # Stop z/OS Connect and Frontend Liberty servers
 #########################################################
 stop_frontend() {
@@ -136,18 +151,13 @@ stop_frontend() {
         opercmd "P BAQ${APP_SHORT_NAME}" 2>/dev/null || true
 
         # Wait up to 25s (5 checks x 5s) for graceful shutdown
-        local count=0
-        while is_task_running "BAQ${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
-            sleep 5
-            count=$((count + 1))
-        done
+        wait_for_task_termination "BAQ${APP_SHORT_NAME}"
 
         # Cancel only if still active after stop attempt
         if is_task_running "BAQ${APP_SHORT_NAME}"; then
             print_info "BAQ${APP_SHORT_NAME} still active - issuing cancel..."
             jcan P "BAQ${APP_SHORT_NAME}" 2>/dev/null || true
             opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
-            sleep 2
         fi
     else
         print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is not active - skipping"
@@ -159,18 +169,13 @@ stop_frontend() {
         opercmd "P FE${APP_SHORT_NAME}" 2>/dev/null || true
 
         # Wait up to 25s (5 checks x 5s) for graceful shutdown
-        local count=0
-        while is_task_running "FE${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
-            sleep 5
-            count=$((count + 1))
-        done
+        wait_for_task_termination "FE${APP_SHORT_NAME}"
 
         # Cancel only if still active after stop attempt
         if is_task_running "FE${APP_SHORT_NAME}"; then
             print_info "FE${APP_SHORT_NAME} still active - issuing cancel..."
             jcan P "FE${APP_SHORT_NAME}" 2>/dev/null || true
             opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
-            sleep 2
         fi
     else
         print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is not active - skipping"
@@ -193,17 +198,12 @@ stop_cics() {
         opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
 
         # Wait up to 25s (5 checks x 5s) for graceful shutdown
-        local count=0
-        while is_task_running "CICS${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
-            sleep 5
-            count=$((count + 1))
-        done
+        wait_for_task_termination "CICS${APP_SHORT_NAME}"
 
         # Cancel only if still active after graceful shutdown attempt
         if is_task_running "CICS${APP_SHORT_NAME}"; then
             print_info "CICS${APP_SHORT_NAME} still active - issuing cancel..."
             opercmd "C CICS${APP_SHORT_NAME}" 2>/dev/null || true
-            sleep 2
         fi
     else
         print_info "CICS${APP_SHORT_NAME} is not active - skipping"
@@ -231,25 +231,19 @@ stop_ims_regions() {
     if [[ -n "$REPLID" ]]; then
         print_info "Stopping dependent regions via IMS console (REPLID=${REPLID})..."
         opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}JMP1" 2>/dev/null || true
-        sleep 2
         opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP1" 2>/dev/null || true
-        sleep 2
         opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP2" 2>/dev/null || true
-        sleep 5
     else
         print_warning "CTL WTOR not found - falling back to JCL-based region stop"
         jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
         jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
         jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
-        sleep 5
     fi
 
     # Wait up to 30s (6 checks x 5s) for dependent regions to stop
-    local count=0
-    while { is_task_running "${IMS_DATASTORE}JMP1" || is_task_running "${IMS_DATASTORE}MPP1" || is_task_running "${IMS_DATASTORE}MPP2"; } && [[ $count -lt 6 ]]; do
-        sleep 5
-        count=$((count + 1))
-    done
+    wait_for_task_termination "${IMS_DATASTORE}JMP1"
+    wait_for_task_termination "${IMS_DATASTORE}MPP1"
+    wait_for_task_termination "${IMS_DATASTORE}MPP2"
 
     # Cancel only if still active
     for region in "${IMS_DATASTORE}JMP1" "${IMS_DATASTORE}MPP1" "${IMS_DATASTORE}MPP2"; do
@@ -259,7 +253,6 @@ stop_ims_regions() {
             opercmd "C $region" 2>/dev/null || true
         fi
     done
-    sleep 2
 
     # Validate shutdown of IMS application regions
     local ims_app_regions=(
@@ -325,11 +318,11 @@ stop_ims_control() {
     opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
 
     # Wait up to 30s (6 checks x 5s) for HWS and IMSplex components to terminate
-    local count=0
-    while { is_task_running "${IMS_DATASTORE}HWS" || is_task_running "${IMS_DATASTORE}SCI" || is_task_running ${IMS_DATASTORE}ODB || is_task_running "${IMS_DATASTORE}OM" || is_task_running "${IMS_DATASTORE}RM"; } && [[ $count -lt 6 ]]; do
-        sleep 5
-        count=$((count + 1))
-    done
+    wait_for_task_termination "${IMS_DATASTORE}HWS"
+    wait_for_task_termination "${IMS_DATASTORE}SCI"
+    wait_for_task_termination "${IMS_DATASTORE}ODB"
+    wait_for_task_termination "${IMS_DATASTORE}OM"
+    wait_for_task_termination "${IMS_DATASTORE}RM"
 
 
     # Fallback: cancel HWS/OM/RM/SCI individually if still active
@@ -345,11 +338,7 @@ stop_ims_control() {
     opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
     
     # Wait up to 25s (5 checks x 5s) for graceful shutdown
-    local count=0
-    while is_task_running "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" && [[ $count -lt 5 ]]; do
-       sleep 5
-       count=$((count + 1))
-    done
+    wait_for_task_termination "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"
 
     if is_task_running "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"; then
         print_info "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM) still active - issuing cancel..."
@@ -404,19 +393,15 @@ start_ims_control() {
 
     print_info "Starting ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
     opercmd "S ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
-    sleep 2
 
     print_info "Starting ${IMS_DATASTORE}SCI..."
     opercmd "S ${IMS_DATASTORE}SCI" 2>/dev/null || true
-    sleep 2
 
     print_info "Starting ${IMS_DATASTORE}OM..."
     opercmd "S ${IMS_DATASTORE}OM" 2>/dev/null || true
-    sleep 2
 
     print_info "Starting ${IMS_DATASTORE}RM..."
     opercmd "S ${IMS_DATASTORE}RM" 2>/dev/null || true
-    sleep 2
 
     print_info "Submitting ${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL) via jsub..."
     jsub "${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL)" 2>/dev/null || true
@@ -472,15 +457,12 @@ start_ims_regions() {
 
     print_info "Submitting ${IMS_DATASTORE}MPP2..."
     jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP2)" 2>/dev/null || true
-    sleep 5
 
     print_info "Submitting ${IMS_DATASTORE}MPP1..."
     jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP1)" 2>/dev/null || true
-    sleep 5
 
     print_info "Submitting STARTJMP (JMP region)..."
     jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)" 2>/dev/null || true
-    sleep 5
 
 
     wait_for_task_running "${IMS_DATASTORE}MPP2" "IMS MPP2 region"
@@ -551,7 +533,6 @@ start_cics() {
             print_info "Starting CICS${APP_SHORT_NAME} via jsub (application PROCLIB)..."
             jsub "${APP_HLQ}.PROCLIB(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
         fi
-        sleep 3
         print_success "CICS region start command issued"
     fi
 
@@ -593,7 +574,6 @@ start_frontend() {
             print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via jsub..."
             jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
         fi
-        sleep 3
         print_success "BAQ${APP_SHORT_NAME} (z/OS Connect) start command issued"
     fi
 
@@ -607,7 +587,6 @@ start_frontend() {
             print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via jsub..."
             jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
         fi
-        sleep 3
         print_success "FE${APP_SHORT_NAME} (Frontend Liberty) start command issued"
     fi
 

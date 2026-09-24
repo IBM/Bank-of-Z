@@ -79,6 +79,22 @@ print_usage() {
 }
 
 #########################################################
+# Helper: Check if a z/OS task/job is currently running
+#########################################################
+is_task_running() {
+    local task_name="$1"
+    local output
+    output=$(opercmd "D A,${task_name}" 2>/dev/null || true)
+    if echo "$output" | grep -qi "NOT FOUND"; then
+        return 1
+    fi
+    if echo "$output" | grep -qi "${task_name}"; then
+        return 0
+    fi
+    return 1
+}
+
+#########################################################
 # Stop z/OS Connect and Frontend Liberty servers
 #########################################################
 stop_frontend() {
@@ -106,13 +122,13 @@ stop_cics() {
     set +e
 
     # Check whether the CICS region is currently active
-    if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
         print_info "CICS${APP_SHORT_NAME} is active - issuing graceful shutdown..."
         opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
         sleep 10
 
         # Cancel only if still active after graceful shutdown attempt
-        if opercmd "D A,CICS${APP_SHORT_NAME}" 2>/dev/null | grep "CICS${APP_SHORT_NAME}" >/dev/null 2>&1; then
+        if is_task_running "CICS${APP_SHORT_NAME}"; then
             print_info "CICS${APP_SHORT_NAME} still active - issuing cancel..."
             opercmd "C CICS${APP_SHORT_NAME}" 2>/dev/null || true
             sleep 2
@@ -202,30 +218,32 @@ stop_ims_control() {
     # Step 2: Graceful IMS Connect shutdown
     print_info "Shutting down ${IMS_DATASTORE}HWS (IMS Connect) gracefully..."
     opercmd "F ${IMS_DATASTORE}HWS,SHUTDOWN MEMBER" 2>/dev/null || true
-    sleep 3
+    sleep 10
+
+
+#    print_info "Stopping ${IMS_DATASTORE}DRC..."
+#    opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null || true
+#    sleep 1
+
+#    # Step 4: Shut down IMSplex components (SCI orchestrates OM and RM)
+#    print_info "Shutting down IMS CTL region..."
+#    opercmd "C ${IMS_DATASTORE}CTL" 2>/dev/null || true
+#    sleep 3
+
+    print_info "Shutting down IMSplex (OM/RM/SCI) via /F SCI,SHUTDOWN CSLPLEX..."
+    opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
+    sleep 10
+
 
     # Step 3: Stop ODBM and DRD (no graceful IMS console command for these)
     print_info "Stopping ${IMS_DATASTORE}ODB..."
     opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null || true
     sleep 1
 
-    print_info "Stopping ${IMS_DATASTORE}DRC..."
-    opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null || true
-    sleep 1
-
-    # Step 4: Shut down IMSplex components (SCI orchestrates OM and RM)
-    print_info "Shutting down IMS CTL region..."
-    opercmd "C ${IMS_DATASTORE}CTL" 2>/dev/null || true
-    sleep 3
-
-    print_info "Shutting down IMSplex (OM/RM/SCI) via /F SCI,SHUTDOWN CSLPLEX..."
-    opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
-    sleep 3
-
     # Fallback: cancel OM/RM/SCI individually if still active
-    opercmd "C ${IMS_DATASTORE}OM"  2>/dev/null || true
-    opercmd "C ${IMS_DATASTORE}RM"  2>/dev/null || true
-    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
+#    opercmd "C ${IMS_DATASTORE}OM"  2>/dev/null || true
+#    opercmd "C ${IMS_DATASTORE}RM"  2>/dev/null || true
+#    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
     sleep 2
 
     # Step 5: IRLM - try graceful abend with nodump first, then cancel
@@ -235,7 +253,31 @@ stop_ims_control() {
     opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
     sleep 2
 
-    print_success "IMS control tasks and IRLM stopped"
+    # Validate shutdown of all IMS control tasks and IRLM
+    local ims_tasks=(
+        "${IMS_DATASTORE}CTL"
+        "${IMS_DATASTORE}HWS"
+        "${IMS_DATASTORE}ODB"
+        "${IMS_DATASTORE}OM"
+        "${IMS_DATASTORE}RM"
+        "${IMS_DATASTORE}SCI"
+        "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"
+    )
+
+    local all_stopped=true
+    for task in "${ims_tasks[@]}"; do
+        if is_task_running "$task"; then
+            print_warning "$task is still running"
+            all_stopped=false
+        fi
+    done
+
+    if [[ "$all_stopped" == "true" ]]; then
+        print_success "All IMS control tasks and IRLM stopped successfully"
+    else
+        print_warning "Some IMS tasks are still active after shutdown attempt"
+        opercmd "D A,${IMS_DATASTORE}*"
+    fi
     set -e
 }
 
@@ -347,7 +389,7 @@ verify_ims() {
 
     # Check if IMS Control Region is running
     print_info "Checking IMS Control Region status..."
-    if opercmd "D A,${IMS_DATASTORE}" 2>/dev/null | grep "${IMS_DATASTORE}" >/dev/null 2>&1; then
+    if is_task_running "${IMS_DATASTORE}"; then
         print_success "IMS Control Region (${IMS_DATASTORE}) is running"
     else
         print_warning "IMS Control Region (${IMS_DATASTORE}) status could not be verified"
@@ -356,7 +398,7 @@ verify_ims() {
     # Check if IMS Connect is running
     print_info "Checking IMS Connect status..."
     IMS_HWS_JOB="${IMS_DATASTORE}HWS"
-    if opercmd "D A,${IMS_HWS_JOB}" 2>/dev/null | grep "${IMS_HWS_JOB}" >/dev/null 2>&1; then
+    if is_task_running "${IMS_HWS_JOB}"; then
         print_success "IMS Connect (${IMS_HWS_JOB}) is running"
     else
         print_warning "IMS Connect (${IMS_HWS_JOB}) status could not be verified"
@@ -374,7 +416,6 @@ verify_ims() {
     print_info "IMS Connect Port: ${IMS_PORT}"
     set -e
 }
-
 #########################################################
 # Start CICS region
 #########################################################
@@ -382,16 +423,20 @@ start_cics() {
     print_stage "STAGE: Start CICS region"
     set +e
 
-    if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-        print_info "Starting CICS${APP_SHORT_NAME} via opercmd (system PROCLIB)..."
-        opercmd "S CICS${APP_SHORT_NAME}" 2>/dev/null || true
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
+        print_info "CICS${APP_SHORT_NAME} is already running - skipping start"
     else
-        print_info "Starting CICS${APP_SHORT_NAME} via jsub (application PROCLIB)..."
-        jsub "${APP_HLQ}.PROCLIB(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
+        if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting CICS${APP_SHORT_NAME} via opercmd (system PROCLIB)..."
+            opercmd "S CICS${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting CICS${APP_SHORT_NAME} via jsub (application PROCLIB)..."
+            jsub "${APP_HLQ}.PROCLIB(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        sleep 3
+        print_success "CICS region start command issued"
     fi
-    sleep 3
 
-    print_success "CICS region start command issued"
     set -e
 }
 
@@ -402,27 +447,36 @@ start_frontend() {
     print_stage "STAGE: Start z/OS Connect and Frontend Liberty servers"
     set +e
 
-    if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-        print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via opercmd..."
-        opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is already running - skipping start"
     else
-        print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via jsub..."
-        jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
+        if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via opercmd..."
+            opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via jsub..."
+            jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        sleep 3
+        print_success "BAQ${APP_SHORT_NAME} (z/OS Connect) start command issued"
     fi
 
-    if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-        print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via opercmd..."
-        opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is already running - skipping start"
     else
-        print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via jsub..."
-        jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+        if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via opercmd..."
+            opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via jsub..."
+            jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        sleep 3
+        print_success "FE${APP_SHORT_NAME} (Frontend Liberty) start command issued"
     fi
-    sleep 3
 
-    print_success "z/OS Connect and Frontend Liberty servers start commands issued"
     set -e
 }
-
 #########################################################
 # Dispatch stop by scope
 #########################################################

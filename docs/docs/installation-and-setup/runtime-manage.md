@@ -29,6 +29,7 @@ Use `runtime-manage.sh` to stop, start, or restart the Bank of Z runtime servers
 | `stop` | Stop the specified servers without deleting any data |
 | `start` | Start the specified servers |
 | `restart` | Stop the specified servers, then start them again |
+| `verify` | Check the running state of the specified servers and report status without making any changes |
 
 ---
 
@@ -116,10 +117,12 @@ The script follows the IBM-recommended ordering for stopping and starting IMS co
 
 **Stop order (scope: `all`)**
 
-1. z/OS Connect (`BAQ<name>`) and Frontend Liberty (`FE<name>`) — cancelled immediately
-2. CICS region — graceful shutdown issued first; cancelled only if still active after 10 seconds
-3. IMS application regions — `/STOP REGION` issued via the CTL WTOR; individual job cancels follow as a safety net
-4. IMS control tasks — `/CHECKPOINT PURGE`, IMS Connect shutdown, ODBM/DRD cancel, CTL cancel, IMSplex shutdown (`F SCI,SHUTDOWN CSLPLEX`), then IRLM abend
+1. z/OS Connect (`BAQ<name>`) and Frontend Liberty (`FE<name>`) — graceful stop issued first; each server is polled for up to 25 seconds and only cancelled if still active
+2. CICS region — `CEMT PERFORM SHUTDOWN` issued first for a clean quiesce; cancelled only if still active after 25 seconds
+3. IMS application regions — `/STOP REGION` issued via the CTL WTOR; individual job cancels follow as a safety net after a 30-second wait
+4. IMS control tasks — `/CHECKPOINT PURGE`, IMS Connect shutdown (`F HWS,SHUTDOWN MEMBER`), IMSplex shutdown (`F SCI,SHUTDOWN CSLPLEX`), individual task cancels after a 30-second wait, then IRLM graceful abend (`F IRLM,ABEND,NODUMP`)
+
+After each stop phase the script validates that every task has actually stopped and prints a warning if any address space remains active.
 
 **Start order (scope: `all`)**
 
@@ -131,11 +134,30 @@ The script follows the IBM-recommended ordering for stopping and starting IMS co
 6. CICS region — started via `opercmd` or `jsub` depending on PROCLIB configuration
 7. z/OS Connect and Frontend Liberty — started via `opercmd` or `jsub` depending on PROCLIB configuration
 
+After each start phase the script calls `wait_for_task_running` for every task to confirm it is up before proceeding.
+
+---
+
+## Verify action
+
+Use `verify` to check the current state of all servers in a scope without making any changes. This is useful as a standalone runtime health-check after a start or at any time to confirm which address spaces are active.
+
+```bash
+.setup/runtime-manage.sh verify all
+```
+
+```bash
+.setup/runtime-manage.sh verify ims
+```
+
+For scope `ims`, the verify step checks the following tasks: IRLM, SCI, OM, RM, CTL, ODB, HWS, MPP1, MPP2, and JMP1. It also checks whether the IMS Connect port (`IMS_PORT`) is listening. Each task prints either a success or warning line. No changes are made to any address space.
+
 ---
 
 ## Notes
 
 - The script does not modify any datasets, Db2 tables, or IMS databases. It only manages the lifecycle of running address spaces.
 - All stop operations use `set +e` internally so that a failure to cancel one server does not prevent the remaining servers from being stopped.
+- Start functions check whether a task is already running before issuing a start command; stop functions validate that each task has actually stopped after the shutdown sequence.
 - If the IMS CTL WTOR is not detected within 60 seconds during a start, the script prints a warning and continues. Check the system log to confirm whether IMS started automatically or requires manual intervention.
 - CICS and frontend server start commands are issued using either `opercmd` (system PROCLIB) or `jsub` (application PROCLIB), determined by the `CICS_SYS_PROCLIB`, `ZOSCONNECT_SYS_PROCLIB`, and `FRONTEND_SYS_PROCLIB` configuration values.

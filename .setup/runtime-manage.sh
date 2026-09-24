@@ -101,14 +101,51 @@ stop_frontend() {
     print_stage "STAGE: Stop z/OS Connect and Frontend Liberty servers"
     set +e
 
-    print_info "Cancelling BAQ${APP_SHORT_NAME} (z/OS Connect)..."
-    jcan P "BAQ${APP_SHORT_NAME}" 2>/dev/null || true
-    opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+    # Stop BAQ (z/OS Connect)
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is active - issuing stop..."
+        opercmd "P BAQ${APP_SHORT_NAME}" 2>/dev/null || true
 
-    print_info "Cancelling FE${APP_SHORT_NAME} (Frontend Liberty)..."
-    jcan P "FE${APP_SHORT_NAME}" 2>/dev/null || true
-    opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
-    sleep 2
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        local count=0
+        while is_task_running "BAQ${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
+            sleep 5
+            count=$((count + 1))
+        done
+
+        # Cancel only if still active after stop attempt
+        if is_task_running "BAQ${APP_SHORT_NAME}"; then
+            print_info "BAQ${APP_SHORT_NAME} still active - issuing cancel..."
+            jcan P "BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            sleep 2
+        fi
+    else
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is not active - skipping"
+    fi
+
+    # Stop FE (Frontend Liberty)
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is active - issuing stop..."
+        opercmd "P FE${APP_SHORT_NAME}" 2>/dev/null || true
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        local count=0
+        while is_task_running "FE${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
+            sleep 5
+            count=$((count + 1))
+        done
+
+        # Cancel only if still active after stop attempt
+        if is_task_running "FE${APP_SHORT_NAME}"; then
+            print_info "FE${APP_SHORT_NAME} still active - issuing cancel..."
+            jcan P "FE${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+            sleep 2
+        fi
+    else
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is not active - skipping"
+    fi
 
     print_success "z/OS Connect and Frontend Liberty servers stopped"
     set -e
@@ -125,7 +162,13 @@ stop_cics() {
     if is_task_running "CICS${APP_SHORT_NAME}"; then
         print_info "CICS${APP_SHORT_NAME} is active - issuing graceful shutdown..."
         opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
-        sleep 10
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        local count=0
+        while is_task_running "CICS${APP_SHORT_NAME}" && [[ $count -lt 5 ]]; do
+            sleep 5
+            count=$((count + 1))
+        done
 
         # Cancel only if still active after graceful shutdown attempt
         if is_task_running "CICS${APP_SHORT_NAME}"; then
@@ -172,13 +215,43 @@ stop_ims_regions() {
         sleep 5
     fi
 
-    print_info "Cancelling ${IMS_DATASTORE}JMP1 / MPP1 / MPP2 (if still active)..."
-    jcan P "${IMS_DATASTORE}JMP1" 2>/dev/null || true
-    jcan P "${IMS_DATASTORE}MPP1" 2>/dev/null || true
-    jcan P "${IMS_DATASTORE}MPP2" 2>/dev/null || true
-    sleep 5
+    # Wait up to 30s (6 checks x 5s) for dependent regions to stop
+    local count=0
+    while { is_task_running "${IMS_DATASTORE}JMP1" || is_task_running "${IMS_DATASTORE}MPP1" || is_task_running "${IMS_DATASTORE}MPP2"; } && [[ $count -lt 6 ]]; do
+        sleep 5
+        count=$((count + 1))
+    done
 
-    print_success "IMS application regions stopped"
+    # Cancel only if still active
+    for region in "${IMS_DATASTORE}JMP1" "${IMS_DATASTORE}MPP1" "${IMS_DATASTORE}MPP2"; do
+        if is_task_running "$region"; then
+            print_info "$region still active - issuing cancel..."
+            jcan P "$region" 2>/dev/null || true
+            opercmd "C $region" 2>/dev/null || true
+        fi
+    done
+    sleep 2
+
+    # Validate shutdown of IMS application regions
+    local ims_app_regions=(
+        "${IMS_DATASTORE}JMP1"
+        "${IMS_DATASTORE}MPP1"
+        "${IMS_DATASTORE}MPP2"
+    )
+
+    local all_stopped=true
+    for region in "${ims_app_regions[@]}"; do
+        if is_task_running "$region"; then
+            print_warning "$region is still running"
+            all_stopped=false
+        fi
+    done
+
+    if [[ "$all_stopped" == "true" ]]; then
+        print_success "IMS application regions stopped"
+    else
+        print_warning "Some IMS application regions are still active after shutdown attempt"
+    fi
     set -e
 }
 
@@ -215,43 +288,45 @@ stop_ims_control() {
         print_warning "CTL WTOR reply ID not found - skipping /CHECKPOINT PURGE"
     fi
 
-    # Step 2: Graceful IMS Connect shutdown
+    # Step 2: Graceful IMS Connect and IMSplex shutdown
     print_info "Shutting down ${IMS_DATASTORE}HWS (IMS Connect) gracefully..."
     opercmd "F ${IMS_DATASTORE}HWS,SHUTDOWN MEMBER" 2>/dev/null || true
-    sleep 10
-
-
-#    print_info "Stopping ${IMS_DATASTORE}DRC..."
-#    opercmd "C ${IMS_DATASTORE}DRC" 2>/dev/null || true
-#    sleep 1
-
-#    # Step 4: Shut down IMSplex components (SCI orchestrates OM and RM)
-#    print_info "Shutting down IMS CTL region..."
-#    opercmd "C ${IMS_DATASTORE}CTL" 2>/dev/null || true
-#    sleep 3
 
     print_info "Shutting down IMSplex (OM/RM/SCI) via /F SCI,SHUTDOWN CSLPLEX..."
     opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
-    sleep 10
+
+    # Wait up to 30s (6 checks x 5s) for HWS and IMSplex components to terminate
+    local count=0
+    while { is_task_running "${IMS_DATASTORE}HWS" || is_task_running "${IMS_DATASTORE}SCI" || is_task_running ${IMS_DATASTORE}ODB || is_task_running "${IMS_DATASTORE}OM" || is_task_running "${IMS_DATASTORE}RM"; } && [[ $count -lt 6 ]]; do
+        sleep 5
+        count=$((count + 1))
+    done
 
 
-    # Step 3: Stop ODBM and DRD (no graceful IMS console command for these)
-    print_info "Stopping ${IMS_DATASTORE}ODB..."
-    opercmd "C ${IMS_DATASTORE}ODB" 2>/dev/null || true
-    sleep 1
+    # Fallback: cancel HWS/OM/RM/SCI individually if still active
+    for task in "${IMS_DATASTORE}HWS" "${IMS_DATASTORE}OM" "${IMS_DATASTORE}ODB" "${IMS_DATASTORE}RM" "${IMS_DATASTORE}SCI"; do
+        if is_task_running "$task"; then
+            print_info "$task still active - issuing cancel..."
+            opercmd "C $task" 2>/dev/null || true
+        fi
+    done
 
-    # Fallback: cancel OM/RM/SCI individually if still active
-#    opercmd "C ${IMS_DATASTORE}OM"  2>/dev/null || true
-#    opercmd "C ${IMS_DATASTORE}RM"  2>/dev/null || true
-#    opercmd "C ${IMS_DATASTORE}SCI" 2>/dev/null || true
-    sleep 2
-
-    # Step 5: IRLM - try graceful abend with nodump first, then cancel
+    # Step 5: IRLM - try graceful abend with nodump first, then cancel if still running
     print_info "Stopping ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
     opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
-    sleep 2
-    opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
-    sleep 2
+    
+    # Wait up to 25s (5 checks x 5s) for graceful shutdown
+    local count=0
+    while is_task_running "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" && [[ $count -lt 5 ]]; do
+       sleep 5
+       count=$((count + 1))
+    done
+
+    if is_task_running "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"; then
+        print_info "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM) still active - issuing cancel..."
+        opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
+        sleep 2
+    fi
 
     # Validate shutdown of all IMS control tasks and IRLM
     local ims_tasks=(

@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=./resource-schema.json
+
 resourceDefinitions:
   # FILE Definitions
   - file:
@@ -1201,3 +1202,27 @@ resourceDefinitions:
       name: BANKZ
       group: BANKZGRP
       dsname01: BANKZ.V0R1M0.LOADLIB
+
+  # MQCONN Definitions
+  - mqconn:
+      name: BOZMQCON
+      group: BANKZGRP
+      description: "MQCONN for Bank of z"
+      #Set from overrides
+      mqname: XXXX
+      initqname: BOZ.CICS.INITQ
+      resyncmember: YES
+
+  # MQMONITOR Definitions
+  - mqmonitor:
+     name: BOZMQMON
+     group: BANKZGRP
+     autostart: YES
+     description: "MQMONITOR for Bank of z"
+     qname: BOZ.CICS.REQUESTQ
+     mondata: "Q=BOZ.CICS.REQUESTQ"
+     status: ENABLED
+     transaction: CKBR
+     monuserid: IBMUSER
+
+  # CICS bridge / adapter definition are picked up via DFHLIST

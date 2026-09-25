@@ -40,6 +40,8 @@
     url: /docs/installation-and-setup/local-tools/zowe-cli-setup.html
   - title: GRUB Setup
     url: /docs/installation-and-setup/local-tools/grub-setup.html
+  - title: Set Up a Database Connection to Db2 for z/OS
+    url: /docs/installation-and-setup/local-tools/setup-dbc-db2-zos.html
   - title: Verification
     url: /docs/installation-and-setup/verification.html
 - title: Tutorials

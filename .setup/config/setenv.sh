@@ -159,6 +159,7 @@ ZCONFIG_HOME="${ZCONFIG_HOME:-{{ zconfig.zconfig_home }}}"
 
 # Debug
 DEBUG_HLQ="{{ debug.debug_hlq }}"
+DEBUG_STC_USER="{{ debug.debug_stc_user }}"
 DEBUG_TCPIP_HQL="{{ debug.tcpip_hlq }}"
 EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 

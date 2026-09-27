@@ -171,6 +171,7 @@ zconfig apply \
   -e java_home="$JAVA_HOME" \
   -e cmci_port="$CICS_CMCI_PORT" \
   -e debug_hlq="$DEBUG_HLQ" \
+  -e debug_stc_user="${DEBUG_STC_USER}" \
   -e db2_hlq="${DB2_HLQ}" \
   -e cics_hlq="${CICS_HLQ}" \
   -e cics_uss_dir="${CICS_USS_DIR}" \

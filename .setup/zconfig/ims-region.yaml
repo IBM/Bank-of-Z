@@ -13,6 +13,7 @@ vars:
   ims_target_user: IBMUSER
   ims_ixvolser: "IMSV15"
   debug_hlq: EQAW
+  debug_stc_user: STCDBG
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
 ims:
@@ -21,6 +22,7 @@ ims:
   ims_hlq: "{{ vars.ims_hlq }}"
   db2_hlq: "{{ vars.db2_hlq }}"
   debug_hlq: "{{ vars.debug_hlq }}"
+  debug_stc_user: "{{ vars.debug_stc_user }}"
   ims_plex: "{{ vars.ims_plex }}"
   ims_type: DB/DC
   ims_unit: SYSALLDA

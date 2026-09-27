@@ -98,17 +98,17 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --templateFile "$SCRIPTS_DIR/../debug_config/eqaprof.env.j2"  --outputFile "${EQAPROF_CONF_DIR}/eqaprof.env"
 
 # =======================================================
-# Stage 4: Grant RACF permissions for STCDBG user
+# Stage 4: Grant RACF permissions for debug STC user
 # =======================================================
 set +e
-print_stage "Stage 4: Granting RACF permissions for STCDBG..."
+print_stage "Stage 4: Granting RACF permissions for ${DEBUG_STC_USER}..."
 run_tso "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
-run_tso "PERMIT BPX.SERVER CLASS(FACILITY) ID(STCDBG) ACCESS(UPDATE)"
+run_tso "PERMIT BPX.SERVER CLASS(FACILITY) ID(${DEBUG_STC_USER}) ACCESS(UPDATE)"
 run_tso "SETROPTS RACLIST(FACILITY) REFRESH"
 run_tso "RLIST FACILITY BPX.SERVER ALL"
 
 run_tso "RDEFINE SURROGAT BPX.SRV.** UACC(NONE)"
-run_tso "PERMIT BPX.SRV.** CLASS(SURROGAT) ID(STCDBG) ACCESS(READ)"
+run_tso "PERMIT BPX.SRV.** CLASS(SURROGAT) ID(${DEBUG_STC_USER}) ACCESS(READ)"
 run_tso "SETROPTS RACLIST(SURROGAT) REFRESH"
 run_tso "RLIST SURROGAT BPX.SRV.** ALL"
 set -e

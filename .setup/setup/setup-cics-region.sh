@@ -79,7 +79,6 @@ drm "${APP_HLQ}.${APP_ZOS_VERSION}.*" 2>/dev/null
 drm "${APP_HLQ}.CICS${APP_SHORT_NAME}.*"  2>/dev/null
 drm "${APP_HLQ}.DBB.*"  2>/dev/null
 mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})" 2>/dev/null || true
-mrm "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
 sleep 5
 rm -rf "$SCRIPTS_DIR/logs"
 rm -rf "$SANDBOX_DIR/CICS${APP_SHORT_NAME}"
@@ -94,6 +93,16 @@ tsocmd "ALLOC DA('${APP_HLQ}.${APP_ZOS_VERSION}.LOADLIB') NEW CATALOG DSNTYPE(LI
 print_stage "STAGE 1: Create CICS instance with zconfig"
 
 export PATH="$ZCONFIG_ZCB_HOME/bin:$PATH"
+
+# Determine JCL type: PROC if the target proclib is in the system concatenation,
+# JOB otherwise (pproc -a lists all proclibs in the active concatenation).
+if pproc -a 2>/dev/null | grep -qF "${CICS_SYS_PROCLIB}"; then
+    CICS_JCL_TYPE="PROC"
+    print_info "Target proclib ${CICS_SYS_PROCLIB} found in pproc concatenation — generating PROC"
+else
+    CICS_JCL_TYPE="JOB"
+    print_info "Target proclib ${CICS_SYS_PROCLIB} not in pproc concatenation — generating JOB"
+fi
 
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
     source "$ZCONFIG_HOME/bin/activate"
@@ -120,6 +129,7 @@ zconfig apply \
   -e proclib="${CICS_SYS_PROCLIB}" \
   -e cics_ipic_port="${CICS_IPIC_PORT}" \
   -e cics_debug_port="${CICS_DEBUG_PORT}" \
+  -e jcl_type="${CICS_JCL_TYPE}" \
   cics-region.yaml
 
 RC=$?
@@ -179,37 +189,24 @@ set -e
 # Stage 4: Start CICS region
 # =========================
 print_stage "STAGE 4: Start CICS region"
-if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
-    # PROC was written directly into the system PROCLIB by zconfig — start it as a started task
+if [[ "${CICS_JCL_TYPE}" == "PROC" ]]; then
+    # PROC is in the system concatenation — start it as a started task
     opercmd "S CICS${APP_SHORT_NAME}"
 else
-    # App-owned PROCLIB is not in the system PROCLIB concatenation, so 'S' won't find the PROC.
-    # Build a JOB inline that sets JCLLIB to the app PROCLIB and EXECs the PROC, then submit it.
-    SUBMIT_JCL="/tmp/CICS${APP_SHORT_NAME}J-$$.jcl"
-    cat > "$SUBMIT_JCL" << EOF
-//CICS${APP_SHORT_NAME} JOB (${ZOS_CURRENT_USER}),MSGCLASS=X,CLASS=A,NOTIFY=&SYSUID,
-//  REGION=0M,USER=${ZOS_CURRENT_USER}
-//PROCLIB  JCLLIB  ORDER=${CICS_SYS_PROCLIB}
-//CICSSTEP EXEC PROC=CICS${APP_SHORT_NAME}
-/*
-EOF
-    a2e -f ISO8859-1 -t IBM-1047 "$SUBMIT_JCL"
-    print_info "Saving start JCL to ${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)..."
-    dcp "$SUBMIT_JCL" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
+    # JOB written directly to the proclib dataset — submit it with jsub
     print_info "Submitting CICS start job via jsub..."
-    jsub -f "$SUBMIT_JCL"
-    rm -f "$SUBMIT_JCL"
+    jsub "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
 fi
 sleep 5
 print_info "CICS Region Job Started"
 sleep 10
 print_info ""
 print_info "To manage the region:"
-if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+if [[ "${CICS_JCL_TYPE}" == "PROC" ]]; then
     print_info "  Start:  opercmd 'S CICS${APP_SHORT_NAME}'"
     print_info "  Stop:   opercmd 'C CICS${APP_SHORT_NAME}'"
 else
-    print_info "  Start:  jsub '${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)'"
+    print_info "  Start:  jsub '${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})'"
     print_info "  Stop:   jcan P 'CICS${APP_SHORT_NAME}'"
 fi
 print_info ""

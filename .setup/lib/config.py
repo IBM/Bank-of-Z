@@ -84,7 +84,14 @@ def render_config(data):
     # Expand environment variables before resolving Jinja. Otherwise a
     # construct such as {{ cfg.zos_admin_user | lower }} receives ${USER},
     # lowers it to ${user}, and loses the value on case-sensitive systems.
-    result = expand_tree(deepcopy(data))
+    result = deepcopy(data)
+    # Environment values may themselves reference other environment variables.
+    # Finish that expansion before filters can change variable-name case.
+    for _ in range(20):
+        expanded = expand_tree(result)
+        if expanded == result:
+            break
+        result = expanded
     for _ in range(20):
         changed = False
 

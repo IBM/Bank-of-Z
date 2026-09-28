@@ -56,6 +56,8 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_catalog_override_and_default(self):
         values = self.environment()
+        self.assertEqual(self.render(values)["catalog"], "DBD2")
+        values["DB2_PROVISION_CATALOG"] = ""
         self.assertNotIn("catalog", self.render(values))
         values["DB2_PROVISION_CATALOG"] = "CUSTOM.CAT"
         self.assertEqual(self.render(values)["catalog"], "CUSTOM.CAT")
@@ -87,10 +89,35 @@ class ProvisioningTests(unittest.TestCase):
                     result = module.render_config(module.normalize_config(source))
                 self.assertEqual(result["lower"], "boztest")
 
+    def test_nested_environment_references_before_filters(self):
+        source = {"cfg": {"user": "${BOZ_TEST_USER}"},
+                  "path": "/u/{{ cfg.user | lower }}/java"}
+        variables = {"BOZ_TEST_USER": "${BOZ_TEST_ACCOUNT}", "BOZ_TEST_ACCOUNT": "BOZTEST"}
+        for module in (config, templates):
+            with patch.dict(os.environ, variables):
+                self.assertEqual(module.render_config(source)["path"], "/u/boztest/java")
+
+    def test_deployment_parameters(self):
+        values = self.values()
+        settings = values["db2_provisioning"]
+        expected = {
+            "catalog": "DBD2", "storage_class": "SGDB213",
+            "user_catalog": "CATALOG.VS01.DB2V13", "volume": "DB2V13",
+            "data_class": "DCDB2EXT", "authid": "BOZTEST",
+            "javaenv": "DBD2.DSN1WLMJ.JAVAENV",
+            "javaenvv": "/u/boztest/dbd2envfile.txt",
+            "jvmprops": "/u/boztest/dbd2jvmsp",
+            "sdsnexit": "DB2V13.DBD2.SDSNEXIT",
+        }
+        for key, value in expected.items():
+            self.assertEqual(settings[key], value, key)
+        self.assertEqual(settings["java_home"], values["java"]["java_home"])
+        self.assertEqual(values["db2"]["runlib"], "DB2V13.DBD2.RUNLIB.LOAD")
+
     def test_environment_template_and_defaults(self):
         values = self.values()
-        self.assertEqual(values["cfg"]["db2_provision"], "false")
-        self.assertEqual(values["cfg"]["db2_ssid"], "DBD1")
+        self.assertEqual(values["cfg"]["db2_provision"], "true")
+        self.assertEqual(values["cfg"]["db2_ssid"], "DBD2")
         script = (ROOT / ".setup/config/setenv.sh").read_text()
         template = script.split("<<'EOF'\n", 1)[1].split("\nEOF", 1)[0]
         output = Environment(undefined=StrictUndefined).from_string(template).render(values)
@@ -129,7 +156,7 @@ read_db2_master_status
         cached = Environment(undefined=StrictUndefined).from_string(template).render(self.values())
         test = ('set -e\nDB2_SSID=ZZ99\nDB2_PROVISION=true\nDB2_PROVISION_CATALOG=CUSTOM\n'
                 + snapshot + '\n' + cached
-                + '\nDB2_PROVISION_CATALOG=STALE\nget_section_value() { printf DBD1; }\n' + restore
+                + '\nDB2_PROVISION_CATALOG=STALE\nget_section_value() { printf DBD2; }\n' + restore
                 + '\n[[ "$DB2_SSID" == ZZ99 && "$DB2_PROVISION" == true ]]\n'
                 + '[[ "$DB2_PROVISION_CATALOG" == CUSTOM ]]\n'
                 + '[[ "$DB2_PROVISION_JAVAENVV" == *zz99* ]]\n')

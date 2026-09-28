@@ -69,7 +69,14 @@ def render_config(config):
 
     # Resolve ${VAR} before Jinja filters are applied. In particular, applying
     # | lower to ${USER} would turn it into ${user} and discard the value.
-    result = expand_tree(deepcopy(config))
+    result = deepcopy(config)
+    # Environment values may themselves reference other environment variables.
+    # Finish that expansion before filters can change variable-name case.
+    for _ in range(20):
+        expanded = expand_tree(result)
+        if expanded == result:
+            break
+        result = expanded
 
     env = Environment(undefined=StrictUndefined)
 

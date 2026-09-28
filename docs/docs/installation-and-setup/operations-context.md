@@ -225,10 +225,11 @@ Confirm the corresponding ports `9080` and `9081` are listening before accessing
 
 ## Provisioning settings and local verification
 
-The checked-in configuration uses `global`, with provisioning disabled and
-`DBD1` selected. Existing files using `cfg` remain supported by the configuration
-loader. Set `DB2_PROVISION=true` and the intended `DB2_SSID` explicitly when
-creating a subsystem.
+The checked-in configuration uses `global`, with provisioning enabled and
+`DBD2` selected, storage class `SGDB213`, and a catalog prefix matching the
+configured SSID. These retain the previous PR deployment settings. Existing files using `cfg` remain supported by the configuration
+loader. Confirm the intended `DB2_SSID` before creating a subsystem; use
+`DB2_PROVISION=false` to deploy against an existing subsystem.
 
 `db2_provisioning.catalog` (or `DB2_PROVISION_CATALOG`) optionally selects the
 VSAM catalog prefix. An empty value leaves naming to zconfig. Empty volume,

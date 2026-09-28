@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "NOT_FOUND"
+    - message:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '1' ? 'From account not found' : ($zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '3' ? 'To account not found' : 'Account not found')"

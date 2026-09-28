@@ -151,40 +151,40 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - The admin page (`admin.html`) has no "Transfer Funds" link.
 
 ### Task GAP-4-A — CICS: Verify XFRFUN is CICS-linkable via zosConnect
-- [ ] Confirm `XFRFUN` program exists in the CICS region and is linkable.
-- [ ] No COBOL changes are needed; the existing commarea (`XFRFUN.cpy`) carries all required fields.
+- [x] Confirm `XFRFUN` program exists in the CICS region and is linkable.
+- [x] No COBOL changes are needed; the existing commarea (`XFRFUN.cpy`) carries all required fields.
 
 ### Task GAP-4-B — zosConnect: Register XFRFUN as a new zosAsset
-- [ ] Create `src/api/src/main/zosAssets/XFRFUN/` with `zosAsset.yaml`, `providerFiles/XFRFUN.cpy`, and `providerFiles/gen/` schemas.
+- [x] Create `src/api/src/main/zosAssets/XFRFUN/` with `zosAsset.yaml`, `providerFiles/XFRFUN.cpy`, and `providerFiles/gen/` schemas.
 
 ### Task GAP-4-C — zosConnect: Add POST /accounts/{accountId}/transfer operation
-- [ ] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D%2Ftransfer/post/`.
-- [ ] `operation.yaml`: `zasset: "XFRFUN"`.
-- [ ] `request.yaml`: map `accountId` path parameter → `COMM-FACCNO`; map body fields: `toAccountId` → `COMM-TACCNO`, `fromSortCode` → `COMM-FSCODE`, `toSortCode` → `COMM-TSCODE`, `amount` → `COMM-AMT`.
-- [ ] `response_201.yaml`: return `fromAccountAvailableBalance`, `fromAccountActualBalance`, `toAccountAvailableBalance`, `toAccountActualBalance` from commarea.
-- [ ] `response_400.yaml` (insufficient funds / invalid account), `response_404.yaml`, `response_500.yaml`.
-- [ ] `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`; map `COMM-FAIL-CODE` into the error body.
+- [x] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D%2Ftransfer/post/`.
+- [x] `operation.yaml`: `zasset: "XFRFUN"`.
+- [x] `request.yaml`: map `accountId` path parameter → `COMM-FACCNO`; map body fields: `toAccountId` → `COMM-TACCNO`, `fromSortCode` → `COMM-FSCODE`, `toSortCode` → `COMM-TSCODE`, `amount` → `COMM-AMT`.
+- [x] `response_201.yaml`: return `fromAccountAvailableBalance`, `fromAccountActualBalance`, `toAccountAvailableBalance`, `toAccountActualBalance` from commarea.
+- [x] `response_400.yaml` (insufficient funds / invalid account), `response_404.yaml`, `response_500.yaml`.
+- [x] `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`; map `COMM-FAIL-CODE` into the error body.
 
 ### Task GAP-4-D — OpenAPI: Add POST /accounts/{accountId}/transfer path + TransferRequest schema
-- [ ] Add `POST /accounts/{accountId}/transfer` to `openapi.yaml`.
-- [ ] Add `TransferRequest` schema: `toAccountId (string, required)`, `amount (number, required, minimum 0.01)`, `fromSortCode (string, pattern ^[0-9]{6}$)`, `toSortCode (string, pattern ^[0-9]{6}$)`.
-- [ ] Add `TransferResponse` schema: `fromAccountAvailableBalance`, `fromAccountActualBalance`, `toAccountAvailableBalance`, `toAccountActualBalance` (all number).
+- [x] Add `POST /accounts/{accountId}/transfer` to `openapi.yaml`.
+- [x] Add `TransferRequest` schema: `toAccountId (string, required)`, `amount (number, required, minimum 0.01)`, `fromSortCode (string, pattern ^[0-9]{6}$)`, `toSortCode (string, pattern ^[0-9]{6}$)`.
+- [x] Add `TransferResponse` schema: `fromAccountAvailableBalance`, `fromAccountActualBalance`, `toAccountAvailableBalance`, `toAccountActualBalance` (all number).
 
 ### Task GAP-4-E — Frontend: Add api.accounts.transferFunds() to api.js
-- [ ] Add `transferFunds(fromAccountId, transferData)` method to `AccountsApi` in `src/frontend/js/api.js` calling `POST ${baseUrl}/accounts/${fromAccountId}/transfer`.
+- [x] Add `transferFunds(fromAccountId, transferData)` method to `AccountsApi` in `src/frontend/js/api.js` calling `POST ${baseUrl}/accounts/${fromAccountId}/transfer`.
 
 ### Task GAP-4-F — Frontend: Create account-transfer.html page
-- [ ] Create `src/frontend/account-transfer.html` with a form matching BNK1TFM:
+- [x] Create `src/frontend/account-transfer.html` with a form matching BNK1TFM:
   - FROM Account Number (text input, required)
   - TO Account Number (text input, required)
   - Amount (number input, min 0.01, required)
   - Sort code fields (pre-populated from `config.defaults.sortCode`, editable for cross-bank transfers)
-- [ ] On submit, call `api.accounts.transferFunds()`.
-- [ ] On success, display the updated balances for both accounts in a summary panel.
-- [ ] Use Carbon Design System components consistent with existing pages.
+- [x] On submit, call `api.accounts.transferFunds()`.
+- [x] On success, display the updated balances for both accounts in a summary panel.
+- [x] Use Carbon Design System components consistent with existing pages.
 
 ### Task GAP-4-G — Frontend: Add Transfer Funds link to admin.html
-- [ ] Add a `<cds-button kind="ghost" href="account-transfer.html">Transfer funds between accounts</cds-button>` entry to the Account Services section in `src/frontend/admin.html`.
+- [x] Add a `<cds-button kind="ghost" href="account-transfer.html">Transfer funds between accounts</cds-button>` entry to the Account Services section in `src/frontend/admin.html`.
 
 ---
 

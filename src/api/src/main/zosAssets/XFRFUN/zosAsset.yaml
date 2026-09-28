@@ -1,0 +1,11 @@
+---
+version: 1.0
+type: "cicsCommarea-1.0"
+description: "Transfer Funds CICS Program"
+providerProperties:
+  transidUsage: "EIB_ONLY"
+  transid: "OMEN"
+  language: "COBOL"
+  program: "XFRFUN"
+  connectionRef: "bankzCicsConnection"
+  ccsid: "037"

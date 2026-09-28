@@ -1,0 +1,14 @@
+---
+version: "1.0"
+response_201.yaml:
+  condition: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-SUCCESS\" = 'Y'"
+  httpStatusCode: 201
+response_404.yaml:
+  condition: "$exists($zosAssetResponse.commarea.XFRFUNZ) and $zosAssetResponse.commarea.XFRFUNZ.\"COMM-SUCCESS\" != 'Y' and ($zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '1' or $zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '3')"
+  httpStatusCode: 404
+response_400.yaml:
+  condition: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-SUCCESS\" = 'N'"
+  httpStatusCode: 400
+response_500.yaml:
+  condition: true
+  httpStatusCode: 500

@@ -639,6 +639,45 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /accounts/{accountId}/transfer:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer funds between accounts
+      description: Transfer funds from this account to another account
+      operationId: transferFunds
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the source account
+          schema:
+            type: string
+            example: "12345678"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '201':
+          description: Transfer successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /accounts/{accountId}/transactions:
     get:
       tags:
@@ -1313,6 +1352,62 @@ components:
           type: string
           description: Transaction reference number
           example: "DEP20260619001"
+
+    TransferRequest:
+      type: object
+      required:
+        - toAccountId
+        - amount
+      properties:
+        toAccountId:
+          type: string
+          description: Unique identifier for the destination account
+          example: "87654321"
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Transfer amount (must be positive)
+          example: 50.00
+        fromSortCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit bank sort code of the source account
+          example: "987654"
+        toSortCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit bank sort code of the destination account
+          example: "987654"
+
+    TransferResponse:
+      type: object
+      required:
+        - fromAccountAvailableBalance
+        - fromAccountActualBalance
+        - toAccountAvailableBalance
+        - toAccountActualBalance
+      properties:
+        fromAccountAvailableBalance:
+          type: number
+          format: double
+          description: Available balance of source account after transfer
+          example: 950.00
+        fromAccountActualBalance:
+          type: number
+          format: double
+          description: Actual balance of source account after transfer
+          example: 950.00
+        toAccountAvailableBalance:
+          type: number
+          format: double
+          description: Available balance of destination account after transfer
+          example: 550.00
+        toAccountActualBalance:
+          type: number
+          format: double
+          description: Actual balance of destination account after transfer
+          example: 550.00
 
     Error:
       type: object

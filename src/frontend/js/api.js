@@ -386,6 +386,24 @@ class AccountsApi extends BaseApi {
     }
 
     /**
+     * Transfer funds between accounts
+     * POST /accounts/{accountId}/transfer
+     * @param {string} fromAccountId - Source account identifier
+     * @param {Object} transferData - Transfer data
+     * @param {string} transferData.toAccountId - Destination account identifier
+     * @param {number} transferData.amount - Amount to transfer (positive number)
+     * @param {string} [transferData.fromSortCode] - Source bank sort code
+     * @param {string} [transferData.toSortCode] - Destination bank sort code
+     * @returns {Promise<TransferResponse>} Balances of both accounts after transfer
+     */
+    async transferFunds(fromAccountId, transferData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${fromAccountId}/transfer`, {
+            method: 'POST',
+            body: JSON.stringify(transferData)
+        });
+    }
+
+    /**
      * Get accounts by customer number (stub - not in OpenAPI spec)
      * Use getCustomerAccounts from CustomersApi instead
      * @param {string} customerNumber - Customer number

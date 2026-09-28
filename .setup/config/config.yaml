@@ -95,6 +95,8 @@ global:
 # ZDVT image; review and change every environment-specific value before
 # setting global.db2_provision to "true".
 db2_provisioning:
+  # Leave empty to use the zconfig catalog naming default.
+  catalog: ""
   user_catalog: "CATALOG.VS01.DB2V13"
   authid: "{{ global.zos_admin_user }}"
   volume: "DB2V13"

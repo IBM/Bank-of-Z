@@ -15,6 +15,7 @@ set -eu
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
+source "$SCRIPTS_DIR/../lib/db2-status.sh"
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -52,28 +53,27 @@ print_info "YAML: db2-provision.yaml"
 print_info "Db2 SSID: ${DB2_SSID}"
 print_info "Db2 HLQ:  ${DB2_HLQ}"
 
-if opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -q "${DB2_SSID}MSTR"; then
+state=$(read_db2_master_status) || exit 1
+if [[ "$state" == active ]]; then
     print_error "Db2 subsystem ${DB2_SSID} is already active; refusing to provision over it"
     print_info "Use an unused SSID, or set DB2_PROVISION=false to use the existing subsystem"
     deactivate
     exit 1
 fi
 
-if zconfig apply \
-    -e db2_ssid="${DB2_SSID}" \
-    -e db2_hlq="${DB2_HLQ}" \
-    -e db2_user_catalog="${DB2_PROVISION_USER_CATALOG}" \
-    -e db2_authid="${DB2_PROVISION_AUTHID}" \
-    -e db2_volume="${DB2_PROVISION_VOLUME}" \
-    -e db2_storage_class="${DB2_PROVISION_STORAGE_CLASS}" \
-    -e db2_data_class="${DB2_PROVISION_DATA_CLASS}" \
-    -e db2_java_home="${DB2_PROVISION_JAVA_HOME}" \
-    -e db2_javaenv="${DB2_PROVISION_JAVAENV}" \
-    -e db2_javaenvv="${DB2_PROVISION_JAVAENVV}" \
-    -e db2_jvmprops="${DB2_PROVISION_JVMPROPS}" \
-    -e db2_sdsnexit="${DB2_PROVISION_SDSNEXIT}" \
-    -e cics_hlq="${CICS_HLQ}" \
-    db2-provision.yaml -v; then
+# Resolve values before zconfig reads the file, including optional SMS fields.
+provision_file=$(mktemp "$SCRIPTS_DIR/../zconfig/db2-rendered.XXXXXX")
+trap 'rm -f "$provision_file"' EXIT
+if command -v chtag >/dev/null 2>&1; then
+    chtag -b "$provision_file"
+fi
+"$PYTHON_HOME/bin/python3" "$SCRIPTS_DIR/../lib/db2_provisioning.py" render \
+    "$SCRIPTS_DIR/../zconfig/db2-provision.yaml" "$provision_file"
+if command -v chtag >/dev/null 2>&1; then
+    chtag -tc UTF-8 "$provision_file"
+fi
+
+if zconfig apply "$provision_file" -v; then
     print_success "zconfig Db2 provisioning completed successfully!"
 else
     print_error "zconfig Db2 provisioning failed"
@@ -91,7 +91,9 @@ print_stage "STAGE 2: Verify Db2 subsystem is active"
 
 print_info "Waiting up to ${DB2_PROVISION_START_TIMEOUT_SECONDS}s for Db2 subsystem ${DB2_SSID} to initialise..."
 elapsed=0
-until opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null | grep -q "${DB2_SSID}MSTR"; do
+while true; do
+    state=$(read_db2_master_status) || exit 1
+    [[ "$state" == active ]] && break
     if [ "$elapsed" -ge "$DB2_PROVISION_START_TIMEOUT_SECONDS" ]; then
         print_error "Db2 subsystem ${DB2_SSID} did not become active within ${DB2_PROVISION_START_TIMEOUT_SECONDS}s"
         exit 1

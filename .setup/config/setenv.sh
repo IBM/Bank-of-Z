@@ -35,7 +35,7 @@ _BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET=false
 for _bankz_var in \
     CICS_AUTO_REPLY_GO \
     DB2_PROVISION DB2_REPROVISION DB2_HLQ DB2_SSID DB2_JAVA_FOLDER \
-    DB2_PROVISION_USER_CATALOG DB2_PROVISION_AUTHID DB2_PROVISION_VOLUME \
+    DB2_PROVISION_CATALOG DB2_PROVISION_USER_CATALOG DB2_PROVISION_AUTHID DB2_PROVISION_VOLUME \
     DB2_PROVISION_STORAGE_CLASS DB2_PROVISION_DATA_CLASS \
     DB2_PROVISION_JAVA_HOME DB2_PROVISION_JAVAENV DB2_PROVISION_JAVAENVV \
     DB2_PROVISION_JVMPROPS DB2_PROVISION_SDSNEXIT \
@@ -78,11 +78,11 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${B
 # Global
 _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
-ZOS_CURRENT_USER="{{ global.zos_current_user }}"
-ZOS_ADMIN_USER="{{ global.zos_admin_user }}"
-ZOS_CA_LABEL="{{ global.zos_ca_label }}"
-ZOS_KEYRING="{{ global.zos_keyring }}"
-ZOS_CREATE_CERTS="{{ global.zos_create_certs }}"
+ZOS_CURRENT_USER="{{ cfg.zos_current_user }}"
+ZOS_ADMIN_USER="{{ cfg.zos_admin_user }}"
+ZOS_CA_LABEL="{{ cfg.zos_ca_label }}"
+ZOS_KEYRING="{{ cfg.zos_keyring }}"
+ZOS_CREATE_CERTS="{{ cfg.zos_create_certs }}"
 
 # Application
 APP_BASE_NAME="{{ app.base_name }}"
@@ -197,8 +197,9 @@ DEBUG_TCPIP_HQL="{{ debug.tcpip_hlq }}"
 EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 
 # Db2
-DB2_PROVISION="${DB2_PROVISION:-{{ global.db2_provision }}}"
-DB2_REPROVISION="${DB2_REPROVISION:-{{ global.db2_reprovision }}}"
+DB2_PROVISION_CATALOG="${DB2_PROVISION_CATALOG-{{ db2_provisioning.catalog | default('') }}}"
+DB2_PROVISION="${DB2_PROVISION:-{{ cfg.db2_provision }}}"
+DB2_REPROVISION="${DB2_REPROVISION:-{{ cfg.db2_reprovision }}}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"

@@ -16,6 +16,19 @@ set -e  # Exit on error
 # Source library scripts
 # =========================
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# setup-local.sh reads the YAML configuration before it can issue remote
+# commands. Check its Mac-side dependencies first so the failure is clear.
+if ! command -v zowe >/dev/null 2>&1; then
+    echo "[ERROR] Zowe CLI is required to run setup-local.sh."
+    exit 1
+fi
+if ! python3 -c 'import yaml, jinja2' >/dev/null 2>&1; then
+    echo "[ERROR] Python packages PyYAML and Jinja2 are required to run setup-local.sh."
+    echo "[INFO] Install them with: python3 -m pip install --user PyYAML Jinja2"
+    exit 1
+fi
+
 source "$SCRIPTS_DIR/config/setenv.sh"
 
 #########################################################
@@ -93,8 +106,24 @@ stage_clone_bank_of_z() {
         fi
     fi
     
-    # Clone Bank of Z repository
-    current_repo=$(git config --get remote.origin.url | sed -E 's#git@([^:]+):#https://\1/#')
+    # Clone from the remote that contains the current branch. This supports
+    # feature branches hosted in a fork when origin points at IBM/Bank-of-Z.
+    current_remote=$(git config --get "branch.${current_branch}.remote" 2>/dev/null || true)
+    if [[ -z "$current_remote" ]]; then
+        for remote_name in $(git remote); do
+            remote_url=$(git config --get "remote.${remote_name}.url")
+            if git ls-remote --exit-code --heads "$remote_url" "refs/heads/${current_branch}" >/dev/null 2>&1; then
+                current_remote="$remote_name"
+                break
+            fi
+        done
+    fi
+    current_remote="${current_remote:-origin}"
+    current_repo=$(git config --get "remote.${current_remote}.url" | sed -E 's#git@([^:]+):#https://\1/#')
+    if [[ -z "$current_repo" ]]; then
+        print_error "Unable to determine the Git remote for branch '$current_branch'"
+        exit 1
+    fi
     print_info "Cloning $current_repo on remote (branch: $current_branch)..."
     print_info "This may take a few minutes..."
     

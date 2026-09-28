@@ -408,6 +408,35 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Create a new account
+      description: Create a new bank account for a customer via the CICS CREACC program
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     get:
       tags:
         - Accounts
@@ -866,6 +895,68 @@ components:
           description: Current status of the customer
           example: "ACTIVE"
 
+
+    CreateAccountRequest:
+      type: object
+      required:
+        - customerNumber
+        - accountType
+      properties:
+        customerNumber:
+          type: string
+          description: Customer number to create account for
+          example: "0000000042"
+        accountType:
+          type: string
+          description: Type of account to create
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA]
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 99.99
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          minimum: 0
+          description: Overdraft limit in whole currency units
+          example: 500
+        openedDate:
+          type: string
+          format: date
+          description: Date account is opened (YYYY-MM-DD); defaults to today if omitted
+          example: "2026-01-15"
+
+    CreatedAccount:
+      type: object
+      required:
+        - accountId
+        - sortCode
+      properties:
+        accountId:
+          type: string
+          description: The newly assigned account number
+          example: "00000001"
+        sortCode:
+          type: string
+          description: The bank sort code for this account
+          example: "987654"
+        openedDate:
+          type: string
+          description: Date account was opened (DDMMYYYY format from CREACC)
+          example: "15012026"
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance at account opening
+          example: 0.00
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance at account opening
+          example: 0.00
 
     AccountList:
       type: object

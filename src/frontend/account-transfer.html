@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Transfer Funds - Bank of Z</title>
+
+    <!-- Carbon Design System Styles -->
+    <link rel="stylesheet" href="css/carbon-styles.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/carbon-overrides.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <cds-layer class="cds--white landing-page">
+        <!-- Banner -->
+        <cds-layer class="layer landing-page__banner">
+            <div class="landing-page__heading">
+                <cds-breadcrumb>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                    <cds-breadcrumb-item>
+                        <cds-breadcrumb-link href="account-transfer.html">Transfer Funds</cds-breadcrumb-link>
+                    </cds-breadcrumb-item>
+                </cds-breadcrumb>
+                <h1>Transfer Funds Between Accounts</h1>
+            </div>
+        </cds-layer>
+
+        <div class="cds--content">
+            <!-- Notification Container -->
+            <div id="notification-container"></div>
+
+            <cds-stack gap="7">
+                <!-- Transfer Form Section -->
+                <cds-layer class="layer">
+                    <h3>Transfer Details</h3>
+                    <cds-form id="transfer-form" class="form-constrained">
+                        <cds-stack gap="7">
+                            <cds-form-item>
+                                <cds-text-input id="fromAccountId" label="From Account Number"
+                                    placeholder="e.g. 10000001" required
+                                    helper-text="Account number to transfer funds from (8 digits)">
+                                </cds-text-input>
+                            </cds-form-item>
+
+                            <cds-form-item>
+                                <cds-text-input id="fromSortCode" label="From Sort Code"
+                                    placeholder="987654" required
+                                    helper-text="Bank sort code for the source account (6 digits)">
+                                </cds-text-input>
+                            </cds-form-item>
+
+                            <cds-form-item>
+                                <cds-text-input id="toAccountId" label="To Account Number"
+                                    placeholder="e.g. 10000002" required
+                                    helper-text="Account number to transfer funds to (8 digits)">
+                                </cds-text-input>
+                            </cds-form-item>
+
+                            <cds-form-item>
+                                <cds-text-input id="toSortCode" label="To Sort Code"
+                                    placeholder="987654" required
+                                    helper-text="Bank sort code for the destination account (6 digits)">
+                                </cds-text-input>
+                            </cds-form-item>
+
+                            <cds-form-item>
+                                <cds-text-input id="amount" label="Transfer Amount"
+                                    placeholder="e.g. 50.00" required
+                                    helper-text="Amount to transfer (must be positive, min 0.01)">
+                                </cds-text-input>
+                            </cds-form-item>
+
+                            <cds-button id="submit-btn" type="submit">Transfer Funds</cds-button>
+                        </cds-stack>
+                    </cds-form>
+                </cds-layer>
+
+                <!-- Transfer Result Summary Section -->
+                <cds-layer class="layer" id="result-summary-section" style="display: none;">
+                    <h3>Transfer Completed</h3>
+                    <cds-grid>
+                        <cds-column lg="8" md="4" sm="4">
+                            <cds-stack gap="5">
+                                <h4>Source Account</h4>
+                                <div><strong>Account Number:</strong> <span id="res-from-acc"></span></div>
+                                <div><strong>Available Balance:</strong> <span id="res-from-avail"></span></div>
+                                <div><strong>Actual Balance:</strong> <span id="res-from-act"></span></div>
+                            </cds-stack>
+                        </cds-column>
+                        <cds-column lg="8" md="4" sm="4">
+                            <cds-stack gap="5">
+                                <h4>Destination Account</h4>
+                                <div><strong>Account Number:</strong> <span id="res-to-acc"></span></div>
+                                <div><strong>Available Balance:</strong> <span id="res-to-avail"></span></div>
+                                <div><strong>Actual Balance:</strong> <span id="res-to-act"></span></div>
+                            </cds-stack>
+                        </cds-column>
+                    </cds-grid>
+                </cds-layer>
+            </cds-stack>
+        </div>
+    </cds-layer>
+
+    <!-- Carbon Web Components - Component-specific imports -->
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/loading.min.js"></script>
+    <script type="module"
+        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/notification.min.js"></script>
+
+    <!-- Page Script -->
+    <script type="module">
+        import { createAdminHeader } from './js/components/headers.js';
+        import api from './js/api.js';
+        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
+        import { config } from './config.js';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject header
+            document.getElementById('header-container').innerHTML = createAdminHeader();
+
+            // Set default sort codes
+            const defaultSortCode = config.defaults ? config.defaults.sortCode : '987654';
+            document.getElementById('fromSortCode').value = defaultSortCode;
+            document.getElementById('toSortCode').value = defaultSortCode;
+
+            // Check if fromAccountId is in query string
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromAccountParam = urlParams.get('fromAccountId') || urlParams.get('accountId');
+            if (fromAccountParam) {
+                document.getElementById('fromAccountId').value = fromAccountParam;
+            }
+
+            // Handle form submission
+            document.getElementById('submit-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await handleTransfer();
+            });
+        });
+
+        function displayNotification(kind, title, message) {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = `
+                <cds-inline-notification kind="${kind}" title="${title}" subtitle="${message}" hide-close-button></cds-inline-notification>
+                <br />
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearNotification() {
+            const container = document.getElementById('notification-container');
+            container.innerHTML = '';
+        }
+
+        function formatCurrency(val) {
+            const num = parseFloat(val);
+            return isNaN(num) ? 'N/A' : `$${num.toFixed(2)}`;
+        }
+
+        async function handleTransfer() {
+            clearNotification();
+
+            const fromAccountId = document.getElementById('fromAccountId').value.trim();
+            const fromSortCode = document.getElementById('fromSortCode').value.trim();
+            const toAccountId = document.getElementById('toAccountId').value.trim();
+            const toSortCode = document.getElementById('toSortCode').value.trim();
+            const amountStr = document.getElementById('amount').value.trim();
+            const amount = parseFloat(amountStr);
+
+            // Validations
+            if (!fromAccountId) {
+                displayNotification('error', 'Validation Error', 'Please enter a source (From) account number');
+                return;
+            }
+
+            if (!toAccountId) {
+                displayNotification('error', 'Validation Error', 'Please enter a destination (To) account number');
+                return;
+            }
+
+            if (fromAccountId === toAccountId && fromSortCode === toSortCode) {
+                displayNotification('error', 'Validation Error', 'Source and destination accounts cannot be identical');
+                return;
+            }
+
+            if (!fromSortCode || !/^\d{6}$/.test(fromSortCode)) {
+                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit From sort code');
+                return;
+            }
+
+            if (!toSortCode || !/^\d{6}$/.test(toSortCode)) {
+                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit To sort code');
+                return;
+            }
+
+            if (!amountStr || isNaN(amount) || amount <= 0) {
+                displayNotification('error', 'Validation Error', 'Please enter a valid transfer amount greater than 0');
+                return;
+            }
+
+            const transferData = {
+                toAccountId: toAccountId,
+                amount: amount,
+                fromSortCode: fromSortCode,
+                toSortCode: toSortCode
+            };
+
+            showLoadingModal('Processing funds transfer...');
+
+            try {
+                const result = await api.accounts.transferFunds(fromAccountId, transferData);
+                hideLoadingModal();
+
+                // Display summary
+                document.getElementById('res-from-acc').textContent = fromAccountId;
+                document.getElementById('res-from-avail').textContent = formatCurrency(result.fromAccountAvailableBalance);
+                document.getElementById('res-from-act').textContent = formatCurrency(result.fromAccountActualBalance);
+
+                document.getElementById('res-to-acc').textContent = toAccountId;
+                document.getElementById('res-to-avail').textContent = formatCurrency(result.toAccountAvailableBalance);
+                document.getElementById('res-to-act').textContent = formatCurrency(result.toAccountActualBalance);
+
+                document.getElementById('result-summary-section').style.display = 'block';
+
+                showSuccessModal(
+                    'Transfer Successful',
+                    `Successfully transferred $${amount.toFixed(2)} from account ${fromAccountId} to account ${toAccountId}.`
+                );
+
+                // Clear amount field
+                document.getElementById('amount').value = '';
+
+                // Scroll to result summary
+                window.scrollTo({
+                    top: document.getElementById('result-summary-section').offsetTop - 50,
+                    behavior: 'smooth'
+                });
+            } catch (error) {
+                hideLoadingModal();
+                console.error('Transfer error:', error);
+
+                let errorMessage = 'Failed to process transfer';
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.status === 404) {
+                    errorMessage = 'One or both accounts were not found';
+                } else if (error.status === 400) {
+                    errorMessage = 'Invalid transfer request or insufficient funds.';
+                } else if (error.status === 500) {
+                    errorMessage = 'Server error during transfer.';
+                }
+
+                showErrorModal('Transfer Failed', errorMessage);
+            }
+        }
+    </script>
+</body>
+
+</html>

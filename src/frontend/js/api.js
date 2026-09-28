@@ -357,13 +357,20 @@ class AccountsApi extends BaseApi {
     }
 
     /**
-     * Update account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
+     * Update account
+     * PUT /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
      * @param {Object} accountData - Updated account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} [accountData.accountType] - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @returns {Promise<UpdatedAccount>} Updated account details
      */
-    async updateAccount(accountNumber, accountData) {
-        throw new Error('Account updates are not supported in the OpenBanking API specification');
+    async updateAccount(accountId, accountData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'PUT',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**

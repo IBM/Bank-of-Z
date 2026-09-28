@@ -502,6 +502,43 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Accounts
+      summary: Update account
+      description: Update editable fields (account type, interest rate, overdraft limit) for a specific account via the CICS UPDACC program
+      operationId: updateAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "00000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Accounts
@@ -957,6 +994,72 @@ components:
           format: double
           description: Actual balance at account opening
           example: 0.00
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        accountType:
+          type: string
+          description: Type of account
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA]
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 99.99
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          minimum: 0
+          description: Overdraft limit in whole currency units
+          example: 500
+
+    UpdatedAccount:
+      type: object
+      required:
+        - accountId
+      properties:
+        accountId:
+          type: string
+          description: Account number
+          example: "00000001"
+        sortCode:
+          type: string
+          description: Bank sort code
+          example: "987654"
+        customerId:
+          type: string
+          description: Customer ID associated with this account
+          example: "0000000042"
+        accountType:
+          type: string
+          description: Updated account type
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          description: Updated annual interest rate
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          description: Updated overdraft limit
+          example: 500
+        openedDate:
+          type: string
+          description: Date account was opened (DDMMYYYY format from UPDACC)
+          example: "15012026"
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance
+          example: 1234.56
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance
+          example: 1234.56
 
     AccountList:
       type: object

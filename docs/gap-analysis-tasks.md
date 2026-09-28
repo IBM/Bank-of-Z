@@ -75,8 +75,8 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - `account-details.html` shows an "Update" button in the UI but it cannot call the backend.
 
 ### Task GAP-2-A — CICS: Verify UPDACC is CICS-linkable via zosConnect
-- [ ] Confirm `UPDACC` program/transaction exists in the CICS region.
-- [ ] The commarea `UPDACC.cpy` carries all editable fields plus read-only fields the program needs for context (account number, sort code, customer number). No COBOL change required.
+- [x] Confirm `UPDACC` program/transaction exists in the CICS region.
+- [x] The commarea `UPDACC.cpy` carries all editable fields plus read-only fields the program needs for context (account number, sort code, customer number). No COBOL change required.
 
 ### Task GAP-2-B — zosConnect: Register UPDACC as a new zosAsset
 - [x] Create `src/api/src/main/zosAssets/UPDACC/` directory with `zosAsset.yaml`, `providerFiles/COMMAREA.cpy`, and `providerFiles/gen/` schemas.
@@ -240,8 +240,8 @@ All three unimplemented stubs should be replaced once their respective gaps abov
 
 ### Task CROSS-2 — OpenAPI: Regenerate Java API interface classes
 After all new paths and schemas are added to `openapi.yaml`:
-- [ ] Run the OpenAPI generator to regenerate `src/api/src/gen/java/com/ibm/zosconnect/api/AccountsApi.java` with the new `createAccount`, `updateAccount`, `deleteAccount`, and `transferFunds` operations.
-- [ ] Rebuild the WAR: `cd src/api && ./gradlew war`.
+- [x] Run the OpenAPI generator to regenerate `src/api/src/gen/java/com/ibm/zosconnect/api/AccountsApi.java` with the new `createAccount`, `updateAccount`, `deleteAccount`, and `transferFunds` operations.
+- [x] Rebuild the WAR: `cd src/api && gradle war` — BUILD SUCCESSFUL.
 
 ### Task CROSS-3 — Testing: Add end-to-end smoke tests for each new endpoint
 For each new operation, add a test in `tests/` that:

@@ -12,6 +12,7 @@ set -eu
 
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
+source "$SCRIPTS_DIR/../lib/db2-status.sh"
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -59,8 +60,8 @@ if zconfig ls 2>/dev/null | grep -Fq "$target_id"; then
     exit 1
 fi
 
-_opercmd_out=$(opercmd "D A,${DB2_SSID}MSTR" 2>/dev/null || true)
-if echo "${_opercmd_out}" | grep -v "NOT FOUND" | grep -v "D A,${DB2_SSID}MSTR" | grep -q "${DB2_SSID}MSTR"; then
+state=$(read_db2_master_status) || exit 1
+if [[ "$state" == active ]]; then
     print_error "Db2 subsystem ${DB2_SSID} is still active after zconfig removal"
     deactivate
     exit 1

@@ -5,14 +5,14 @@ title: Operations Context and Repeatable Deployment
 
 # Operations Context and Repeatable Deployment
 
-This note records the operational sequence verified on the Bank of Z z/OS environment. It separates an application redeploy from a full environment rebuild.
+This note records historical z/OS observations and the current deployment sequence. The replacement provisioning helpers require a fresh z/OS integration run. It separates an application redeploy from a full environment rebuild.
 
-## Verified Db2 configuration
+## Db2 configuration
 
 Bank of Z can use an existing Db2 subsystem; it does not provision one during setup unless explicitly configured to do so.
 
 ```yaml
-cfg:
+global:
   db2_provision: "false"
   db2_ssid: "<your-existing-ssid>"
   db2_runlib: "<your-runlib-data-set>"
@@ -23,12 +23,12 @@ The Db2 master address space must be active before setup or deployment. The Db2 
 ## Db2 lifecycle test
 
 The normal `environment` phase does not remove or recreate Db2 when
-`cfg.db2_provision` is `false`; it only recreates Bank of Z middleware and
+`global.db2_provision` is `false`; it only recreates Bank of Z middleware and
 its application database objects on the existing subsystem.
 
 To make every environment iteration run the complete Db2 lifecycle, set both
-`cfg.db2_provision: "true"` and `cfg.db2_reprovision: "true"`, and ensure
-`cfg.db2_ssid` identifies the intended subsystem. `environment` then stops
+`global.db2_provision: "true"` and `global.db2_reprovision: "true"`, and ensure
+`global.db2_ssid` identifies the intended subsystem. `environment` then stops
 Bank of Z consumers, removes the zconfig-managed Db2 subsystem, provisions it
 again, and continues with the Bank of Z rebuild.
 
@@ -61,7 +61,7 @@ overwritten by a zconfig upgrade; track the underlying fix with zconfig.
 The Bank of Z Db2 teardown uses zconfig `rm --ie`. The `--ie` option is the
 zconfig-supported way to continue past cleanup errors, such as an alias already
 being absent after a partial provision. This makes the intentional destructive
-`cfg.db2_reprovision: "true"` workflow repeatable. Bank of Z still verifies that
+`global.db2_reprovision: "true"` workflow repeatable. Bank of Z still verifies that
 zconfig no longer reports the Db2 configuration and that its Db2 master address
 space is not active before treating teardown as successful.
 
@@ -69,7 +69,7 @@ space is not active before treating teardown as successful.
 
 `db2_provisioning.java_home` supplies the Java runtime for Db2's
 `<SSID>WLM_JAVA` application environment. It must reference a Java installation
-(by default, `cfg.java_home`), not `db2_java_dir`, which is the Db2 installation
+(by default, `global.java_home`), not `db2_java_dir`, which is the Db2 installation
 directory containing JDBC and Db2 Java classes. If `DSNTIJRV` reports that the
 Java WLM environment is unavailable, inspect its `DBD2WLMJ` (or equivalent)
 started-task output. `CEE3501S The module libjvm.so was not found` indicates an
@@ -78,7 +78,7 @@ invalid Java runtime path.
 ### ZDVT lifecycle-test checkpoint
 
 The repeatable lifecycle test on the ZDVT image uses `DBD2` with
-`cfg.db2_provision: "true"` and `cfg.db2_reprovision: "true"`. The following
+`global.db2_provision: "true"` and `global.db2_reprovision: "true"`. The following
 environment-specific zconfig behaviors were observed:
 
 - zconfig 0.8.0.dev1 must use a Db2 job timeout above 40 seconds; see the
@@ -222,3 +222,26 @@ opercmd 'S FEBOZ'
 ```
 
 Confirm the corresponding ports `9080` and `9081` are listening before accessing the frontend.
+
+## Provisioning settings and local verification
+
+The checked-in configuration uses `global`, with provisioning disabled and
+`DBD1` selected. Existing files using `cfg` remain supported by the configuration
+loader. Set `DB2_PROVISION=true` and the intended `DB2_SSID` explicitly when
+creating a subsystem.
+
+`db2_provisioning.catalog` (or `DB2_PROVISION_CATALOG`) optionally selects the
+VSAM catalog prefix. An empty value leaves naming to zconfig. Empty volume,
+storage-class and data-class values are omitted from the generated configuration
+so site defaults can apply.
+
+The setup renders a temporary, fully resolved YAML file before invoking zconfig.
+Status checks distinguish active, absent, and indeterminate console responses;
+command failures or unrecognized output stop provisioning rather than assuming
+the subsystem is absent. The same check verifies startup and teardown.
+
+Run the local regression checks with:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_db2_provisioning.py'
+```

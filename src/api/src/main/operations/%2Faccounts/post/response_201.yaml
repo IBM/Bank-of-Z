@@ -1,0 +1,25 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACCZ.\"COMM-KEY\".\"COMM-NUMBER\"}}"
+    - sortCode:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.CREACCZ.\"COMM-KEY\".\"COMM-SORTCODE\"}}"
+    - openedDate:
+        required: false
+        nullable: true
+        expression: "$string($zosAssetResponse.commarea.CREACCZ.\"COMM-OPENED\")"
+    - availableBalance:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.CREACCZ.\"COMM-AVAIL-BAL\""
+    - actualBalance:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.CREACCZ.\"COMM-ACT-BAL\""

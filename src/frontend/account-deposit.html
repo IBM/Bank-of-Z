@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#000000">
-    <title>Deposit Funds - Bank of Z</title>
+    <title>Credit / Debit Funds - Bank of Z</title>
 
     <!-- Carbon Design System Styles -->
     <link rel="stylesheet" href="css/carbon-styles.min.css">
@@ -33,10 +33,10 @@
                         <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
                     </cds-breadcrumb-item>
                     <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="account-deposit.html">Deposit Funds</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                </cds-breadcrumb>
-                <h1>Deposit Funds to Account</h1>
+                       <cds-breadcrumb-link href="account-deposit.html">Credit / Debit Funds</cds-breadcrumb-link>
+                   </cds-breadcrumb-item>
+               </cds-breadcrumb>
+               <h1>Credit / Debit Funds</h1>
             </div>
         </cds-layer>
 
@@ -69,9 +69,9 @@
                     <div id="accounts-table"></div>
                 </cds-layer>
                 
-                <!-- Deposit Form Section -->
+                <!-- Credit / Debit Form Section -->
                 <cds-layer class="layer" id="deposit-form-section" style="display: none;">
-                    <h3>Deposit to Account</h3>
+                    <h3>Credit / Debit Account</h3>
                 <cds-form id="deposit-form" class="form-constrained">
                     <cds-stack gap="7">
                         <cds-form-item>
@@ -85,9 +85,16 @@
                         </cds-form-item>
 
                         <cds-form-item>
-                            <cds-text-input id="amount" label="Deposit Amount"
+                            <cds-select id="transactionSign" label="Transaction Type">
+                                <cds-select-item value="credit">Credit (+) — add funds</cds-select-item>
+                                <cds-select-item value="debit">Debit (−) — remove funds</cds-select-item>
+                            </cds-select>
+                        </cds-form-item>
+
+                        <cds-form-item>
+                            <cds-text-input id="amount" label="Amount"
                                 placeholder="e.g. 100.00"
-                                helper-text="Enter the amount to deposit (minimum 0.01)">
+                                helper-text="Enter the amount (must be greater than 0)">
                             </cds-text-input>
                         </cds-form-item>
 
@@ -105,7 +112,7 @@
                             </cds-text-input>
                         </cds-form-item>
 
-                        <cds-button id="submit-btn" type="submit">Deposit Funds</cds-button>
+                        <cds-button id="submit-btn" type="submit">Submit</cds-button>
                         <cds-button id="back-btn" kind="secondary">Back to Account Selection</cds-button>
                     </cds-stack>
                 </cds-form>
@@ -328,7 +335,7 @@
             // Validation
 
             if (!amount || amount <= 0) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid deposit amount greater than 0');
+                displayNotification('error', 'Validation Error', 'Please enter a valid amount greater than 0');
                 return;
             }
 
@@ -337,14 +344,19 @@
                 return;
             }
 
+            // Apply sign — debit sends a negative amount to DBCRFUN
+            const sign = document.getElementById('transactionSign').value;
+            const signedAmount = sign === 'debit' ? -Math.abs(amount) : Math.abs(amount);
+            const transactionLabel = sign === 'debit' ? 'debit' : 'deposit';
+
             // Prepare deposit data
             const depositData = {
-                amount: amount,
+                amount: signedAmount,
                 sortCode: sortCode,
-                description: description || 'Deposit via web interface'
+                description: description || (sign === 'debit' ? 'Debit via web interface' : 'Credit via web interface')
             };
 
-            showLoadingModal('Processing deposit...');
+            showLoadingModal(`Processing ${transactionLabel}...`);
 
             try {
                 const result = await api.accounts.depositToAccount(accountId, depositData, selectedCustomerId);
@@ -367,11 +379,13 @@
                         balanceDisplay = result.availableBalance[0].toFixed(2);
                     }
                 }
+
+                const successTitle = sign === 'debit' ? 'Debit Successful' : 'Credit Successful';
+                const successMsg = sign === 'debit'
+                    ? `Successfully debited $${amount.toFixed(2)} from account ${accountId}. New balance: $${balanceDisplay}`
+                    : `Successfully credited $${amount.toFixed(2)} to account ${accountId}. New balance: $${balanceDisplay}`;
                 
-                showSuccessModal(
-                    'Deposit Successful',
-                    `Successfully deposited $${amount.toFixed(2)} to account ${accountId}. New balance: $${balanceDisplay}`
-                );
+                showSuccessModal(successTitle, successMsg);
 
                 // Clear form and reset to search
                 document.getElementById('amount').value = '';
@@ -385,7 +399,7 @@
                 hideLoadingModal();
                 console.error('Deposit error:', error);
                 
-                let errorMessage = 'Failed to process deposit';
+                let errorMessage = `Failed to process ${transactionLabel}`;
                 if (error.message) {
                     errorMessage = error.message;
                 } else if (error.status === 404) {

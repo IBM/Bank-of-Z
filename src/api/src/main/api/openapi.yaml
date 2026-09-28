@@ -1313,8 +1313,10 @@ components:
         amount:
           type: number
           format: double
-          minimum: 0.01
-          description: Deposit amount (must be positive)
+          not:
+            maximum: 0
+            minimum: 0
+          description: "Amount to credit or debit. Positive value = credit (deposit); negative value = debit (withdrawal). Must be non-zero."
           example: 100.00
         sortCode:
           type: string

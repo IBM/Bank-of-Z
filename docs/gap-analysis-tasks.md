@@ -32,33 +32,33 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - No OpenAPI path exists for account creation.
 
 ### Task GAP-1-A — CICS: Verify CREACC is CICS-linkable via zosConnect
-- [ ] Confirm `CREACC` transaction/program is defined in the CICS region and can be called via a zosConnect CICS asset (it already exists as a commarea-based program).
-- [ ] No COBOL changes needed; the commarea interface (`CREACC.cpy`) already carries all required fields.
+- [x] Confirm `CREACC` transaction/program is defined in the CICS region and can be called via a zosConnect CICS asset (it already exists as a commarea-based program).
+- [x] No COBOL changes needed; the commarea interface (`CREACC.cpy`) already carries all required fields.
 
 ### Task GAP-1-B — zosConnect: Register CREACC as a new zosAsset
-- [ ] Create `src/api/src/main/zosAssets/CREACC/` directory structure matching existing assets.
-- [ ] Create `zosAsset.yaml` pointing to the CICS `CREACC` program.
-- [ ] Provide `providerFiles/COMMAREA.cpy` (copy from `src/base/cics/copy/CREACC.cpy`).
-- [ ] Generate `providerFiles/gen/` schema files (`requestSchema.json`, `responseSchema.json`, `CREACC_request_0.cpy`, `CREACC_response_0.cpy`) following the pattern in `DBCRFUN/`.
+- [x] Create `src/api/src/main/zosAssets/CREACC/` directory structure matching existing assets.
+- [x] Create `zosAsset.yaml` pointing to the CICS `CREACC` program.
+- [x] Provide `providerFiles/COMMAREA.cpy` (copy from `src/base/cics/copy/CREACC.cpy`).
+- [x] Generate `providerFiles/gen/` schema files (`requestSchema.json`, `responseSchema.json`, `CREACC_request_0.cpy`, `CREACC_response_0.cpy`) following the pattern in `DBCRFUN/`.
 
 ### Task GAP-1-C — zosConnect: Add POST /accounts operation
-- [ ] Create operation directory `src/api/src/main/operations/%2Faccounts/post/`.
-- [ ] Write `operation.yaml` with `zasset: "CREACC"`.
-- [ ] Write `request.yaml` mapping HTTP body fields (`customerNumber`, `accountType`, `interestRate`, `overdraftLimit`) to the CREACC commarea fields (`COMM-CUSTNO`, `COMM-ACC-TYPE`, `COMM-INT-RT`, `COMM-OVERDR-LIM`). Map `COMM-OPENED` from today's date.
-- [ ] Write `response_201.yaml` returning the new account id, sort code, and dates from `COMM-NUMBER`, `COMM-SORTCODE`, `COMM-OPENED-*`, `COMM-AVAIL-BAL`, `COMM-ACT-BAL`.
-- [ ] Write `response_400.yaml`, `response_404.yaml` (customer not found), `response_500.yaml`.
-- [ ] Write `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`.
+- [x] Create operation directory `src/api/src/main/operations/%2Faccounts/post/`.
+- [x] Write `operation.yaml` with `zasset: "CREACC"`.
+- [x] Write `request.yaml` mapping HTTP body fields (`customerNumber`, `accountType`, `interestRate`, `overdraftLimit`) to the CREACC commarea fields (`COMM-CUSTNO`, `COMM-ACC-TYPE`, `COMM-INT-RT`, `COMM-OVERDR-LIM`). Map `COMM-OPENED` from today's date.
+- [x] Write `response_201.yaml` returning the new account id, sort code, and dates from `COMM-NUMBER`, `COMM-SORTCODE`, `COMM-OPENED-*`, `COMM-AVAIL-BAL`, `COMM-ACT-BAL`.
+- [x] Write `response_400.yaml`, `response_404.yaml` (customer not found), `response_500.yaml`.
+- [x] Write `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`.
 
 ### Task GAP-1-D — OpenAPI: Add POST /accounts path + CreateAccountRequest schema
-- [ ] Add `POST /accounts` to `src/api/src/main/api/openapi.yaml` under paths.
-- [ ] Add `CreateAccountRequest` schema: `customerNumber (string, required)`, `accountType (string, required, enum: SAVING|CURRENT|LOAN|MORTGAGE|ISA)`, `interestRate (number, min 0, max 99.99)`, `overdraftLimit (integer, min 0)`.
-- [ ] Add `CreatedAccount` response schema: `accountId`, `sortCode`, `openedDate`, `availableBalance`, `actualBalance`.
-- [ ] Regenerate `src/api/src/gen/java/com/ibm/zosconnect/api/AccountsApi.java` (or update by hand) to include the new operation method.
+- [x] Add `POST /accounts` to `src/api/src/main/api/openapi.yaml` under paths.
+- [x] Add `CreateAccountRequest` schema: `customerNumber (string, required)`, `accountType (string, required, enum: SAVING|CURRENT|LOAN|MORTGAGE|ISA)`, `interestRate (number, min 0, max 99.99)`, `overdraftLimit (integer, min 0)`.
+- [x] Add `CreatedAccount` response schema: `accountId`, `sortCode`, `openedDate`, `availableBalance`, `actualBalance`.
+- [x] Regenerate `src/api/src/gen/java/com/ibm/zosconnect/api/AccountsApi.java` (or update by hand) to include the new operation method.
 
 ### Task GAP-1-E — Frontend: Wire account-create.html to the new API
-- [ ] Remove the `throw` stub from `AccountsApi.createAccount()` in `src/frontend/js/api.js`.
-- [ ] Implement `createAccount(accountData)` calling `POST ${baseUrl}/accounts` with JSON body.
-- [ ] Update `src/frontend/account-create.html` to display the returned account number and sort code in the success modal (currently uses `response.id || response.accountNumber` which will match once the API returns `accountId`).
+- [x] Remove the `throw` stub from `AccountsApi.createAccount()` in `src/frontend/js/api.js`.
+- [x] Implement `createAccount(accountData)` calling `POST ${baseUrl}/accounts` with JSON body.
+- [x] Update `src/frontend/account-create.html` to display the returned account number and sort code in the success modal (currently uses `response.id || response.accountNumber` which will match once the API returns `accountId`).
 
 ---
 
@@ -114,26 +114,26 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - `account-delete.html` search/delete form exists but the delete call always fails.
 
 ### Task GAP-3-A — CICS: Verify DELACC is CICS-linkable
-- [ ] Confirm `DELACC` program is installed and linkable. The commarea (`DELACC.cpy`) includes PCB pointer fields (`DELACC-DEL-PCB*`) which are IMS artefacts and should be left blank/zero for a pure CICS invocation.
+- [x] Confirm `DELACC` program is installed and linkable. The commarea (`DELACC.cpy`) includes PCB pointer fields (`DELACC-DEL-PCB*`) which are IMS artefacts and should be left blank/zero for a pure CICS invocation.
 
 ### Task GAP-3-B — zosConnect: Register DELACC as a new zosAsset
-- [ ] Create `src/api/src/main/zosAssets/DELACC/` with `zosAsset.yaml`, `providerFiles/DELACC.cpy`, and `providerFiles/gen/` schemas.
+- [x] Create `src/api/src/main/zosAssets/DELACC/` with `zosAsset.yaml`, `providerFiles/DELACC.cpy`, and `providerFiles/gen/` schemas.
 
 ### Task GAP-3-C — zosConnect: Add DELETE /accounts/{accountId} operation
-- [ ] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D/delete/`.
-- [ ] `operation.yaml`: `zasset: "DELACC"`.
-- [ ] `request.yaml`: map `accountId` path parameter → `DELACC-ACCNO`. Leave PCB pointer fields as empty/zero.
-- [ ] `response_204.yaml`: no body on success.
-- [ ] `response_404.yaml`, `response_400.yaml`, `response_500.yaml`.
-- [ ] `response_mapping.yaml` conditioned on `DELACC-DEL-SUCCESS = 'Y'`.
+- [x] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D/delete/`.
+- [x] `operation.yaml`: `zasset: "DELACC"`.
+- [x] `request.yaml`: map `accountId` path parameter → `DELACC-ACCNO`. Leave PCB pointer fields as empty/zero.
+- [x] `response_204.yaml`: no body on success.
+- [x] `response_404.yaml`, `response_400.yaml`, `response_500.yaml`.
+- [x] `response_mapping.yaml` conditioned on `DELACC-DEL-SUCCESS = 'Y'`.
 
 ### Task GAP-3-D — OpenAPI: Add DELETE /accounts/{accountId} path
-- [ ] Add `DELETE /accounts/{accountId}` to `openapi.yaml` with `204 No Content` success and standard error responses.
+- [x] Add `DELETE /accounts/{accountId}` to `openapi.yaml` with `204 No Content` success and standard error responses.
 
 ### Task GAP-3-E — Frontend: Wire account-delete.html to the new API
-- [ ] Remove the `throw` stub from `AccountsApi.deleteAccount()` in `src/frontend/js/api.js`.
-- [ ] Implement `deleteAccount(accountId)` calling `DELETE ${baseUrl}/accounts/${accountId}`.
-- [ ] `account-delete.html`: confirm the delete button correctly calls `api.accounts.deleteAccount(accountId)` and shows an appropriate success/error modal.
+- [x] Remove the `throw` stub from `AccountsApi.deleteAccount()` in `src/frontend/js/api.js`.
+- [x] Implement `deleteAccount(accountId)` calling `DELETE ${baseUrl}/accounts/${accountId}`.
+- [x] `account-delete.html`: confirm the delete button correctly calls `api.accounts.deleteAccount(accountId)` and shows an appropriate success/error modal.
 
 ---
 
@@ -199,16 +199,15 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - `account-deposit.html` has no sign selector.
 
 ### Task GAP-5-A — zosConnect: Extend /accounts/{accountId}/deposit to support negative amounts
-- [ ] Update `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D%2Fdeposit/post/request.yaml` to pass `$body.amount` directly (positive or negative) — DBCRFUN already handles signed values via `COMM-AMT PIC S9(10)V99`.
-- [ ] Remove the `minimum: 0.01` constraint from the `DepositRequest.amount` field in `openapi.yaml`, replacing with a non-zero validation note.
+- [x] `request.yaml` already passes `$body.amount` directly — DBCRFUN handles signed values via `COMM-AMT PIC S9(10)V99`. No change required.
 
 ### Task GAP-5-B — OpenAPI: Update DepositRequest schema to allow negative amounts (debits)
-- [ ] In `openapi.yaml`, update `DepositRequest.amount`: remove `minimum: 0.01`, add description clarifying positive = credit, negative = debit.
+- [x] In `openapi.yaml`, updated `DepositRequest.amount`: removed `minimum: 0.01`, added description clarifying positive = credit, negative = debit.
 
 ### Task GAP-5-C — Frontend: Add credit/debit sign selector to account-deposit.html
-- [ ] Add a `<cds-select id="transactionSign">` with options `Credit (+)` / `Debit (−)` to the deposit form in `account-deposit.html`.
-- [ ] Update the page title and breadcrumb to "Credit / Debit Funds" to match the BMS screen.
-- [ ] Multiply `amount` by `-1` when the sign selector is set to Debit before calling `api.accounts.depositToAccount()`.
+- [x] Added `<cds-select id="transactionSign">` with options `Credit (+)` / `Debit (−)` to the deposit form in `account-deposit.html`.
+- [x] Updated page title, breadcrumb, and `<h1>` to "Credit / Debit Funds" to match the BMS screen.
+- [x] Negate `amount` when sign selector is set to Debit before calling `api.accounts.depositToAccount()`.
 
 ---
 
@@ -222,12 +221,12 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - `customer-details.html` shows accounts when you look up a customer, but there is no standalone "accounts for customer" search page.
 
 ### Task GAP-6-A — Frontend: Add standalone "Accounts for Customer" search page
-- [ ] Create `src/frontend/customer-accounts.html` with a customer number search field.
-- [ ] On submit, call `api.customers.getCustomerAccounts(customerId)` and display results in a `<cds-data-table>` showing Sort Code, Account Number, Account Type, Available Balance, Actual Balance — matching the BNK1ACC column layout.
-- [ ] Each table row should link to `account-details.html?accountId=<id>`.
+- [x] Created `src/frontend/customer-accounts.html` with a customer number search field (supports C/I prefix for CICS/IMS).
+- [x] On submit, calls `api.customers.getCustomerAccounts(customerId, system)` and displays results in a `<cds-data-table>` showing Sort Code, Account Number, Account Type, Available Balance, Actual Balance — matching the BNK1ACC column layout.
+- [x] Each account number in the table links to `account-details.html?accountId=<id>`.
 
 ### Task GAP-6-B — Frontend: Add link to admin.html
-- [ ] Add `<cds-button kind="ghost" href="customer-accounts.html">Look up accounts by customer number</cds-button>` to the Account Services section of `admin.html`.
+- [x] Added `<cds-button kind="ghost" href="customer-accounts.html">Look up accounts by customer number</cds-button>` to the Account Services section of `admin.html`.
 
 ---
 
@@ -235,11 +234,9 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 
 ### Task CROSS-1 — Frontend: Remove all stub throws in api.js
 All three unimplemented stubs should be replaced once their respective gaps above are closed:
-- [ ] `AccountsApi.createAccount()` — replaced by GAP-1-E
-- [ ] `AccountsApi.updateAccount()` — replaced by GAP-2-E
-- [ ] `AccountsApi.deleteAccount()` — replaced by GAP-3-E
-
-These stubs currently display "Feature Not Implemented" errors in the UI; removing them should be done as part of each gap's frontend task, not independently.
+- [x] `AccountsApi.createAccount()` — replaced by GAP-1-E
+- [x] `AccountsApi.updateAccount()` — replaced by GAP-2-E
+- [x] `AccountsApi.deleteAccount()` — replaced by GAP-3-E
 
 ### Task CROSS-2 — OpenAPI: Regenerate Java API interface classes
 After all new paths and schemas are added to `openapi.yaml`:
@@ -248,9 +245,9 @@ After all new paths and schemas are added to `openapi.yaml`:
 
 ### Task CROSS-3 — Testing: Add end-to-end smoke tests for each new endpoint
 For each new operation, add a test in `tests/` that:
-- [ ] Calls the new endpoint with valid data and asserts HTTP 201/200/204.
-- [ ] Calls with missing/invalid data and asserts HTTP 400.
-- [ ] Calls with a non-existent account/customer ID and asserts HTTP 404.
+- [x] Calls the new endpoint with valid data and asserts HTTP 201/200/204 — covered by `tests/test_create_account.sh`, `tests/test_update_account.sh`, `tests/test_delete_account.sh`, `tests/test_transfer_funds.sh`.
+- [x] Calls with missing/invalid data and asserts HTTP 400.
+- [x] Calls with a non-existent account/customer ID and asserts HTTP 404.
 
 ---
 

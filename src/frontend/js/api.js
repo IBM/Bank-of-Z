@@ -338,14 +338,22 @@ class AccountsApi extends BaseApi {
         });
     }
 
-    // Stub methods for legacy endpoints not in OpenAPI spec
     /**
-     * Create a new account (stub - not in OpenAPI spec)
+     * Create a new account
+     * POST /accounts
      * @param {Object} accountData - Account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} accountData.customerNumber - Customer number (required)
+     * @param {string} accountData.accountType - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA (required)
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @param {string} [accountData.openedDate] - Opened date (YYYY-MM-DD); defaults to today
+     * @returns {Promise<CreatedAccount>} Created account with accountId, sortCode and balances
      */
     async createAccount(accountData) {
-        throw new Error('Account creation is not supported in the OpenBanking API specification');
+        return this.request(`${this.configuration.baseUrl}/accounts`, {
+            method: 'POST',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**

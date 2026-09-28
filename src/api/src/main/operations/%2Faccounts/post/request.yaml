@@ -1,0 +1,41 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CREACCZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            expression: "$number($body.customerNumber)"
+        - COMM-KEY:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-SORTCODE:
+                required: false
+                nullable: false
+                template: "987654"
+            - COMM-NUMBER:
+                required: false
+                nullable: false
+                template: "0"
+        - COMM-ACC-TYPE:
+            required: false
+            nullable: false
+            template: "{{$body.accountType}}"
+        - COMM-INT-RT:
+            required: false
+            nullable: false
+            expression: "$exists($body.interestRate) ? $number($body.interestRate) : 0"
+        - COMM-OPENED:
+            required: false
+            nullable: false
+            expression: "$exists($body.openedDate) and $match($body.openedDate, /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.openedDate, 8, 2) & $substring($body.openedDate, 5, 2) & $substring($body.openedDate, 0, 4)) : 0"
+        - COMM-OVERDR-LIM:
+            required: false
+            nullable: false
+            expression: "$exists($body.overdraftLimit) ? $number($body.overdraftLimit) : 0"

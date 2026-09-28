@@ -16,6 +16,7 @@ vars:
   proclib: "SYS1.PROCLIB"
   cics_ipic_port: 4320
   cics_debug_port: 27103
+  jcl_type: "PROC"
 
 cics_region:
   applid: "{{ vars.applid }}"
@@ -41,7 +42,7 @@ cics_region:
   region_hlq: "{{ vars.region_hlq }}.{{ vars.applid }}"
 
   region_jcl:
-    type: PROC
+    type: "{{ vars.jcl_type }}"
     dsn: "{{ vars.proclib }}({{ vars.applid }})"
     cics_exec_step_parameters:
       region: 0M

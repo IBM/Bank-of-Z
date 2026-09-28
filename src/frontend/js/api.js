@@ -359,12 +359,15 @@ class AccountsApi extends BaseApi {
     }
 
     /**
-     * Delete account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
-     * @returns {Promise<Object>} Rejected promise
+     * Delete account
+     * DELETE /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
+     * @returns {Promise<void>} No content on success
      */
-    async deleteAccount(accountNumber) {
-        throw new Error('Account deletion is not supported in the OpenBanking API specification');
+    async deleteAccount(accountId) {
+        await this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'DELETE'
+        });
     }
 
     /**

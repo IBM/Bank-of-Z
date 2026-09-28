@@ -1,0 +1,31 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "UPDACCZ" : {
+          "type" : "object",
+          "properties" : {
+            "COMM-EYE"       : { "maxLength" : 4,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-EYE PIC X(4) USAGE DISPLAY.",       "name" : "COMM-EYE"       } },
+            "COMM-CUSTNO"    : { "maxLength" : 10, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-CUSTNO PIC X(10) USAGE DISPLAY.",    "name" : "COMM-CUSTNO"    } },
+            "COMM-SCODE"     : { "maxLength" : 6,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-SCODE PIC X(6) USAGE DISPLAY.",      "name" : "COMM-SCODE"     } },
+            "COMM-ACCNO"     : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-ACCNO PIC 9(8) USAGE DISPLAY.", "name" : "COMM-ACCNO" } },
+            "COMM-ACC-TYPE"  : { "maxLength" : 8,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-ACC-TYPE PIC X(8) USAGE DISPLAY.",   "name" : "COMM-ACC-TYPE"  } },
+            "COMM-INT-RATE"  : { "minimum" : 0, "maximum" : 9999.99, "type" : "number",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-INT-RATE PIC 9(4)V99 USAGE DISPLAY.", "name" : "COMM-INT-RATE" } },
+            "COMM-OPENED"    : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-OPENED PIC 9(8) USAGE DISPLAY.", "name" : "COMM-OPENED" } },
+            "COMM-OVERDRAFT" : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-OVERDRAFT PIC 9(8) USAGE DISPLAY.", "name" : "COMM-OVERDRAFT" } },
+            "COMM-LAST-STMT-DT" : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-LAST-STMT-DT PIC 9(8) USAGE DISPLAY.", "name" : "COMM-LAST-STMT-DT" } },
+            "COMM-NEXT-STMT-DT" : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 COMM-NEXT-STMT-DT PIC 9(8) USAGE DISPLAY.", "name" : "COMM-NEXT-STMT-DT" } },
+            "COMM-AVAIL-BAL" : { "type" : "number", "x-ibm-zcon-metadata" : { "type" : "03 COMM-AVAIL-BAL PIC S9(10)V99 USAGE DISPLAY.",  "name" : "COMM-AVAIL-BAL"  } },
+            "COMM-ACTUAL-BAL": { "type" : "number", "x-ibm-zcon-metadata" : { "type" : "03 COMM-ACTUAL-BAL PIC S9(10)V99 USAGE DISPLAY.", "name" : "COMM-ACTUAL-BAL" } },
+            "COMM-SUCCESS"   : { "maxLength" : 1, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 COMM-SUCCESS PIC X USAGE DISPLAY.",       "name" : "COMM-SUCCESS"   } }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

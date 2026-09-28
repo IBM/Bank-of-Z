@@ -79,25 +79,25 @@ The current zosConnect API and web frontend cover **inquiry and deposit** well b
 - [ ] The commarea `UPDACC.cpy` carries all editable fields plus read-only fields the program needs for context (account number, sort code, customer number). No COBOL change required.
 
 ### Task GAP-2-B — zosConnect: Register UPDACC as a new zosAsset
-- [ ] Create `src/api/src/main/zosAssets/UPDACC/` directory with `zosAsset.yaml`, `providerFiles/COMMAREA.cpy`, and `providerFiles/gen/` schemas.
+- [x] Create `src/api/src/main/zosAssets/UPDACC/` directory with `zosAsset.yaml`, `providerFiles/COMMAREA.cpy`, and `providerFiles/gen/` schemas.
 
 ### Task GAP-2-C — zosConnect: Add PUT /accounts/{accountId} operation
-- [ ] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D/put/`.
-- [ ] `operation.yaml`: `zasset: "UPDACC"`.
-- [ ] `request.yaml`: map path parameter `accountId` → `COMM-ACCNO`; map body fields `accountType` → `COMM-ACC-TYPE`, `interestRate` → `COMM-INT-RATE`, `overdraftLimit` → `COMM-OVERDRAFT`. Pass `COMM-SCODE` from config/defaults.
-- [ ] `response_200.yaml`: return updated account fields from commarea.
-- [ ] `response_400.yaml`, `response_404.yaml`, `response_500.yaml`.
-- [ ] `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`.
+- [x] Create `src/api/src/main/operations/%2Faccounts%2F%7BaccountId%7D/put/`.
+- [x] `operation.yaml`: `zasset: "UPDACC"`.
+- [x] `request.yaml`: map path parameter `accountId` → `COMM-ACCNO`; map body fields `accountType` → `COMM-ACC-TYPE`, `interestRate` → `COMM-INT-RATE`, `overdraftLimit` → `COMM-OVERDRAFT`. Pass `COMM-SCODE` from config/defaults.
+- [x] `response_200.yaml`: return updated account fields from commarea.
+- [x] `response_400.yaml`, `response_404.yaml`, `response_500.yaml`.
+- [x] `response_mapping.yaml` conditioned on `COMM-SUCCESS = 'Y'`.
 
 ### Task GAP-2-D — OpenAPI: Add PUT /accounts/{accountId} path + UpdateAccountRequest schema
-- [ ] Add `PUT /accounts/{accountId}` to `openapi.yaml`.
-- [ ] Add `UpdateAccountRequest` schema: `accountType (string)`, `interestRate (number)`, `overdraftLimit (integer)`.
+- [x] Add `PUT /accounts/{accountId}` to `openapi.yaml`.
+- [x] Add `UpdateAccountRequest` schema: `accountType (string)`, `interestRate (number)`, `overdraftLimit (integer)`.
 
 ### Task GAP-2-E — Frontend: Wire the update form in account-details.html
-- [ ] Remove the `throw` stub from `AccountsApi.updateAccount()` in `src/frontend/js/api.js`.
-- [ ] Implement `updateAccount(accountId, accountData)` calling `PUT ${baseUrl}/accounts/${accountId}`.
-- [ ] In `account-details.html`, hook the existing (currently non-functional) "Update" / "Save" button to call `api.accounts.updateAccount()` with the editable fields.
-- [ ] Refresh the displayed account details from the API response after a successful update.
+- [x] Remove the `throw` stub from `AccountsApi.updateAccount()` in `src/frontend/js/api.js`.
+- [x] Implement `updateAccount(accountId, accountData)` calling `PUT ${baseUrl}/accounts/${accountId}`.
+- [x] In `account-details.html`, hook the existing (currently non-functional) "Update" / "Save" button to call `api.accounts.updateAccount()` with the editable fields.
+- [x] Refresh the displayed account details from the API response after a successful update.
 
 ---
 

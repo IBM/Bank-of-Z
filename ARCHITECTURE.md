@@ -319,7 +319,7 @@ zowe rse-api-for-zowe-cli issue unix-shell \
    /usr/lpp/liberty_zos/25.0.0.9/bin/server stop bankz-frontend && \
    sleep 3 && \
    /usr/lpp/liberty_zos/25.0.0.9/bin/server start bankz-frontend" \
-  --cwd "/" --rse-profile manzanita
+  --cwd "/" --rse-profile zdvt
 ```
 
 ### DBB metadata mismatch on branch switch

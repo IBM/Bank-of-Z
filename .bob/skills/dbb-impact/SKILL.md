@@ -32,7 +32,7 @@ Based on the answer, read the appropriate file with `read_file`:
 Zowe config files use two profile layouts — handle both:
 
 1. **Flat** — top-level `profiles` object where each entry has `"type": "rse"` directly.
-   Profile name = the top-level key (e.g. `"manzanita"`).
+   Profile name = the top-level key (e.g. `"zdvt"`).
 
 2. **Nested** — a top-level profile group (e.g. `"bank-of-z"`) whose `profiles` sub-object
    contains entries with `"type": "rse"`. The usable profile name is the dotted path

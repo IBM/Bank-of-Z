@@ -79,7 +79,7 @@ listed there, the API discards it even if COBOL sets it correctly.
 |---|---|
 | z/OS host | `9.47.93.199` |
 | SSH / RSE ports | `22` / `8195` |
-| Zowe profile | `manzanita` |
+| Zowe profile | `zdvt` |
 | CICS region | `CICSBOZ` |
 | z/OS Connect URL | `http://9.47.93.199:9080` |
 | Frontend URL | `http://9.47.93.199:9081` |

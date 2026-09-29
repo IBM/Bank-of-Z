@@ -103,7 +103,7 @@ sandbox:
 
 # Zowe CLI configuration
 zowe:
-  rse_profile: "manzanita"
+  rse_profile: "zdvt"
 
 # Git repositories to clone
 repositories:

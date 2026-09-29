@@ -27,7 +27,7 @@
             05 INQACC-NEXT-STMT-DAY         PIC 99.
             05 INQACC-NEXT-STMT-MONTH         PIC 99.
             05 INQACC-NEXT-STMT-YEAR         PIC 9999.
-          03 INQACC-AVAIL-BAL            PIC S9(10)V99.
+          03 INQACC-AVAIL-BAL            PIC S9(10).
           03 INQACC-ACTUAL-BAL           PIC S9(10)V99.
           03 INQACC-SUCCESS              PIC X.
           03 INQACC-PCB1-POINTER         POINTER.

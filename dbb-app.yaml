@@ -137,7 +137,7 @@ application:
         #   PGMNAME(LONGMIXED) - Mixed-case entry points for Java interop
         - name: compileParms
           forFiles: "**/src/base/ims/cobol/IBTRAN.cbl"
-          value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,LP(32),JAVAIOP(JAVA64),LIB
+          value: XREF,PGMNAME(LONGMIXED),DLL,RENT,NOEXP,THREAD,LIB
           append:
           - condition:
               exists: errPrefix

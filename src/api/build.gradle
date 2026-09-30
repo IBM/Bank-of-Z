@@ -39,4 +39,9 @@ tasks.named('processTestResources').configure {
     dependsOn tasks.named('openApiGenerate')
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.fork = true
+    options.forkOptions.memoryMaximumSize = '512m'
+}
+
 // Made with Bob

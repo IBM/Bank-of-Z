@@ -1586,7 +1586,7 @@ resourceDefinitions:
       authenticate: BASIC
       backlog: 30
       maxdatalen: 32768
-      portnumber: 27103
+      portnumber: "{{ vars.cics_debug_port }}"
       protocol: HTTP
       socketclose: NO
       ssl: NO

@@ -1,0 +1,789 @@
+#!/usr/bin/env bash
+
+#########################################################
+# runtime-manage.sh - Bank of Z runtime lifecycle manager
+# This script runs directly on z/OS USS (not remotely)
+#
+# Manages the lifecycle (stop / start / restart) of the
+# Bank of Z runtime servers WITHOUT touching any datasets
+# or application data.
+#
+# Used when the z/OS infrastructure is restarted and the
+# Bank of Z tasks need to be brought back up manually.
+#
+# Usage:
+#   bash runtime-manage.sh <action> <scope>
+#
+# Actions:
+#   stop      Stop servers (no data deletion)
+#   start     Start servers
+#   restart   Stop then start servers
+#   verify    Verify if servers are running
+#
+# Scopes (required - no default):
+#   all        IMS + CICS + z/OS Connect + Frontend
+#   ims        IMS control tasks + IRLM + app regions
+#   cics       CICS region
+#   frontend   z/OS Connect + Frontend Liberty
+#
+# Examples:
+#   bash runtime-manage.sh stop all
+#   bash runtime-manage.sh start ims
+#   bash runtime-manage.sh restart cics
+#   bash runtime-manage.sh restart frontend
+#   bash runtime-manage.sh verify all
+#
+# Environment variables:
+#   IMS_DISABLED    Set to true to skip all IMS tasks (default: false)
+#   IMS_COLD_START  Set to true to perform a cold start on the next IMS
+#                   restart instead of a warm restart (default: false)
+#########################################################
+
+set -e
+
+# =========================
+# Source library scripts
+# =========================
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPTS_DIR/config/setenv.sh"
+
+# =========================
+# Environment
+# =========================
+export PATH="${ZOAU_HOME:-}/bin:$PATH"
+export LIBPATH="${ZOAU_HOME:-}/lib:${LIBPATH:-}"
+
+#########################################################
+# Usage
+#########################################################
+print_usage() {
+    echo "Usage: bash runtime-manage.sh <action> <scope>"
+    echo ""
+    echo "Actions:"
+    echo "  stop      Stop servers (no data deletion)"
+    echo "  start     Start servers"
+    echo "  restart   Stop then start servers"
+    echo "  verify    Verify if servers are running"
+    echo ""
+    echo "Scopes (required):"
+    echo "  all        IMS + CICS + z/OS Connect + Frontend"
+    echo "  ims        IMS control tasks + IRLM + app regions"
+    echo "  cics       CICS region"
+    echo "  frontend   z/OS Connect + Frontend Liberty"
+    echo ""
+    echo "Examples:"
+    echo "  bash runtime-manage.sh stop all"
+    echo "  bash runtime-manage.sh start ims"
+    echo "  bash runtime-manage.sh restart cics"
+    echo "  bash runtime-manage.sh verify all"
+    echo ""
+    echo "Environment variables:"
+    echo "  IMS_DISABLED    Set to true to skip all IMS tasks (default: false)"
+    echo "  IMS_COLD_START  Set to true to cold-start IMS on next restart (default: false)"
+}
+
+#########################################################
+# Helper: Check if a z/OS task/job is currently running
+#########################################################
+is_task_running() {
+    local task_name="$1"
+    local output
+    output=$(opercmd "D A,${task_name}" 2>/dev/null || true)
+    if echo "$output" | grep -qi "NOT FOUND"; then
+        return 1
+    fi
+    if echo "$output" | grep -qi "${task_name}"; then
+        return 0
+    fi
+    return 1
+}
+
+#########################################################
+# Helper: Wait for a z/OS task to be up and running
+#########################################################
+wait_for_task_running() {
+    local task_name="$1"
+    local description="${2:-$task_name}"
+    local max_checks="${3:-6}"
+    local interval="${4:-5}"
+
+    print_info "Waiting for ${description} to start..."
+    local count=0
+    while ! is_task_running "${task_name}" && [[ $count -lt $max_checks ]]; do
+        sleep "$interval"
+        count=$((count + 1))
+    done
+
+    if is_task_running "${task_name}"; then
+        print_success "${description} (${task_name}) is running"
+        return 0
+    else
+        print_warning "${description} (${task_name}) status could not be verified"
+        return 1
+    fi
+}
+
+#########################################################
+# Helper: Wait for a z/OS task to stop running
+#########################################################
+wait_for_task_termination() {
+    local task_name="$1"
+    local max_checks="${2:-6}"
+    local interval="${3:-5}"
+
+    local count=0
+    while is_task_running "${task_name}" && [[ $count -lt $max_checks ]]; do
+        sleep "$interval"
+        count=$((count + 1))
+    done
+}
+
+#########################################################
+# Stop z/OS Connect and Frontend Liberty servers
+#########################################################
+stop_frontend() {
+    print_stage "STAGE: Stop z/OS Connect and Frontend Liberty servers"
+    set +e
+
+    # Stop BAQ (z/OS Connect)
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is active - issuing stop..."
+        opercmd "P BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        wait_for_task_termination "BAQ${APP_SHORT_NAME}"
+
+        # Cancel only if still active after stop attempt
+        if is_task_running "BAQ${APP_SHORT_NAME}"; then
+            print_info "BAQ${APP_SHORT_NAME} still active - issuing cancel..."
+            jcan P "BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+        fi
+    else
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is not active - skipping"
+    fi
+
+    # Stop FE (Frontend Liberty)
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is active - issuing stop..."
+        opercmd "P FE${APP_SHORT_NAME}" 2>/dev/null || true
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        wait_for_task_termination "FE${APP_SHORT_NAME}"
+
+        # Cancel only if still active after stop attempt
+        if is_task_running "FE${APP_SHORT_NAME}"; then
+            print_info "FE${APP_SHORT_NAME} still active - issuing cancel..."
+            jcan P "FE${APP_SHORT_NAME}" 2>/dev/null || true
+            opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
+        fi
+    else
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is not active - skipping"
+    fi
+
+    print_success "z/OS Connect and Frontend Liberty servers stopped"
+    set -e
+}
+
+#########################################################
+# Stop CICS region
+#########################################################
+stop_cics() {
+    print_stage "STAGE: Stop CICS region"
+    set +e
+
+    # Check whether the CICS region is currently active
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
+        print_info "CICS${APP_SHORT_NAME} is active - issuing graceful shutdown..."
+        opercmd "F CICS${APP_SHORT_NAME},CEMT PERFORM SHUTDOWN" 2>/dev/null || true
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        wait_for_task_termination "CICS${APP_SHORT_NAME}"
+
+        # Cancel only if still active after graceful shutdown attempt
+        if is_task_running "CICS${APP_SHORT_NAME}"; then
+            print_info "CICS${APP_SHORT_NAME} still active - issuing cancel..."
+            opercmd "C CICS${APP_SHORT_NAME}" 2>/dev/null || true
+        fi
+    else
+        print_info "CICS${APP_SHORT_NAME} is not active - skipping"
+    fi
+
+    print_success "CICS region stopped"
+    set -e
+}
+
+#########################################################
+# Stop IMS application regions (MPP / JMP)
+# Uses IMS console commands routed via the CTL WTOR reply
+# so that IMS can quiesce transactions before stopping.
+#########################################################
+stop_ims_regions() {
+    print_stage "STAGE: Stop IMS application regions (MPP / JMP)"
+    set +e
+
+    # Resolve the current WTOR reply ID for the CTL region so we can
+    # issue /STOP REGION commands through the IMS console.
+    local REPLID
+    REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+             | grep -i "IMS READY" | awk '{print $1}' | head -1)
+
+    if [[ -n "$REPLID" ]]; then
+        print_info "Stopping dependent regions via IMS console (REPLID=${REPLID})..."
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}JMP1" 2>/dev/null || true
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP1" 2>/dev/null || true
+        opercmd "${REPLID},/STOP REGION JOBNAME ${IMS_DATASTORE}MPP2" 2>/dev/null || true
+    else
+        print_warning "CTL WTOR not found - falling back to JCL-based region stop"
+        jsub "${IMS_APP_HLQ}.JOBS(STOPMPP1)"         2>/dev/null || true
+        jsub "${IMS_APP_HLQ}.JOBS(STOPMPP2)"         2>/dev/null || true
+        jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STOPJMP)"  2>/dev/null || true
+    fi
+
+    # Wait up to 30s (6 checks x 5s) for dependent regions to stop
+    wait_for_task_termination "${IMS_DATASTORE}JMP1"
+    wait_for_task_termination "${IMS_DATASTORE}MPP1"
+    wait_for_task_termination "${IMS_DATASTORE}MPP2"
+
+    # Cancel only if still active
+    for region in "${IMS_DATASTORE}JMP1" "${IMS_DATASTORE}MPP1" "${IMS_DATASTORE}MPP2"; do
+        if is_task_running "$region"; then
+            print_info "$region still active - issuing cancel..."
+            jcan P "$region" 2>/dev/null || true
+            opercmd "C $region" 2>/dev/null || true
+        fi
+    done
+
+    # Validate shutdown of IMS application regions
+    local ims_app_regions=(
+        "${IMS_DATASTORE}JMP1"
+        "${IMS_DATASTORE}MPP1"
+        "${IMS_DATASTORE}MPP2"
+    )
+
+    local all_stopped=true
+    for region in "${ims_app_regions[@]}"; do
+        if is_task_running "$region"; then
+            print_warning "$region is still running"
+            all_stopped=false
+        fi
+    done
+
+    if [[ "$all_stopped" == "true" ]]; then
+        print_success "IMS application regions stopped"
+    else
+        print_warning "Some IMS application regions are still active after shutdown attempt"
+    fi
+    set -e
+}
+
+#########################################################
+# Stop IMS control tasks + IRLM
+#
+# Follows the IBM IMS 15.4 recommended shutdown sequence:
+#   1. /CHECKPOINT PURGE  - quiesce in-flight work on CTL
+#   2. F HWS,SHUTDOWN MEMBER - graceful IMS Connect shutdown
+#   3. C ODB / DRC        - stop ODBM and DRD (no clean cmd)
+#   4. F SCI,SHUTDOWN CSLPLEX - stop OM/RM/SCI together
+#   5. C/F IRLM           - release the database lock manager
+#
+# Environment variables:
+#   IMS_COLD_START   Set to "true" to force a cold start on
+#                    the next restart (uses /NRE CHECKPOINT 0
+#                    reply instead of /NRESTART).
+#########################################################
+stop_ims_control() {
+    print_stage "STAGE: Stop IMS control tasks + IRLM"
+    set +e
+
+    # Step 1: Quiesce CTL via /CHECKPOINT PURGE
+    # Resolve the IMS WTOR reply ID first.
+    local REPLID
+    REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+             | grep -i "IMS READY" | awk '{print $1}' | head -1)
+
+    if [[ -n "$REPLID" ]]; then
+        print_info "Issuing /CHECKPOINT PURGE via CTL WTOR (REPLID=${REPLID})..."
+        opercmd "${REPLID},/CHECKPOINT PURGE" 2>/dev/null || true
+        sleep 5
+    else
+        print_warning "CTL WTOR reply ID not found - skipping /CHECKPOINT PURGE"
+    fi
+
+    # Step 2: Graceful IMS Connect and IMSplex shutdown
+    print_info "Shutting down ${IMS_DATASTORE}HWS (IMS Connect) gracefully..."
+    opercmd "F ${IMS_DATASTORE}HWS,SHUTDOWN MEMBER" 2>/dev/null || true
+
+    print_info "Shutting down IMSplex (OM/RM/SCI) via /F SCI,SHUTDOWN CSLPLEX..."
+    opercmd "F ${IMS_DATASTORE}SCI,SHUTDOWN CSLPLEX" 2>/dev/null || true
+
+    # Wait up to 30s (6 checks x 5s) for HWS and IMSplex components to terminate
+    wait_for_task_termination "${IMS_DATASTORE}HWS"
+    wait_for_task_termination "${IMS_DATASTORE}SCI"
+    wait_for_task_termination "${IMS_DATASTORE}ODB"
+    wait_for_task_termination "${IMS_DATASTORE}OM"
+    wait_for_task_termination "${IMS_DATASTORE}RM"
+
+
+    # Fallback: cancel HWS/OM/RM/SCI individually if still active
+    for task in "${IMS_DATASTORE}HWS" "${IMS_DATASTORE}OM" "${IMS_DATASTORE}ODB" "${IMS_DATASTORE}RM" "${IMS_DATASTORE}SCI"; do
+        if is_task_running "$task"; then
+            print_info "$task still active - issuing cancel..."
+            opercmd "C $task" 2>/dev/null || true
+        fi
+    done
+
+    # Step 5: IRLM - try graceful abend with nodump first, then cancel if still running
+    print_info "Stopping ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
+    opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
+    
+    # Wait up to 25s (5 checks x 5s) for graceful shutdown
+    wait_for_task_termination "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"
+
+    if is_task_running "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"; then
+        print_info "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM) still active - issuing cancel..."
+        opercmd "C ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
+        sleep 2
+    fi
+
+    # Validate shutdown of all IMS control tasks and IRLM
+    local ims_tasks=(
+        "${IMS_DATASTORE}CTL"
+        "${IMS_DATASTORE}HWS"
+        "${IMS_DATASTORE}ODB"
+        "${IMS_DATASTORE}OM"
+        "${IMS_DATASTORE}RM"
+        "${IMS_DATASTORE}SCI"
+        "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"
+    )
+
+    local all_stopped=true
+    for task in "${ims_tasks[@]}"; do
+        if is_task_running "$task"; then
+            print_warning "$task is still running"
+            all_stopped=false
+        fi
+    done
+
+    if [[ "$all_stopped" == "true" ]]; then
+        print_success "All IMS control tasks and IRLM stopped successfully"
+    else
+        print_warning "Some IMS tasks are still active after shutdown attempt"
+        opercmd "D A,${IMS_DATASTORE}*"
+    fi
+    set -e
+}
+
+#########################################################
+# Start IMS control tasks + IRLM
+#
+# After CTL starts it issues a WTOR asking what type of
+# restart to perform.  This function polls for that WTOR
+# and automatically replies:
+#   /NRESTART         - warm restart (default)
+#   /NRE CHECKPOINT 0 - cold start (IMS_COLD_START=true)
+#
+# Environment variables:
+#   IMS_COLD_START   Set to "true" to reply with a cold
+#                    start instead of a warm restart.
+#########################################################
+start_ims_control() {
+    print_stage "STAGE: Start IMS control tasks + IRLM"
+    set +e
+
+    print_info "Starting ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
+    opercmd "S ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" 2>/dev/null || true
+
+    print_info "Starting ${IMS_DATASTORE}SCI..."
+    opercmd "S ${IMS_DATASTORE}SCI" 2>/dev/null || true
+
+    print_info "Starting ${IMS_DATASTORE}OM..."
+    opercmd "S ${IMS_DATASTORE}OM" 2>/dev/null || true
+
+    print_info "Starting ${IMS_DATASTORE}RM..."
+    opercmd "S ${IMS_DATASTORE}RM" 2>/dev/null || true
+
+    print_info "Submitting ${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL) via jsub..."
+    jsub "${IMS_APP_HLQ}.PROCLIB(${IMS_DATASTORE}CTL)" 2>/dev/null || true
+
+    # Poll for the IMS WTOR reply ID (CTL will wait for a restart type reply).
+    # IMS issues message DFS989I or similar with a WTOR when it is ready.
+    print_info "Waiting for IMS CTL WTOR (up to 60s)..."
+    local REPLID=""
+    local waited=0
+    while [[ -z "$REPLID" && $waited -lt 60 ]]; do
+        sleep 5
+        waited=$((waited + 5))
+        REPLID=$(opercmd "D R,JOB=${IMS_DATASTORE}CTL" 2>/dev/null \
+                 | grep -i "IMS READY" | awk '{print $1}' | head -1)
+    done
+
+    if [[ -n "$REPLID" ]]; then
+        if [[ "${IMS_COLD_START:-false}" == "true" ]]; then
+            print_info "IMS_COLD_START=true - replying with /NRE CHECKPOINT 0 (cold start)..."
+            opercmd "${REPLID},/NRE CHECKPOINT 0" 2>/dev/null || true
+        else
+            print_info "Replying with /NRESTART (warm restart) to REPLID=${REPLID}..."
+            opercmd "${REPLID},/NRESTART" 2>/dev/null || true
+        fi
+    else
+        print_warning "CTL WTOR not detected after 60s - IMS may have started automatically or failed"
+    fi
+
+    print_info "Starting ${IMS_DATASTORE}ODB..."
+    opercmd "S ${IMS_DATASTORE}ODB" 2>/dev/null || true
+
+    print_info "Starting ${IMS_DATASTORE}HWS..."
+    opercmd "S ${IMS_DATASTORE}HWS" 2>/dev/null || true
+
+    wait_for_task_running "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}" "IRLM lock manager"
+    wait_for_task_running "${IMS_DATASTORE}SCI" "IMS SCI"
+    wait_for_task_running "${IMS_DATASTORE}OM" "IMS OM"
+    wait_for_task_running "${IMS_DATASTORE}RM" "IMS RM"
+    wait_for_task_running "${IMS_DATASTORE}CTL" "IMS CTL region"
+    wait_for_task_running "${IMS_DATASTORE}ODB" "IMS ODB"
+    wait_for_task_running "${IMS_DATASTORE}HWS" "IMS Connect (HWS)"
+
+    print_success "IMS control tasks and IRLM started"
+    set -e
+}
+
+#########################################################
+# Start IMS application regions (MPP / JMP)
+#########################################################
+start_ims_regions() {
+    print_stage "STAGE: Start IMS application regions (MPP / JMP)"
+    set +e
+
+    print_info "Submitting ${IMS_DATASTORE}MPP2..."
+    jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP2)" 2>/dev/null || true
+
+    print_info "Submitting ${IMS_DATASTORE}MPP1..."
+    jsub "${IMS_APP_HLQ}.JOBS(${IMS_DATASTORE}MPP1)" 2>/dev/null || true
+
+    print_info "Submitting STARTJMP (JMP region)..."
+    jsub "${IMS_APP_HLQ}.IMSJAVA.JOBS(STARTJMP)" 2>/dev/null || true
+
+
+    wait_for_task_running "${IMS_DATASTORE}MPP2" "IMS MPP2 region"
+    wait_for_task_running "${IMS_DATASTORE}MPP1" "IMS MPP1 region"
+    wait_for_task_running "${IMS_DATASTORE}JMP1" "IMS JMP region"
+
+    print_success "IMS application regions started"
+    set -e
+}
+
+#########################################################
+# Verify IMS status (Control, IRLM, CSL, Regions, Connect, Port)
+#########################################################
+verify_ims() {
+    print_stage "STAGE: Verify IMS status"
+    set +e
+
+    local ims_tasks=(
+        "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}:IRLM lock manager"
+        "${IMS_DATASTORE}SCI:IMS SCI"
+        "${IMS_DATASTORE}OM:IMS OM"
+        "${IMS_DATASTORE}RM:IMS RM"
+        "${IMS_DATASTORE}CTL:IMS Control Region"
+        "${IMS_DATASTORE}ODB:IMS ODB"
+        "${IMS_DATASTORE}HWS:IMS Connect (HWS)"
+        "${IMS_DATASTORE}MPP1:IMS MPP1 region"
+        "${IMS_DATASTORE}MPP2:IMS MPP2 region"
+        "${IMS_DATASTORE}JMP1:IMS JMP region"
+    )
+
+    for entry in "${ims_tasks[@]}"; do
+        local task_name="${entry%%:*}"
+        local task_desc="${entry#*:}"
+        if is_task_running "${task_name}"; then
+            print_success "${task_desc} (${task_name}) is running"
+        else
+            print_warning "${task_desc} (${task_name}) is not running"
+        fi
+    done
+
+    # Check if IMS Connect port is listening
+    print_info "Checking if IMS Connect port ${IMS_PORT} is listening..."
+    if netstat -a 2>/dev/null | grep ":${IMS_PORT}.*LISTEN" >/dev/null 2>&1; then
+        print_success "IMS Connect is listening on port ${IMS_PORT}"
+    else
+        print_warning "Port ${IMS_PORT} status could not be verified (not listening)"
+    fi
+
+    print_info "IMS Datastore: ${IMS_DATASTORE}"
+    print_info "IMS Connect Port: ${IMS_PORT}"
+    set -e
+}
+
+#########################################################
+# Start CICS region
+#########################################################
+start_cics() {
+    print_stage "STAGE: Start CICS region"
+    set +e
+
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
+        print_info "CICS${APP_SHORT_NAME} is already running - skipping start"
+    else
+        if [[ "$CICS_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting CICS${APP_SHORT_NAME} via opercmd (system PROCLIB)..."
+            opercmd "S CICS${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting CICS${APP_SHORT_NAME} via jsub (application PROCLIB)..."
+            jsub "${APP_HLQ}.PROCLIB(CICS${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        print_success "CICS region start command issued"
+    fi
+
+    wait_for_task_running "CICS${APP_SHORT_NAME}" "CICS region"
+
+    set -e
+}
+
+#########################################################
+# Verify CICS status
+#########################################################
+verify_cics() {
+    print_stage "STAGE: Verify CICS status"
+    set +e
+
+    if is_task_running "CICS${APP_SHORT_NAME}"; then
+        print_success "CICS region (CICS${APP_SHORT_NAME}) is running"
+    else
+        print_warning "CICS region (CICS${APP_SHORT_NAME}) is not running"
+    fi
+
+    set -e
+}
+
+#########################################################
+# Start z/OS Connect and Frontend Liberty servers
+#########################################################
+start_frontend() {
+    print_stage "STAGE: Start z/OS Connect and Frontend Liberty servers"
+    set +e
+
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_info "BAQ${APP_SHORT_NAME} (z/OS Connect) is already running - skipping start"
+    else
+        if [[ "$ZOSCONNECT_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via opercmd..."
+            opercmd "S BAQ${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting BAQ${APP_SHORT_NAME} (z/OS Connect) via jsub..."
+            jsub "${ZOSCONNECT_SYS_PROCLIB}(BAQ${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        print_success "BAQ${APP_SHORT_NAME} (z/OS Connect) start command issued"
+    fi
+
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_info "FE${APP_SHORT_NAME} (Frontend Liberty) is already running - skipping start"
+    else
+        if [[ "$FRONTEND_SYS_PROCLIB" != "${APP_HLQ}.PROCLIB" ]]; then
+            print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via opercmd..."
+            opercmd "S FE${APP_SHORT_NAME}" 2>/dev/null || true
+        else
+            print_info "Starting FE${APP_SHORT_NAME} (Frontend Liberty) via jsub..."
+            jsub "${FRONTEND_SYS_PROCLIB}(FE${APP_SHORT_NAME}J)" 2>/dev/null || true
+        fi
+        print_success "FE${APP_SHORT_NAME} (Frontend Liberty) start command issued"
+    fi
+
+    wait_for_task_running "BAQ${APP_SHORT_NAME}" "z/OS Connect server"
+    wait_for_task_running "FE${APP_SHORT_NAME}" "Frontend Liberty server"
+
+    set -e
+}
+
+#########################################################
+# Verify z/OS Connect and Frontend Liberty servers
+#########################################################
+verify_frontend() {
+    print_stage "STAGE: Verify z/OS Connect and Frontend Liberty servers"
+    set +e
+
+    if is_task_running "BAQ${APP_SHORT_NAME}"; then
+        print_success "z/OS Connect server (BAQ${APP_SHORT_NAME}) is running"
+    else
+        print_warning "z/OS Connect server (BAQ${APP_SHORT_NAME}) is not running"
+    fi
+
+    if is_task_running "FE${APP_SHORT_NAME}"; then
+        print_success "Frontend Liberty server (FE${APP_SHORT_NAME}) is running"
+    else
+        print_warning "Frontend Liberty server (FE${APP_SHORT_NAME}) is not running"
+    fi
+
+    set -e
+}
+#########################################################
+# Dispatch stop by scope
+#########################################################
+do_stop() {
+    local scope="$1"
+    case "$scope" in
+        all)
+            # Stop order: Frontend -> CICS -> IMS
+            stop_frontend
+            stop_cics
+            if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
+                stop_ims_regions
+                stop_ims_control
+            else
+                print_info "IMS_DISABLED=true - skipping IMS stop"
+            fi
+            ;;
+        ims)
+            stop_ims_regions
+            stop_ims_control
+            ;;
+        cics)
+            stop_cics
+            ;;
+        frontend)
+            stop_frontend
+            ;;
+    esac
+}
+
+#########################################################
+# Dispatch start by scope
+#########################################################
+do_start() {
+    local scope="$1"
+    case "$scope" in
+        all)
+            # Start order: IMS -> CICS -> Frontend
+            if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
+                start_ims_control
+                start_ims_regions
+                verify_ims
+            else
+                print_info "IMS_DISABLED=true - skipping IMS start"
+            fi
+            start_cics
+            start_frontend
+            ;;
+        ims)
+            start_ims_control
+            start_ims_regions
+            verify_ims
+            ;;
+        cics)
+            start_cics
+            ;;
+        frontend)
+            start_frontend
+            ;;
+    esac
+}
+
+#########################################################
+# Dispatch verify by scope
+#########################################################
+do_verify() {
+    local scope="$1"
+    case "$scope" in
+        all)
+            if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
+                verify_ims
+            else
+                print_info "IMS_DISABLED=true - skipping IMS verification"
+            fi
+            verify_cics
+            verify_frontend
+            ;;
+        ims)
+            verify_ims
+            ;;
+        cics)
+            verify_cics
+            ;;
+        frontend)
+            verify_frontend
+            ;;
+    esac
+}
+
+#########################################################
+# Main
+#########################################################
+main() {
+    local action="${1:-}"
+    local scope="${2:-}"
+
+    case "$action" in
+        -h|--help|help)
+            print_usage
+            exit 0
+            ;;
+        stop|start|restart|verify)
+            ;;
+        "")
+            print_error "Action is required."
+            echo ""
+            print_usage
+            exit 1
+            ;;
+        *)
+            print_error "Unknown action: $action"
+            echo ""
+            print_usage
+            exit 1
+            ;;
+    esac
+
+    case "$scope" in
+        all|ims|cics|frontend)
+            ;;
+        "")
+            print_error "Scope is required."
+            echo ""
+            print_usage
+            exit 1
+            ;;
+        *)
+            print_error "Unknown scope: $scope"
+            echo ""
+            print_usage
+            exit 1
+            ;;
+    esac
+
+    # Detect repo location (sets BANK_DIR, EXECUTION_MODE)
+    detect_bank_of_z_location
+
+    case "$action" in
+        stop)
+            print_stage "ACTION: Stop Bank of Z servers (scope: ${scope})"
+            do_stop "$scope"
+            print_stage "STOP COMPLETE"
+            print_success "All requested servers have been stopped."
+            ;;
+        start)
+            print_stage "ACTION: Start Bank of Z servers (scope: ${scope})"
+            do_start "$scope"
+            print_stage "START COMPLETE"
+            print_success "All requested servers have been started."
+            ;;
+        restart)
+            print_stage "ACTION: Restart Bank of Z servers (scope: ${scope})"
+            do_stop "$scope"
+            do_start "$scope"
+            print_stage "RESTART COMPLETE"
+            print_success "All requested servers have been restarted."
+            ;;
+        verify)
+            print_stage "ACTION: Verify Bank of Z servers (scope: ${scope})"
+            do_verify "$scope"
+            print_stage "VERIFY COMPLETE"
+            print_success "Server status verification completed."
+            ;;
+    esac
+}
+
+main "$@"
+exit $?
+
+# Made with Bob

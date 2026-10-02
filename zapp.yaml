@@ -46,3 +46,29 @@ profiles:
         - type: local
           locations:
             - "zcodescan/zcodescan-rules.yaml"
+
+  - name: BankOfZUserBuild
+    type: userbuild
+    settings:
+      tasks:
+      - prerequisites:
+          localCommand: >
+            .zopeneditor/grub_client prerequisites --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - upload:
+          dependenciesUpload: false
+          localCommand: >
+            .zopeneditor/grub_client gitPush --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - build:
+          localCommand: >
+            .zopeneditor/grub_client execute --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE}
+            --command "bash ${ZOS_WORKSPACE}/${application}/.setup/setup-remote.sh"
+            --verbose
+      - results:
+            localCommand: >
+              .zopeneditor/grub_client fetch --hostname ${ZOS_USER}@${ZOS_HOST}
+              --remoteWorkspace ${ZOS_WORKSPACE}
+              --files "logs/dbb/Bank-of-Z.*.log logs/dbb/logs/Bank-of-Z.*.log logs/deploy/*.console.log"
+              --localDir logs --verbose      

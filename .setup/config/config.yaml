@@ -34,7 +34,7 @@ global:
   liberty_home: "/usr/lpp/liberty_zos/25.0.0.9"
 
   # z/OS System
-  zos_admin_user: "${USER}"
+  zos_admin_user: "IBMUSER"
   zos_current_user: "${USER}"
   zos_ca_label: "VSICA"
   zos_keyring: "BOZRING"

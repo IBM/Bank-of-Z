@@ -35,3 +35,4 @@ scripts/update-frontend-file-zos.sh
 **/datasets.yaml
 .gradle/
 .bobz
+.zopeneditor/

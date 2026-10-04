@@ -503,7 +503,7 @@ activities:
               - key: "template"
                 value: "template"
               - key: "var_template_name"
-                value: "template_name_zosconnect_config"
+                value: "template_name_zosconnect_config_boz"
               - key: "path_filter"
                 value: '^(?!.*-frontend).*\.war$'
             loop:

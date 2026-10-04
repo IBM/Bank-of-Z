@@ -22,6 +22,9 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../lib/utilities.sh"
 source "$SCRIPTS_DIR/../lib/colors.sh"
+if [ -z "${SANDBOX_DIR:-}" ]; then
+    source "$SCRIPTS_DIR/../config/setenv.sh"
+fi
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -151,8 +154,6 @@ print_result "[BUILD-LIST] ${DBB_LOG_FOLDER}/buildList.txt"
 # Skip packaging if nothing processed
 # =========================
 set +e
-mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
-rm -rf "$PWD/logs"
 grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_result "[TAR-PATH] NONE"

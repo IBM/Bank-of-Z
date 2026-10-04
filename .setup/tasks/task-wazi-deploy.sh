@@ -20,6 +20,9 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../lib/utilities.sh"
 source "$SCRIPTS_DIR/../lib/colors.sh"
+if [ -z "${APP_HLQ:-}" ]; then
+    source "$SCRIPTS_DIR/../config/setenv.sh"
+fi
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -47,7 +50,7 @@ EVIDENCE_FOLDER="${OUTPUT_FOLDER}/evidences"
 LOG_TAR="${OUTPUT_FOLDER}/wazi-deploy-log.tar"
 EVIDENCE_FILE="${EVIDENCE_FOLDER}/evidence.yaml"
 
-rm -rf "$OUTPUT_FOLDER" "$EVIDENCE_FOLDER"
+rm -f "$OUTPUT_FOLDER"/* 2>/dev/null || true
 mkdir -p "$OUTPUT_FOLDER" "$EVIDENCE_FOLDER"
 
 # =========================
@@ -60,20 +63,14 @@ finalize_results() {
     cd "$OUTPUT_FOLDER"
 
     if ls wazideploy*.log >/dev/null 2>&1; then
-        chtag -tc IBM-1047 wazideploy*.log
-        # Convert BankZ logs if they exist
-        [ -f "$OUTPUT_FOLDER/wazideploy-generate-bankz.console.log" ] && \
-            a2e -f IBM-1047 -t ISO8859-1 "$OUTPUT_FOLDER/wazideploy-generate-bankz.console.log"
-        [ -f "$OUTPUT_FOLDER/wazideploy-deploy-bankz.console.log" ] && \
-            a2e -f IBM-1047 -t ISO8859-1 "$OUTPUT_FOLDER/wazideploy-deploy-bankz.console.log"
-        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
+        tar cf "$LOG_TAR" "$OUTPUT_FOLDER" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$OUTPUT_FOLDER/wazi-deploy-console.log"
-        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
+        tar cf "$LOG_TAR" "$OUTPUT_FOLDERs" 2>/dev/null || true
     fi
+    chtag -b "$LOG_TAR"
 
     print_result "[LOG-PATH] $LOG_TAR"
-
 
     if [ $RC -eq 0 ]; then
         print_success "Process completed"
@@ -137,7 +134,7 @@ print_info "BankZ Deployment"
 print_info "========================================="
 
 print_info "Starting wazideploy-generate for BankZ"
-
+: > "${OUTPUT_FOLDER}/wazideploy-generate-bankz.console.log"
 CMD="wazideploy-generate \
  --deploymentPlanName $APP_BASE_NAME \
  --deploymentPlanVersion $APP_FULL_VERSION \
@@ -173,7 +170,7 @@ if [ -n "${CICS_PASSWORD:-}" ]; then
 fi
 
 # Resolve environment varaiables in config file.
-export TMPL_CONFIG_FILE="/tmp/config.yaml"
+export TMPL_CONFIG_FILE="/tmp/wazideploy-config.yaml"
 cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2.$$"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --templateFile "$TMPL_CONFIG_FILE.j2.$$"  --outputFile "$TMPL_CONFIG_FILE"
@@ -203,7 +200,7 @@ rm -f message.log
 
 print_info "Executing command:"
 print_info "\t$CMD"
-
+: > "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log"
 ${CMD} 2>&1 | tee "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log" | while IFS= read -r line
 do
     print_info "[DEPLOY-${APP_BASE_NAME}] $line"

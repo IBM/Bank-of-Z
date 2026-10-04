@@ -22,6 +22,7 @@ source "$SCRIPTS_DIR/../lib/colors.sh"
 if [ -z "${SCAN_CONFIG_FILE:-}" ]; then
     source "$SCRIPTS_DIR/../config/setenv.sh"
 fi
+
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue

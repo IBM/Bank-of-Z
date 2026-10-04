@@ -42,7 +42,7 @@ if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
 fi
 
 export PATH="$JAVA_HOME/bin:$DBB_HOME/bin:$PATH"
-export GRADLE_USER_HOME="$SANDBOX_DIR/../.gradle"
+export GRADLE_USER_HOME="$SANDBOX_DIR/.gradle"
 export GRADLE_OPTS="-Dfile.encoding=UTF-8"
 export GRADLE_DAEMON_BIND_ADDRESS=127.0.0.1
 
@@ -70,7 +70,6 @@ finalize_results() {
     if ls logs/*.log >/dev/null 2>&1; then
         chtag -tc ISO8859-1 logs/*.log
         tar cf "$LOG_TAR" logs  2>/dev/null || true
-        mv -f logs ${DBB_LOG_FOLDER}
     else
         echo "No DBB log files found" > ${DBB_LOG_FOLDER}/dbb-build-console.log
         tar cf "$LOG_TAR" ${DBB_LOG_FOLDER}/dbb-build-console.log 2>/dev/null || true
@@ -155,8 +154,6 @@ print_result "[BUILD-LIST] ${DBB_LOG_FOLDER}/buildList.txt"
 # Skip packaging if nothing processed
 # =========================
 set +e
-mv $PWD/logs/*.* ${DBB_LOG_FOLDER} >/dev/null 2>&1
-rm -rf "$PWD/logs"
 grep "Total files processed : 0" "$TMP_LOG" >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     print_result "[TAR-PATH] NONE"

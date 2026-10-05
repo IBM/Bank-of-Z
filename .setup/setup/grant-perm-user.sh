@@ -132,3 +132,16 @@ print_info "Submitting DB2 table grant JCL for $MYUSER..."
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile "$CONFIG_FILE" \
     --extraVar "db2_user=$MYUSER" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-grant-user.j2" --outputFile "/tmp/CICS-Db2-grant-$$.jcl"
 run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
+
+
+# =====================================
+# Handle profile file and config script
+# =====================================
+MYUSER_HOME=$(python -c "import pwd, sys; print(pwd.getpwnam(sys.argv[1]).pw_dir)" "$MYUSER")
+mkdir -p "${SANDBOX_DIR}"
+chown "$MYUSER" "${SANDBOX_DIR}"
+
+if [ -f "$HOME/.profile.bankz" ]; then
+    sed "s/${USER}/${MYUSER}/g" "$HOME/.profile.bankz" > "${MYUSER_HOME}/.profile.bankz"
+    chown "$MYUSER" "${MYUSER_HOME}/.profile.bankz"
+fi

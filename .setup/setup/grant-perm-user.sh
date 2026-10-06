@@ -31,9 +31,10 @@ trap 'exec >&- 2>&-; wait' EXIT
 # Parameter validation
 # =========================
 MYUSER="$1"
+MYPASSWORD="$2"
 
-if [[ -z "$MYUSER" ]]; then
-    print_error "Usage: $0 <MYUSER> - the MYUSER parameter is required."
+if [[ -z "$MYUSER" || -z "$MYPASSWORD" ]]; then
+    print_error "Usage: $0 <MYUSER> <MYPASSWORD> - both parameters are required."
     exit 1
 fi
 
@@ -132,3 +133,27 @@ print_info "Submitting DB2 table grant JCL for $MYUSER..."
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile "$CONFIG_FILE" \
     --extraVar "db2_user=$MYUSER" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-grant-user.j2" --outputFile "/tmp/CICS-Db2-grant-$$.jcl"
 run_job_and_wait "/tmp/CICS-Db2-grant-$$.jcl"
+
+
+# =====================================
+# Handle profile file and config script
+# =====================================
+print_info "Granting folders ..."
+MYUSER_HOME=$(python -c "import pwd, sys; print(pwd.getpwnam(sys.argv[1]).pw_dir)" "$MYUSER")
+chown -R "$MYUSER" "${SANDBOX_DIR}"
+if [ -f "$HOME/.profile.bankz" ]; then
+    # Échappe \ & | pour que la valeur soit sûre dans le sed (délimiteur |)
+    ESC_USER=$(printf '%s' "$MYUSER" | sed 's/[\\&|]/\\&/g')
+    ESC_PASS=$(printf '%s' "$MYPASSWORD" | sed 's/[\\&|]/\\&/g')
+
+    sed "
+s|${USER}|${ESC_USER}|g
+s|^\(export IMS_USER=\).*|\1${ESC_USER}|
+s|^\(export IMS_PASSWORD=\).*|\1${ESC_PASS}|
+s|^\(export CICS_USER=\).*|\1${ESC_USER}|
+s|^\(export CICS_PASSWORD=\).*|\1${ESC_PASS}|
+" "$HOME/.profile.bankz" > "${MYUSER_HOME}/.profile.bankz"
+
+    chown "$MYUSER" "${MYUSER_HOME}/.profile.bankz"
+    chmod 600 "${MYUSER_HOME}/.profile.bankz"
+fi

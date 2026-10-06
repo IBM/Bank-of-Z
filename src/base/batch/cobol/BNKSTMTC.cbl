@@ -1698,6 +1698,10 @@
       *-----------------------------------------------------------------
       *    Footer is 3 lines (banner, END text, banner).
       *    Eject to new page if fewer than 3 lines remain.
+      *    Per spec §4.3: when the footer spills to a fresh page the
+      *    full standard header must be reprinted — banner, period/issue
+      *    date, customer ID, AND the account header block (items 1-5
+      *    of the §4.3 header-reprinting list).
       *-----------------------------------------------------------------
            IF WS-LINE-COUNT > WS-LINES-PER-PAGE - 3
                ADD 1 TO WS-PAGE-NUMBER
@@ -1715,6 +1719,10 @@
                MOVE ' ' TO WS-PL-CC
                MOVE WS-CUSTID-LINE TO WS-PL-DATA
                PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+      *        Reprint account header block (spec §4.3 items 3-5):
+      *        separator, account type/number/sort code, separator,
+      *        opening balance, column headings and separator.
+               PERFORM 4200-WRITE-ACCT-HEADER THRU 4200-EXIT
            END-IF
 
            MOVE '0' TO WS-PL-CC

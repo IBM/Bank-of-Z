@@ -1123,7 +1123,7 @@ resourceDefinitions:
       name: ZOSEE
       group: BANKZGRP
       description: ZOS CONNECT EE TCPIPS
-      portnumber: 1234
+      portnumber: "{{ vars.cics_ipic_port }}"
       protocol: IPIC
       urm: DFHISAIP
       transaction: CISS

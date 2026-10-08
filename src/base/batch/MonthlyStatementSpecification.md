@@ -17,7 +17,7 @@ Both programs accept identical input control cards from `SYSIN`, write informati
 
 ## 2. Input Specifications (`SYSIN`)
 
-The programs read runtime configuration from a single sequential 80-byte `SYSIN` control record:
+The programs read runtime configuration from a single sequential 80-byte `SYSIN` control record. Exactly one control record is permitted per execution. If multiple non-empty records are present in `SYSIN`, emit `BNKZE0022` and terminate immediately with Return Code `8` without performing any database or report processing.
 
 ### 2.1 Record Layout
 ```text
@@ -49,36 +49,38 @@ Customer IDs are **always normalised to a canonical 10-character padded form** f
 #### 2.2.2 Prefix Rules
 The prefix determines which subsystem originally created and owns the customer record. It is used **for routing purposes only** and has no effect on the data retrieved from Db2.
 - **Prefix `C` (CICS customer):** The customer record was created via the CICS transaction interface. Followed by 1 to 9 numeric digits. Normalised to `C` + 9 zero-padded digits.
-- **Prefix `I` (IMS customer):** The customer record was created via the IMS transaction interface. Followed by exactly 9 numeric digits. Normalised to `I` + 9 digits (no extra padding needed as 9 digits are required).
+- **Prefix `I` (IMS customer):** The customer record was created via the IMS transaction interface. Followed by 1 to 9 numeric digits. Normalised to `I` + 9 zero-padded digits (e.g. `I15` → `I000000015`). `BNKZE0004` is only emitted when **more than 9** digits are supplied after the `I` prefix (i.e. the value cannot be normalised into 9 digits).
 
 > **Note:** Both prefixes resolve to the same `BANKZ.CUSTOMER` and `BANKZ.ACCOUNT` Db2 tables. The prefix does not change which tables are queried.
 
 #### 2.2.3 Validation & Error Checks
-All SYSIN validation checks must be performed in the following order. **All errors must be emitted before termination — do not short-circuit after the first error.** After all checks are complete, if any error was emitted, terminate with Return Code `8`.
+All SYSIN validation checks must be performed in the following order. Checks 1 and 2 are **hard early exits** — processing stops immediately on either condition and no further checks run. Checks 3–9 use a **collect-all-errors** approach: all applicable errors are emitted before termination.
 
-1. Missing, empty, or all-spaces `SYSIN` record → emit `BNKZI0005`, print usage guide to `SYSOUT`, and terminate immediately with Return Code `4` (this is the only early-exit check; see Section 2.4).
-2. Missing or invalid prefix (not `C` or `I`) → emit `BNKZE0002: Customer ID prefix must be 'C' (CICS) or 'I' (IMS)`.
-3. Non-numeric customer ID digits → emit `BNKZE0003: Non-numeric customer ID digits found: <digits>`.
-4. IMS ID not having exactly 9 digits → emit `BNKZE0004: IMS customer ID must have 9 digits after prefix 'I'`.
-5. Invalid Statement Period format (delimiter missing) → emit `BNKZE0005: Invalid statement period format. Expected YYYY-MM`.
-6. Invalid month value → emit `BNKZE0006: Invalid month value MM in statement period: <MM>`.
-7. Year out of range → emit `BNKZE0007: Statement year YYYY is outside valid range (1900-2099): <YYYY>`.
-8. Future period → emit `BNKZE0008: Statement period is in the future: <YYYY-MM>`.
+1. Missing, empty, or all-spaces `SYSIN` record → emit `BNKZI0005`, print usage guide to `SYSOUT`, and terminate immediately with Return Code `4` (hard early exit; see Section 2.4).
+2. Multiple non-empty `SYSIN` records detected → emit `BNKZE0022: Multiple SYSIN control records detected; only single-record input is supported` and terminate immediately with Return Code `8` (hard early exit — no field validation, database queries, or report generation). If a field-level error (checks 3–9) also exists on the first record, it is **not** reported; only `BNKZE0022` is emitted.
+3. Missing or invalid prefix (not `C` or `I`) → emit `BNKZE0002: Customer ID prefix must be 'C' (CICS) or 'I' (IMS)`.
+4. Non-numeric customer ID digits → emit `BNKZE0003: Non-numeric customer ID digits found: <digits>`.
+5. IMS ID having **more than 9** digits after prefix `I` (cannot be normalised) → emit `BNKZE0004: IMS customer ID must not exceed 9 digits after prefix 'I'`. *(Short IMS IDs are zero-padded silently; only over-length IDs are an error.)*
+6. Invalid Statement Period format (non-blank characters in columns 12–18 not matching `YYYY-MM`, or missing `-` delimiter) → emit `BNKZE0005: Invalid statement period format. Expected YYYY-MM`. (Note: If columns 12–18 are all spaces, the period is considered omitted rather than invalid; see Section 2.3). **If check 6 fires, checks 7–9 are skipped entirely — the field is unparseable and month/year/future validation cannot be applied.**
+7. Invalid month value → emit `BNKZE0006: Invalid month value MM in statement period: <MM>`. *(Only evaluated if check 6 passes.)*
+8. Year out of range → emit `BNKZE0007: Statement year YYYY is outside valid range (1900-2099): <YYYY>`. *(Only evaluated if check 6 passes.)*
+9. Future period → emit `BNKZE0008: Statement period is in the future: <YYYY-MM>`. *(Only evaluated if check 6 passes.)*
 
 ### 2.3 Statement Period & Date Range Validation
-- **Input Format:** `YYYY-MM` (7 characters, e.g., `2026-07`).
+- **Input Format:** `YYYY-MM` (7 characters, e.g., `2026-07`) in columns 12–18.
 - **Validation Rules:**
-  - Delimiter in column 11 must be space, and delimiter in column 16 must be `-` -> `BNKZE0005: Invalid statement period format. Expected YYYY-MM`.
-  - Month value `MM` must be between `01` and `12` -> `BNKZE0006: Invalid month value MM in statement period: <MM>`.
-  - Year value `YYYY` must be within reasonable bounds (`1900` to `2099`) -> `BNKZE0007: Statement year YYYY is outside valid range (1900-2099): <YYYY>`.
-  - Future date check: If statement period is in the future beyond current date -> `BNKZE0008: Statement period is in the future: <YYYY-MM>`.
+  - If columns 12–18 are all spaces/blank, the statement period is treated as **omitted** (valid): it defaults to the current system date's month and issues informational message `BNKZI0001: Statement period omitted; defaulting to current month: <YYYY-MM>` (sets Return Code to 4).
+  - If columns 12–18 contain non-blank characters:
+    - Delimiter in column 11 must be space, and delimiter in column 16 must be `-` -> `BNKZE0005: Invalid statement period format. Expected YYYY-MM`.
+    - Month value `MM` must be between `01` and `12` -> `BNKZE0006: Invalid month value MM in statement period: <MM>`.
+    - Year value `YYYY` must be within reasonable bounds (`1900` to `2099`) -> `BNKZE0007: Statement year YYYY is outside valid range (1900-2099): <YYYY>`.
+    - Future date check: If statement period is in the future beyond current date -> `BNKZE0008: Statement period is in the future: <YYYY-MM>`.
 - **Internal Processing & Leap Year Rules:** *(These apply after all validation checks above pass.)*
   - Start Date: First day of the month (`YYYY-MM-01`).
   - End Date: Last day of the specified month (inclusive), accounting for:
     - 31-day months: Jan (01), Mar (03), May (05), Jul (07), Aug (08), Oct (10), Dec (12) -> `YYYY-MM-31`.
     - 30-day months: Apr (04), Jun (06), Sep (09), Nov (11) -> `YYYY-MM-30`.
     - February: `YYYY-MM-29` if leap year (`(YYYY % 4 == 0 AND YYYY % 100 != 0) OR (YYYY % 400 == 0)`), else `YYYY-MM-28`.
-  - If omitted in `SYSIN`, defaults to the current system date's month and issues an informational message `BNKZI0001: Statement period omitted; defaulting to current month: <YYYY-MM>`.
 
 ### 2.4 Usage Diagnostic Output (Printed to `SYSOUT` when SYSIN is Unspecified/Insufficient)
 When `SYSIN` is unspecified, empty, or lacks required parameters, the program emits informational message `BNKZI0005` and prints the following usage guide to `SYSOUT` (<= 30 lines) before exiting with Return Code `4`.
@@ -100,7 +102,7 @@ SAMPLE OUTPUT (SYSPRINT) - 132-column layout:
 ====================================================================================================================================
 BANK OF Z                                        MONTHLY CUSTOMER STATEMENT                                    PAGE:      1
 ====================================================================================================================================
-STATEMENT PERIOD: 2026-07-01 TO 2026-07-31                                                     STATEMENT DATE: 2026-07-31
+STATEMENT PERIOD: 2026-07-01 TO 2026-07-31                                               STATEMENT ISSUE DATE: 2026-07-31
 CUSTOMER ID     : C000000001
 
 CUSTOMER INFORMATION:
@@ -133,18 +135,25 @@ END OF MONTH BALANCE:  $3,100.00
 
 ## 3. Database Access & Business Logic
 
-### 3.1 Sort Code
+### 3.1 Processing Sequence
+To resolve dependencies and avoid circular lookups, the program must execute database queries in the following strict order:
+1. **Account Query (`BANKZ.ACCOUNT`):** Query for all accounts belonging to the customer first. This confirms account existence and retrieves all matching account records including `ACCOUNT_SORTCODE`.
+   - If the customer has no accounts (0 rows fetched), issue `BNKZI0002: Customer <CustomerID> has no active accounts on file` to `SYSOUT`, **suppress all `SYSPRINT` output entirely** (do not open or write to `SYSPRINT`), and complete processing with Return Code `4` without querying customer demographics or transaction tables.
+2. **Customer Query (`BANKZ.CUSTOMER`):** Query demographic information for each account individually using `CUSTOMER_NUMBER` and the respective account's `ACCOUNT_SORTCODE` (since a customer may hold accounts across different branches/institutions).
+3. **Transaction Query (`BANKZ.PROCTRAN`):** For each account retrieved in step 1, query its transactions for the statement period.
+
+### 3.2 Sort Code
 The **sort code** is a 6-digit number (stored as `CHAR(6)`) that identifies the bank branch to which all customers and accounts belong. In this application, a single institution-wide sort code is shared by all records (the application sort code constant, defined in `SORTCODE.cpy`, is `987654`).
 
 When **displaying** the sort code in the report, it must be reformatted with hyphens inserted after digits 2 and 4:
-```
+```text
 Raw value : 987654
 Display   : 98-76-54
 ```
 This transformation is applied anywhere `ACCOUNT_SORTCODE` is printed on the statement.
 
-### 3.2 Customer Demographics
-`BANKZ.CUSTOMER` is keyed by **both** `CUSTOMER_SORTCODE` and `CUSTOMER_NUMBER`. The sort code to use is sourced from `ACCOUNT_SORTCODE` of the first account retrieved for the customer (all accounts for a customer share the same sort code).
+### 3.3 Customer Demographics
+`BANKZ.CUSTOMER` is keyed by **both** `CUSTOMER_SORTCODE` and `CUSTOMER_NUMBER`. Sourced after Step 1 (Section 3.1), demographic lookup is performed individually per account using each account's `ACCOUNT_SORTCODE` to support multi-institution account holdings.
 
 ```sql
 SELECT CUSTOMER_TITLE,
@@ -160,7 +169,7 @@ FROM   BANKZ.CUSTOMER
 WHERE  CUSTOMER_SORTCODE = :HV-CUST-SORTCODE
   AND  CUSTOMER_NUMBER   = :HV-CUST-NUMBER
 ```
-- If SQLCODE = 100 (Customer not found): Issue `BNKZE0010: Customer not found in database: <CustomerID>` and terminate with return code `8`.
+- If SQLCODE = 100 (Customer not found): Issue `BNKZE0010: Customer not found in database: <CustomerID>` and **terminate immediately** with Return Code `8`. No further accounts are processed.
 - If SQLCODE < 0 (Database error): Issue `BNKZE0011: Db2 error querying CUSTOMER table. SQLCODE=<sqlcode>` and terminate with return code `8`.
 - **Null / blank field handling:** All customer fields must support being absent (null or blank). When a field is null or blank, display `N/A` in the corresponding report position. This applies to: `CUSTOMER_TITLE`, `CUSTOMER_FIRST_NAME`, `CUSTOMER_LAST_NAME`, `CUSTOMER_ADDR_LINE1`, `CUSTOMER_ADDR_LINE2`, `CUSTOMER_CITY`, `CUSTOMER_POSTCODE`, `CUSTOMER_COUNTRY`, `CUSTOMER_PHONE`.
 - **Address block assembly rules:** The customer address is printed as a multi-line block immediately beneath the `Address:` label. Each line is indented to column 13 (aligned with the name and phone fields). The assembly rules are:
@@ -168,7 +177,7 @@ WHERE  CUSTOMER_SORTCODE = :HV-CUST-SORTCODE
   - Line 2 (continuation indent): `CUSTOMER_ADDR_LINE2` — printed only when non-null and non-blank; the line is suppressed entirely if the field is absent.
   - Final line (continuation indent): `<CUSTOMER_CITY>, <CUSTOMER_POSTCODE>, <CUSTOMER_COUNTRY>` — each sub-field is substituted with `N/A` if null or blank; the comma-separated line is always printed (even if all three are `N/A`).
 
-### 3.3 Account Retrieval
+### 3.4 Account Retrieval
 `ACCOUNT_NUMBER` is stored as `CHAR(8)` (e.g. `12345678`) and is displayed as-is with no numeric reformatting. Query `BANKZ.ACCOUNT` for all accounts belonging to the customer:
 ```sql
 SELECT ACCOUNT_NUMBER,
@@ -179,12 +188,12 @@ FROM   BANKZ.ACCOUNT
 WHERE  ACCOUNT_CUSTOMER_NUMBER = :HV-CUST-NUMBER
 ORDER BY ACCOUNT_NUMBER ASC
 ```
-- `ACCOUNT_ACTUAL_BALANCE` (`DECIMAL(10,2)`) is the true ledger balance — the amount physically held in the account, updated on every committed debit and credit. This is the field used as the basis for the running balance calculation in Section 3.5.
+- `ACCOUNT_ACTUAL_BALANCE` (`DECIMAL(10,2)`) is the true ledger balance — the amount physically held in the account, updated on every committed debit and credit. This is the field used as the basis for the running balance calculation in Section 3.6.
 - `ACCOUNT_AVAILABLE_BALANCE` also exists in the schema but is **not selected or used by this program**. It represents the balance reduced by any pending holds or authorisations. In the current application both values are updated identically on each transaction; the distinction exists for future payment-hold support. The statement uses `ACCOUNT_ACTUAL_BALANCE` exclusively.
-- If customer has no accounts: Issue `BNKZI0002: Customer <CustomerID> has no active accounts on file` and complete with return code `4`.
+- If customer has no accounts: Issue `BNKZI0002: Customer <CustomerID> has no active accounts on file` to `SYSOUT`, suppress all `SYSPRINT` output, and complete with Return Code `4`.
 - If SQLCODE < 0: Issue `BNKZE0012: Db2 error opening/fetching ACCOUNT cursor. SQLCODE=<sqlcode>` and terminate with return code `8`.
 
-### 3.4 Transaction History
+### 3.5 Transaction History
 For each account, query `BANKZ.PROCTRAN` filtered by date range:
 ```sql
 SELECT CHAR(PROCTRAN_DATE, ISO),
@@ -215,7 +224,7 @@ ORDER BY PROCTRAN_DATE ASC, PROCTRAN_TIME ASC
 - **Null/blank field handling:** If `PROCTRAN_DESC` is null or blank, display `N/A` in the description column.
 - If SQLCODE < 0: Issue `BNKZE0013: Db2 error opening/fetching PROCTRAN cursor. SQLCODE=<sqlcode>` and terminate with return code `8`.
 
-### 3.5 Balance & Currency Calculation Rules
+### 3.6 Balance & Currency Calculation Rules
 - **Currency Symbol Configuration:**
   - A variable / working-storage field (e.g. `WS-CURRENCY-SYMBOL` in COBOL, `DCL CURRENCY_SYM` in PL/I) is used for all monetary formatting (default: `$`).
 - **`PROCTRAN_AMOUNT` Precision:** The Db2 column is `DECIMAL(12, 2)` (per `PROCDB2.cpy`). Host variable declarations in both COBOL and PL/I must accommodate this precision — `PIC S9(12)V99 COMP-3` in COBOL, `FIXED DEC(12,2)` in PL/I. The 2 decimal places represent pennies (cents). The Db2 column definition takes precedence over any copybook working-storage picture clause that may differ.
@@ -248,12 +257,13 @@ ORDER BY PROCTRAN_DATE ASC, PROCTRAN_TIME ASC
 
   - **Deposit transactions** (`CRE`, `PCR`, `CHI`): Displayed under `Deposit` column; `Withdrawal` column is blank. Running balance is increased: `Running Balance = Running Balance + Amount`.
   - **Withdrawal transactions** (`DEB`, `PDR`, `CHO`): Displayed under `Withdrawal` column (as positive absolute value); `Deposit` column is blank. Running balance is decreased: `Running Balance = Running Balance - Amount`.
-  - **Transfer transactions** (`TFR`): Classified by the **sign of `PROCTRAN_AMOUNT`**. If `PROCTRAN_AMOUNT > 0`, treat as a **Deposit** (incoming transfer). If `PROCTRAN_AMOUNT < 0` or `= 0`, treat as a **Withdrawal** (outgoing transfer). Display the absolute value in the appropriate column.
-  - **Informational transactions** (`CHA`, `CHF`, `ICA`, `ICC`, `IDA`, `IDC`, `OCA`, `OCC`, `ODA`, `ODC`, `OCS`): Both `Withdrawal` and `Deposit` columns are blank; description is printed. `PROCTRAN_AMOUNT` is expected to be zero. If it is non-zero, see the rule below.
-  - **Informational transactions with a non-zero `PROCTRAN_AMOUNT`:** If `PROCTRAN_AMOUNT` is non-zero for any informational type, the amount must be treated as a withdrawal (decreasing the running balance), the absolute value must appear in the `Withdrawal` column, and warning message `BNKZI0007` must be emitted to `SYSOUT`. The description column still shows the transaction description as normal.
+  - **Transfer transactions** (`TFR`): Classified by the **sign of `PROCTRAN_AMOUNT`**. If `PROCTRAN_AMOUNT > 0`, treat as a **Deposit** (incoming transfer). If `PROCTRAN_AMOUNT < 0`, treat as a **Withdrawal** (outgoing transfer). If `PROCTRAN_AMOUNT = 0`, treat as **Informational** — both columns blank, no balance impact (consistent with other zero-amount event records). Display the absolute value in the appropriate column for non-zero amounts.
+  - **Informational transactions** (`CHA`, `CHF`, `ICA`, `ICC`, `IDA`, `IDC`, `OCA`, `OCC`, `ODA`, `ODC`, `OCS`): Both `Withdrawal` and `Deposit` columns are blank; description is printed. `PROCTRAN_AMOUNT` is expected to be zero (`0.00`). If it is non-zero (`PROCTRAN_AMOUNT != 0`), see the rule below.
+  - **Informational transactions with a non-zero `PROCTRAN_AMOUNT`:** If `PROCTRAN_AMOUNT` is non-zero for any informational type, the amount must be treated as a withdrawal (decreasing the running balance), the absolute value must appear in the `Withdrawal` column, and warning message `BNKZI0007: Informational transaction type <type> has non-zero amount <amount> for account <account-number>; treated as withdrawal` must be emitted to `SYSOUT` (where `<amount>` is formatted with the currency symbol, e.g. `$100.00`). The description column still shows the transaction description as normal. **The non-zero amount is included in `TOTAL WITHDRAWALS` and is factored into the `END OF MONTH BALANCE` calculation, exactly as a normal withdrawal would be.**
   - Any unrecognised `PROCTRAN_TYPE` value not in the above table must be treated as a **Withdrawal** (conservative default) and flagged with informational message `BNKZI0006: Unrecognised transaction type <type> for account <account-number>; treated as withdrawal`.
-- **End of Month Balance:** Closing balance after applying all deposit and withdrawal transactions in the billing period (`$0.00 Opening Balance + Total Deposits - Total Withdrawals`).
-- **No Transactions in Period:** If an account has zero transactions in the period, outputs `  NO TRANSACTIONS FOR THIS PERIOD` in `SYSPRINT`, issues informational message `BNKZI0003: No transactions found for account <account-number> in period <YYYY-MM-01> to <YYYY-MM-DD>` in `SYSOUT`, sets totals to `0.00`, and reports `END OF MONTH BALANCE: $0.00`.
+  - **Negative Amount & Balance Formatting:** All negative currency amounts (including negative running balances and negative summary totals) must be formatted consistently as `-$xxx.xx` (e.g. `-$100.00`, `-$1,250.50`), right-aligned within their respective columns.
+  - **End of Month Balance:** Closing balance after applying all deposit and withdrawal transactions in the billing period (`$0.00 Opening Balance + Total Deposits - Total Withdrawals`).
+  - **No Transactions in Period:** If an account has zero transactions in the period, outputs `  NO TRANSACTIONS FOR THIS PERIOD` in `SYSPRINT`, issues informational message `BNKZI0003: No transactions found for account <account-number> in period <YYYY-MM-01> to <YYYY-MM-DD>` in `SYSOUT`, sets totals to `0.00`, and reports `END OF MONTH BALANCE: $0.00`.
 
 ---
 
@@ -276,7 +286,7 @@ ORDER BY PROCTRAN_DATE ASC, PROCTRAN_TIME ASC
 ====================================================================================================================================
 BANK OF Z                                        MONTHLY CUSTOMER STATEMENT                                    PAGE:      1
 ====================================================================================================================================
-STATEMENT PERIOD: 2026-07-01 TO 2026-07-31                                                     STATEMENT DATE: 2026-07-31
+STATEMENT PERIOD: 2026-07-01 TO 2026-07-31                                               STATEMENT ISSUE DATE: 2026-07-31
 CUSTOMER ID     : C000000001
 
 CUSTOMER INFORMATION:
@@ -323,19 +333,34 @@ END OF MONTH BALANCE:     $25.00
 ```
 
 ### 4.3 Pagination and Formatting
-- Page size: 55 lines per page before page breaks.
-- On a page break, the following headers are reprinted with an incremented page number:
+- **ANSI Carriage Control Characters:**
+  - `SYSPRINT` is written as a carriage-control report file (record format `FBA` / `133` bytes logical record length, with column 1 containing the ANSI control character and columns 2–133 containing the 132-character print line):
+    - `'1'` : Skip to channel 1 (new page / form feed).
+    - `' '` : Single space (advance 1 line before printing).
+    - `'0'` : Double space (advance 2 lines before printing).
+    - `'-'` : Triple space (advance 3 lines before printing).
+- **Page Size:** 55 lines per page before page breaks.
+- **Account Page Flow & Eject Rule:**
+  - **Account #1** starts immediately on **Page 1** directly beneath the Customer Information block (as shown in the sample layout).
+  - Each subsequent account (Account #2, Account #3, etc.) **must start on a fresh page** with an ANSI page eject (`'1'`).
+  - When transaction lines for an account exceed the page capacity (55 lines per page), a page break is executed to a continuation page.
+  - **`*** END OF STATEMENT ***` footer:** The closing footer block (two `====` banner lines enclosing the `*** END OF STATEMENT ***` line) is printed after the last account's totals. If the remaining lines on the current page are insufficient to fit the footer without exceeding the 55-line limit, a page eject (`'1'`) is issued first and the footer is printed at the top of a fresh page (with the standard header reprinted). The footer is never split across pages.
+- **Page Counter Scope:** The page counter is **global for the entire statement** — it increments continuously from Page 1 through to the final page across all accounts and is never reset between accounts.
+- **Header Reprinting on Page Break:** On any page break (including continuation pages within a single account or moving to a new account), the following header blocks are printed with an incremented page number:
   1. The top banner line (`BANK OF Z ... MONTHLY CUSTOMER STATEMENT ... PAGE: N`).
-  2. The transaction column headings and their separator line (exact layout per the column width table below).
-  3. The account header block for the account currently being printed (`ACCOUNT TYPE: ...  ACCOUNT NUMBER: ...  SORT CODE: ...` and its separator lines).
-- The **customer information block** (name, address, phone) is printed **only on page 1** and is not repeated on continuation pages.
+  2. The statement metadata lines (`STATEMENT PERIOD: ... STATEMENT ISSUE DATE: ...`, `CUSTOMER ID: ...`).
+  3. The account header block for the account currently being printed (`ACCOUNT TYPE: ... ACCOUNT NUMBER: ... SORT CODE: ...` and its separator lines).
+  4. The `OPENING BALANCE: $0.00` line.
+  5. The transaction column headings and their separator line (exact layout per the column width table below).
+- The **customer information block** (name, address, phone) is printed **only on page 1** and is not repeated on continuation pages or subsequent account pages.
+- **Statement Issue Date:** The `STATEMENT ISSUE DATE` field in the report header represents the current system run date on which the batch statement was generated (formatted as `YYYY-MM-DD`).
 
 #### 4.3.1 Transaction Line Column Width Table
 All transaction output lines (column headings, separator lines, and data lines) must use the following **exact** column positions within the 132-character report line:
 
 | Column Name | Start Col | Width | Notes |
 | :--- | :---: | :---: | :--- |
-| `DATE` | 1 | 12 | Format: `Mmm DD, YYYY` (e.g. `Jul 02, 2026`) |
+| `DATE` | 1 | 12 | Format: `Mmm DD, YYYY` (e.g. `Jul 02, 2026`). Month abbreviation is mixed-case (`Jan`–`Dec`); Day is 2-digit zero-padded for days < 10. |
 | *(space separator)* | 13 | 2 | Two spaces |
 | `TRANSACTION DESCRIPTION` | 15 | 40 | Left-aligned; full 40-char `PROCTRAN_DESC`; blank if null → `N/A` |
 | *(space separator)* | 55 | 2 | Two spaces |
@@ -343,7 +368,7 @@ All transaction output lines (column headings, separator lines, and data lines) 
 | *(space separator)* | 71 | 2 | Two spaces |
 | `DEPOSIT` | 73 | 14 | Right-aligned; blank for debits and informational |
 | *(space separator)* | 87 | 2 | Two spaces |
-| `RUNNING BALANCE` | 89 | 17 | Right-aligned, signed (negative shown with leading `-`) |
+| `RUNNING BALANCE` | 89 | 17 | Right-aligned, signed (negative shown with leading `-$`, e.g. `-$100.00`) |
 
 Total used: columns 1–105. Columns 106–132 are blank (reserved).
 
@@ -354,13 +379,14 @@ Total used: columns 1–105. Columns 106–132 are blank (reserved).
 ### 5.1 Informational Messages (`BNKZInnnn`)
 | Message ID | Message Text | Notes |
 | :--- | :--- | :--- |
-| `BNKZI0001` | `BNKZI0001: Statement period omitted; defaulting to current month: <YYYY-MM>` | |
-| `BNKZI0002` | `BNKZI0002: Customer <CustomerID> has no active accounts on file` | |
-| `BNKZI0003` | `BNKZI0003: No transactions found for account <account-number> in period <YYYY-MM-01> to <YYYY-MM-DD>` | |
-| `BNKZI0004` | `BNKZI0004: Monthly statement generation completed successfully for customer <CustomerID>` | Emitted to `SYSOUT` as the final step before setting Return Code `0`. Not emitted when the return code is `4`, `8`, or `12`. |
-| `BNKZI0005` | `BNKZI0005: SYSIN not specified or insufficient parameters; displaying usage syntax` | |
-| `BNKZI0006` | `BNKZI0006: Unrecognised transaction type <type> for account <account-number>; treated as withdrawal` | |
-| `BNKZI0007` | `BNKZI0007: Informational transaction type <type> has non-zero amount <amount> for account <account-number>; treated as withdrawal` | |
+| `BNKZI0000` | `BNKZI0000: Monthly statement generation completed successfully for customer <CustomerID>` | Special completion informational message emitted to `SYSOUT` upon successful statement generation without errors. Unlike other informational messages, issuing `BNKZI0000` does not raise the Return Code from `0` to `4`. Not emitted when the return code is `4`, `8`, or `12`. |
+| `BNKZI0001` | `BNKZI0001: Statement period omitted; defaulting to current month: <YYYY-MM>` | Sets Return Code to 4. |
+| `BNKZI0002` | `BNKZI0002: Customer <CustomerID> has no active accounts on file` | Sets Return Code to 4. |
+| `BNKZI0003` | `BNKZI0003: No transactions found for account <account-number> in period <YYYY-MM-01> to <YYYY-MM-DD>` | Sets Return Code to 4. |
+| ~~`BNKZI0004`~~ | *(Reserved — renumbered to BNKZI0000)* | Reserved for future use. Do not assign. |
+| `BNKZI0005` | `BNKZI0005: SYSIN not specified or insufficient parameters; displaying usage syntax` | Sets Return Code to 4. |
+| `BNKZI0006` | `BNKZI0006: Unrecognised transaction type <type> for account <account-number>; treated as withdrawal` | Sets Return Code to 4. |
+| `BNKZI0007` | `BNKZI0007: Informational transaction type <type> has non-zero amount <amount> for account <account-number>; treated as withdrawal` | Sets Return Code to 4. |
 
 ### 5.2 Error Messages (`BNKZE00nn`)
 | Message ID | Message Text | Notes |
@@ -368,7 +394,7 @@ Total used: columns 1–105. Columns 106–132 are blank (reserved).
 | ~~`BNKZE0001`~~ | *(Reserved — not assigned)* | Reserved for future use. Do not assign. |
 | `BNKZE0002` | `BNKZE0002: Customer ID prefix must be 'C' (CICS) or 'I' (IMS)` | |
 | `BNKZE0003` | `BNKZE0003: Non-numeric customer ID digits found: <digits>` | |
-| `BNKZE0004` | `BNKZE0004: IMS customer ID must have 9 digits after prefix 'I'` | |
+| `BNKZE0004` | `BNKZE0004: IMS customer ID must not exceed 9 digits after prefix 'I'` | Only fires when more than 9 digits are supplied; short IMS IDs are zero-padded silently. |
 | `BNKZE0005` | `BNKZE0005: Invalid statement period format. Expected YYYY-MM` | |
 | `BNKZE0006` | `BNKZE0006: Invalid month value MM in statement period: <MM>` | |
 | `BNKZE0007` | `BNKZE0007: Statement year YYYY is outside valid range (1900-2099): <YYYY>` | |
@@ -386,11 +412,12 @@ Total used: columns 1–105. Columns 106–132 are blank (reserved).
 | ~~`BNKZE0019`~~ | *(Reserved — not assigned)* | Reserved for future use. Do not assign. |
 | `BNKZE0020` | `BNKZE0020: SYSPRINT dataset is unavailable or unwritable. File status=<status>` | |
 | `BNKZE0021` | `BNKZE0021: Error reading SYSIN control dataset. File status=<status>` | |
+| `BNKZE0022` | `BNKZE0022: Multiple SYSIN control records detected; only single-record input is supported` | Sets Return Code to 8; terminates before DB queries or report generation. |
 
 ---
 
 ## 6. Return Codes Contract
-- **`0`**: No error and no informational messages produced (clean execution with accounts and transactions).
-- **`4`**: One or more informational messages produced (e.g. usage guide displayed, period defaulted, customer has no accounts, or account has no transactions in the period), and zero error messages produced.
+- **`0`**: Clean execution with active accounts and transactions, with zero error messages and no non-nominal informational messages (the success message `BNKZI0000` is permitted and keeps RC = `0`).
+- **`4`**: One or more informational messages produced (`BNKZI0001`, `BNKZI0002`, `BNKZI0003`, `BNKZI0005`, `BNKZI0006`, `BNKZI0007`), and zero error messages produced.
 - **`8`**: One or more error messages produced (e.g. invalid prefix/digits, invalid date, customer not found, database errors, unwritable `SYSPRINT`).
 - **`12`**: Critical failure — `SYSOUT` dataset is unavailable or cannot be opened. `SYSPRINT` output is undefined and must not be attempted when this return code is set.

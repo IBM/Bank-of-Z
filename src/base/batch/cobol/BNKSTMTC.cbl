@@ -413,7 +413,7 @@
            03 FILLER PIC X(27) VALUE SPACES.
 
       *-----------------------------------------------------------------
-      * Transaction detail print line (132 chars per spec §4.3.1)
+      * Transaction detail print line (132 chars per spec sec.4.3.1)
       *   DATE        cols  1-12  (12)
       *   space-sep   cols 13-14  ( 2)
       *   DESCRIPTION cols 15-54  (40)
@@ -562,7 +562,7 @@
       *-----------------------------------------------------------------
        MAIN-CONTROL.
       *-----------------------------------------------------------------
-      * 1. Validate SYSOUT availability first (spec §4.1).
+      * 1. Validate SYSOUT availability first (spec sec.4.1).
       *    On z/OS, DISPLAY routes to SYSOUT DD automatically.
       *    Attempt a probe DISPLAY; if the DD is missing the system
       *    will abend, so we treat reaching this point as SYSOUT OK.
@@ -602,7 +602,7 @@
                STOP RUN
            END-IF
 
-      *    Validate SYSIN fields (collect-all errors per spec §2.2.3)
+      *    Validate SYSIN fields (collect-all errors per spec sec.2.2.3)
            PERFORM 1200-VALIDATE-SYSIN THRU 1200-EXIT
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
@@ -616,7 +616,7 @@
       *    Calculate statement period date range
            PERFORM 1400-CALC-DATE-RANGE THRU 1400-EXIT
 
-      *    Query accounts first (spec §3.1 ordering)
+      *    Query accounts first (spec sec.3.1 ordering)
            PERFORM 2000-QUERY-ACCOUNTS THRU 2000-EXIT
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
@@ -682,7 +682,7 @@
       *-----------------------------------------------------------------
       *    Read all records from SYSIN; count non-empty ones.
       *    Save the FIRST non-empty record for validation.
-      *    Spec §2.2.3: check 1 (empty) and check 2 (multiple) first.
+      *    Spec sec.2.2.3: check 1 (empty) and check 2 (multiple) first.
       *-----------------------------------------------------------------
            PERFORM UNTIL WS-SYSIN-EOF = 'Y'
                READ SYSIN-FILE INTO WS-SYSIN-RECORD
@@ -782,7 +782,7 @@
       *    WS-RAW-CUSTID is PIC X(10); col 1 is prefix.
       *    We copy cols 2-10 (9 bytes) into the first 9 chars of
       *    WS-CUST-RAW-DIGITS (PIC X(10)) to leave room for an
-      *    overrun sentinel — the 10th byte stays SPACE.
+      *    overrun sentinel - the 10th byte stays SPACE.
            MOVE SPACES TO WS-CUST-RAW-DIGITS
            MOVE WS-RAW-CUSTID(2:9) TO WS-CUST-RAW-DIGITS(1:9)
       *    Find actual digit string (strip trailing spaces)
@@ -814,9 +814,9 @@
       *    the error fires when MORE THAN 9 digits are supplied; since
       *    the input field is exactly 9 digits wide, the check fires
       *    only when all 9 positions are non-space digits AND the field
-      *    is genuinely full (i.e. user supplied exactly 9 digits —
+      *    is genuinely full (i.e. user supplied exactly 9 digits -
       *    which is valid) OR overflows into SYSIN col 11. Per spec
-      *    §2.1 col 11 is the space delimiter; if col 11 is not space
+      *    sec.2.1 col 11 is space delimiter; if col 11 is not space
       *    AND prefix is 'I', the ID is overlong. We detect this here.
            IF WS-CUST-PREFIX = 'I'
               AND WS-SYSIN-SPACE NOT = SPACE
@@ -828,7 +828,7 @@
            END-IF
 
       *    Check 6 - period format (if non-blank)
-      *    Spec §2.3: col 11 must be space AND col 16 must be '-'
+      *    Spec sec.2.3: col 11 must be space AND col 16 must be '-'
            IF WS-PERIOD-RAW NOT = SPACES
                IF WS-SYSIN-SPACE NOT = SPACE
                OR WS-PERIOD-DASH NOT = '-'
@@ -861,7 +861,7 @@
       *            Check 9 - future period (only if check 6 passed,
       *            which is guaranteed here since we are in the ELSE
       *            branch of the format check; checks 7/8 do not
-      *            suppress check 9 per spec §2.2.3)
+      *            suppress check 9 per spec sec.2.2.3)
                    IF WS-PERIOD-YYYY > WS-CURR-YYYY
                        OR (WS-PERIOD-YYYY = WS-CURR-YYYY AND
                            WS-PERIOD-MM   > WS-CURR-MM)
@@ -1063,10 +1063,10 @@
       *-----------------------------------------------------------------
       *    At entry the cursor is open and the first row is already
       *    sitting in host vars from 2000-QUERY-ACCOUNTS.
-      *    Per spec §3.1, customer demographics are queried individually
+      *    Per spec sec.3.1, customer demographics are queried individually
       *    per account using each account's ACCOUNT_SORTCODE so that
       *    multi-institution account holdings are supported.
-      *    Customer info block is printed only on page 1 (spec §4.3).
+      *    Customer info block is printed only on page 1 (spec sec.4.3).
       *-----------------------------------------------------------------
       *    Query customer demographics using first account sort code
       *    (HV-CUST-SORTCODE already set from HV-ACCT-SORTCODE in
@@ -1220,7 +1220,7 @@
       *-----------------------------------------------------------------
       *    Writes the full page 1 header: banner, period line,
       *    customer ID line, blank line, customer info block, blank.
-      *    Customer info is only on page 1 (spec §4.3).
+      *    Customer info is only on page 1 (spec sec.4.3).
       *-----------------------------------------------------------------
            MOVE 0 TO WS-LINE-COUNT
            PERFORM 4010-WRITE-BANNER THRU 4010-EXIT
@@ -1273,7 +1273,7 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Address line 2 (only if non-blank AND addr1 was not N/A)
-      *    Spec §3.3: when addr1 is null/blank (printed as N/A), addr2
+      *    Spec sec.3.3: when addr1 is null/blank (printed as N/A), addr2
       *    is omitted entirely regardless of its own value.
            IF HV-CUST-ADDR2 NOT = SPACES
            AND HV-CUST-ADDR1 NOT = 'N/A'
@@ -1341,7 +1341,7 @@
        4100-PAGE-EJECT.
       *-----------------------------------------------------------------
       *    Issue page eject and reprint full abbreviated header per
-      *    spec §4.3: banner, period/issue, customer ID, account header
+      *    spec sec.4.3: banner, period/issue, customer ID, account header
       *    block (type/number/sort code, separator, opening balance,
       *    column headings and separator).
       *    Does NOT reprint customer info block (page 1 only).
@@ -1362,7 +1362,7 @@
            MOVE WS-CUSTID-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
-      *    Reprint account header block (items 3-5 of spec §4.3 list)
+      *    Reprint account header block (items 3-5 of spec sec.4.3 list)
            PERFORM 4200-WRITE-ACCT-HEADER THRU 4200-EXIT.
        4100-EXIT.
            EXIT.
@@ -1526,7 +1526,7 @@
        4310-CLASSIFY-TRAN.
       *-----------------------------------------------------------------
       *    Sets WS-TRAN-CLASS (D/W/I) based on PROCTRAN_TYPE and
-      *    PROCTRAN_AMOUNT sign per spec §3.6.
+      *    PROCTRAN_AMOUNT sign per spec sec.3.6.
       *-----------------------------------------------------------------
            EVALUATE HV-TRAN-TYPE
                WHEN 'CRE' WHEN 'PCR' WHEN 'CHI'
@@ -1700,10 +1700,10 @@
       *-----------------------------------------------------------------
       *    Footer is 3 lines (banner, END text, banner).
       *    Eject to new page if fewer than 3 lines remain.
-      *    Per spec §4.3: when the footer spills to a fresh page the
-      *    full standard header must be reprinted — banner, period/issue
+      *    Per spec sec.4.3: when footer spills to a fresh page the
+      *    full standard header must be reprinted - banner, period/issue
       *    date, customer ID, AND the account header block (items 1-5
-      *    of the §4.3 header-reprinting list).
+      *    of the sec.4.3 header-reprinting list).
       *-----------------------------------------------------------------
            IF WS-LINE-COUNT > WS-LINES-PER-PAGE - 3
                PERFORM 4100-PAGE-EJECT THRU 4100-EXIT
@@ -1730,17 +1730,17 @@
       *-----------------------------------------------------------------
        6100-OPEN-SYSPRINT.
       *-----------------------------------------------------------------
-      *    SYSOUT availability probe (spec §4.1).
+      *    SYSOUT availability probe (spec sec.4.1).
       *    On z/OS, DISPLAY writes to the SYSOUT DD.  Issue a probe
       *    DISPLAY now; if SYSOUT DD is absent the run-time abend
       *    prevents us from reaching this point, which is the only
       *    mechanism available to detect the condition.  Successfully
       *    executing the DISPLAY confirms SYSOUT is reachable; RC=12
       *    is the contract for this failure but can only be raised by
-      *    an external abend-handler or operator action — we set it
+      *    an external abend-handler or operator action - we set it
       *    defensively here so the guard in MAIN-CONTROL is active.
       *    SYSPRINT is opened for OUTPUT later in 6110 only after
-      *    accounts are confirmed to exist (spec §3.1).
+      *    accounts are confirmed to exist (spec sec.3.1).
       *-----------------------------------------------------------------
            DISPLAY 'BNKSTMTC: program start'.
        6100-EXIT.
@@ -1751,7 +1751,7 @@
       *-----------------------------------------------------------------
       *    Open SYSPRINT for output. Only set the open-flag on success
       *    so that 6200-CLOSE-FILES does not attempt to close a file
-      *    that was never successfully opened (spec §4.2).
+      *    that was never successfully opened (spec sec.4.2).
       *-----------------------------------------------------------------
            OPEN OUTPUT SYSPRINT-FILE
            IF WS-SYSPRINT-STATUS NOT = '00'

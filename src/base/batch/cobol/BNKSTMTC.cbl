@@ -223,6 +223,7 @@
 
        01  WS-SYSIN-RECORD-COUNT      PIC 9(4) COMP VALUE 0.
        01  WS-SYSIN-ERROR-COUNT       PIC 9(4) COMP VALUE 0.
+       01  WS-SYSIN-SAVED-RECORD      PIC X(80) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Customer ID normalisation fields
@@ -305,6 +306,7 @@
        01  WS-AMT-EDIT-POS            PIC $$,$$$,$$$,$$9.99.
        01  WS-AMT-WORK-POS            PIC S9(12)V99 COMP-3.
        01  WS-AMT-FORMATTED           PIC X(17).
+       01  WS-AMT-FORMATTED-14        PIC X(14).
        01  WS-AMT-TEMP                PIC X(17).
 
       *-----------------------------------------------------------------
@@ -379,13 +381,9 @@
       *-----------------------------------------------------------------
       * Fixed report line constants
       *-----------------------------------------------------------------
-       01  WS-BANNER-LINE             PIC X(132) VALUE
-           '============================================================
-      -    '===================================='.
+       01  WS-BANNER-LINE             PIC X(132) VALUE ALL '='.
 
-       01  WS-ACCT-SEP-LINE           PIC X(132) VALUE
-           '------------------------------------------------------------
-      -    '------------------------------------'.
+       01  WS-ACCT-SEP-LINE           PIC X(132) VALUE ALL '-'.
 
        01  WS-COL-HDR-LINE.
            03 FILLER PIC X(12) VALUE 'DATE        '.
@@ -442,18 +440,18 @@
       * Account header line
       *-----------------------------------------------------------------
        01  WS-ACCT-HDR-LINE.
-           03 FILLER                  PIC X(13)
-               VALUE 'ACCOUNT TYPE:'.
+           03 FILLER                  PIC X(14)
+               VALUE 'ACCOUNT TYPE: '.
            03 WS-AH-TYPE              PIC X(8).
-           03 FILLER                  PIC X(28) VALUE SPACES.
-           03 FILLER                  PIC X(15)
-               VALUE 'ACCOUNT NUMBER:'.
+           03 FILLER                  PIC X(27) VALUE SPACES.
+           03 FILLER                  PIC X(16)
+               VALUE 'ACCOUNT NUMBER: '.
            03 WS-AH-NUMBER            PIC X(8).
            03 FILLER                  PIC X(22) VALUE SPACES.
            03 FILLER                  PIC X(11)
                VALUE 'SORT CODE: '.
            03 WS-AH-SORTCODE          PIC X(8).
-           03 FILLER                  PIC X(19) VALUE SPACES.
+           03 FILLER                  PIC X(18) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Page header lines
@@ -473,11 +471,10 @@
            03 WS-SP-FROM              PIC X(10).
            03 FILLER                  PIC X(4)  VALUE ' TO '.
            03 WS-SP-TO                PIC X(10).
-           03 FILLER                  PIC X(33) VALUE SPACES.
-           03 FILLER                  PIC X(21)
-               VALUE 'STATEMENT ISSUE DATE:'.
-           03 WS-SP-ISSUE             PIC X(11).
-           03 FILLER                  PIC X(25) VALUE SPACES.
+           03 FILLER                  PIC X(58) VALUE SPACES.
+           03 FILLER                  PIC X(22)
+               VALUE 'STATEMENT ISSUE DATE: '.
+           03 WS-SP-ISSUE             PIC X(10).
 
        01  WS-CUSTID-LINE.
            03 FILLER                  PIC X(18)
@@ -492,30 +489,25 @@
                VALUE 'CUSTOMER INFORMATION:'.
 
        01  WS-CI-NAME-LINE.
-           03 FILLER                  PIC X(10) VALUE '  Name   :'.
-           03 WS-CI-NAME              PIC X(122).
+           03 FILLER                  PIC X(11) VALUE '  Name   : '.
+           03 WS-CI-NAME              PIC X(121).
 
        01  WS-CI-ADDR1-LINE.
-           03 FILLER                  PIC X(10) VALUE '  Address:'.
-           03 WS-CI-ADDR1             PIC X(122).
+           03 FILLER                  PIC X(11) VALUE '  Address: '.
+           03 WS-CI-ADDR1             PIC X(121).
 
        01  WS-CI-ADDR2-LINE.
-           03 FILLER                  PIC X(12) VALUE '            '.
-           03 WS-CI-ADDR2             PIC X(120).
+           03 FILLER                  PIC X(11) VALUE '           '.
+           03 WS-CI-ADDR2             PIC X(121).
 
        01  WS-CI-ADDRFINAL-LINE.
-           03 FILLER                  PIC X(12) VALUE '            '.
-           03 WS-CI-CITY              PIC X(50).
-           03 FILLER                  PIC X(2)  VALUE ', '.
-           03 WS-CI-POSTCODE          PIC X(10).
-           03 FILLER                  PIC X(2)  VALUE ', '.
-           03 WS-CI-COUNTRY           PIC X(50).
-           03 FILLER                  PIC X(6)  VALUE SPACES.
+           03 FILLER                  PIC X(11) VALUE '           '.
+           03 WS-CI-ADDRFINAL         PIC X(121).
 
        01  WS-CI-PHONE-LINE.
-           03 FILLER                  PIC X(10) VALUE '  Phone  :'.
+           03 FILLER                  PIC X(11) VALUE '  Phone  : '.
            03 WS-CI-PHONE             PIC X(20).
-           03 FILLER                  PIC X(102) VALUE SPACES.
+           03 FILLER                  PIC X(101) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Summary lines
@@ -547,9 +539,9 @@
        01  WS-NO-TRAN-LINE            PIC X(132)
                VALUE '  NO TRANSACTIONS FOR THIS PERIOD'.
 
-       01  WS-END-STMT-LINE           PIC X(132)
-               VALUE '                                       *** END OF S
-      -        'TATEMENT ***'.
+       01  WS-END-STMT-LINE           PIC X(132) VALUE
+           '                                                   *** END O
+      -    'F STATEMENT ***'.
 
       *-----------------------------------------------------------------
       * Temporary index / work fields
@@ -698,6 +690,10 @@
                    NOT AT END
                        IF WS-SYSIN-RECORD NOT = SPACES
                            ADD 1 TO WS-SYSIN-RECORD-COUNT
+                           IF WS-SYSIN-RECORD-COUNT = 1
+                               MOVE WS-SYSIN-RECORD
+                                 TO WS-SYSIN-SAVED-RECORD
+                           END-IF
                        END-IF
                        IF WS-SYSIN-STATUS NOT = '00'
                            AND WS-SYSIN-STATUS NOT = '10'
@@ -711,12 +707,10 @@
                END-READ
            END-PERFORM
 
-      *    Per Enterprise COBOL behaviour, AT-END READ INTO does not
-      *    overwrite the receiving field; WS-SYSIN-RECORD therefore
-      *    holds the last SUCCESSFUL (non-AT-END) read on exit.
-      *    For count=1 that is the one non-empty record — correct.
-      *    For count>1, check 2 below terminates before any field
-      *    validation, so the record content is irrelevant.
+      *    Restore the single valid control record saved on first read.
+           IF WS-SYSIN-RECORD-COUNT = 1
+               MOVE WS-SYSIN-SAVED-RECORD TO WS-SYSIN-RECORD
+           END-IF
 
       *    Check 1 - no records
            IF WS-SYSIN-RECORD-COUNT = 0
@@ -818,15 +812,15 @@
 
       *    Check 5 - IMS ID must not exceed 9 digits after prefix.
       *    Because WS-RAW-CUSTID is 10 chars (col 1 = prefix, cols 2-10
-      *    = up to 9 digits) there is no physical room in SYSIN cols 1-10
-      *    for more than 9 post-prefix digits.  The spec says the error
-      *    fires when MORE THAN 9 digits are supplied; since the input
-      *    field is exactly 9 digits wide, the check fires only when all
-      *    9 positions are non-space digits AND the field is genuinely
-      *    full (i.e. the user supplied exactly 9 digits — which is
-      *    valid) OR overflows into SYSIN col 11.  Per spec §2.1 col 11
-      *    is the space delimiter; if col 11 is not space AND the prefix
-      *    is 'I', the ID is overlong.  We detect this here.
+      *    = up to 9 digits) there is no physical room in SYSIN
+      *    cols 1-10 for more than 9 post-prefix digits. The spec says
+      *    the error fires when MORE THAN 9 digits are supplied; since
+      *    the input field is exactly 9 digits wide, the check fires
+      *    only when all 9 positions are non-space digits AND the field
+      *    is genuinely full (i.e. user supplied exactly 9 digits —
+      *    which is valid) OR overflows into SYSIN col 11. Per spec
+      *    §2.1 col 11 is the space delimiter; if col 11 is not space
+      *    AND prefix is 'I', the ID is overlong. We detect this here.
            IF WS-CUST-PREFIX = 'I'
               AND WS-SYSIN-SPACE NOT = SPACE
               AND WS-DIGIT-LEN >= 9
@@ -887,6 +881,7 @@
                                    'in the future: '
                                    WS-MSG(1:7)
                            PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
+                           ADD 1 TO WS-SYSIN-ERROR-COUNT
                        END-IF
                END-IF
            ELSE
@@ -1074,7 +1069,8 @@
       *-----------------------------------------------------------------
       *    Query customer demographics using first account sort code
       *    (HV-CUST-SORTCODE already set from HV-ACCT-SORTCODE in
-      *    MAIN-CONTROL after 2000-QUERY-ACCOUNTS confirmed accounts exist)
+      *    MAIN-CONTROL after 2000-QUERY-ACCOUNTS confirmed accounts
+      *    exist)
            PERFORM 3100-QUERY-CUSTOMER THRU 3100-EXIT
            IF WS-RETURN-CODE >= 8
                GO TO 3000-EXIT
@@ -1088,8 +1084,8 @@
            PERFORM UNTIL WS-ACCT-EOF = 'Y'
                ADD 1 TO WS-ACCT-SEQ
 
-      *        For account 2+: update sort code and re-query demographics
-      *        so multi-branch accounts use the correct customer record
+      *        For account 2+: update sort code and re-query
+      *        demographics so multi-branch accounts use correct record
                IF WS-ACCT-SEQ > 1
                    MOVE HV-ACCT-SORTCODE TO HV-CUST-SORTCODE
                    PERFORM 3100-QUERY-CUSTOMER THRU 3100-EXIT
@@ -1231,9 +1227,7 @@
       *    Statement period and issue date line
            MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
            MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
-           STRING ' ' WS-ISSUE-DATE-DISP DELIMITED BY SIZE
-                  INTO WS-SP-ISSUE
-           END-STRING
+           MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
            MOVE ' ' TO WS-PL-CC
            MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
@@ -1289,9 +1283,19 @@
            END-IF
 
       *    Address final line: City, Postcode, Country
-           MOVE HV-CUST-CITY     TO WS-CI-CITY
-           MOVE HV-CUST-POSTCODE TO WS-CI-POSTCODE
-           MOVE HV-CUST-COUNTRY  TO WS-CI-COUNTRY
+           MOVE SPACES TO WS-CI-ADDRFINAL
+           STRING FUNCTION TRIM(HV-CUST-CITY)
+                      DELIMITED BY SIZE
+                  ', '
+                      DELIMITED BY SIZE
+                  FUNCTION TRIM(HV-CUST-POSTCODE)
+                      DELIMITED BY SIZE
+                  ', '
+                      DELIMITED BY SIZE
+                  FUNCTION TRIM(HV-CUST-COUNTRY)
+                      DELIMITED BY SIZE
+                  INTO WS-CI-ADDRFINAL
+           END-STRING
            MOVE ' ' TO WS-PL-CC
            MOVE WS-CI-ADDRFINAL-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
@@ -1347,9 +1351,7 @@
 
            MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
            MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
-           STRING ' ' WS-ISSUE-DATE-DISP DELIMITED BY SIZE
-                  INTO WS-SP-ISSUE
-           END-STRING
+           MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
            MOVE ' ' TO WS-PL-CC
            MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
@@ -1393,11 +1395,9 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Opening balance: always $0.00
-           MOVE SPACES TO WS-OB-AMOUNT
-           STRING WS-CURRENCY-SYMBOL DELIMITED BY SIZE
-                  '0.00'             DELIMITED BY SIZE
-                  INTO WS-OB-AMOUNT
-           END-STRING
+           MOVE 0 TO WS-AMT-WORK-POS
+           PERFORM 8100-FORMAT-AMOUNT THRU 8100-EXIT
+           MOVE WS-AMT-FORMATTED TO WS-OB-AMOUNT
            MOVE ' ' TO WS-PL-CC
            MOVE WS-OPEN-BAL-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
@@ -1560,7 +1560,8 @@
                               HV-TRAN-TYPE DELIMITED BY SIZE
                               ' has non-zero amount '
                                   DELIMITED BY SIZE
-                              WS-AMT-FORMATTED DELIMITED BY SIZE
+                              FUNCTION TRIM(WS-AMT-TEMP, LEADING)
+                                  DELIMITED BY SIZE
                               ' for account '   DELIMITED BY SIZE
                               HV-ACCT-NUMBER    DELIMITED BY SIZE
                               '; treated as withdrawal'
@@ -1617,7 +1618,7 @@
                WHEN TRAN-IS-DEPOSIT
                    MOVE WS-ABS-AMOUNT TO WS-AMT-WORK-POS
                    PERFORM 8100-FORMAT-AMOUNT THRU 8100-EXIT
-                   MOVE WS-AMT-FORMATTED TO WS-TL-DEPOSIT
+                   MOVE WS-AMT-FORMATTED-14 TO WS-TL-DEPOSIT
                    MOVE SPACES TO WS-TL-WITHDRAWAL
                    ADD WS-ABS-AMOUNT TO WS-TOTAL-DEPOSITS
                    ADD WS-ABS-AMOUNT TO WS-RUNNING-BALANCE
@@ -1625,7 +1626,7 @@
                WHEN TRAN-IS-WITHDRAWAL
                    MOVE WS-ABS-AMOUNT TO WS-AMT-WORK-POS
                    PERFORM 8100-FORMAT-AMOUNT THRU 8100-EXIT
-                   MOVE WS-AMT-FORMATTED TO WS-TL-WITHDRAWAL
+                   MOVE WS-AMT-FORMATTED-14 TO WS-TL-WITHDRAWAL
                    MOVE SPACES TO WS-TL-DEPOSIT
                    ADD WS-ABS-AMOUNT TO WS-TOTAL-WITHDRAWALS
                    SUBTRACT WS-ABS-AMOUNT FROM WS-RUNNING-BALANCE
@@ -1709,9 +1710,7 @@
                PERFORM 4010-WRITE-BANNER THRU 4010-EXIT
                MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
                MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
-               STRING ' ' WS-ISSUE-DATE-DISP DELIMITED BY SIZE
-                      INTO WS-SP-ISSUE
-               END-STRING
+               MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
                MOVE ' ' TO WS-PL-CC
                MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
                PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
@@ -1810,11 +1809,16 @@
       *-----------------------------------------------------------------
        8100-FORMAT-AMOUNT.
       *-----------------------------------------------------------------
-      *    Formats WS-AMT-WORK-POS into WS-AMT-FORMATTED (17 chars).
+      *    Formats WS-AMT-WORK-POS into:
+      *    - WS-AMT-FORMATTED    (17 chars, right-aligned)
+      *    - WS-AMT-FORMATTED-14 (14 chars, right-aligned)
+      *    - WS-AMT-TEMP         (trimmed with leading sign/currency)
       *    Handles negative values (WS-AMT-WORK-POS may be signed).
       *    Output format: $n,nnn.nn or -$n,nnn.nn, right-aligned.
       *-----------------------------------------------------------------
            MOVE SPACES TO WS-AMT-FORMATTED
+           MOVE SPACES TO WS-AMT-FORMATTED-14
+           MOVE SPACES TO WS-AMT-TEMP
 
            IF WS-AMT-WORK-POS < 0
       *        Negative: format absolute value then prepend -$
@@ -1822,33 +1826,32 @@
       *        we only prepend the minus sign to avoid double-dollar.
                COMPUTE WS-AMT-WORK-POS = WS-AMT-WORK-POS * -1
                MOVE WS-AMT-WORK-POS TO WS-AMT-EDIT-POS
-               MOVE SPACES TO WS-AMT-TEMP
                STRING '-' DELIMITED BY SIZE
                       FUNCTION TRIM(WS-AMT-EDIT-POS, LEADING)
                           DELIMITED BY SIZE
                       INTO WS-AMT-TEMP
                END-STRING
-      *        Right-align in 17-char field
-               MOVE FUNCTION TRIM(WS-AMT-TEMP, LEADING)
-                   TO WS-AMT-TEMP
-               MOVE SPACES TO WS-AMT-FORMATTED
-               COMPUTE WS-AMT-LEN = FUNCTION LENGTH(
-                   FUNCTION TRIM(WS-AMT-TEMP, TRAILING))
-               COMPUTE WS-AMT-START = 17 - WS-AMT-LEN + 1
-               MOVE WS-AMT-TEMP TO
-                   WS-AMT-FORMATTED(WS-AMT-START : WS-AMT-LEN)
            ELSE
       *        Positive: format with leading $
                MOVE WS-AMT-WORK-POS TO WS-AMT-EDIT-POS
-               MOVE SPACES TO WS-AMT-TEMP
                MOVE FUNCTION TRIM(WS-AMT-EDIT-POS, LEADING)
                    TO WS-AMT-TEMP
-               MOVE SPACES TO WS-AMT-FORMATTED
-               COMPUTE WS-AMT-LEN = FUNCTION LENGTH(
-                   FUNCTION TRIM(WS-AMT-TEMP, TRAILING))
+           END-IF
+
+      *    Right-align in 17-char field
+           COMPUTE WS-AMT-LEN = FUNCTION LENGTH(
+               FUNCTION TRIM(WS-AMT-TEMP, TRAILING))
+           IF WS-AMT-LEN <= 17
                COMPUTE WS-AMT-START = 17 - WS-AMT-LEN + 1
                MOVE WS-AMT-TEMP TO
                    WS-AMT-FORMATTED(WS-AMT-START : WS-AMT-LEN)
+           END-IF
+
+      *    Right-align in 14-char field
+           IF WS-AMT-LEN <= 14
+               COMPUTE WS-AMT-START = 14 - WS-AMT-LEN + 1
+               MOVE WS-AMT-TEMP TO
+                   WS-AMT-FORMATTED-14(WS-AMT-START : WS-AMT-LEN)
            END-IF.
        8100-EXIT.
            EXIT.

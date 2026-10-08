@@ -12,6 +12,12 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Change into SCRIPT_DIR so that git rev-parse (called by detect_bank_of_z_location
+# inside setenv.sh / pipeline-common.sh) resolves the repo root correctly and
+# sets EXECUTION_MODE=grub rather than falling through to the VSCode path.
+cd "$SCRIPT_DIR"
+
 source "$SCRIPT_DIR/config/setenv.sh"
 
 echo "==> Stopping all Bank of Z servers..."

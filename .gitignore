@@ -36,3 +36,4 @@ scripts/update-frontend-file-zos.sh
 .gradle/
 .bobz
 .zopeneditor/
+zos-downloads/

@@ -908,8 +908,8 @@
            MOVE WS-CUST-RAW-DIGITS(1:WS-DIGIT-LEN) TO
                WS-DIGIT-WORK(1:WS-DIGIT-LEN)
       *    Convert digit string to numeric, then to 9-digit picture
-           MOVE FUNCTION NUMVAL(WS-DIGIT-WORK(1:WS-DIGIT-LEN))
-               TO WS-DIGIT-NUMERIC
+           COMPUTE WS-DIGIT-NUMERIC =
+               FUNCTION NUMVAL(WS-DIGIT-WORK(1:WS-DIGIT-LEN))
            MOVE WS-DIGIT-NUMERIC TO WS-DIGIT-EDIT
       *    Build canonical ID: prefix + 9-digit zero-padded string
            STRING WS-CUST-PREFIX DELIMITED BY SIZE
@@ -931,8 +931,10 @@
       *    Derive PERIOD-FROM (YYYY-MM-01) and PERIOD-TO (YYYY-MM-LL)
       *    where LL = last day of month, accounting for leap years.
       *-----------------------------------------------------------------
-           MOVE FUNCTION NUMVAL(WS-PERIOD-YYYY) TO WS-PERIOD-YYYY-NUM
-           MOVE FUNCTION NUMVAL(WS-PERIOD-MM)   TO WS-PERIOD-MM-NUM
+           COMPUTE WS-PERIOD-YYYY-NUM =
+               FUNCTION NUMVAL(WS-PERIOD-YYYY)
+           COMPUTE WS-PERIOD-MM-NUM =
+               FUNCTION NUMVAL(WS-PERIOD-MM)
 
       *    Default last day = 31
            MOVE 31 TO WS-PERIOD-DD-END
@@ -1847,7 +1849,8 @@
       *    Converts ISO date in WS-TRAN-DATE-WORK (YYYY-MM-DD)
       *    to WS-TRAN-DATE-DISP format: Mmm DD, YYYY (12 chars).
       *-----------------------------------------------------------------
-           MOVE FUNCTION NUMVAL(WS-TD-MM) TO WS-MONTH-ABBR-IDX
+           COMPUTE WS-MONTH-ABBR-IDX =
+               FUNCTION NUMVAL(WS-TD-MM)
            IF WS-MONTH-ABBR-IDX < 1 OR WS-MONTH-ABBR-IDX > 12
                MOVE 1 TO WS-MONTH-ABBR-IDX
            END-IF

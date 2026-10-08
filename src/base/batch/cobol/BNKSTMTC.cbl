@@ -713,21 +713,23 @@
                MOVE WS-SYSIN-SAVED-RECORD TO WS-SYSIN-RECORD
            END-IF
 
-      *    Check 1 - no records
+      *    Check 1 - no records (hard early exit per spec sec.2.2.3)
            IF WS-SYSIN-RECORD-COUNT = 0
                DISPLAY 'BNKZI0005: SYSIN not specified or '
                        'insufficient parameters; displaying '
                        'usage syntax'
                PERFORM 1110-PRINT-USAGE THRU 1110-EXIT
                PERFORM 9200-RAISE-INFO THRU 9200-EXIT
+               GO TO 1100-EXIT
            END-IF
 
-      *    Check 2 - multiple records
+      *    Check 2 - multiple records (hard early exit per spec sec.2.2.3)
            IF WS-SYSIN-RECORD-COUNT > 1
                DISPLAY 'BNKZE0022: Multiple SYSIN control records '
                        'detected; only single-record input is '
                        'supported'
                PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
+               GO TO 1100-EXIT
            END-IF.
        1100-EXIT.
            EXIT.

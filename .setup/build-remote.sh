@@ -1,5 +1,5 @@
 #!/bin/bash
-# build-remote.sh — Incremental build and redeploy for Bank of Z
+# build-remote.sh - Incremental build and redeploy for Bank of Z
 #
 # Stops all Bank of Z servers, runs an incremental DBB build and Wazi Deploy,
 # then restarts all servers. The restart step is skipped if build or deploy fails.

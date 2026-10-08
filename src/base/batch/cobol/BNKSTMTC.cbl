@@ -350,9 +350,9 @@
            03 FILLER PIC X(3) VALUE 'Oct'.
            03 FILLER PIC X(3) VALUE 'Nov'.
            03 FILLER PIC X(3) VALUE 'Dec'.
-       01  WS-MONTH-ABBR-IDX          PIC 99 COMP VALUE 1.
        01  WS-MONTH-ABBR REDEFINES WS-MONTH-ABBR-TABLE.
            03 WS-MON-ABBR             PIC X(3) OCCURS 12 TIMES.
+       01  WS-MONTH-ABBR-IDX          PIC 99 COMP VALUE 1.
 
       *-----------------------------------------------------------------
       * Name display work field (Title FirstName LastName)

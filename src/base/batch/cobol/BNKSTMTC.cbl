@@ -1009,7 +1009,6 @@
            EXEC SQL
                OPEN ACCT-CURSOR
            END-EXEC
-           MOVE 'Y' TO WS-ACCT-CURSOR-OPEN
 
            IF SQLCODE < 0
                MOVE SQLCODE TO SQLCODE-DISPLAY
@@ -1018,6 +1017,7 @@
                PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
                GO TO 2000-EXIT
            END-IF
+           MOVE 'Y' TO WS-ACCT-CURSOR-OPEN
 
       *    Fetch one row to see if any accounts exist
            EXEC SQL
@@ -1435,7 +1435,6 @@
            EXEC SQL
                OPEN TRAN-CURSOR
            END-EXEC
-           MOVE 'Y' TO WS-TRAN-CURSOR-OPEN
 
            IF SQLCODE < 0
                MOVE SQLCODE TO SQLCODE-DISPLAY
@@ -1444,6 +1443,7 @@
                PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
                GO TO 4300-EXIT
            END-IF
+           MOVE 'Y' TO WS-TRAN-CURSOR-OPEN
 
            MOVE 'N' TO WS-TRAN-EOF
 

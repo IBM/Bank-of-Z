@@ -208,6 +208,7 @@
        01  WS-SYSIN-EOF               PIC X VALUE 'N'.
        01  WS-ACCT-EOF                PIC X VALUE 'N'.
        01  WS-TRAN-EOF                PIC X VALUE 'N'.
+       01  WS-ACCT-FOUND              PIC X VALUE 'N'.
 
       *-----------------------------------------------------------------
       * SYSIN parsing fields
@@ -623,7 +624,7 @@
                STOP RUN
            END-IF
 
-           IF WS-RETURN-CODE = 4
+           IF WS-ACCT-FOUND = 'N'
       *        No accounts - message already emitted; suppress SYSPRINT
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
@@ -641,7 +642,7 @@
                STOP RUN
            END-IF
 
-      *    Re-open account cursor (closed in 2000 after peek)
+      *    Process all accounts (cursor open from 2000-QUERY-ACCOUNTS)
            PERFORM 3000-PROCESS-ALL-ACCOUNTS THRU 3000-EXIT
 
            IF WS-RETURN-CODE < 8
@@ -745,18 +746,14 @@
            DISPLAY 'EXAMPLE INPUT:'
            DISPLAY '  C000000001 2026-07'
            DISPLAY 'SAMPLE OUTPUT (SYSPRINT) - 132-column layout:'
-           DISPLAY '======================================'
-                   '======================================'
-                   '==============================='
-           DISPLAY 'BANK OF Z                        '
-                   '        MONTHLY CUSTOMER STATEMENT'
-                   '                    PAGE:      1'
-           DISPLAY '======================================'
-                   '======================================'
-                   '==============================='
+           DISPLAY WS-BANNER-LINE
+           DISPLAY 'BANK OF Z                                 '
+                   '       MONTHLY CUSTOMER STATEMENT         '
+                   '                   PAGE:      1'
+           DISPLAY WS-BANNER-LINE
            DISPLAY 'STATEMENT PERIOD: 2026-07-01 TO 2026-07-31'
-                   '                               STATEMENT '
-                   'ISSUE DATE: 2026-07-31'
+                   '                                          '
+                   '       STATEMENT ISSUE DATE: 2026-07-31'
            DISPLAY 'CUSTOMER ID     : C000000001'.
        1110-EXIT.
            EXIT.
@@ -1033,6 +1030,7 @@
 
            IF SQLCODE = 100
       *        No accounts found
+               MOVE 'N' TO WS-ACCT-FOUND
                DISPLAY 'BNKZI0002: Customer '
                        WS-CUST-ID-CANONICAL
                        ' has no active accounts on file'
@@ -1043,12 +1041,15 @@
            END-IF
 
            IF SQLCODE < 0
+               MOVE 'N' TO WS-ACCT-FOUND
                MOVE SQLCODE TO SQLCODE-DISPLAY
                DISPLAY 'BNKZE0012: Db2 error opening/fetching '
                        'ACCOUNT cursor. SQLCODE=' SQLCODE-DISPLAY
                PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
                EXEC SQL CLOSE ACCT-CURSOR END-EXEC
                MOVE 'N' TO WS-ACCT-CURSOR-OPEN
+           ELSE
+               MOVE 'Y' TO WS-ACCT-FOUND
            END-IF.
        2000-EXIT.
            EXIT.
@@ -1239,7 +1240,7 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Blank line
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE SPACES TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
@@ -1307,7 +1308,7 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Blank line after customer info
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE SPACES TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
        4000-EXIT.
@@ -1403,7 +1404,7 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Blank line
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE SPACES TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
@@ -1662,7 +1663,7 @@
            MOVE WS-AMT-FORMATTED TO WS-EB-AMOUNT
 
       *    Blank line before totals
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE SPACES TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
@@ -1684,7 +1685,7 @@
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 
       *    Blank line after separator
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE SPACES TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
        4400-EXIT.
@@ -1705,26 +1706,10 @@
       *    of the §4.3 header-reprinting list).
       *-----------------------------------------------------------------
            IF WS-LINE-COUNT > WS-LINES-PER-PAGE - 3
-               ADD 1 TO WS-PAGE-NUMBER
-               MOVE 0 TO WS-LINE-COUNT
-               PERFORM 4010-WRITE-BANNER THRU 4010-EXIT
-               MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
-               MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
-               MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
-               MOVE ' ' TO WS-PL-CC
-               MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
-               PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
-               MOVE WS-CUST-ID-CANONICAL TO WS-CL-CUSTID
-               MOVE ' ' TO WS-PL-CC
-               MOVE WS-CUSTID-LINE TO WS-PL-DATA
-               PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
-      *        Reprint account header block (spec §4.3 items 3-5):
-      *        separator, account type/number/sort code, separator,
-      *        opening balance, column headings and separator.
-               PERFORM 4200-WRITE-ACCT-HEADER THRU 4200-EXIT
+               PERFORM 4100-PAGE-EJECT THRU 4100-EXIT
            END-IF
 
-           MOVE '0' TO WS-PL-CC
+           MOVE ' ' TO WS-PL-CC
            MOVE WS-BANNER-LINE TO WS-PL-DATA
            PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
 

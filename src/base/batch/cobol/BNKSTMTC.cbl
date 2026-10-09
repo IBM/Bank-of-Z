@@ -34,7 +34,7 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
 
-           SELECT SYSIN-FILE
+           SELECT SYSIN
                ASSIGN TO SYSIN
                ORGANIZATION IS SEQUENTIAL
                ACCESS MODE  IS SEQUENTIAL
@@ -49,7 +49,7 @@
        DATA DIVISION.
        FILE SECTION.
 
-       FD  SYSIN-FILE
+       FD  SYSIN
            RECORDING MODE F
            BLOCK CONTAINS 0 RECORDS
            RECORD CONTAINS 80 CHARACTERS
@@ -222,9 +222,7 @@
                05 WS-PERIOD-MM        PIC X(2).
            03 FILLER                  PIC X(62).
 
-       01  WS-SYSIN-RECORD-COUNT      PIC 9(4) COMP VALUE 0.
        01  WS-SYSIN-ERROR-COUNT       PIC 9(4) COMP VALUE 0.
-       01  WS-SYSIN-SAVED-RECORD      PIC X(80) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Customer ID normalisation fields
@@ -666,55 +664,45 @@
       *-----------------------------------------------------------------
        1000-OPEN-SYSIN.
       *-----------------------------------------------------------------
-           OPEN INPUT SYSIN-FILE
-           IF WS-SYSIN-STATUS NOT = '00'
-               DISPLAY 'BNKZE0021: Error reading SYSIN control '
-                       'dataset. File status=' WS-SYSIN-STATUS
-               PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
-           ELSE
-               MOVE 'Y' TO WS-SYSIN-OPEN
-           END-IF.
+           OPEN INPUT SYSIN
+           EVALUATE WS-SYSIN-STATUS
+               WHEN '00'
+                   MOVE 'Y' TO WS-SYSIN-OPEN
+               WHEN '10'
+      *            Empty stream: OPEN returned at-end immediately.
+      *            Set EOF flag now so the read loop in 1100 is skipped
+      *            and Check 1 (count=0) fires correctly.
+                   MOVE 'Y' TO WS-SYSIN-OPEN
+                   MOVE 'Y' TO WS-SYSIN-EOF
+               WHEN OTHER
+                   DISPLAY 'BNKZE0021: Error reading SYSIN control '
+                           'dataset. File status=' WS-SYSIN-STATUS
+                   PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
+           END-EVALUATE.
        1000-EXIT.
            EXIT.
 
       *-----------------------------------------------------------------
        1100-READ-SYSIN.
       *-----------------------------------------------------------------
-      *    Read all records from SYSIN; count non-empty ones.
-      *    Save the FIRST non-empty record for validation.
-      *    Spec sec.2.2.3: check 1 (empty) and check 2 (multiple) first.
+      *    Read one record from SYSIN.
+      *    Check 1: EOF on first read -> empty SYSIN -> usage message.
+      *    Check 2: not at EOF after read -> multiple records -> error.
       *-----------------------------------------------------------------
-           PERFORM UNTIL WS-SYSIN-EOF = 'Y'
-               READ SYSIN-FILE INTO WS-SYSIN-RECORD
-                   AT END
-                       MOVE 'Y' TO WS-SYSIN-EOF
-                   NOT AT END
-                       IF WS-SYSIN-RECORD NOT = SPACES
-                           ADD 1 TO WS-SYSIN-RECORD-COUNT
-                           IF WS-SYSIN-RECORD-COUNT = 1
-                               MOVE WS-SYSIN-RECORD
-                                 TO WS-SYSIN-SAVED-RECORD
-                           END-IF
-                       END-IF
-                       IF WS-SYSIN-STATUS NOT = '00'
-                           AND WS-SYSIN-STATUS NOT = '10'
-                           DISPLAY 'BNKZE0021: Error reading SYSIN '
-                                   'control dataset. File status='
-                                   WS-SYSIN-STATUS
-                           PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
-                           MOVE 'Y' TO WS-SYSIN-EOF
-                           GO TO 1100-EXIT
-                       END-IF
-               END-READ
-           END-PERFORM
+           READ SYSIN INTO WS-SYSIN-RECORD
+               AT END MOVE 'Y' TO WS-SYSIN-EOF
+           END-READ
 
-      *    Restore the single valid control record saved on first read.
-           IF WS-SYSIN-RECORD-COUNT = 1
-               MOVE WS-SYSIN-SAVED-RECORD TO WS-SYSIN-RECORD
+           IF WS-SYSIN-STATUS NOT = '00'
+           AND WS-SYSIN-STATUS NOT = '10'
+               DISPLAY 'BNKZE0021: Error reading SYSIN control '
+                       'dataset. File status=' WS-SYSIN-STATUS
+               PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
+               GO TO 1100-EXIT
            END-IF
 
-      *    Check 1 - no records (hard early exit per spec sec.2.2.3)
-           IF WS-SYSIN-RECORD-COUNT = 0
+           IF WS-SYSIN-EOF = 'Y'
+           OR WS-SYSIN-RECORD = SPACES
                DISPLAY 'BNKZI0005: SYSIN not specified or '
                        'insufficient parameters; displaying '
                        'usage syntax'
@@ -723,23 +711,16 @@
                GO TO 1100-EXIT
            END-IF
 
-      *    Check 2 - multiple records (hard early exit per spec sec.2.2.3)
-           IF WS-SYSIN-RECORD-COUNT > 1
-               DISPLAY 'BNKZE0022: Multiple SYSIN control records '
-                       'detected; only single-record input is '
-                       'supported'
-               PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
-               GO TO 1100-EXIT
-           END-IF.
+           CONTINUE.
        1100-EXIT.
            EXIT.
 
       *-----------------------------------------------------------------
-       1110-PRINT-USAGE.
+       1110-PRINT-USAGE. 
       *-----------------------------------------------------------------
            DISPLAY 'USAGE:'
            DISPLAY '  //SYSIN DD *'
-           DISPLAY '  <CustomerID> <YYYY-MM>'
+           DISPLAY '  <CustomerID> <YYYY-MM> '
            DISPLAY '  /*'
            DISPLAY 'SYNTAX:'
            DISPLAY '  - Customer ID : C<digits> (CICS, 1-9 digits)'
@@ -787,16 +768,14 @@
       *    overrun sentinel - the 10th byte stays SPACE.
            MOVE SPACES TO WS-CUST-RAW-DIGITS
            MOVE WS-RAW-CUSTID(2:9) TO WS-CUST-RAW-DIGITS(1:9)
-      *    Find actual digit string (strip trailing spaces)
-           MOVE 9 TO WS-DIGIT-LEN
+      *    Find length of digit string by scanning backwards for last
+      *    non-space. WS-DIGIT-IDX ends up pointing at the last non-space
+      *    position (1-9), or 0 if all spaces (treated as length 1 below).
            PERFORM VARYING WS-DIGIT-IDX FROM 9 BY -1
                UNTIL WS-DIGIT-IDX = 0
-               IF WS-CUST-RAW-DIGITS(WS-DIGIT-IDX:1) = SPACE
-                   SUBTRACT 1 FROM WS-DIGIT-LEN
-               ELSE
-                   MOVE 0 TO WS-DIGIT-IDX
-               END-IF
+                   OR WS-CUST-RAW-DIGITS(WS-DIGIT-IDX:1) NOT = SPACE
            END-PERFORM
+           MOVE WS-DIGIT-IDX TO WS-DIGIT-LEN
            IF WS-DIGIT-LEN = 0
                MOVE 1 TO WS-DIGIT-LEN
            END-IF
@@ -1773,7 +1752,7 @@
        6200-CLOSE-FILES.
       *-----------------------------------------------------------------
            IF WS-SYSIN-OPEN = 'Y'
-               CLOSE SYSIN-FILE
+               CLOSE SYSIN
                MOVE 'N' TO WS-SYSIN-OPEN
            END-IF
            IF WS-ACCT-CURSOR-OPEN = 'Y'

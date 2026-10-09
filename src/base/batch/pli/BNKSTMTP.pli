@@ -9,7 +9,7 @@
   *------------------------------------------------------------*/
 
   /*------------------------------------------------------------*
-  * Procedure: BNKSTMT
+  * Procedure: BNKSTMTP
   * Description: PL/I Batch Program for Bank Monthly Statement Generation
   * 
   * Purpose: Generate monthly account statements for bank customers
@@ -24,7 +24,7 @@
   *   - PROCTRAN: Transaction history (processed transactions)
   *------------------------------------------------------------*/
 
-  BNKSTMT: PROCEDURE OPTIONS(MAIN);
+  BNKSTMTP: PROCEDURE OPTIONS(MAIN);
 
   /*------------------------------------------------------------*
   * SQL INCLUDE FOR DB2 COMMUNICATION AREA
@@ -908,4 +908,4 @@
   RETURN;
   END CHECK_PAGE_BREAK;
 
-  END BNKSTMT;
+  END BNKSTMTP;

@@ -1,20 +1,20 @@
-name: Generated ZAPP document
+name: Bank of Z zapp document
 description: >-
-  CRRZG5299I Note that this default file will search all your local folders in
-  all your open VS Code workspaces and can be highly inefficient. Modify the
-  "locations" entries to be as specific as possible. Add a new entry of type
-  "MVS" to specify remote locations. See the user documentation for more
-  details:
+  See the user documentation for more details:
   https://ibm.github.io/zopeneditor-about/Docs/setting_propertygroup.html
-author: IBM Z Open Editor
-
+author: Bank of Z Team
 propertyGroups:
   - name: search-all-local
     libraries:
       - name: syslib
         type: local
         locations:
-          - '**'
+          - "src/base/cics/copy"
+          - "src/base/ims/copy"
+      - name: syslib
+        type: mvs
+        locations:
+          - ${DTE_COPYBOOK_DATASET}
   - name: remote-libraries
     language: cobol
     compilerOptions: CICS
@@ -34,7 +34,9 @@ profiles:
         procLib:
           - SYS1.PROCLIB # Required: Procedure libraries
         userLibraries:
-          - BANKZ.V0R1M0.LOAD # Application load libraries
+          # - BANKZ.V0R1M0.LOAD # Application load libraries
+          - BANKZ.V0R1M0.LOADLIB
+          - BANKZ.V0R1M0.LOAD
           
   # Custom ZCodeScan rules example
   - name: zcodescan
@@ -45,19 +47,54 @@ profiles:
           locations:
             - "zcodescan/zcodescan-rules.yaml"
 
-  - name: zBuilder-userbuild
-    type: dbb
+  - name: BankOfZFullBuild
+    type: userbuild
     settings:
-      command: "$DBB_HOME/bin/dbb build"
-      lifecycle: user
-      lifecycleArgs:
-        - "--hlq ${dbbHlq}"
-        - "--errPrefix ${errPrefix}" # Requires advanced capabilities
-        - "--verbose"
-      additionalDependencies:
-        - "dbb-app.yaml"
-        - "dbb-app_ub.yaml"
-      logFilePatterns:
-        - "*.log" # Fetch build logs
-        - "*.json" # Fetch Runtime.json and BuildReport.json
-        - "*.html" # Fetch BuildReport.html
+      tasks:
+      - prerequisites:
+          localCommand: >
+            .zopeneditor/grub_client prerequisites --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - upload:
+          dependenciesUpload: false
+          localCommand: >
+            .zopeneditor/grub_client gitPush --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - build:
+          localCommand: >
+            .zopeneditor/grub_client execute --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE}
+            --command "bash ${ZOS_WORKSPACE}/${application}/.setup/setup-remote.sh"
+            --verbose
+      - results:
+            localCommand: >
+              .zopeneditor/grub_client fetch --hostname ${ZOS_USER}@${ZOS_HOST}
+              --remoteWorkspace ${ZOS_WORKSPACE}
+              --files "logs/dbb/Bank-of-Z.*.log logs/dbb/logs/Bank-of-Z.*.log logs/deploy/*.console.log"
+              --localDir logs --verbose
+
+  - name: BankOfZAppBuild
+    type: userbuild
+    settings:
+      tasks:
+      - prerequisites:
+          localCommand: >
+            .zopeneditor/grub_client prerequisites --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - upload:
+          dependenciesUpload: false
+          localCommand: >
+            .zopeneditor/grub_client gitPush --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE} --verbose
+      - build:
+          localCommand: >
+            .zopeneditor/grub_client execute --hostname ${ZOS_USER}@${ZOS_HOST}
+            --remoteWorkspace ${ZOS_WORKSPACE}
+            --command "bash ${ZOS_WORKSPACE}/${application}/.setup/pipeline-remote.sh"
+            --verbose
+      - results:
+            localCommand: >
+              .zopeneditor/grub_client fetch --hostname ${ZOS_USER}@${ZOS_HOST}
+              --remoteWorkspace ${ZOS_WORKSPACE}
+              --files "logs/dbb/Bank-of-Z.*.log logs/deploy/*.console.log"
+              --localDir logs --verbose

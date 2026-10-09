@@ -6,10 +6,6 @@
                 "protocol": "https",
                 "rejectUnauthorized": false
             },
-            "secure": [
-                "user",
-                "password"
-            ],
             "profiles": {
                 "zosmf": {
                     "type": "zosmf",
@@ -21,19 +17,26 @@
                     "type": "ssh",
                     "properties": {
                         "port": 22
-                    }
+                    },
+                "secure": [
+                        "user", "password"
+                    ]
                 },
                 "rse": {
                     "type": "rse",
                     "properties": {
                         "port": 8195,
                         "basePath": "rseapi"
-                    }
+                    },
+                    "secure": [
+                        "user", "password"
+                    ]
                 },
                 "cics": {
                     "type": "cics",
                     "properties": {
-                        "protocol": "http"
+                        // Change this is you're using a different CMCI port from standard
+                        "port": 27100
                     }
                 },
                 "zOpenDebug": {
@@ -46,7 +49,10 @@
                         "rdsPort": 8194,
                         "rdsSecured": true,
                         "uuid": "05a46db4-b73f-4c81-9f0a-51350d171355"
-                    }
+                    },
+                    "secure": [
+                        "user", "password"
+                    ]
                 }
             }
         }

@@ -20,6 +20,9 @@ set -eu
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../lib/utilities.sh"
 source "$SCRIPTS_DIR/../lib/colors.sh"
+if [ -z "${APP_HLQ:-}" ]; then
+    source "$SCRIPTS_DIR/../config/setenv.sh"
+fi
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -42,13 +45,13 @@ export DEPLOY_TEMPLATES_PATH="$SCRIPTS_DIR/../deploy"
 # Output directories
 # =========================
 timestamp=$(date +%F_%H-%M-%S)
-outputDir="${DEPLOY_LOG_FOLDER}"
-evidenceDir="${outputDir}/evidences"
-LOG_TAR="${outputDir}/wazi-deploy-log.tar"
-EVIDENCE_FILE="${evidenceDir}/evidence.yaml"
+OUTPUT_FOLDER="${DEPLOY_LOG_FOLDER}"
+EVIDENCE_FOLDER="${OUTPUT_FOLDER}/evidences"
+LOG_TAR="${OUTPUT_FOLDER}/wazi-deploy-log.tar"
+EVIDENCE_FILE="${EVIDENCE_FOLDER}/evidence.yaml"
 
-rm -rf "$outputDir" "$evidenceDir"
-mkdir -p "$outputDir" "$evidenceDir"
+rm -f "$OUTPUT_FOLDER"/* 2>/dev/null || true
+mkdir -p "$OUTPUT_FOLDER" "$EVIDENCE_FOLDER"
 
 # =========================
 # Finalize: always publish log tar on exit
@@ -56,24 +59,18 @@ mkdir -p "$outputDir" "$evidenceDir"
 finalize_results() {
     RC=$?
 
-    mkdir -p "$outputDir" "$evidenceDir"
-    cd "$outputDir"
+    mkdir -p "$OUTPUT_FOLDER" "$EVIDENCE_FOLDER"
+    cd "$OUTPUT_FOLDER"
 
     if ls wazideploy*.log >/dev/null 2>&1; then
-        chtag -tc IBM-1047 wazideploy*.log
-        # Convert BankZ logs if they exist
-        [ -f "$outputDir/wazideploy-generate-bankz.console.log" ] && \
-            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-generate-bankz.console.log"
-        [ -f "$outputDir/wazideploy-deploy-bankz.console.log" ] && \
-            a2e -f IBM-1047 -t ISO8859-1 "$outputDir/wazideploy-deploy-bankz.console.log"
-        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
+        tar cf "$LOG_TAR" "$OUTPUT_FOLDER" 2>/dev/null || true
     else
-        echo "No Wazi Deploy logs found" > "$outputDir/wazi-deploy-console.log"
-        tar cf "$LOG_TAR" "logs" 2>/dev/null || true
+        echo "No Wazi Deploy logs found" > "$OUTPUT_FOLDER/wazi-deploy-console.log"
+        tar cf "$LOG_TAR" "$OUTPUT_FOLDERs" 2>/dev/null || true
     fi
+    chtag -b "$LOG_TAR"
 
     print_result "[LOG-PATH] $LOG_TAR"
-
 
     if [ $RC -eq 0 ]; then
         print_success "Process completed"
@@ -86,11 +83,11 @@ finalize_results() {
 
 trap finalize_results EXIT
 
-rm -rf "$outputDir"
-mkdir -p "$outputDir" "$evidenceDir"
+rm -rf "$OUTPUT_FOLDER"
+mkdir -p "$OUTPUT_FOLDER" "$EVIDENCE_FOLDER"
 
-print_info "Output directory  : $outputDir"
-print_info "Evidence directory: $evidenceDir"
+print_info "Output directory  : $OUTPUT_FOLDER"
+print_info "Evidence directory: $EVIDENCE_FOLDER"
 
 # =========================
 # Skip if no package
@@ -137,19 +134,19 @@ print_info "BankZ Deployment"
 print_info "========================================="
 
 print_info "Starting wazideploy-generate for BankZ"
-
+: > "${OUTPUT_FOLDER}/wazideploy-generate-bankz.console.log"
 CMD="wazideploy-generate \
  --deploymentPlanName $APP_BASE_NAME \
  --deploymentPlanVersion $APP_FULL_VERSION \
  --deploymentMethod $DEPLOY_DEPLOYMENT_METHOD \
- --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
- --deploymentPlanReport $outputDir/deploymentPlanReport-bankz.html \
+ --deploymentPlan $OUTPUT_FOLDER/deploymentPlan-bankz.yaml \
+ --deploymentPlanReport $OUTPUT_FOLDER/deploymentPlanReport-bankz.html \
  --packageInputFile $PACKAGE_URL"
 
 print_info "Executing command:"
 print_info "\t$CMD"
 
-${CMD}  --deploymentPlanDescription "$APP_DESCRIPTION" 2>&1 | tee "${outputDir}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
+${CMD}  --deploymentPlanDescription "$APP_DESCRIPTION" 2>&1 | tee "${OUTPUT_FOLDER}/wazideploy-generate-bankz.console.log" | while IFS= read -r line
 do
     print_info "[GENERATE-${APP_BASE_NAME} $line"
 done
@@ -173,7 +170,7 @@ if [ -n "${CICS_PASSWORD:-}" ]; then
 fi
 
 # Resolve environment varaiables in config file.
-export TMPL_CONFIG_FILE="/tmp/config.yaml"
+export TMPL_CONFIG_FILE="/tmp/wazideploy-config.yaml"
 cp  "$CONFIG_FILE" "$TMPL_CONFIG_FILE.j2.$$"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --templateFile "$TMPL_CONFIG_FILE.j2.$$"  --outputFile "$TMPL_CONFIG_FILE"
@@ -182,7 +179,7 @@ rm -rf "${DEPLOY_LOG_FOLDER}/work-bankz"
 
 CMD="wazideploy-deploy \
  --workingFolder ${DEPLOY_LOG_FOLDER}/work-bankz \
- --deploymentPlan $outputDir/deploymentPlan-bankz.yaml \
+ --deploymentPlan $OUTPUT_FOLDER/deploymentPlan-bankz.yaml \
  --envFile $DEPLOY_ENV_FILE \
  -e script_dir=$SCRIPTS_DIR \
  -e @$TMPL_CONFIG_FILE \
@@ -193,7 +190,7 @@ CMD="wazideploy-deploy \
  -e sandbox_path=$SANDBOX_DIR \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
- --evidencesFileName ${evidenceDir}/evidence-bankz.yaml $@"
+ --evidencesFileName ${EVIDENCE_FOLDER}/evidence-bankz.yaml $@"
 
 if [[ "$IMS_DISABLED" == "true" ]]; then
  CMD="$CMD -pst ims"
@@ -203,8 +200,8 @@ rm -f message.log
 
 print_info "Executing command:"
 print_info "\t$CMD"
-
-${CMD} 2>&1 | tee "${outputDir}/wazideploy-deploy-bankz.console.log" | while IFS= read -r line
+: > "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log"
+${CMD} 2>&1 | tee "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log" | while IFS= read -r line
 do
     print_info "[DEPLOY-${APP_BASE_NAME}] $line"
 done

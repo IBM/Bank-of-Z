@@ -135,7 +135,7 @@ dbb:
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
-  dbb_log_dir: "{{sandbox.path}}/logs/dbb"
+  dbb_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs"
   gradle_home:  "{{ global.gradle_home }}"
   igzxjni2: "{{ global.igzxjni2 }}"
   igy_hlq: "{{ global.igy_hlq }}"
@@ -153,7 +153,7 @@ zcodescan:
   zcodescan_home: "{{ global.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
-  output_dir: "{{sandbox.path}}/zcodescan"
+  output_dir: "{{sandbox.path}}/${REPO_NAME}/logs/zcodescan"
   rule_file: "{{sandbox.path}}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml"
   src_encoding: "IBM-1047"
   config_file: "${HOME}/zcs_config_file.yml"
@@ -166,7 +166,7 @@ wazideploy:
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
-  deploy_log_dir: "{{sandbox.path}}/logs/deploy"
+  deploy_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs/deploy"
 
 # Debug
 debug:

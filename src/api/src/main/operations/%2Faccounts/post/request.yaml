@@ -7,10 +7,14 @@ mappings:
         required: false
         nullable: false
         mappings:
+        - COMM-EYECATCHER:
+            required: false
+            nullable: false
+            template: "ACCT"
         - COMM-CUSTNO:
             required: false
             nullable: false
-            expression: "$number($body.customerNumber)"
+            expression: "$number($replace($string($body.customerNumber), /^[cC]/, ''))"
         - COMM-KEY:
             required: false
             nullable: false
@@ -39,3 +43,27 @@ mappings:
             required: false
             nullable: false
             expression: "$exists($body.overdraftLimit) ? $number($body.overdraftLimit) : 0"
+        - COMM-LAST-STMT-DT:
+            required: false
+            nullable: false
+            expression: 0
+        - COMM-NEXT-STMT-DT:
+            required: false
+            nullable: false
+            expression: 0
+        - COMM-AVAIL-BAL:
+            required: false
+            nullable: false
+            expression: "$exists($body.availableBalance) ? $number($body.availableBalance) : 0"
+        - COMM-ACT-BAL:
+            required: false
+            nullable: false
+            expression: "$exists($body.actualBalance) ? $number($body.actualBalance) : 0"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "N"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: " "

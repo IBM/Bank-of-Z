@@ -254,8 +254,8 @@ rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "proclib=${CICS_SYS_PROCLIB}" --extraVar "task_name=CICS${APP_SHORT_NAME}" \
     --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/CICS${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/CICS${APP_SHORT_NAME}J.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
+    --outputFile "/tmp/CICS${APP_SHORT_NAME}J$$.jcl"
+dcp "/tmp/CICS${APP_SHORT_NAME}J$$.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
 
 # =========================
 # Stage 7: Start CICS region

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #########################################################
-# Remoyes Pipeline Orchestrator for Bank of Z
+# Remote Pipeline Orchestrator for Bank of Z
 # This script runs on the remote z/OS USS system
 # Usage: bash pipeline-remote.sh
 #########################################################

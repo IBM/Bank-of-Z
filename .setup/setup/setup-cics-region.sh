@@ -98,10 +98,10 @@ export PATH="$ZCONFIG_ZCB_HOME/bin:$PATH"
 # JOB otherwise (pproc -a lists all proclibs in the active concatenation).
 if pproc -a 2>/dev/null | grep -qF "${CICS_SYS_PROCLIB}"; then
     CICS_JCL_TYPE="PROC"
-    print_info "Target proclib ${CICS_SYS_PROCLIB} found in pproc concatenation — generating PROC"
+    print_info "Target proclib ${CICS_SYS_PROCLIB} found in pproc concatenation - generating PROC"
 else
     CICS_JCL_TYPE="JOB"
-    print_info "Target proclib ${CICS_SYS_PROCLIB} not in pproc concatenation — generating JOB"
+    print_info "Target proclib ${CICS_SYS_PROCLIB} not in pproc concatenation - generating JOB"
 fi
 
 if [ -f "$ZCONFIG_HOME/bin/activate" ]; then
@@ -170,15 +170,25 @@ set +e
 print_info "Defining RACF STARTED class..."
 tsocmd "RDEFINE STARTED CICS${APP_SHORT_NAME}.* STDATA(USER(${CICS_USER}) TRUSTED(YES))" 2>/dev/null
 
+# Users that need access: the configured CICS user (may be a personal ID such as
+# the developer's, see grant-perm-user.sh) AND the CICS default user (DFLTUSER),
+# which is the identity inbound IPIC requests (e.g. z/OS Connect -> CSMI) run
+# under when no user ID is flowed.
+CICS_DEFAULT_USER="CICSUSER"
+
 print_info "Defining RACF ACICSPCT profiles and permissions..."
 for p in OCR1 OCR2 OCR3 OCR4 OCR5; do
     tsocmd "RDEFINE ACICSPCT $p UACC(NONE)" 2>/dev/null
-    tsocmd "PERMIT $p CLASS(ACICSPCT) ID(${CICS_USER}) ACCESS(READ)" 2>/dev/null
+    for u in "${CICS_USER}" "${CICS_DEFAULT_USER}"; do
+        tsocmd "PERMIT $p CLASS(ACICSPCT) ID($u) ACCESS(READ)" 2>/dev/null
+    done
 done
 
 print_info "Defining RACF DCICSDCT profiles and permissions..."
 tsocmd "RDEFINE DCICSDCT CESE UACC(NONE)" 2>/dev/null
-tsocmd "PERMIT CESE CLASS(DCICSDCT) ID(${CICS_USER}) ACCESS(UPDATE)" 2>/dev/null
+for u in "${CICS_USER}" "${CICS_DEFAULT_USER}"; do
+    tsocmd "PERMIT CESE CLASS(DCICSDCT) ID($u) ACCESS(UPDATE)" 2>/dev/null
+done
 
 print_info "Refreshing RACF..."
 tsocmd "SETROPTS RACLIST(STARTED ACICSPCT DCICSDCT) REFRESH" 2>/dev/null
@@ -192,10 +202,10 @@ set -e
 # =========================
 print_stage "STAGE 4: Start CICS region"
 if [[ "${CICS_JCL_TYPE}" == "PROC" ]]; then
-    # PROC is in the system concatenation — start it as a started task
+    # PROC is in the system concatenation - start it as a started task
     opercmd "S CICS${APP_SHORT_NAME}"
 else
-    # JOB written directly to the proclib dataset — submit it with jsub
+    # JOB written directly to the proclib dataset - submit it with jsub
     print_info "Submitting CICS start job via jsub..."
     jsub "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME})"
 fi

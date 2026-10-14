@@ -209,7 +209,7 @@ if [ "$(uname)" = "OS/390" ]; then
         error=1
       fi
     done
-    
+
     if [ "$error" -eq 1 ]; then
       print_error "One or more variables are missing. Stopping script." >&2
       rm -f "$ENV_FILE"

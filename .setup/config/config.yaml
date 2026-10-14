@@ -5,7 +5,7 @@
 version: "1.0.0"
 
 # Global properties
-# - Shared by middleware/tools 
+# - Shared by middleware/tools
 # - Subject to change with middleware/tools updates
 global:
 
@@ -65,7 +65,7 @@ global:
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   cics_sec: "YES"
-  
+
   # IMS
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
@@ -75,7 +75,7 @@ global:
   ims_ixvolser: "IMSV15"
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
-  
+
   # DB2
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
@@ -115,7 +115,7 @@ repositories:
 # Java Home
 java:
   java_home: "{{ global.java_home }}"
-  
+
 # Python Home
 python:
   python_home: "{{ global.python_home }}"
@@ -306,3 +306,13 @@ db2:
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   db2_java_dir: "{{ global.db2_java_dir }}"
+
+# MQ configuration
+mq:
+  qmgr_name: "MQ21"
+  install_hlq: "MQCD94"
+  qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
+  cpf: "!{{ mq.qmgr_name }}"
+  proclib: "SYS1.PROCLIB"
+  otma_group: "IMSXCFGN"
+  otma_ims: "{{ ims.datastore }}"

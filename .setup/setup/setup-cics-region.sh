@@ -21,6 +21,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[ZCONFIG-CICS]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 finalize_results() {
     RC=$?
@@ -176,6 +177,7 @@ zconfig apply \
   -e java_home="$JAVA_HOME" \
   -e cmci_port="$CICS_CMCI_PORT" \
   -e debug_hlq="$DEBUG_HLQ" \
+  -e debug_stc_user="${DEBUG_STC_USER}" \
   -e db2_hlq="${DB2_HLQ}" \
   -e cics_hlq="${CICS_HLQ}" \
   -e cics_uss_dir="${CICS_USS_DIR}" \
@@ -260,8 +262,8 @@ rm -f "/tmp/CICS${APP_SHORT_NAME}-$$.jcl"
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "proclib=${CICS_SYS_PROCLIB}" --extraVar "task_name=CICS${APP_SHORT_NAME}" \
     --extraVar "start_user=${ZOS_CURRENT_USER}" --templateFile "$SCRIPTS_DIR/../jcl/tasks/Task-start.j2"\
-    --outputFile "/tmp/CICS${APP_SHORT_NAME}J.jcl"
-dcp "/tmp/CICS${APP_SHORT_NAME}J.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
+    --outputFile "/tmp/CICS${APP_SHORT_NAME}J$$.jcl"
+dcp "/tmp/CICS${APP_SHORT_NAME}J$$.jcl" "${CICS_SYS_PROCLIB}(CICS${APP_SHORT_NAME}J)"
 
 # =========================
 # Stage 7: Start CICS region

@@ -64,7 +64,7 @@ Verifies that all required tools are installed at the required versions. Resolve
 .setup/setup-common.sh environment
 ```
 
-Provisions the complete application runtime, including Db2 tables, a CICS region, an IMS region and database, a z/OS Connect server, and the Liberty frontend server. Expect this to take several minutes.
+Provisions the complete application runtime, including Db2 tables, a CICS region, an IMS region and database, a z/OS Connect server, and the Liberty frontend server. Expect this to take several minutes. Includes prereq check.
 
 ---
 
@@ -74,7 +74,7 @@ Provisions the complete application runtime, including Db2 tables, a CICS region
 .setup/setup-common.sh install-bank-of-z
 ```
 
-Performs a full application build by using IBM Dependency Based Build (DBB), packages the generated artifacts, deploys them by using Wazi Deploy, and populates the Db2 and IMS databases with sample data. The initial build and deployment typically take 15 to 20 minutes.
+Includes prereq check. Performs a full application build by using IBM Dependency Based Build (DBB), packages the generated artifacts, deploys them by using Wazi Deploy, and populates the Db2 and IMS databases with sample data. The initial build and deployment typically take 15 to 20 minutes.
 
 > **Note:** Warnings related to the YAML scanner and `chown` failures are expected and do not indicate a problem.
 

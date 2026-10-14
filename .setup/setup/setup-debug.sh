@@ -25,6 +25,7 @@ exec > >(while IFS= read -r line; do
     [[ -z "$line" ]] && continue
     printf "${CYAN}[DEBUG]${NC} %s\n" "${line}" 2>/dev/null || true
 done) 2>&1
+trap 'exec >&- 2>&-; wait' EXIT
 
 # =========================
 # Environment
@@ -66,7 +67,7 @@ else
     RC=$?
     set -e
     if [ $RC -eq 0 ]; then
-        rm -f /tmp/dtcn.ports*
+        rm -f /tmp/dtcn.ports* || true
         cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
         echo "" >> "$DTCN_PORTS_TMP"
         echo "  CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT}" >> "$DTCN_PORTS_TMP"
@@ -96,12 +97,29 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "app_hlq=${APP_HLQ}" \
     --templateFile "$SCRIPTS_DIR/../debug_config/eqaprof.env.j2"  --outputFile "${EQAPROF_CONF_DIR}/eqaprof.env"
 
+# =======================================================
+# Stage 4: Grant RACF permissions for debug STC user
+# =======================================================
+set +e
+print_stage "Stage 4: Granting RACF permissions for ${DEBUG_STC_USER}..."
+run_tso "RDEFINE FACILITY BPX.SERVER UACC(NONE)"
+run_tso "PERMIT BPX.SERVER CLASS(FACILITY) ID(${DEBUG_STC_USER}) ACCESS(UPDATE)"
+run_tso "SETROPTS RACLIST(FACILITY) REFRESH"
+run_tso "RLIST FACILITY BPX.SERVER ALL"
+
+run_tso "RDEFINE SURROGAT BPX.SRV.** UACC(NONE)"
+run_tso "PERMIT BPX.SRV.** CLASS(SURROGAT) ID(${DEBUG_STC_USER}) ACCESS(READ)"
+run_tso "SETROPTS RACLIST(SURROGAT) REFRESH"
+run_tso "RLIST SURROGAT BPX.SRV.** ALL"
+set -e
+
+
 
 # ===================================
-# Stage 4: Start EQAPROF and EQARMTD
+# Stage 5: Start EQAPROF and EQARMTD
 # ===================================
 set +e
-print_stage "Stage 4: Start EQAPROF task"
+print_stage "Stage 5: Start EQAPROF task"
 opercmd -p "S EQAPROF,CFGDIR='${EQAPROF_CONF_DIR}'" 
 
 if netstat | grep -q "EQARMTD"

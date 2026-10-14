@@ -47,6 +47,7 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
+  debug_stc_user: "STCDBG"  # STC userid for the Debug Profile Service task
   asm_hlq: "ASM"
 
   # GUI
@@ -134,7 +135,7 @@ dbb:
   dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
   dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
   dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
-  dbb_log_dir: "{{sandbox.path}}/logs/dbb"
+  dbb_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs"
   gradle_home:  "{{ global.gradle_home }}"
   igzxjni2: "{{ global.igzxjni2 }}"
   igy_hlq: "{{ global.igy_hlq }}"
@@ -152,7 +153,7 @@ zcodescan:
   zcodescan_home: "{{ global.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
   src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
-  output_dir: "{{sandbox.path}}/zcodescan"
+  output_dir: "{{sandbox.path}}/${REPO_NAME}/logs/zcodescan"
   rule_file: "{{sandbox.path}}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml"
   src_encoding: "IBM-1047"
   config_file: "${HOME}/zcs_config_file.yml"
@@ -165,14 +166,15 @@ wazideploy:
   deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
   types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
-  deploy_log_dir: "{{sandbox.path}}/logs/deploy"
+  deploy_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs/deploy"
 
 # Debug
 debug:
   debug_hlq: "{{ global.debug_hlq }}"
+  debug_stc_user: "{{ global.debug_stc_user }}"
   tcpip_hlq: "{{ global.tcpip_hlq }}"
   eqaprof_conf_dir: "{{ sandbox.path }}/debug"
-  eqaprof_keystore_file: "safkeyring://STCDBG/EQAPROF_Ring"
+  eqaprof_keystore_file: "safkeyring://{{ global.debug_stc_user }}/EQAPROF_Ring"
   eqaprof_port: 8192
   eqaprof_port_shutdown: 8105
 

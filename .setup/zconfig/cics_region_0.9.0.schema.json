@@ -1177,6 +1177,19 @@
           "default": null,
           "description": "Specify the Block Size",
           "title": "block_size"
+        },
+        "writer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Specify the writer name, for example INTRDR",
+          "title": "writer"
         }
       },
       "required": [
@@ -1876,10 +1889,13 @@
               "type": "string"
             },
             "initparm": {
+              "additionalProperties": {
+                "type": "string"
+              },
               "default": null,
               "description": "Initialization parameters for programs",
               "title": "Initparm",
-              "type": "string"
+              "type": "object"
             },
             "intrdrjobuser": {
               "$ref": "#/$defs/intrdrjobuserValue",
@@ -3092,7 +3108,7 @@
             }
           ],
           "default": null,
-          "description": "Programs to run in first quiesce stage",
+          "description": "Programs run during the first stage of controlled CICS shutdown (PLTSD).",
           "title": "first_phase"
         },
         "second_phase": {
@@ -3108,7 +3124,7 @@
             }
           ],
           "default": null,
-          "description": "Programs to run in second quiesce stage",
+          "description": "Programs run during the second stage of CICS shutdown, triggered on immediate shutdown (PLTSD).",
           "title": "second_phase"
         }
       },
@@ -3128,6 +3144,22 @@
     "StartupProgramsConfig": {
       "additionalProperties": false,
       "properties": {
+        "first_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Programs run during the second stage of CICS initialization, before user initialization programs (PLTPI).",
+          "title": "first_phase"
+        },
         "second_phase": {
           "anyOf": [
             {
@@ -3141,24 +3173,8 @@
             }
           ],
           "default": null,
-          "description": "Programs to run in 2nd initialization stage (first PLT pass)",
+          "description": "Programs run during the third stage of CICS initialization, after user initialization programs (PLTPI).",
           "title": "second_phase"
-        },
-        "third_phase": {
-          "anyOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Programs to run in 3rd initialization stage (second PLT pass)",
-          "title": "third_phase"
         }
       },
       "title": "StartupProgramsConfig",

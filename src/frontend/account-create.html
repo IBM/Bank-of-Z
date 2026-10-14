@@ -73,6 +73,12 @@
                             </cds-number-input>
                         </cds-form-item>
 
+                        <cds-form-item>
+                            <cds-number-input id="initialBalance" label="Initial Balance / Amount Owed" value="0" step="100"
+                                helper-text="For Mortgage/Loan, enter initial amount owed (e.g. 250000)">
+                            </cds-number-input>
+                        </cds-form-item>
+
                         <cds-button id="submit-btn" type="submit">Submit</cds-button>
                     </cds-stack>
                 </cds-form>
@@ -130,6 +136,7 @@
             const accountType = document.getElementById('accountType').value;
             const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
             const overdraftLimit = parseInt(document.getElementById('overdraft').value, 10) || 0;
+            const initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
 
             // Validate required fields
             if (!customerNumber || !accountType) {
@@ -146,6 +153,7 @@
                 accountType: accountType,
                 interestRate: interestRate,
                 overdraftLimit: overdraftLimit,
+                initialBalance: initialBalance,
                 openedDate: today
             };
 

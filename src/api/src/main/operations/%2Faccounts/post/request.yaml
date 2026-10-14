@@ -54,11 +54,11 @@ mappings:
         - COMM-AVAIL-BAL:
             required: false
             nullable: false
-            expression: "$exists($body.availableBalance) ? $number($body.availableBalance) : 0"
+            expression: "$exists($body.availableBalance) ? $number($body.availableBalance) : ($exists($body.initialBalance) ? $number($body.initialBalance) : 0)"
         - COMM-ACT-BAL:
             required: false
             nullable: false
-            expression: "$exists($body.actualBalance) ? $number($body.actualBalance) : 0"
+            expression: "$exists($body.actualBalance) ? $number($body.actualBalance) : ($exists($body.initialBalance) ? $number($body.initialBalance) : 0)"
         - COMM-SUCCESS:
             required: false
             nullable: false

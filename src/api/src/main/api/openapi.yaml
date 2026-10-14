@@ -999,6 +999,11 @@ components:
           minimum: 0
           description: Overdraft limit in whole currency units
           example: 500
+        initialBalance:
+          type: number
+          format: double
+          description: Initial balance or amount owed (for Loans/Mortgages)
+          example: 250000.00
         openedDate:
           type: string
           format: date
@@ -1128,7 +1133,7 @@ components:
           example: "ACC987654321" #pragma: allowlist secret
         accountType:
           type: string
-          enum: [CURRENT, SAVINGS, CREDIT_CARD, LOAN]
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA, SAVINGS, CREDIT_CARD]
           description: Type of account
           example: "CURRENT"
         accountSubType:
@@ -1169,6 +1174,25 @@ components:
           type: string
           description: Customer ID associated with this account
           example: "CUST123456"
+        interestRate:
+          type: number
+          format: double
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          description: Overdraft limit in whole currency units
+          example: 500
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance
+          example: 1000.00
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance
+          example: 1000.00
 
     BalanceList:
       type: object

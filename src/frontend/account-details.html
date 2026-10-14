@@ -258,12 +258,15 @@
             let tableRows = '';
             accounts.forEach((account, index) => {
                 const accountNumber = account.accountNumber || account.accountId || 'N/A';
+                const available = (typeof account.availableBalance === 'number')
+                    ? formatCurrency(account.availableBalance, account.currency) : 'N/A';
                 tableRows += `
                     <tr class="account-row" data-account-index="${index}" style="cursor: pointer;">
                         <td>${account.accountId || 'N/A'}</td>
                         <td>${accountNumber}</td>
                         <td>${account.sortCode || 'N/A'}</td>
                         <td>${account.accountType || 'N/A'}</td>
+                        <td style="text-align:right">${available}</td>
                         <td>${account.currency || 'N/A'}</td>
                         <td>${account.status || 'N/A'}</td>
                     </tr>
@@ -278,6 +281,7 @@
                             <th>Account Number</th>
                             <th>Sort Code</th>
                             <th>Account Type</th>
+                            <th style="text-align:right">Available Balance</th>
                             <th>Currency</th>
                             <th>Status</th>
                         </tr>

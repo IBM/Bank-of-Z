@@ -10,7 +10,7 @@ mappings:
         - COMM-ACCNO:
             required: false
             nullable: false
-            expression: "$substring('00000000', 0, 8 - $length($string($number($pathParameters.accountId)))) & $string($number($pathParameters.accountId))"
+            expression: "$pad($replace($string($pathParameters.accountId), /\\D/, ''), -8, '0')"
         - COMM-AMT:
             required: false
             nullable: false
@@ -18,7 +18,15 @@ mappings:
         - COMM-SORTC:
             required: false
             nullable: false
-            expression: "$number($body.sortCode)"
+            expression: "$exists($body.sortCode) ? $number($body.sortCode) : 987654"
+        - COMM-AV-BAL:
+            required: false
+            nullable: false
+            expression: 0
+        - COMM-ACT-BAL:
+            required: false
+            nullable: false
+            expression: 0
         - COMM-ORIGIN:
             required: false
             nullable: false
@@ -47,3 +55,11 @@ mappings:
                 required: false
                 nullable: false
                 expression: "$body.description ? $body.description : ''"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "N"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: " "

@@ -34,13 +34,13 @@ stage_execute_pipeline() {
     # Execute the pipeline script on remote
     set -o pipefail
     if [[ "$EXECUTION_MODE" != "grub" ]]; then
-        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy&
+        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy "$@" &
         PID=$!
         # Wait for deployment to complete (ZOAU/ZOWE ISSUE)
         wait "$PID"
         RC=$?
     else
-        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy
+        ${SCRIPTS_DIR}/pipeline-common.sh scan-build-and-deploy "$@"
         RC=$?
     fi
     if [[ $RC -eq 0 ]]; then
@@ -74,7 +74,7 @@ main() {
     detect_bank_of_z_location
     
     # Execute stages
-    stage_execute_pipeline
+    stage_execute_pipeline "$@"
     
     # Summary
     print_stage "PIPELINE ORCHESTRATION COMPLETE"

@@ -183,9 +183,9 @@
                 const accNumber   = acc.accountNumber || accountId || 'N/A';
                 const accType     = acc.accountType  || 'N/A';
                 const available   = (typeof acc.availableBalance === 'number')
-                    ? formatCurrency(acc.availableBalance) : 'N/A';
+                    ? formatCurrency(acc.availableBalance, acc.currency || 'GBP') : 'N/A';
                 const actual      = (typeof acc.actualBalance === 'number')
-                    ? formatCurrency(acc.actualBalance) : 'N/A';
+                    ? formatCurrency(acc.actualBalance, acc.currency || 'GBP') : 'N/A';
                 const detailsHref = `account-details.html?accountId=${encodeURIComponent(accountId)}`;
 
                 return `

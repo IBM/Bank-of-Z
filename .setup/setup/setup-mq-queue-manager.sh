@@ -59,6 +59,7 @@ cd "$SCRIPTS_DIR/../zconfig"
 export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
 
 zconfig apply \
+  --force     \
   -e mq_qmgr_name="${MQ_QMGR_NAME}" \
   -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   -e mq_qmgr_hlq="${MQ_QMGR_HLQ}" \

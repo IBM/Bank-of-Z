@@ -103,6 +103,7 @@ public class TransferMoneyInCICS {
     //         05 COMM-NETWRK-ID        PIC X(8).         Network ID
     //         05 COMM-FACILTYPE        PIC S9(8) COMP.   496 means no terminal, so no overdraft
     //         05 FILLER                PIC X(4).
+    //         05 COMM-DESCRIPTION      PIC X(40).
     //    03 COMM-SUCCESS             PIC X.              Y or N
     //    03 COMM-FAIL-CODE           PIC X.              Error code: '1'=account not found, '2'=DB2 error, '3'=insufficient funds, '4'=overdraft not allowed
 
@@ -117,6 +118,7 @@ public class TransferMoneyInCICS {
     requestMessage.writeBytes("NETWORK ".getBytes(EBCDIC));
     requestMessage.writeInt(0);
     requestMessage.writeBytes("    ".getBytes(EBCDIC));
+    requestMessage.writeBytes("                                        ".getBytes(EBCDIC));
     requestMessage.writeBytes("N".getBytes(EBCDIC));
     requestMessage.writeBytes("0".getBytes(EBCDIC));
 
@@ -139,11 +141,11 @@ public class TransferMoneyInCICS {
       replyMessage.readBytes(replyBytes);
 
       //Check COMM-SUCCESS.
-      if(getStringFromBytes(replyBytes, 90, 1).equals("Y")) {
+      if(getStringFromBytes(replyBytes, 130, 1).equals("Y")) {
         System.out.printf("Transfer succeeded. Available balance: %s, actual balance: %s%n", zonedDecimalToString(replyBytes, 26), zonedDecimalToString(replyBytes, 38));
       }
       else {
-        System.out.printf("Transfer failed. Error code: %s%n",  getStringFromBytes(replyBytes, 91, 1));
+        System.out.printf("Transfer failed. Error code: %s%n",  getStringFromBytes(replyBytes, 131, 1));
       }
     }
     else {

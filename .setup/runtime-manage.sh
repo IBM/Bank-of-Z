@@ -602,7 +602,7 @@ start_mq() {
         print_success "Queue manager start command issued"
     fi
 
-    wait_for_task_running "${MQ_QMGR_NAME}MSTR" "queue manager"
+    wait_for_task_running "${MQ_QMGR_NAME}MSTR" "Queue manager"
 
     set -e
 }

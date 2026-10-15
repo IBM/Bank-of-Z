@@ -73,6 +73,12 @@
                             </cds-number-input>
                         </cds-form-item>
 
+                        <cds-form-item>
+                            <cds-number-input id="initialBalance" label="Initial Balance / Amount Owed" value="0" step="100"
+                                helper-text="For Mortgage/Loan, enter initial amount owed (e.g. 250000)">
+                            </cds-number-input>
+                        </cds-form-item>
+
                         <cds-button id="submit-btn" type="submit">Submit</cds-button>
                     </cds-stack>
                 </cds-form>
@@ -126,10 +132,11 @@
 
         async function createAccount() {
             // Get form values
-            const customerNumber = document.getElementById('customerNumber').value;
+            const customerNumber = document.getElementById('customerNumber').value.trim();
             const accountType = document.getElementById('accountType').value;
-            const interestRate = document.getElementById('interestRate').value || '0';
-            const overdraft = document.getElementById('overdraft').value || '0';
+            const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const overdraftLimit = parseInt(document.getElementById('overdraft').value, 10) || 0;
+            const initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
 
             // Validate required fields
             if (!customerNumber || !accountType) {
@@ -137,17 +144,17 @@
                 return;
             }
 
-            // Get current date in YYYY-MM-DD format for dateOpened
+            // Get current date in YYYY-MM-DD format for openedDate
             const today = new Date().toISOString().split('T')[0];
 
-            // Prepare data according to API schema
+            // Prepare data according to CreateAccountRequest schema
             const accountData = {
                 customerNumber: customerNumber,
                 accountType: accountType,
                 interestRate: interestRate,
-                overdraft: overdraft,
-                dateOpened: today,
-                sortCode: config.defaults.sortCode
+                overdraftLimit: overdraftLimit,
+                initialBalance: initialBalance,
+                openedDate: today
             };
 
             // Show loading
@@ -157,20 +164,21 @@
                 const response = await api.accounts.createAccount(accountData);
                 hideLoadingModal();
 
+                const accountId = response.accountId || response.id || response.accountNumber || 'N/A';
+                const sortCode = response.sortCode || 'N/A';
+
                 showSuccessModal(
                     'Account created successfully',
-                    `Account has been created. Account Number: ${response.id || response.accountNumber}`,
+                    `Account Number: ${accountId}  |  Sort Code: ${sortCode}`,
                     () => {
-                        window.location.href = 'account-details.html';
+                        window.location.href = `account-details.html?accountId=${accountId}`;
                     }
                 );
             } catch (error) {
                 hideLoadingModal();
                 console.log(error);
-                
-                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
-                    showErrorModal('Feature Not Implemented', error.message);
-                } else if (error.message.includes('Failed to fetch')) {
+
+                if (error.message && error.message.includes('Failed to fetch')) {
                     showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
                 } else {
                     showErrorModal('Error', error.message || 'Failed to create account. Please check the customer number exists.');

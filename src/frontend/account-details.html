@@ -69,13 +69,14 @@
                         <cds-text-input id="accountNumber" label="Account ID" readonly></cds-text-input>
                         <cds-text-input id="customerNumber" label="Customer ID" readonly></cds-text-input>
                         <cds-text-input id="availableBalance" label="Available Balance" readonly></cds-text-input>
-                        <cds-text-input id="accountType" label="Account Type" readonly></cds-text-input>
+                        <cds-text-input id="accountType" label="Account Type" helper-text="Editable: SAVING, CURRENT, LOAN, MORTGAGE, ISA"></cds-text-input>
+                        <cds-text-input id="interestRate" label="Interest Rate (%)" helper-text="Editable: 0 – 99.99" type="number"></cds-text-input>
+                        <cds-text-input id="overdraftLimit" label="Overdraft Limit" helper-text="Editable: whole currency units" type="number"></cds-text-input>
                         <cds-text-input id="currency" label="Currency" readonly></cds-text-input>
                         <cds-text-input id="status" label="Status" readonly></cds-text-input>
                         <cds-text-input id="accountNumberField" label="Account Number" readonly></cds-text-input>
                         <cds-text-input id="sortCode" label="Sort Code" readonly></cds-text-input>
                         <cds-text-input id="iban" label="IBAN" readonly></cds-text-input>
-                        <cds-text-input id="nickname" label="Nickname"></cds-text-input>
                         <cds-text-input id="openingDate" label="Opening Date" readonly></cds-text-input>
                         <br>
                         <cds-button id="update-btn">Update Account</cds-button>
@@ -257,12 +258,15 @@
             let tableRows = '';
             accounts.forEach((account, index) => {
                 const accountNumber = account.accountNumber || account.accountId || 'N/A';
+                const available = (typeof account.availableBalance === 'number')
+                    ? formatCurrency(account.availableBalance, account.currency) : 'N/A';
                 tableRows += `
                     <tr class="account-row" data-account-index="${index}" style="cursor: pointer;">
                         <td>${account.accountId || 'N/A'}</td>
                         <td>${accountNumber}</td>
                         <td>${account.sortCode || 'N/A'}</td>
                         <td>${account.accountType || 'N/A'}</td>
+                        <td style="text-align:right">${available}</td>
                         <td>${account.currency || 'N/A'}</td>
                         <td>${account.status || 'N/A'}</td>
                     </tr>
@@ -277,6 +281,7 @@
                             <th>Account Number</th>
                             <th>Sort Code</th>
                             <th>Account Type</th>
+                            <th style="text-align:right">Available Balance</th>
                             <th>Currency</th>
                             <th>Status</th>
                         </tr>
@@ -401,12 +406,13 @@
             document.getElementById('accountNumber').value = account.accountId || '';
             document.getElementById('customerNumber').value = account.customerId || '';
             document.getElementById('accountType').value = account.accountType || '';
+            document.getElementById('interestRate').value = account.interestRate !== undefined ? account.interestRate : '';
+            document.getElementById('overdraftLimit').value = account.overdraftLimit !== undefined ? account.overdraftLimit : '';
             document.getElementById('currency').value = account.currency || '';
             document.getElementById('status').value = account.status || '';
             document.getElementById('sortCode').value = account.sortCode || '';
             document.getElementById('accountNumberField').value = account.accountNumber || '';
             document.getElementById('iban').value = account.iban || '';
-            document.getElementById('nickname').value = account.nickname || '';
             document.getElementById('openingDate').value = account.openingDate || '';
             document.getElementById('availableBalance').value = 'Loading...';
 
@@ -460,22 +466,30 @@
         async function updateAccount() {
             if (!currentAccount) return;
 
-            const updatedData = {
-                nickname: document.getElementById('nickname').value
-            };
+            const accountType = document.getElementById('accountType').value.trim();
+            const interestRateRaw = document.getElementById('interestRate').value;
+            const overdraftLimitRaw = document.getElementById('overdraftLimit').value;
+
+            const updatedData = {};
+            if (accountType) updatedData.accountType = accountType;
+            if (interestRateRaw !== '') updatedData.interestRate = parseFloat(interestRateRaw);
+            if (overdraftLimitRaw !== '') updatedData.overdraftLimit = parseInt(overdraftLimitRaw, 10);
 
             showLoadingModal('Updating account...');
 
             try {
-                await api.accounts.updateAccount(currentAccount.accountId, updatedData);
+                const response = await api.accounts.updateAccount(currentAccount.accountId, updatedData);
                 hideLoadingModal();
+                // Refresh displayed details from the API response
+                if (response && response.accountId) {
+                    const refreshed = { ...currentAccount, ...response };
+                    currentAccount = refreshed;
+                    await displayAccountDetails(refreshed, refreshed._customerId || refreshed.customerId);
+                }
                 showSuccessModal('Success', 'Account updated successfully');
             } catch (error) {
                 hideLoadingModal();
-
-                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
-                    showErrorModal('Feature Not Implemented', error.message);
-                } else if (error.message.includes('Failed to fetch')) {
+                if (error.message && error.message.includes('Failed to fetch')) {
                     showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
                 } else {
                     showErrorModal('Error', error.message || 'Failed to update account');

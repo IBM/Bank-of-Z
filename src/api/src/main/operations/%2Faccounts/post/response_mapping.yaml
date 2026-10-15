@@ -1,0 +1,14 @@
+---
+version: "1.0"
+response_201.yaml:
+  condition: "$zosAssetResponse.commarea.CREACCZ.\"COMM-SUCCESS\" = 'Y'"
+  httpStatusCode: 201
+response_404.yaml:
+  condition: "$exists($zosAssetResponse.commarea.CREACCZ) and $zosAssetResponse.commarea.CREACCZ.\"COMM-SUCCESS\" != 'Y' and $zosAssetResponse.commarea.CREACCZ.\"COMM-FAIL-CODE\" = '1'"
+  httpStatusCode: 404
+response_400.yaml:
+  condition: "$zosAssetResponse.commarea.CREACCZ.\"COMM-SUCCESS\" = 'N'"
+  httpStatusCode: 400
+response_500.yaml:
+  condition: true
+  httpStatusCode: 500

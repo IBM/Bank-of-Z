@@ -55,8 +55,7 @@
         "zosmf": "bank-of-z.zosmf",
         "ssh": "bank-of-z.ssh",
         "rse": "bank-of-z.rse",
-        "cics": "bank-of-z.cics",
-        "zOpenDebug": "bank-of-z.zOpenDebug"
+        "cics": "bank-of-z.cics"
     },
     "autoStore": true
 }

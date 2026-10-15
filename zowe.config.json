@@ -3,6 +3,7 @@
     "profiles": {
         "bank-of-z": {
             "properties": {
+                "host": "9.47.93.199",
                 "protocol": "https",
                 "rejectUnauthorized": false
             },
@@ -20,7 +21,8 @@
                 "ssh": {
                     "type": "ssh",
                     "properties": {
-                        "port": 22
+                        "port": 22,
+                        "hostKey": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKEYotoqPNwRXKMCM1Mg3eFtC4v7bKCrXCshblAA2ASmovzQU3D1IhHBeGXMRpB7RCJz35lWr0Vz2ojuBFSh3tw="
                     }
                 },
                 "rse": {

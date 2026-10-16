@@ -36,3 +36,4 @@
 *.java zos-working-tree-encoding=utf-8
 *.md zos-working-tree-encoding=utf-8
 *.rec binary
+config.yaml zos-working-tree-encoding=iso8859-1

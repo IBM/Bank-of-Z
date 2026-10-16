@@ -1,10 +1,11 @@
 {
     "$schema": "./zowe.schema.json",
-    "profiles": {
+    "profiles": {  
         "bank-of-z": {
             "properties": {
                 "protocol": "https",
-                "rejectUnauthorized": false
+                "rejectUnauthorized": false,
+                "host": "$ZOS_HOST"
             },
             "profiles": {
                 "zosmf": {

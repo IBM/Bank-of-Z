@@ -311,16 +311,26 @@
                 }
             }
             
+            // Parse [HIGH RISK] tag out of the last name if present
+            const rawLastName = customer.lastName || '';
+            const isHighRisk = rawLastName.includes('[HIGH RISK]');
+            const cleanLastName = rawLastName.replace('[HIGH RISK]', '').trimEnd();
+            const riskBadge = isHighRisk
+                ? ' <span style="background:#da1e28;color:#fff;font-size:0.75rem;' +
+                  'font-weight:600;padding:2px 6px;border-radius:2px;' +
+                  'vertical-align:middle;letter-spacing:0.04em;">HIGH RISK</span>'
+                : '';
+
             // Restore the proper HTML structure
             detailsSection.innerHTML = `
-                <h3>Customer Information (${system})</h3>
+                <h3>Customer Information (${system})${riskBadge}</h3>
 
                 <div class="form-constrained">
                     <cds-form id="customer-form">
                         <cds-text-input id="customerId" label="Customer ID" readonly value="${displayCustomerId}"></cds-text-input>
                         <cds-text-input id="title" label="Title" value="${customer.title || ''}"></cds-text-input>
                         <cds-text-input id="firstName" label="First Name" value="${customer.firstName || ''}"></cds-text-input>
-                        <cds-text-input id="lastName" label="Last Name" value="${customer.lastName || ''}"></cds-text-input>
+                        <cds-text-input id="lastName" label="Last Name" value="${cleanLastName}"></cds-text-input>
                         <cds-text-input id="phoneNumber" label="Phone Number" value="${customer.phoneNumber || ''}"></cds-text-input>
                         <cds-text-input id="dateOfBirth" label="Date of Birth" value="${formattedDOB}"></cds-text-input>
                         <cds-text-input id="addressLine1" label="Address Line 1" value="${customer.address?.addressLine1 || ''}"></cds-text-input>

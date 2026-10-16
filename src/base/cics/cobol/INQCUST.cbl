@@ -76,6 +76,8 @@
           03 WS-CICS-RESP              PIC S9(8) COMP.
           03 WS-CICS-RESP2             PIC S9(8) COMP.
 
+       01 WS-RISK-THRESHOLD            PIC S9(4) COMP VALUE 300.
+
        LOCAL-STORAGE SECTION.
        COPY SORTCODE.
 
@@ -392,6 +394,15 @@
                  FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE / 100, 100)
               COMPUTE CUSTOMER-CS-REVIEW-DAY =
                  FUNCTION MOD(HV-CUSTOMER-CS-REVIEW-DATE, 100)
+              IF HV-CUSTOMER-CREDIT-SCORE < WS-RISK-THRESHOL
+                 STRING FUNCTION TRIM(
+                           CUSTOMER-LAST-NAME OF CUSTOMER-NAME)
+                        DELIMITED BY SIZE
+                        ' [HIGH RISK]'
+                        DELIMITED BY SIZE
+                        INTO CUSTOMER-LAST-NAME OF CUSTOMER-NAME
+                 END-STRING
+              END-IF
               GO TO RCD999
            END-IF.
 

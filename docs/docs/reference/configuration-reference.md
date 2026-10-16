@@ -26,7 +26,7 @@ The **global** section contains the primary configuration values required to con
 |---|---|---|
 | `sandbox_root` | `/usr/local/sandboxes` | Root directory of the sandbox |
 
-### Application 
+### Application
 
 | Variable | Default Value | Description |
 |---|---|---|
@@ -116,6 +116,18 @@ The **global** section contains the primary configuration values required to con
 | `db2_sqlid` | `{{ global.zos_current_user }}` | DB2 SQL ID |
 | `db2_java_dir` | `/usr/lpp/db2d10` | DB2 Java installation path |
 | `db2_grants` | `CICSUSER` | List of DB2 grantees |
+
+### MQ
+
+| Variable | Default Value | Description |
+|---|---|---|
+| `mq_qmgr_name` | `MQ21` | Queue manager name |
+| `mq_install_hlq` | `MQCD94` | High-level qualifier for MQ install |
+| `mq_qmgr_hlq` | `CSQ.{{ mq.qmgr_name }}` | High-level qualifier for queue manager configuration  |
+| `mq_cpf` | `!{{ mq.qmgr_name }}` | Queue manager command prefix |
+| `mq_proclib` | `SYS1.PROCLIB` | Proclib for queue manager JCL |
+| `mq_otma_group` | `IMSXCFGN` | OTMA XCF group name for IMS bridge |
+| `mq_otma_ims` | `{{ global.ims_datastore }}` | IMS XCF member name for the IMS bridge |
 
 ## Sections settings
 

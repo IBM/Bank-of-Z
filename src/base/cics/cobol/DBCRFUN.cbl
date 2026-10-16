@@ -221,6 +221,7 @@
       *           Go and update the ACCOUNT record
       *
             PERFORM UPDATE-ACCOUNT-DB2.
+
       *
       *    The COMMAREA values have now been set so all we need to do
       *    is finish
@@ -238,6 +239,7 @@
            MOVE COMM-ACCNO TO DESIRED-ACC-NO.
            MOVE DESIRED-SORT-CODE TO HV-ACCOUNT-SORTCODE.
            MOVE DESIRED-ACC-NO TO HV-ACCOUNT-ACC-NO.
+
 
       *
       *    Retrieve the account information

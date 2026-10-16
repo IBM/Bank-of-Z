@@ -21,9 +21,10 @@
 #   verify    Verify if servers are running
 #
 # Scopes (required - no default):
-#   all        IMS + CICS + z/OS Connect + Frontend
+#   all        IMS + CICS + MQ + z/OS Connect + Frontend
 #   ims        IMS control tasks + IRLM + app regions
 #   cics       CICS region
+#   mq         MQ
 #   frontend   z/OS Connect + Frontend Liberty
 #
 # Examples:
@@ -66,9 +67,10 @@ print_usage() {
     echo "  verify    Verify if servers are running"
     echo ""
     echo "Scopes (required):"
-    echo "  all        IMS + CICS + z/OS Connect + Frontend"
+    echo "  all        IMS + CICS + MQ + z/OS Connect + Frontend"
     echo "  ims        IMS control tasks + IRLM + app regions"
     echo "  cics       CICS region"
+    echo "  mq         MQ"
     echo "  frontend   z/OS Connect + Frontend Liberty"
     echo ""
     echo "Examples:"
@@ -214,6 +216,34 @@ stop_cics() {
 }
 
 #########################################################
+# Stop queue manager
+#########################################################
+stop_mq() {
+    print_stage "STAGE: Stop queue manager"
+    set +e
+
+    # Check whether the queue manager is currently active
+    if is_task_running "${MQ_QMGR_NAME}MSTR"; then
+        print_info "${MQ_QMGR_NAME} is active - issuing shutdown..."
+        opercmd "${MQ_CPF} STOP QMGR MODE(FORCE)"  2>/dev/null || true
+
+        # Wait up to 25s (5 checks x 5s) for graceful shutdown
+        wait_for_task_termination "${MQ_QMGR_NAME}MSTR"
+
+        # Cancel only if still active after graceful shutdown attempt
+        if is_task_running "${MQ_QMGR_NAME}MSTR"; then
+            print_info "${MQ_QMGR_NAME} still active - issuing cancel..."
+            opercmd "C ${MQ_QMGR_NAME}MSTR" 2>/dev/null || true
+        fi
+    else
+        print_info "${MQ_QMGR_NAME} is not active - skipping"
+    fi
+
+    print_success "queue manager stopped"
+    set -e
+}
+
+#########################################################
 # Stop IMS application regions (MPP / JMP)
 # Uses IMS console commands routed via the CTL WTOR reply
 # so that IMS can quiesce transactions before stopping.
@@ -336,7 +366,7 @@ stop_ims_control() {
     # Step 5: IRLM - try graceful abend with nodump first, then cancel if still running
     print_info "Stopping ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME} (IRLM)..."
     opercmd "F ${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME},ABEND,NODUMP" 2>/dev/null || true
-    
+
     # Wait up to 25s (5 checks x 5s) for graceful shutdown
     wait_for_task_termination "${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME}"
 
@@ -558,6 +588,42 @@ verify_cics() {
 }
 
 #########################################################
+# Start queue manager
+#########################################################
+start_mq() {
+    print_stage "STAGE: Start queue manager"
+    set +e
+
+    if is_task_running "${MQ_QMGR_NAME}MSTR"; then
+        print_info "${MQ_QMGR_NAME} is already running - skipping start"
+    else
+        print_info "Starting ${MQ_QMGR_NAME}"
+        opercmd "${MQ_CPF} START QMGR" 2>/dev/null || true
+        print_success "Queue manager start command issued"
+    fi
+
+    wait_for_task_running "${MQ_QMGR_NAME}MSTR" "Queue manager"
+
+    set -e
+}
+
+#########################################################
+# Verify MQ status
+#########################################################
+verify_mq() {
+    print_stage "STAGE: Verify queue manager status"
+    set +e
+
+    if is_task_running "${MQ_QMGR_NAME}MSTR"; then
+        print_success "${MQ_QMGR_NAME} is running"
+    else
+        print_warning "${MQ_QMGR_NAME} is not running"
+    fi
+
+    set -e
+}
+
+#########################################################
 # Start z/OS Connect and Frontend Liberty servers
 #########################################################
 start_frontend() {
@@ -624,8 +690,9 @@ do_stop() {
     local scope="$1"
     case "$scope" in
         all)
-            # Stop order: Frontend -> CICS -> IMS
+            # Stop order: Frontend -> MQ -> CICS -> IMS
             stop_frontend
+            stop_mq
             stop_cics
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
                 stop_ims_regions
@@ -641,6 +708,9 @@ do_stop() {
         cics)
             stop_cics
             ;;
+        mq)
+            stop_mq
+            ;;
         frontend)
             stop_frontend
             ;;
@@ -654,7 +724,7 @@ do_start() {
     local scope="$1"
     case "$scope" in
         all)
-            # Start order: IMS -> CICS -> Frontend
+            # Start order: IMS -> CICS -> MQ -> Frontend
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
                 start_ims_control
                 start_ims_regions
@@ -663,6 +733,7 @@ do_start() {
                 print_info "IMS_DISABLED=true - skipping IMS start"
             fi
             start_cics
+            start_mq
             start_frontend
             ;;
         ims)
@@ -672,6 +743,9 @@ do_start() {
             ;;
         cics)
             start_cics
+            ;;
+        mq)
+            start_mq
             ;;
         frontend)
             start_frontend
@@ -692,6 +766,7 @@ do_verify() {
                 print_info "IMS_DISABLED=true - skipping IMS verification"
             fi
             verify_cics
+            verify_mq
             verify_frontend
             ;;
         ims)
@@ -699,6 +774,9 @@ do_verify() {
             ;;
         cics)
             verify_cics
+            ;;
+        mq)
+            verify_mq
             ;;
         frontend)
             verify_frontend
@@ -735,7 +813,7 @@ main() {
     esac
 
     case "$scope" in
-        all|ims|cics|frontend)
+        all|ims|cics|mq|frontend)
             ;;
         "")
             print_error "Scope is required."

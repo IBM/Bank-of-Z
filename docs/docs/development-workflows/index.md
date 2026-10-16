@@ -36,7 +36,7 @@ A typical Bank of Z development workflow consists of the following activities:
 ### 5. Deploy changes
 
 - Deploy validated artifacts to the target environment.
-- Updated components are activated in the appropriate runtime environments, including CICS, Db2, IMS, and z/OS Connect.
+- Updated components are activated in the appropriate runtime environments, including CICS, Db2, IMS, MQ and z/OS Connect.
 
 ### 6. Validate changes
 

@@ -64,7 +64,7 @@ Verifies that all required tools are installed at the required versions. Resolve
 .setup/setup-common.sh environment
 ```
 
-Provisions the complete application runtime, including Db2 tables, a CICS region, an IMS region and database, a z/OS Connect server, and the Liberty frontend server. Expect this to take several minutes. Includes prereq check.
+Provisions the complete application runtime, including Db2 tables, a CICS region, an IMS region and database, an MQ queue manager, a z/OS Connect server, and the Liberty frontend server. Expect this to take several minutes. Includes prereq check.
 
 ---
 

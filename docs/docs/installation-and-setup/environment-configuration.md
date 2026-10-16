@@ -13,11 +13,11 @@ Before you begin, ensure that your z/OS environment meets all requirements descr
 
 Edit `.setup/config/config.yaml` in your local clone of the repository. This file controls the paths, environment setting, and middleware configuration used during setup, build, and deployment.
 
-Update the values in the **global** section to match your environment. Unless otherwise noted, the remaining configuration values use template references and do not require modification. 
+Update the values in the **global** section to match your environment. Unless otherwise noted, the remaining configuration values use template references and do not require modification.
 
 ```yaml
 # Global properties
-# - Shared by middleware/tools 
+# - Shared by middleware/tools
 # - Subject to change with middleware/tools updates
 global:
 
@@ -60,7 +60,7 @@ global:
   ipv_hlq: "IPV"
   pli_hlq: "PLI.V6R2M0"
   debug_hlq: "EQAW"
-  
+
   # GUI
   zosconnect_http_port: 9080
   zosconnect_https_port: 9444
@@ -76,14 +76,14 @@ global:
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   cics_sec: "YES"
-  
+
   # IMS
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
   ims_java_dir: "/usr/lpp/ims/imsjava"
   ims_datastore: "IMS2"
   ims_dfsplex: "PLEX2"
-  
+
   # DB2
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
@@ -93,6 +93,15 @@ global:
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
+
+  # MQ
+  mq_qmgr_name: "MQ21"
+  mq_install_hlq: "MQCD94"
+  mq_qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
+  mq_cpf: "!{{ mq.qmgr_name }}"
+  mq_proclib: "SYS1.PROCLIB"
+  mq_otma_group: "IMSXCFGN"
+  mq_otma_ims: "{{ global.ims_datastore }}"
 ```
 
 All other configuration values use template references ({% raw %}`{{section.field}}`{% endraw %}) and do not require changes unless your environment uses non-default values. For a complete field description of every configuration property, see [Configuration Reference](../reference/configuration-reference.html).
@@ -101,7 +110,7 @@ All other configuration values use template references ({% raw %}`{{section.fiel
 
 If you are not using the `IBMUSER` user ID, grant your user ID permission to create Db2 database objects before running the `environment` setup.
 
-Run the following command as an administrator, replacing `MYUSER` with your user ID: 
+Run the following command as an administrator, replacing `MYUSER` with your user ID:
 
 ```bash
 .setup/setup/grant-perm-user.sh MYUSER

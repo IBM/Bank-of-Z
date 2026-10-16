@@ -34,6 +34,7 @@ export BOZ_IMS_HLQ="${IMS_APP_HLQ}"
 # =========================
 # Stop IBM BOZ regions
 # =========================
+print_info "Stopping IMS ${APP_BASE_NAME} regions .."
 set +e
 # Delete stale stop members so jsub fails silently rather than executing
 # outdated JCL that may reference deleted datasets. Members are rebuilt

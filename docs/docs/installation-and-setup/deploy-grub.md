@@ -43,7 +43,7 @@ GRUB transfers your local changes to z/OS USS. Only files that have changed sinc
 After the sync completes, the configured post-sync hook runs `setup-remote.sh` on z/OS USS. The script runs the following setup stages automatically:
 
 - `validate-prereqs` — Verifies that all required tools are installed on USS.
-- `environment` — Provisions Db2, CICS, IMS, z/OS Connect, and the frontend server.
+- `environment` — Provisions Db2, CICS, IMS, MQ, z/OS Connect, and the frontend server.
 - `install-bank-of-z` — Builds the application, deploys the generated artifacts by using Wazi Deploy, and populates the Db2 and IMS databases with sample data.
 
 The initial deployment typically takes 15 to 20 minutes. Subsequent syncs are typically faster because only changed files are transferred.

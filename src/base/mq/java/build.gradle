@@ -11,7 +11,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.ibm.boz'
+group = 'com.ibm.boq'
 version = '1.0.0-SNAPSHOT'
 
 java {
@@ -24,7 +24,7 @@ java {
 def outputDir = project.findProperty('outputDir') ?: layout.buildDirectory.get().asFile.absolutePath
 
 jar {
-    archiveBaseName = 'boz-mq'
+    archiveBaseName = 'boq'
     destinationDirectory = file(outputDir)
 }
 

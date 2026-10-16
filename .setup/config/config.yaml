@@ -86,6 +86,15 @@ global:
   db2_grants:
   - "CICSUSER"
 
+  # MQ
+  mq_qmgr_name: "MQ21"
+  mq_install_hlq: "MQCD94"
+  mq_qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
+  mq_cpf: "!{{ mq.qmgr_name }}"
+  mq_proclib: "SYS1.PROCLIB"
+  mq_otma_group: "IMSXCFGN"
+  mq_otma_ims: "{{ global.ims_datastore }}"
+
 
 # Application properties
 app:
@@ -309,10 +318,10 @@ db2:
 
 # MQ configuration
 mq:
-  qmgr_name: "MQ21"
-  install_hlq: "MQCD94"
-  qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
-  cpf: "!{{ mq.qmgr_name }}"
-  proclib: "SYS1.PROCLIB"
-  otma_group: "IMSXCFGN"
-  otma_ims: "{{ ims.datastore }}"
+  qmgr_name: "{{ global.qmgr_name }}"
+  install_hlq: "{{ global.install_hlq }}"
+  qmgr_hlq: "{{ global.qmgr_hlq }}"
+  cpf: "{{ global.cpf }}"
+  proclib: "{{ global.proclib }}"
+  otma_group: "{{ global.otma_group }}"
+  otma_ims: "{{ global.otma_ims }}"

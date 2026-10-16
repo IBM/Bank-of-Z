@@ -7,7 +7,7 @@
  * disclosure restricted by GSA ADP Schedule Contract
  * with IBM Corp.
  */
-package com.ibm.boz.mq;
+package com.ibm.boq;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -27,41 +27,25 @@ import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 
 /**
  * Transfer money into the Bank of Z via CICS using the MQ - CICS bridge.
- *
- * To run:
- *
- * java TransferMoneyInCICS qmgr accountNumber amount
- *
- * qmgr:          queue manager name, e.g. MQ21
- * accountNumber: eight digit account number, e.g 00000008
- * amount:        amount of money to be transferred in if positive, out if negative, e.g 99.99 or -99.99
- *
- * Before running you need to have set up STEPLIB and native library path.
- * E.g:
- *
- * export STEPLIB=MQCD94.SCSQAUTH
- * export LIBPATH=/mqm/
+ * Called from TransferMoneyToBOZ.
  */
-public class TransferMoneyInCICS {
+class TransferMoneyToBOZViaCICS {
   private static final Charset EBCDIC = Charset.forName("Cp1047");
 
   //Offset to COBOL copy book in reply: CIH + 8 character program name.
   private static final int BASE_OFFSET = CMQC.MQCIH_LENGTH_1 + 8;
 
-  private static String qmgr = "";
-  private static String accountNumber = "";
-  private static String amount = "";
+  private String qmgr = "";
+  private String accountNumber = "";
+  private String amount = "";
 
-  public static void main(String[] args) throws JMSException {
-    if(args.length != 3) {
-      System.out.println("Expected usage: java TransferMoneyInCICS qmgr accountNumber amount");
-      return;
-    }
+  protected TransferMoneyToBOZViaCICS(String qmgr, String accountNumber, String amount) {
+    this.qmgr = qmgr;
+    this.accountNumber = accountNumber;
+    this.amount = amount;
+  }
 
-    qmgr = args[0];
-    accountNumber = args[1];
-    amount = args[2];
-
+  protected void performTransfer() throws JMSException {
     //Connect to local queue manager via bindings mode connection.
     MQConnectionFactory cf = new MQConnectionFactory();
     cf.setQueueManager(qmgr);
@@ -107,7 +91,7 @@ public class TransferMoneyInCICS {
     //    03 COMM-SUCCESS             PIC X.              Y or N
     //    03 COMM-FAIL-CODE           PIC X.              Error code: '1'=account not found, '2'=DB2 error, '3'=insufficient funds, '4'=overdraft not allowed
 
-    requestMessage.writeBytes(accountNumber.getBytes(EBCDIC));
+    requestMessage.writeBytes(padLeftWithZeros(accountNumber).getBytes(EBCDIC));
     requestMessage.writeBytes(zonedDecimal(new BigDecimal(amount)));
     requestMessage.writeBytes("000000".getBytes(EBCDIC));
     requestMessage.writeBytes(zonedDecimal(BigDecimal.ZERO));
@@ -196,6 +180,20 @@ public class TransferMoneyInCICS {
     requestMessage.writeBytes("    ".getBytes(EBCDIC));  //Next transaction if
     requestMessage.writeBytes("        ".getBytes(EBCDIC));  //Reserved2
     requestMessage.writeBytes("        ".getBytes(EBCDIC));  //Reserved3
+  }
+
+  /**
+   * Pads a string on the left with zeros so that it is 8 characters long.
+   * Strings longer than 8 characters are truncated to their first 8 characters.
+   *
+   * @param value the string to pad or truncate
+   * @return an 8 character string, e.g. "123" becomes "00000123" and "1234567890" becomes "12345678"
+   */
+  private static String padLeftWithZeros(String value) {
+    if (value.length() >= 8) {
+      return value.substring(0, 8);
+    }
+    return "0".repeat(8 - value.length()) + value;
   }
 
   /**

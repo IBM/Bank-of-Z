@@ -34,7 +34,7 @@ import com.ibm.dbb.task.TaskConstants
  environment is in place when the build runs.
  */
 
-log.info("MqJavaBuilder: Starting MQ Java build for Bank-of-Z")
+log.info("MqJavaBuilder: Starting MQ Java build for Bank-of-Q")
 
 // -------------------------------------------------------------------------
 // Context variables

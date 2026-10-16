@@ -7,7 +7,7 @@
  * disclosure restricted by GSA ADP Schedule Contract
  * with IBM Corp.
  */
-package com.ibm.boz.mq;
+package com.ibm.boq;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,23 +28,9 @@ import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 
 /**
  * Transfer money into the Bank of Z via IMS using the MQ - IMS bridge.
- *
- * To run:
- *
- *   java TransferMoneyInIMS qmgr accountId customerId amount
- *
- *   qmgr:        queue manager name, e.g. MQ21
- *   customerId:  9-digit customer ID, e.g. 000000001
- *   accountId:   18-digit account ID, e.g. 000000000000000001
- *   amount:      amount of money to be transferred in if positive, out if negative, e.g 99.99 or -99.99
- *
- * Before running you need to have set up STEPLIB and native library path.
- * E.g:
- *
- *   export STEPLIB=MQCD94.SCSQAUTH
- *   export LIBPATH=/mqm/
+ * Called from TransferMoneyToBOZ.
  */
-public class TransferMoneyInIMS {
+class TransferMoneyToBOZViaIMS {
 
   private static final Charset EBCDIC = Charset.forName("Cp1047");
 
@@ -72,17 +58,20 @@ public class TransferMoneyInIMS {
   private static final int OUTPUT_MSG_LEN    = 43;
   private static final int OUTPUT_TOTAL_LEN  =  1;
 
-  public static void main(String[] args) throws JMSException {
-    if (args.length != 4) {
-      System.out.println("Expected usage: java TransferMoneyInIMS qmgr customerId accountId amount");
-      return;
-    }
+  private String qmgr = "";
+  private String customerID = "";
+  private String accountNumber = "";
+  private String amount = "";
 
-    String qmgr = args[0];
-    String customerId = args[1];
-    String accountId = args[2];
-    String amount  = args[3];
+  protected TransferMoneyToBOZViaIMS(String qmgr, String customerID, String accountNumber, String amount) {
+    this.qmgr = qmgr;
+    //Drop leading I.
+    this.customerID = customerID.substring(1,customerID.length());
+    this.accountNumber = accountNumber;
+    this.amount = amount;
+  }
 
+  protected void performTransfer() throws JMSException {
     // Derive IBTRAN's IN-TRXTYPE from the sign of amount.
     boolean negative = amount.startsWith("-");
     String trxType   = negative ? "w" : "d";
@@ -121,7 +110,7 @@ public class TransferMoneyInIMS {
     requestMessage.writeBytes("IBTRAN  ".getBytes(EBCDIC));
 
     // IN-ACCID: right-justified in 18 bytes, space-padded on the left.
-    requestMessage.writeBytes(padLeft(accountId, INPUT_ACCID_LEN).getBytes(EBCDIC));
+    requestMessage.writeBytes(padLeft(accountNumber, INPUT_ACCID_LEN).getBytes(EBCDIC));
 
     // IN-AMOUNT: right-justified in 16 bytes, space-padded on the left (always unsigned).
     requestMessage.writeBytes(padLeft(absAmount, INPUT_AMOUNT_LEN).getBytes(EBCDIC));
@@ -130,7 +119,7 @@ public class TransferMoneyInIMS {
     requestMessage.writeBytes(trxType.getBytes(EBCDIC));
 
     // IN-CUSTID: right-justified in 9 bytes, space-padded on the left.
-    requestMessage.writeBytes(padLeft(customerId, INPUT_CUSTID_LEN).getBytes(EBCDIC));
+    requestMessage.writeBytes(padLeft(customerID, INPUT_CUSTID_LEN).getBytes(EBCDIC));
 
     // IMS MQ bridge message properties.
     requestMessage.setStringProperty(WMQConstants.JMS_IBM_FORMAT, "MQIMSVS ");

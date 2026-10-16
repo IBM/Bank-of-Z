@@ -318,10 +318,10 @@ db2:
 
 # MQ configuration
 mq:
-  qmgr_name: "{{ global.qmgr_name }}"
-  install_hlq: "{{ global.install_hlq }}"
-  qmgr_hlq: "{{ global.qmgr_hlq }}"
-  cpf: "{{ global.cpf }}"
-  proclib: "{{ global.proclib }}"
-  otma_group: "{{ global.otma_group }}"
-  otma_ims: "{{ global.otma_ims }}"
+  qmgr_name: "{{ global.mq_qmgr_name }}"
+  install_hlq: "{{ global.mq_install_hlq }}"
+  qmgr_hlq: "{{ global.mq_qmgr_hlq }}"
+  cpf: "{{ global.mq_cpf }}"
+  proclib: "{{ global.mq_proclib }}"
+  otma_group: "{{ global.mq_otma_group }}"
+  otma_ims: "{{ global.mq_otma_ims }}"

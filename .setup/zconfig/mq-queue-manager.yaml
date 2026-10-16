@@ -1,4 +1,3 @@
-#TODO: all of this will need tweaking and lining up with the latest version and the docs.
 vars:
   mq_qmgr_name: '????'
   mq_install_hlq: '????'
@@ -11,7 +10,7 @@ vars:
 mq_zconfig_schema_version: '1.0.0'
 queue_managers:
 - name: '{{ vars.mq_qmgr_name }}'
-  version: '9.4.5'                                   # TODO version 10 available now
+  version: '9.4.5'
   language: 'E'
   license: 'MQ'
   cpf: '{{ vars.mq_cpf }}'
@@ -284,7 +283,7 @@ queue_managers:
         outbuff: '400'
         maxrtu: '2'
         maxarch: '500'
-        twoactv: 'YES' # TODO: back to single when we can
+        twoactv: 'YES'
         twoarch: 'YES'
         twobsds: 'YES'
         offload: 'NO'
@@ -446,7 +445,6 @@ queue_managers:
       xcfmname: '{{ vars.mq_otma_ims }}'
       passtkta: ''
       descr: 'IMS bridge storage class'
-    #TODO: tweak STGCLASS at some point to ensure we use the standard ones.
     queues:
       local:
       - name: '{{ vars.mq_qmgr_name }}.DEAD.QUEUE'
@@ -3631,7 +3629,6 @@ queue_managers:
       nltype: 'NONE'
       descr: ''
       names: ''
-    #TODO: not being applied properly, but don't care at the moment.
     - name: 'SYSTEM.QPUBSUB.QUEUE.NAMELIST'
       qsgdisp: 'QMGR'
       nltype: 'QUEUE'

@@ -55,7 +55,6 @@ fi
 
 cd "$SCRIPTS_DIR/../zconfig"
 
-#TODO: need to have MQ and CICS zconfig in the same place.
 export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
 
 zconfig apply \

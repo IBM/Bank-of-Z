@@ -79,6 +79,13 @@ fi
 
 deactivate
 
+# zconfig has a bug where it adds SCSQLOAD to the STEPLIB of the
+# MSTR JCL. SCSQLOAD isn't needed and isn't normally APF authorised
+# so APF authorise it here.
+DSINFO=$(dls -l "${MQ_INSTALL_HLQ}".SCSQLOAD)
+DSVOL=$(awk '{print $NF}' <<< "$DSINFO")
+opercmd "SETPROG APF,ADD,DSNAME=${MQ_INSTALL_HLQ},VOLUME=$DSVOL"
+
 # =========================
 # Stage 2: Start MQ queue manager
 # =========================

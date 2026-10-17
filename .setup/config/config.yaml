@@ -77,14 +77,39 @@ global:
   ims_database_lock_manager_server_name: "IRLM"
   
   # DB2
+  db2_provision: "true"   # set to "true" to provision a new Db2 subsystem with zconfig
+  # When true, each environment run removes the zconfig-managed subsystem
+  # before provisioning it again. This is destructive and requires
+  # db2_provision: "true".
+  db2_reprovision: "false"
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
-  db2_ssid: "DBD1"
-  db2_runlib: "{{ global.db2_ssid }}.RUNLIB.LOAD"
+  db2_ssid: "DBD2"
+  db2_runlib: "{{ global.db2_hlq }}.{{ global.db2_ssid }}.RUNLIB.LOAD"
   db2_sqlid: "{{ global.zos_current_user }}"
   db2_java_dir: "/usr/lpp/db2d10"
   db2_grants:
   - "CICSUSER"
+
+# Db2 subsystem provisioning attributes. These defaults match the supplied
+# ZDVT image; review and change every environment-specific value before
+# setting global.db2_provision to "true".
+db2_provisioning:
+  # Preserve the deployment catalog prefix; empty selects the zconfig default.
+  catalog: "{{ global.db2_ssid }}"
+  user_catalog: "CATALOG.VS01.DB2V13"
+  authid: "{{ global.zos_admin_user }}"
+  volume: "DB2V13"
+  storage_class: "SGDB213"
+  data_class: "DCDB2EXT"
+  # Java runtime for the Db2 Java WLM environment. This must be a Java home,
+  # not the Db2 installation directory used for JDBC and Db2 Java classes.
+  java_home: "{{ global.java_home }}"
+  javaenv: "{{ global.db2_ssid }}.DSN1WLMJ.JAVAENV"
+  javaenvv: "/u/{{ global.zos_admin_user | lower }}/{{ global.db2_ssid | lower }}envfile.txt"
+  jvmprops: "/u/{{ global.zos_admin_user | lower }}/{{ global.db2_ssid | lower }}jvmsp"
+  sdsnexit: "{{ global.db2_hlq }}.{{ global.db2_ssid }}.SDSNEXIT"
+  start_timeout_seconds: 180
 
 
 # Application properties
@@ -208,6 +233,11 @@ cics:
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
   cmci_port: 27100
+  # Some ZDVT images pause CICS startup at the EZACIC20 PLT prompt.
+  # Set to "true" only when automatically replying GO is appropriate.
+  auto_reply_go: "false"
+  # CICS can take several minutes to bring CMCI online after startup.
+  cmci_start_timeout_seconds: 300
   ipic_port: 4320
   debug_port: 27103
   sys_proclib: "{{ global.sys_proclib }}"

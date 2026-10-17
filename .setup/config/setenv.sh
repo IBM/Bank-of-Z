@@ -16,6 +16,37 @@ set +e
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
 fi
+
+# ``.env`` is a cached rendering of config.yaml.  Child setup scripts source
+# this file again, so preserve explicit lifecycle overrides supplied by the
+# caller before importing the cache.  In particular, a one-shot Db2 run may
+# select a different SSID without editing config.yaml on the target system.
+_BANKZ_CALLER_OVERRIDES=()
+_BANKZ_CALLER_DB2_SSID_SET=false
+_BANKZ_CALLER_DB2_PROVISION_JAVAENV_SET=false
+_BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET=false
+_BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET=false
+_BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET=false
+[[ -n "${DB2_SSID+x}" ]] && _BANKZ_CALLER_DB2_SSID_SET=true
+[[ -n "${DB2_PROVISION_JAVAENV+x}" ]] && _BANKZ_CALLER_DB2_PROVISION_JAVAENV_SET=true
+[[ -n "${DB2_PROVISION_JAVAENVV+x}" ]] && _BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET=true
+[[ -n "${DB2_PROVISION_JVMPROPS+x}" ]] && _BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET=true
+[[ -n "${DB2_PROVISION_SDSNEXIT+x}" ]] && _BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET=true
+for _bankz_var in \
+    CICS_AUTO_REPLY_GO \
+    DB2_PROVISION DB2_REPROVISION DB2_HLQ DB2_SSID DB2_JAVA_FOLDER \
+    DB2_PROVISION_CATALOG DB2_PROVISION_USER_CATALOG DB2_PROVISION_AUTHID DB2_PROVISION_VOLUME \
+    DB2_PROVISION_STORAGE_CLASS DB2_PROVISION_DATA_CLASS \
+    DB2_PROVISION_JAVA_HOME DB2_PROVISION_JAVAENV DB2_PROVISION_JAVAENVV \
+    DB2_PROVISION_JVMPROPS DB2_PROVISION_SDSNEXIT \
+    DB2_PROVISION_START_TIMEOUT_SECONDS; do
+    if [[ -n "${!_bankz_var+x}" ]]; then
+        _BANKZ_CALLER_OVERRIDES+=("$_bankz_var=${!_bankz_var}")
+    fi
+done
+# A profile can clear USER. Resolve it after loading profile settings because
+# config.yaml uses ${USER} for z/OS user defaults.
+export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
@@ -47,11 +78,11 @@ if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${B
 # Global
 _BPXK_AUTOCVT=ON
 PYTHONUNBUFFERED=1
-ZOS_CURRENT_USER="{{ global.zos_current_user }}"
-ZOS_ADMIN_USER="{{ global.zos_admin_user }}"
-ZOS_CA_LABEL="{{ global.zos_ca_label }}"
-ZOS_KEYRING="{{ global.zos_keyring }}"
-ZOS_CREATE_CERTS="{{ global.zos_create_certs }}"
+ZOS_CURRENT_USER="{{ cfg.zos_current_user }}"
+ZOS_ADMIN_USER="{{ cfg.zos_admin_user }}"
+ZOS_CA_LABEL="{{ cfg.zos_ca_label }}"
+ZOS_KEYRING="{{ cfg.zos_keyring }}"
+ZOS_CREATE_CERTS="{{ cfg.zos_create_certs }}"
 
 # Application
 APP_BASE_NAME="{{ app.base_name }}"
@@ -134,6 +165,8 @@ CICS_USS_DIR="${CICS_USS_DIR:-{{ cics.uss_dir }}}"
 CICS_SEC="${CICS_SEC:-{{ cics.cics_sec }}}"
 CICS_SYS_PROCLIB="{{ cics.sys_proclib }}"
 CICS_HOST="${CICS_HOST:-{{ cics.host }}}"
+CICS_AUTO_REPLY_GO="${CICS_AUTO_REPLY_GO:-{{ cics.auto_reply_go }}}"
+CICS_CMCI_START_TIMEOUT_SECONDS="${CICS_CMCI_START_TIMEOUT_SECONDS:-{{ cics.cmci_start_timeout_seconds }}}"
 
 # IMS
 IMS_DISABLED="${IMS_DISABLED:-{{ ims.disabled }}}"
@@ -164,9 +197,23 @@ DEBUG_TCPIP_HQL="{{ debug.tcpip_hlq }}"
 EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 
 # Db2
+DB2_PROVISION_CATALOG="${DB2_PROVISION_CATALOG-{{ db2_provisioning.catalog | default('') }}}"
+DB2_PROVISION="${DB2_PROVISION:-{{ cfg.db2_provision }}}"
+DB2_REPROVISION="${DB2_REPROVISION:-{{ cfg.db2_reprovision }}}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
+DB2_PROVISION_USER_CATALOG="${DB2_PROVISION_USER_CATALOG:-{{ db2_provisioning.user_catalog }}}"
+DB2_PROVISION_AUTHID="${DB2_PROVISION_AUTHID:-{{ db2_provisioning.authid }}}"
+DB2_PROVISION_VOLUME="${DB2_PROVISION_VOLUME:-{{ db2_provisioning.volume }}}"
+DB2_PROVISION_STORAGE_CLASS="${DB2_PROVISION_STORAGE_CLASS:-{{ db2_provisioning.storage_class }}}"
+DB2_PROVISION_DATA_CLASS="${DB2_PROVISION_DATA_CLASS:-{{ db2_provisioning.data_class }}}"
+DB2_PROVISION_JAVA_HOME="${DB2_PROVISION_JAVA_HOME:-{{ db2_provisioning.java_home }}}"
+DB2_PROVISION_JAVAENV="${DB2_PROVISION_JAVAENV:-{{ db2_provisioning.javaenv }}}"
+DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV:-{{ db2_provisioning.javaenvv }}}"
+DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS:-{{ db2_provisioning.jvmprops }}}"
+DB2_PROVISION_SDSNEXIT="${DB2_PROVISION_SDSNEXIT:-{{ db2_provisioning.sdsnexit }}}"
+DB2_PROVISION_START_TIMEOUT_SECONDS="${DB2_PROVISION_START_TIMEOUT_SECONDS:-{{ db2_provisioning.start_timeout_seconds }}}"
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE="{{ zowe.rse_profile }}"
@@ -180,6 +227,39 @@ set -a
 chmod 777 "$ENV_FILE" 2>/dev/null || true
 source "$ENV_FILE"
 set +a
+
+# Read the configured SSID from config.yaml rather than from .env: an explicit
+# caller override can already be cached there while its dependent values still
+# reflect the original configuration.
+_BANKZ_CONFIG_DB2_SSID="$(get_section_value 'cfg' 'db2_ssid')"
+_BANKZ_CONFIG_DB2_SSID_LOWER="$(printf '%s' "$_BANKZ_CONFIG_DB2_SSID" | tr '[:upper:]' '[:lower:]')"
+for _bankz_override in "${_BANKZ_CALLER_OVERRIDES[@]}"; do
+    export "$_bankz_override"
+done
+
+if [[ "$_BANKZ_CALLER_DB2_SSID_SET" == true ]] && [[ "$DB2_SSID" != "$_BANKZ_CONFIG_DB2_SSID" ]]; then
+    _BANKZ_CALLER_DB2_SSID_LOWER="$(printf '%s' "$DB2_SSID" | tr '[:upper:]' '[:lower:]')"
+    if [[ "$_BANKZ_CALLER_DB2_PROVISION_JAVAENV_SET" == false ]]; then
+        DB2_PROVISION_JAVAENV="${DB2_PROVISION_JAVAENV//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
+    fi
+    if [[ "$_BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET" == false ]]; then
+        DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV//$_BANKZ_CONFIG_DB2_SSID_LOWER/$_BANKZ_CALLER_DB2_SSID_LOWER}"
+    fi
+    if [[ "$_BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET" == false ]]; then
+        DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS//$_BANKZ_CONFIG_DB2_SSID_LOWER/$_BANKZ_CALLER_DB2_SSID_LOWER}"
+    fi
+    if [[ "$_BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET" == false ]]; then
+        DB2_PROVISION_SDSNEXIT="${DB2_PROVISION_SDSNEXIT//$_BANKZ_CONFIG_DB2_SSID/$DB2_SSID}"
+    fi
+fi
+
+unset _BANKZ_CALLER_OVERRIDES _BANKZ_CALLER_DB2_SSID_SET \
+    _BANKZ_CALLER_DB2_PROVISION_JAVAENV_SET \
+    _BANKZ_CALLER_DB2_PROVISION_JAVAENVV_SET \
+    _BANKZ_CALLER_DB2_PROVISION_JVMPROPS_SET \
+    _BANKZ_CALLER_DB2_PROVISION_SDSNEXIT_SET \
+    _BANKZ_CONFIG_DB2_SSID _BANKZ_CONFIG_DB2_SSID_LOWER \
+    _BANKZ_CALLER_DB2_SSID_LOWER _bankz_override _bankz_var
 
 # List of variables to check
 VARS_TO_CHECK=(

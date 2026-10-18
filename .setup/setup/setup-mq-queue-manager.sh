@@ -84,7 +84,7 @@ deactivate
 # so APF authorise it here.
 DSINFO=$(dls -l "${MQ_INSTALL_HLQ}".SCSQLOAD)
 DSVOL=$(awk '{print $NF}' <<< "$DSINFO")
-opercmd "SETPROG APF,ADD,DSNAME=${MQ_INSTALL_HLQ},VOLUME=$DSVOL"
+opercmd "SETPROG APF,ADD,DSNAME=${MQ_INSTALL_HLQ}.SCSQLOAD,VOLUME=$DSVOL"
 
 # =========================
 # Stage 2: Start MQ queue manager

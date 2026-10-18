@@ -239,7 +239,7 @@ stop_mq() {
         print_info "${MQ_QMGR_NAME} is not active - skipping"
     fi
 
-    print_success "queue manager stopped"
+    print_success "Queue manager stopped"
     set -e
 }
 

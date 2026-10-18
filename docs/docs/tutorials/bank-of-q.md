@@ -28,7 +28,7 @@ Log in to USS and make sure that your STEPLIB contains MQ's SCSQAUTH data set, a
 export MQINSTALL=/usr/local/sandboxes/tools/mq/java/lib
 export STEPLIB=MQCD94.SCSQAUTH:$STEPLIB
 export LIBPATH=$MQINSTALL:$LIBPATH
-export CLASSPATH=$MQINSTALL/jakarta.jms-api.jar:$MQINSTALL/com.ibm.mq.jakarta.client.jar:$BANK_OF_Z_WORK_DIR/boz-mq-1.0.0-SNAPSHOT.jar
+export CLASSPATH=$MQINSTALL/jakarta.jms-api.jar:$MQINSTALL/com.ibm.mq.jakarta.client.jar:$BANK_OF_Z_WORK_DIR/jars/boq-1.0.0-SNAPSHOT.jar
 ```
 
 ## Part 2: Transfer money from Bank of Q to Bank of Z

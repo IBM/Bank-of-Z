@@ -5,13 +5,29 @@
  */
 
 /* Carbon Design System Customizations */
-/* Using Carbon's default white (light) theme */
 
-/* Button customizations */
-cds-button[kind="ghost"] {
-    width: 100%;
-    text-align: left;
-    justify-content: flex-start;
+/* Keep web components from collapsing before the CDN modules have loaded */
+cds-text-input,
+cds-select,
+cds-number-input {
+    display: block;
+}
+
+cds-header-name {
+    white-space: nowrap;
+}
+
+cds-tag {
+    margin: 0;
+}
+
+/* Buttons: pointer cursor, not-allowed when disabled */
+cds-button {
+    cursor: pointer;
+}
+
+cds-button[disabled] {
+    cursor: not-allowed;
 }
 
 /* Made with Bob */

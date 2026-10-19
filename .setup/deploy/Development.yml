@@ -110,5 +110,9 @@ include_global_config:
 
 
 
+# IMS dataset references - required by types_pattern_mapping.yml for IMSLOAD/PSBLOAD/DBDLOAD type resolution
+ims_hlq: "{{ extra_vars.ims_hlq if extra_vars.ims_hlq is defined else app.app_hlq }}"
+ims_datastore: "{{ extra_vars.ims_datastore if extra_vars.ims_datastore is defined else ims.datastore }}"
+
 # Sandbox path - used by frontend_root to locate the sandbox base directory
 sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined else '/usr/local/sandboxes/bank-of-z' }}"

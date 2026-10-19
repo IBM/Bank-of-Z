@@ -4,102 +4,170 @@
  *
  */
 
-/* Landing Page Styles */
-.layer {
-    background:var(--cds-layer-background);
+/* ------------------------------------------------------------------
+ * Page shell - identical on every page so breadcrumbs, titles and
+ * content always line up on the same left edge.
+ * ------------------------------------------------------------------ */
+.page {
+    padding-top: 3rem; /* fixed header height */
+    min-height: 100vh;
 }
 
-cds-layer {
-    background:var(--cds-layer-background);
+.page-inner {
+    max-width: var(--bz-max);
+    margin: 0 auto;
+    padding-left: var(--bz-pad);
+    padding-right: var(--bz-pad);
 }
 
-.cbsa-form-grid > div {
-    row-gap: 1rem;
+.page-banner {
+    background: var(--bz-surface);
+    border-bottom: 1px solid var(--bz-border);
 }
 
-.landing-page {
-    margin-top: 4rem;
+.page-banner .page-inner {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
 }
 
-.landing-page__banner {
-    padding-left: 1.5rem;
-}
-
-.landing-page__heading {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-}
-
-.landing-page__heading > h1 {
-    font-size: 2rem;
-    font-weight: 400;
-    line-height: 1.2;
-}
-
-.landing-page__subheading {
-    font-size: 1.75rem;
-    font-weight: 400;
-}
-
-.landing-page__p {
-    font-size: 1rem;
-    line-height: 1.5;
-    margin: 1rem 0;
-}
-
-.page-image {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-    object-fit: cover;
-}
-
-/* Tabs */
-.tabs-group {
-    border-bottom: 1px solid var(--cds-border-subtle);
-	background-color: var(--cds-layer-01);
-}
-
-.tabs-group-content {
-    padding: 2rem 0;
-}
-
-/* Responsive Control Panel */
-@media (max-width: 1055px) {
-    .control-panel-parent {
-        flex-direction: column;
-    }
-}
-
-/* Customer/Account Forms */
-.customer-form,
-.account-form {
-    background-color: var(--cds-layer);
-    padding: 2rem;
-    border-radius: 4px;
-}
-
-/* Form Width Constraint */
-.form-constrained {
-    max-width: 600px;
+.page-banner cds-breadcrumb {
     display: block;
 }
 
-/* Error Page */
-.error-page {
-    text-align: center;
-    padding: 4rem 2rem;
+.page-title {
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.25;
+    margin: 1rem 0 0;
 }
 
-.error-page h1 {
-    font-size: 3rem;
-    color: var(--cds-danger);
-    margin-bottom: 1rem;
+.page-subtitle {
+    color: var(--bz-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
 }
 
-.error-page p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
+.page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.page-content .page-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+#notification-container:empty {
+    display: none;
+}
+
+#notification-container cds-inline-notification {
+    max-width: none;
+    width: 100%;
+}
+
+/* ------------------------------------------------------------------
+ * Layout helpers
+ * ------------------------------------------------------------------ */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 1055px) {
+    .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 671px) {
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :root {
+        --bz-pad: 1rem;
+    }
+}
+
+/* ------------------------------------------------------------------
+ * Home
+ * ------------------------------------------------------------------ */
+.home-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-card__step {
+    color: var(--bz-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.32px;
+    margin-bottom: 0.75rem;
+}
+
+.home-card cds-button {
+    margin-top: 1.25rem;
+    align-self: flex-start;
+}
+
+.flow-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.flow-list li {
+    border-top: 3px solid var(--cds-link-primary, #0f62fe);
+    padding-top: 0.75rem;
+}
+
+.flow-list strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.flow-list span {
+    color: var(--bz-muted);
+    font-size: 0.875rem;
+    line-height: 1.43;
+}
+
+/* ------------------------------------------------------------------
+ * Transfer
+ * ------------------------------------------------------------------ */
+.destination-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.transfer-result {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 671px) {
+    .transfer-result {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 /* Made with Bob */

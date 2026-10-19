@@ -13,7 +13,7 @@
  */
 export function formatDate(dateString) {
     if (!dateString) return '';
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = String(dateString).substring(0, 10).split('-');
     return `${day}/${month}/${year}`;
 }
 
@@ -43,12 +43,15 @@ export function escapeHtml(value) {
 /**
  * Format currency
  */
-export function formatCurrency(amount, currency = 'USD') {
-    const locale = currency === 'USD' ? 'en-US' : 'en-GB';
+export function formatCurrency(amount, currency) {
+    const value = Number(amount);
+    if (amount === null || amount === undefined || amount === '' || Number.isNaN(value)) return 'N/A';
+    const code = currency || 'GBP';
+    const locale = code === 'USD' ? 'en-US' : 'en-GB';
     return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: currency
-    }).format(amount);
+        currency: code
+    }).format(value);
 }
 
 /**
@@ -150,7 +153,7 @@ export function showLoadingModal(message = 'Loading...') {
     modal.setAttribute('prevent-close', '');
     modal.innerHTML = `
         <cds-modal-header>
-            <cds-modal-heading>${message}</cds-modal-heading>
+            <cds-modal-heading>${escapeHtml(message)}</cds-modal-heading>
         </cds-modal-header>
     `;
     document.body.appendChild(modal);
@@ -176,10 +179,10 @@ export function showSuccessModal(title, message, onClose) {
     modal.setAttribute('open', '');
     modal.innerHTML = `
         <cds-modal-header>
-            <cds-modal-heading>${title}</cds-modal-heading>
+            <cds-modal-heading>${escapeHtml(title)}</cds-modal-heading>
         </cds-modal-header>
         <cds-modal-body>
-            <p>${message}</p>
+            <p>${escapeHtml(message)}</p>
         </cds-modal-body>
         <cds-modal-footer>
             <cds-modal-footer-button kind="primary" data-modal-close>OK</cds-modal-footer-button>
@@ -205,10 +208,10 @@ export function showErrorModal(title, message) {
     modal.setAttribute('danger', '');
     modal.innerHTML = `
         <cds-modal-header>
-            <cds-modal-heading>${title}</cds-modal-heading>
+            <cds-modal-heading>${escapeHtml(title)}</cds-modal-heading>
         </cds-modal-header>
         <cds-modal-body>
-            <p>${message}</p>
+            <p>${escapeHtml(message)}</p>
         </cds-modal-body>
         <cds-modal-footer>
             <cds-modal-footer-button kind="primary" data-modal-close>OK</cds-modal-footer-button>
@@ -221,6 +224,50 @@ export function showErrorModal(title, message) {
     
     document.body.appendChild(modal);
     return modal;
+}
+
+/**
+ * Show a confirmation modal. Resolves true if the user confirms, false otherwise.
+ * @param {string} title - Modal heading
+ * @param {string} message - Body text
+ * @param {Object} [options]
+ * @param {string} [options.confirmLabel] - Label of the confirm button
+ * @param {boolean} [options.danger] - Style as a destructive action
+ * @returns {Promise<boolean>}
+ */
+export function showConfirmModal(title, message, { confirmLabel = 'Confirm', danger = false } = {}) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('cds-modal');
+        modal.id = 'confirm-modal';
+        modal.setAttribute('open', '');
+        if (danger) modal.setAttribute('danger', '');
+        modal.innerHTML = `
+            <cds-modal-header>
+                <cds-modal-heading>${escapeHtml(title)}</cds-modal-heading>
+            </cds-modal-header>
+            <cds-modal-body>
+                <p>${escapeHtml(message)}</p>
+            </cds-modal-body>
+            <cds-modal-footer>
+                <cds-modal-footer-button kind="secondary" data-modal-close>Cancel</cds-modal-footer-button>
+                <cds-modal-footer-button kind="${danger ? 'danger' : 'primary'}" id="confirm-modal-ok">${escapeHtml(confirmLabel)}</cds-modal-footer-button>
+            </cds-modal-footer>
+        `;
+
+        let confirmed = false;
+        modal.querySelector('#confirm-modal-ok').addEventListener('click', () => {
+            confirmed = true;
+            modal.removeAttribute('open');
+            modal.remove();
+            resolve(true);
+        });
+        modal.addEventListener('cds-modal-closed', () => {
+            modal.remove();
+            if (!confirmed) resolve(false);
+        });
+
+        document.body.appendChild(modal);
+    });
 }
 
 /**

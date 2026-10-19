@@ -25,10 +25,11 @@ By completing this tutorial, you learn how to run the Bank of Q Java code.
 Log in to USS and make sure that your STEPLIB contains MQ's SCSQAUTH data set, and that MQ's USS native libraries are in your LIBPATH. Additionally ensure the CLASSPATH contains the jar files for MQ's JMS implementation, and the Bank of Q.
 
 ```bash
-export MQINSTALL=/usr/local/sandboxes/tools/mq/java/lib
+export SANDBOX_DIR=/usr/local/sandboxes
+export MQINSTALL=$SANDBOX_DIR/tools/mq/java/lib
 export STEPLIB=MQCD94.SCSQAUTH:$STEPLIB
 export LIBPATH=$MQINSTALL:$LIBPATH
-export CLASSPATH=$MQINSTALL/jakarta.jms-api.jar:$MQINSTALL/com.ibm.mq.jakarta.client.jar:$BANK_OF_Z_WORK_DIR/jars/boq-1.0.0-SNAPSHOT.jar
+export CLASSPATH=$MQINSTALL/jakarta.jms-api.jar:$MQINSTALL/com.ibm.mq.jakarta.client.jar:$SANDBOX_DIR/bank-of-z/jars/boq-1.0.0-SNAPSHOT.jar
 ```
 
 ## Part 2: Transfer money from Bank of Q to Bank of Z

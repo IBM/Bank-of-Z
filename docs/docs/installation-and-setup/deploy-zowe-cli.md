@@ -58,7 +58,7 @@ The script runs the following stages:
 2. Clones your current branch from GitHub to z/OS USS.
 3. Invokes `setup-remote.sh` on USS, which runs the following stages:
    - `validate-prereqs` — Verifies that all required tools are installed on USS.
-   - `environment` — Provisions Db2, CICS, IMS, z/OS Connect, and the frontend server.
+   - `environment` — Provisions Db2, CICS, IMS, MQ, z/OS Connect, and the frontend server.
    - `install-bank-of-z` — Builds the application, deploys the generated artifacts by using Wazi Deploy, and populates the Db2 and IMS databases with sample data.
 
 The initial deployment typically takes 15 to 20 minutes. Logs are written to `/tmp/remote-setup.log` on your local machine.

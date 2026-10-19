@@ -9,6 +9,8 @@ Bank of Z uses a hybrid architecture that combines modern web technologies with 
 
 Requests are submitted through a browser-based user interface and routed through z/OS Connect to the appropriate transaction-processing environment, where business functions run in either CICS or IMS TM while sharing common data and application services.
 
+Inter-bank transfer requests are submitted by sending messages to MQ which get forwarded to CICS or IMS via the MQ-CICS or MQ-IMS bridge.
+
 This architecture demonstrates how modern interfaces, APIs, transaction-processing systems, databases, and messaging technologies can work together within an IBM Z environment.
 
 ![Architecture Diagram](../about-bank-of-z/images/architecture-diagram.png)

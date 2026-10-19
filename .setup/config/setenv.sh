@@ -136,7 +136,6 @@ CICS_SYS_PROCLIB="{{ cics.sys_proclib }}"
 CICS_HOST="${CICS_HOST:-{{ cics.host }}}"
 
 # IMS
-IMS_DISABLED="${IMS_DISABLED:-{{ ims.disabled }}}"
 IMS_APP_HLQ="${IMS_APP_HLQ:-{{ ims.ims_hlq }}}"
 IMS_SYS_HLQ="${IMS_SYS_HLQ:-{{ ims.ims_sys_hlq }}}"
 IMS_HOST="${IMS_HOST:-{{ ims.host }}}"

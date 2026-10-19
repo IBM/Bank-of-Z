@@ -163,10 +163,10 @@ print_info "Starting wazideploy-deploy for BankZ"
 
 CICS_CREDS=""
 if [ -n "${CICS_USER:-}" ]; then
-    CICS_CREDS="$CICS_CREDS -e default_cics_user=$CICS_USER"
+    CICS_CREDS="$CICS_CREDS -e default_cics_user=$CICS_USER" #pragma: allowlist secret
 fi
-if [ -n "${CICS_PASSWORD:-}" ]; then
-    CICS_CREDS="$CICS_CREDS -e default_cics_password=$CICS_PASSWORD"
+if [ -n "${CICS_PASSWORD:-}" ]; then #pragma: allowlist secret
+    CICS_CREDS="$CICS_CREDS -e default_cics_password=$CICS_PASSWORD" #pragma: allowlist secret
 fi
 
 # Resolve environment varaiables in config file.
@@ -190,11 +190,9 @@ CMD="wazideploy-deploy \
  -e sandbox_path=$SANDBOX_DIR \
  $CICS_CREDS \
  --packageInputFile $PACKAGE_URL \
- --evidencesFileName ${EVIDENCE_FOLDER}/evidence-bankz.yaml $@"
-
-if [[ "$IMS_DISABLED" == "true" ]]; then
- CMD="$CMD -pst ims"
-fi
+ --evidencesFileName ${EVIDENCE_FOLDER}/evidence-bankz.yaml \
+ -pst ims \
+ $@"
 
 rm -f message.log
 

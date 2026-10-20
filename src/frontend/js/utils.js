@@ -71,11 +71,11 @@ export function parseCustomerId(input) {
         }
     }
     
-    // Check for I prefix (IMS)
+    // Check for I prefix (IMS) - up to 9 digits, zero-padded to 9 (I123 -> I000000123)
     if (trimmed.startsWith('I')) {
         const digits = trimmed.substring(1);
-        if (/^\d{9}$/.test(digits)) { // IMS requires exactly 9 digits
-            return { system: 'IMS', customerId: digits };
+        if (/^\d{1,9}$/.test(digits)) {
+            return { system: 'IMS', customerId: digits.padStart(9, '0') };
         }
     }
     
@@ -127,11 +127,11 @@ export function validateCustomerId(input) {
         };
     }
     
-    // IMS requires exactly 9 digits
-    if (prefix === 'I' && digits.length !== 9) {
-        return { 
-            valid: false, 
-            error: 'IMS customer ID must have exactly 9 digits after I prefix (e.g., I000000015)', 
+    // IMS allows at most 9 digits (shorter IDs are zero-padded)
+    if (prefix === 'I' && digits.length > 9) {
+        return {
+            valid: false,
+            error: 'IMS customer ID must have at most 9 digits after I prefix (e.g., I123 or I000000123)',
             system: null 
         };
     }

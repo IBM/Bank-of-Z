@@ -9,10 +9,11 @@ vars:
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   db2_hlq: "DB2V13"
-  eqaw_hlq: "EQAW.SEQAMOD"
+  debug_hlq: "EQAW"
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
   db2_ssid: "DBD1"
+  mq_qmgr_name: "MQ21"
   mq_install_hlq: "MQCD94"
   proclib: "SYS1.PROCLIB"
   cics_ipic_port: 4320

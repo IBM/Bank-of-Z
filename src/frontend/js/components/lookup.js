@@ -15,7 +15,7 @@ import { validateCustomerId, parseCustomerId, formatCustomerId, escapeHtml, pars
  */
 
 export const CUSTOMER_ID_PLACEHOLDER = 'e.g. C0000000042';
-export const CUSTOMER_ID_HELP = 'Start with C for a CICS customer or I for an IMS customer.';
+export const CUSTOMER_ID_HELP = 'Start with C for a CICS customer or I for an IMS customer (e.g. C123 or I123).';
 
 /**
  * Parse and validate a typed customer ID.

@@ -169,6 +169,7 @@ DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
 
 # MQ
+MQ_DISABLED="${MQ_DISABLED:-{{ mq.disabled }}}"
 MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
 MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
 MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')

@@ -87,8 +87,9 @@ global:
   - "CICSUSER"
 
   # MQ
+  mq_disabled: "true"
   mq_qmgr_name: "MQ21"
-  mq_install_hlq: "MQCD94"
+  mq_install_hlq: "CSQ.V9R4M0"
   mq_qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
   mq_cpf: "!{{ mq.qmgr_name }}"
   mq_proclib: "SYS1.PROCLIB"
@@ -318,6 +319,7 @@ db2:
 
 # MQ configuration
 mq:
+  disabled: "{{ global.mq_disabled }}"
   qmgr_name: "{{ global.mq_qmgr_name }}"
   install_hlq: "{{ global.mq_install_hlq }}"
   qmgr_hlq: "{{ global.mq_qmgr_hlq }}"

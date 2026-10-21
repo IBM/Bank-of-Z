@@ -62,7 +62,7 @@ if [[ -z "$ca_label" ]]; then
 fi
 
 # Step 1: Create the keyring and connect VSICA as the trust anchor.
-run_tso "RACDCERT ID($userid) ADDRING($ring)"
+run_tso "RACDCERT ID($userid) ADDRING($ring)" || true
 run_tso "RACDCERT ID($userid) CONNECT(CERTAUTH LABEL('$ca_label') RING($ring) USAGE(CERTAUTH))"
 rc=$?
 # Only DIGTRING changed - CONNECT modifies ring membership, not the cert itself

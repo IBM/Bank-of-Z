@@ -81,6 +81,9 @@ ZOAU_HOME="${ZOAU_HOME:-{{ zoau.zoau_home }}}"
 ZBUILDER_SOURCE="{{ zbuilder.source_dir }}"
 ZBUILDER_TARGET="{{ zbuilder.target_dir }}"
 
+# Gradle
+GRADLE_HOME="{{ dbb.gradle_home }}"
+
 # DBB
 DBB_HOME="{{ dbb.dbb_home }}"
 DBB_BUILD="{{ dbb.dbb_build }}"

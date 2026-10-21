@@ -113,7 +113,7 @@ If you are not using the `IBMUSER` user ID, grant your user ID permission to cre
 Run the following command as an administrator, replacing `MYUSER` with your user ID:
 
 ```bash
-.setup/setup/grant-perm-user.sh MYUSER
+.setup/setup/grant-perm-user.sh MYUSER MYPASSWORD
 ```
 
 ## Set the IMS and CICS credentials

@@ -108,6 +108,7 @@ zconfig apply -e ims_user="${IMS_USER}" \
               -e db2_java_dir="${DB2_JAVA_FOLDER}" \
               -e ims_java_dir="${IMS_JAVA_FOLDER}" \
               -e ims_java_home="${IMS_JAVA_HOME}" \
+              -e ims_java_conf_path="${IMS_JAVA_CONF_PATH}" \
               -e db2_ssid="${DB2_SSID}" \
               -e debug_hlq="${DEBUG_HLQ}" \
               -e debug_stc_user="${DEBUG_STC_USER}" \

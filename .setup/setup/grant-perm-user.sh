@@ -4,7 +4,7 @@ set -e
 # Script  : grant-perm-user.sh
 # Summary : Grants DB2 and RACF keyring access rights for a given user.
 #
-# Usage   : grant-perm-user.sh <MYUSER>
+# Usage   : grant-perm-user.sh <MYUSER> <MYPASSWORD>
 #
 # Runs on the remote z/OS USS system after the workspace has been cloned.
 # Requires RACF SPECIAL authority - run as IBMUSER or equivalent admin.

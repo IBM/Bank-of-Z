@@ -1,419 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Credit / Debit Funds - Bank of Z</title>
-
-    <!-- Carbon Design System Styles -->
+    <title>Credit / debit - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
-
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
 
-    <!-- Main Content -->
-    <cds-layer class="cds--white landing-page">
-        <!-- Banner -->
-        <cds-layer class="layer landing-page__banner">
-            <div class="landing-page__heading">
-                <cds-breadcrumb>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                       <cds-breadcrumb-link href="account-deposit.html">Credit / Debit Funds</cds-breadcrumb-link>
-                   </cds-breadcrumb-item>
-               </cds-breadcrumb>
-               <h1>Credit / Debit Funds</h1>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+                <div id="content"></div>
             </div>
-        </cds-layer>
+        </section>
+    </main>
 
-        <div class="cds--content">
-            <!-- Error/Notification Container -->
-            <div id="notification-container"></div>
-            
-            <cds-stack gap="7">
-                <!-- Search Section -->
-                <cds-grid>
-                    <cds-column lg="16" md="8" sm="4">
-                        <cds-stack gap="7">
-                    <cds-form-item>
-                        <cds-text-input
-                            id="customerId"
-                            label="Customer ID"
-                            placeholder="C1234 or I000000015"
-                            helper-text="Enter Customer ID with prefix: C for CICS, I for IMS (e.g., C1234 or I000000015)">
-                        </cds-text-input>
-                    </cds-form-item>
-                            <cds-button id="search-accounts-btn">Search Accounts</cds-button>
-                        </cds-stack>
-                    </cds-column>
-                </cds-grid>
-                
-                <!-- Account Selection Section -->
-                <cds-layer class="layer" id="account-selection-section" style="display: none;">
-                    <h3>Select Account for Deposit</h3>
-                    <p>Click on an account to proceed with deposit:</p>
-                    <div id="accounts-table"></div>
-                </cds-layer>
-                
-                <!-- Credit / Debit Form Section -->
-                <cds-layer class="layer" id="deposit-form-section" style="display: none;">
-                    <h3>Credit / Debit Account</h3>
-                <cds-form id="deposit-form" class="form-constrained">
-                    <cds-stack gap="7">
-                        <cds-form-item>
-                            <cds-text-input id="selectedAccountId" label="Account ID" readonly>
-                            </cds-text-input>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-text-input id="selectedAccountType" label="Account Type" readonly>
-                            </cds-text-input>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-select id="transactionSign" label="Transaction Type">
-                                <cds-select-item value="credit">Credit (+) — add funds</cds-select-item>
-                                <cds-select-item value="debit">Debit (−) — remove funds</cds-select-item>
-                            </cds-select>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-text-input id="amount" label="Amount"
-                                placeholder="e.g. 100.00"
-                                helper-text="Enter the amount (must be greater than 0)">
-                            </cds-text-input>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-text-input id="sortCode" label="Sort Code"
-                                placeholder="987654" required
-                                helper-text="Bank sort code (defaults to 987654 for this system)">
-                            </cds-text-input>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-text-input id="description" label="Description"
-                                placeholder="Optional description"
-                                helper-text="Add a note about this deposit (optional)">
-                            </cds-text-input>
-                        </cds-form-item>
-
-                        <cds-button id="submit-btn" type="submit">Submit</cds-button>
-                        <cds-button id="back-btn" kind="secondary">Back to Account Selection</cds-button>
-                    </cds-stack>
-                </cds-form>
-                </cds-layer>
-            </cds-stack>
-        </div>
-    </cds-layer>
-
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/number-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/loading.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/notification.min.js"></script>
-
-    <!-- Page Script -->
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, validateCustomerId, parseCustomerId } from './js/utils.js';
-        import { config } from './config.js';
+        import { mountPage, notify, clearNotification, errorMessage } from './js/components/layout.js';
+        import {
+            readContext, customerLookupHtml, bindCustomerLookup, fetchCustomerAccounts,
+            loadAccountContext, urls, systemTagHtml
+        } from './js/components/lookup.js';
+        import { showLoadingModal, hideLoadingModal, formatCurrency, escapeHtml } from './js/utils.js';
 
-        let selectedAccount = null;
-        let selectedCustomerId = null;
-        let selectedSystem = null;
+        const content = document.getElementById('content');
+        const { accountId, customer } = readContext();
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
+        let account = null;
+        let system = 'CICS';
+        let customerRef = null;
+        let customerNumber = null;
 
-            // Set default sort code
-            document.getElementById('sortCode').value = config.defaults.sortCode;
-
-            // Handle search accounts
-            document.getElementById('search-accounts-btn').addEventListener('click', searchCustomerAccounts);
-            document.getElementById('customerId').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchCustomerAccounts();
-                }
-            });
-
-            // Handle form submission
-            document.getElementById('submit-btn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await handleDeposit();
-            });
-
-            // Handle back button
-            document.getElementById('back-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('deposit-form-section').style.display = 'none';
-                document.getElementById('account-selection-section').style.display = 'block';
-            });
-        });
-
-        function displayNotification(kind, title, message) {
-            const container = document.getElementById('notification-container');
-            container.innerHTML = `
-                <cds-inline-notification kind="${kind}" title="${title}" subtitle="${message}" hide-close-button></cds-inline-notification>
-                <br />
-            `;
-            // Scroll to top to ensure notification is visible
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        function clearNotification() {
-            const container = document.getElementById('notification-container');
-            container.innerHTML = '';
+        if (customer && !customer.ok) {
+            showLookup();
+            notify('error', 'Invalid customer ID', customer.error);
+        } else if (accountId) {
+            loadAccount();
+        } else if (customer) {
+            loadAccountPicker(customer);
+        } else {
+            showLookup();
         }
 
-        async function searchCustomerAccounts() {
-            const customerIdInput = document.getElementById('customerId').value.trim();
-            
-            // Clear any previous notifications
-            clearNotification();
-            
-            if (!customerIdInput) {
-                displayNotification('error', 'Validation Error', 'Please enter a Customer ID');
-                return;
-            }
+        /* ---------- no customer: ask for one ---------- */
+        function showLookup() {
+            mountPage({ crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Credit / debit' }], title: 'Credit or debit an account' });
+            content.innerHTML = `
+                <div class="card" style="max-width: 640px;">
+                    <h2 class="card__title">Which customer?</h2>
+                    <p class="card__intro">Enter the customer ID, then choose one of their accounts.</p>
+                    ${customerLookupHtml({ buttonLabel: 'Continue' })}
+                </div>`;
+            bindCustomerLookup({ onFound: (r) => { window.location.href = urls.deposit(null, r.ref); } });
+        }
 
-            // Validate Customer ID
-            const validation = validateCustomerId(customerIdInput);
-            if (!validation.valid) {
-                displayNotification('error', 'Validation Error', validation.error);
-                return;
-            }
-            
-            // Parse to get numeric ID and system
-            const parsed = parseCustomerId(customerIdInput);
-            const customerId = parsed.customerId;
-            const system = parsed.system;
-
-            showLoadingModal(`Searching for ${system} customer accounts...`);
-
+        /* ---------- customer only: pick an account ---------- */
+        async function loadAccountPicker(ref) {
+            mountPage({
+                crumbs: [{ label: 'Home', href: 'admin.html' }, { label: ref.ref, href: urls.customer(ref.ref) }, { label: 'Credit / debit' }],
+                title: 'Credit or debit an account',
+                subtitle: `Choose an account for customer ${ref.ref}`
+            });
+            content.innerHTML = '<cds-loading></cds-loading>';
             try {
-                const response = await api.customers.getCustomerAccounts(customerId, system);
-                const accounts = response.accounts || [];
-                
-                hideLoadingModal();
-                
-                if (accounts.length === 0) {
-                    displayNotification('error', 'No Results', 'No accounts found for this customer');
-                    document.getElementById('account-selection-section').style.display = 'none';
-                    document.getElementById('deposit-form-section').style.display = 'none';
-                } else {
-                    // Store the FULL customer ID with prefix (e.g., "C1234" or "I000000015")
-                    // so the API routing logic can determine the correct endpoint
-                    selectedCustomerId = customerIdInput;
-                    selectedSystem = system;
-                    displayAccountsList(accounts);
+                const accounts = await fetchCustomerAccounts(ref);
+                if (!accounts.length) {
+                    content.innerHTML = `<div class="card"><div class="empty">This customer has no accounts.</div></div>`;
+                    return;
                 }
+                const rows = accounts.map((a) => `
+                    <tr>
+                        <td>${escapeHtml(a.accountNumber || a.accountId)}</td>
+                        <td>${escapeHtml(a.accountType || 'N/A')}</td>
+                        <td class="num">${formatCurrency(a.availableBalance, a.currency)}</td>
+                        <td><a href="${urls.deposit(a.accountId, ref.ref)}">Select</a></td>
+                    </tr>`).join('');
+                content.innerHTML = `
+                    <div class="card"><div class="table-wrap"><table class="bz-table">
+                        <thead><tr><th>Account number</th><th>Type</th><th class="num">Available</th><th></th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table></div></div>`;
             } catch (error) {
-                hideLoadingModal();
-                displayNotification('error', 'Error', 'Customer not found or error loading accounts');
-                document.getElementById('account-selection-section').style.display = 'none';
-                document.getElementById('deposit-form-section').style.display = 'none';
+                content.innerHTML = '';
+                notify('error', 'Could not load accounts', errorMessage(error, 'Customer not found or error loading accounts'));
             }
         }
 
-        function displayAccountsList(accounts) {
-            document.getElementById('account-selection-section').style.display = 'block';
-            document.getElementById('deposit-form-section').style.display = 'none';
-            
-            let tableRows = '';
-            accounts.forEach((account, index) => {
-                const accountNumber = account.accountNumber || account.accountId || 'N/A';
-                tableRows += `
-                    <tr class="account-row" data-account-index="${index}" style="cursor: pointer;">
-                        <td>${account.accountId || 'N/A'}</td>
-                        <td>${accountNumber}</td>
-                        <td>${account.accountType || 'N/A'}</td>
-                        <td>${account.currency || 'N/A'}</td>
-                        <td>${account.status || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-            
-            document.getElementById('accounts-table').innerHTML = `
-                <table class="cds--data-table cds--data-table--zebra">
-                    <thead>
-                        <tr>
-                            <th>Account ID</th>
-                            <th>Account Number</th>
-                            <th>Account Type</th>
-                            <th>Currency</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-            `;
-            
-            // Add click handlers to rows
-            const rows = document.querySelectorAll('.account-row');
-            rows.forEach(row => {
-                row.addEventListener('click', () => {
-                    const index = parseInt(row.getAttribute('data-account-index'));
-                    selectedAccount = accounts[index];
-                    showDepositForm();
-                });
-            });
-        }
-
-        function showDepositForm() {
-            document.getElementById('account-selection-section').style.display = 'none';
-            document.getElementById('deposit-form-section').style.display = 'block';
-            
-            // Populate account info
-            document.getElementById('selectedAccountId').value = selectedAccount.accountId || '';
-            document.getElementById('selectedAccountType').value = selectedAccount.accountType || '';
-            
-            // Clear previous deposit values
-            document.getElementById('amount').value = '';
-            document.getElementById('description').value = '';
-            
-            // Scroll to form
-            window.scrollTo({ top: document.getElementById('deposit-form-section').offsetTop - 100, behavior: 'smooth' });
-        }
-
-        async function handleDeposit() {
-            if (!selectedAccount) {
-                displayNotification('error', 'Error', 'No account selected');
-                return;
-            }
-
-            const accountId = selectedAccount.accountId;
-            const amount = parseFloat(document.getElementById('amount').value.trim());
-            const sortCode = document.getElementById('sortCode').value.trim();
-            const description = document.getElementById('description').value.trim();
-
-            // Clear any previous notifications
-            clearNotification();
-
-            // Validation
-
-            if (!amount || amount <= 0) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid amount greater than 0');
-                return;
-            }
-
-            if (!sortCode || !/^\d{6}$/.test(sortCode)) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit sort code');
-                return;
-            }
-
-            // Apply sign — debit sends a negative amount to DBCRFUN
-            const sign = document.getElementById('transactionSign').value;
-            const signedAmount = sign === 'debit' ? -Math.abs(amount) : Math.abs(amount);
-            const transactionLabel = sign === 'debit' ? 'debit' : 'deposit';
-
-            // Prepare deposit data
-            const depositData = {
-                amount: signedAmount,
-                sortCode: sortCode,
-                description: description || (sign === 'debit' ? 'Debit via web interface' : 'Credit via web interface')
-            };
-
-            showLoadingModal(`Processing ${transactionLabel}...`);
-
+        /* ---------- account chosen: the form ---------- */
+        async function loadAccount() {
+            mountPage({ crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Credit / debit' }], title: 'Credit or debit an account' });
+            content.innerHTML = '<cds-loading></cds-loading>';
             try {
-                const result = await api.accounts.depositToAccount(accountId, depositData, selectedCustomerId);
+                const ctx = await loadAccountContext(accountId, customer);
+                account = ctx.account;
+                system = ctx.system;
+                customerRef = ctx.ref;
+                customerNumber = ctx.customerNumber;
+            } catch (error) {
+                content.innerHTML = '';
+                notify('error', 'Account not found', errorMessage(error, `Could not load account ${accountId}`));
+                return;
+            }
+
+            const number = account.accountNumber || account.accountId;
+            mountPage({
+                crumbs: [
+                    { label: 'Home', href: 'admin.html' },
+                    ...(customerRef ? [{ label: customerRef, href: urls.customer(customerRef) }] : []),
+                    { label: `Account ${number}`, href: urls.account(account.accountId, customerRef) },
+                    { label: 'Credit / debit' }
+                ],
+                title: 'Credit or debit',
+                subtitle: `Account ${number}${customerRef ? ` for customer ${customerRef}` : ''}`
+            });
+            renderForm();
+        }
+
+        function renderForm() {
+            const a = account;
+            content.innerHTML = `
+                <div class="stat-row">
+                    <div class="stat"><div class="stat__label">Account</div><div class="stat__value">${escapeHtml(a.accountNumber || a.accountId)}</div></div>
+                    <div class="stat"><div class="stat__label">Type</div><div class="stat__value">${escapeHtml(a.accountType || 'N/A')}</div></div>
+                    <div class="stat"><div class="stat__label">Available balance</div><div class="stat__value" id="balance">${formatCurrency(a.availableBalance, a.currency)}</div></div>
+                </div>
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">Transaction</h2>${systemTagHtml(system)}</div>
+                    <div class="form-grid">
+                        <cds-select id="sign" label-text="Type">
+                            <cds-select-item value="credit">Credit: add funds</cds-select-item>
+                            <cds-select-item value="debit">Debit: remove funds</cds-select-item>
+                        </cds-select>
+                        <cds-text-input id="amount" label="Amount" placeholder="e.g. 100.00" helper-text="Must be greater than 0"></cds-text-input>
+                        <cds-text-input id="description" label="Description (optional)" maxlength="40" placeholder="Shown on the statement"></cds-text-input>
+                    </div>
+                    <div class="form-actions">
+                        <cds-button id="submit-btn">Submit</cds-button>
+                        <cds-button kind="secondary" href="${urls.account(a.accountId, customerRef)}">Back to account</cds-button>
+                    </div>
+                </div>`;
+            document.getElementById('submit-btn').addEventListener('click', submit);
+        }
+
+        function pickBalance(result) {
+            if (typeof result.availableBalance === 'number') return result.availableBalance;
+            if (Array.isArray(result.availableBalance) && result.availableBalance.length) {
+                const ids = result.accountId ? String(result.accountId).replace(/[\[\]]/g, '').split(',').map((s) => s.trim()) : [];
+                const index = ids.indexOf(String(account.accountId));
+                return result.availableBalance[index >= 0 ? index : 0];
+            }
+            return undefined;
+        }
+
+        async function submit() {
+            clearNotification();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const sign = document.getElementById('sign').value;
+            const description = (document.getElementById('description').value || '').trim();
+
+            if (!amount || amount <= 0) return notify('error', 'Validation error', 'Enter an amount greater than 0');
+
+            const isDebit = sign === 'debit';
+            showLoadingModal(isDebit ? 'Processing debit...' : 'Processing credit...');
+            try {
+                const result = await api.accounts.depositToAccount(account.accountId, {
+                    amount: isDebit ? -amount : amount,
+                    description: description || (isDebit ? 'Debit via web interface' : 'Credit via web interface')
+                }, system, customerNumber);
                 hideLoadingModal();
-                
-                // The API returns arrays of all customer accounts
-                // Find the balance for the specific account we deposited to
-                let balanceDisplay = 'N/A';
-                if (typeof result.availableBalance === 'number') {
-                    balanceDisplay = result.availableBalance.toFixed(2);
-                } else if (Array.isArray(result.availableBalance) && result.availableBalance.length > 0) {
-                    // If accountId is in the array format, parse it
-                    const accountIds = result.accountId ? result.accountId.replace(/[\[\]]/g, '').split(',') : [];
-                    const accountIndex = accountIds.findIndex(id => id.trim() === accountId.toString());
-                    
-                    if (accountIndex >= 0 && accountIndex < result.availableBalance.length) {
-                        balanceDisplay = result.availableBalance[accountIndex].toFixed(2);
-                    } else {
-                        // Fallback: use the first balance
-                        balanceDisplay = result.availableBalance[0].toFixed(2);
-                    }
+
+                const balance = pickBalance(result);
+                if (balance !== undefined) {
+                    account.availableBalance = balance;
+                    document.getElementById('balance').textContent = formatCurrency(balance, account.currency);
                 }
-
-                const successTitle = sign === 'debit' ? 'Debit Successful' : 'Credit Successful';
-                const successMsg = sign === 'debit'
-                    ? `Successfully debited $${amount.toFixed(2)} from account ${accountId}. New balance: $${balanceDisplay}`
-                    : `Successfully credited $${amount.toFixed(2)} to account ${accountId}. New balance: $${balanceDisplay}`;
-                
-                showSuccessModal(successTitle, successMsg);
-
-                // Clear form and reset to search
                 document.getElementById('amount').value = '';
-                document.getElementById('sortCode').value = config.defaults.sortCode;
                 document.getElementById('description').value = '';
-                
-                // Go back to account selection
-                document.getElementById('deposit-form-section').style.display = 'none';
-                document.getElementById('account-selection-section').style.display = 'block';
+                notify('success', isDebit ? 'Debit successful' : 'Credit successful',
+                    `${formatCurrency(amount, account.currency)} ${isDebit ? 'debited from' : 'credited to'} account ${account.accountNumber || account.accountId}.` +
+                    (balance !== undefined ? ` New available balance: ${formatCurrency(balance, account.currency)}.` : ''));
             } catch (error) {
                 hideLoadingModal();
-                console.error('Deposit error:', error);
-                
-                let errorMessage = `Failed to process ${transactionLabel}`;
-                if (error.message) {
-                    errorMessage = error.message;
-                } else if (error.status === 404) {
-                    errorMessage = 'Account not found';
-                } else if (error.status === 400) {
-                    errorMessage = 'Invalid deposit request. Please check your input.';
-                } else if (error.status === 500) {
-                    errorMessage = 'Server error. The backend system may not be configured properly.';
-                }
-                
-                showErrorModal('Deposit Failed', errorMessage);
+                notify('error', isDebit ? 'Debit failed' : 'Credit failed', errorMessage(error, 'The transaction could not be processed'));
             }
         }
     </script>
 </body>
-
 </html>

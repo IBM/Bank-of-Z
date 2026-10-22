@@ -1,292 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Transfer Funds - Bank of Z</title>
-
-    <!-- Carbon Design System Styles -->
+    <title>Transfer funds - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
-
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
 
-    <!-- Main Content -->
-    <cds-layer class="cds--white landing-page">
-        <!-- Banner -->
-        <cds-layer class="layer landing-page__banner">
-            <div class="landing-page__heading">
-                <cds-breadcrumb>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="account-transfer.html">Transfer Funds</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                </cds-breadcrumb>
-                <h1>Transfer Funds Between Accounts</h1>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+                <div id="content"></div>
             </div>
-        </cds-layer>
+        </section>
+    </main>
 
-        <div class="cds--content">
-            <!-- Notification Container -->
-            <div id="notification-container"></div>
-
-            <cds-stack gap="7">
-                <!-- Transfer Form Section -->
-                <cds-layer class="layer">
-                    <h3>Transfer Details</h3>
-                    <cds-form id="transfer-form" class="form-constrained">
-                        <cds-stack gap="7">
-                            <cds-form-item>
-                                <cds-text-input id="fromAccountId" label="From Account Number"
-                                    placeholder="e.g. 10000001" required
-                                    helper-text="Account number to transfer funds from (8 digits)">
-                                </cds-text-input>
-                            </cds-form-item>
-
-                            <cds-form-item>
-                                <cds-text-input id="fromSortCode" label="From Sort Code"
-                                    placeholder="987654" required
-                                    helper-text="Bank sort code for the source account (6 digits)">
-                                </cds-text-input>
-                            </cds-form-item>
-
-                            <cds-form-item>
-                                <cds-text-input id="toAccountId" label="To Account Number"
-                                    placeholder="e.g. 10000002" required
-                                    helper-text="Account number to transfer funds to (8 digits)">
-                                </cds-text-input>
-                            </cds-form-item>
-
-                            <cds-form-item>
-                                <cds-text-input id="toSortCode" label="To Sort Code"
-                                    placeholder="987654" required
-                                    helper-text="Bank sort code for the destination account (6 digits)">
-                                </cds-text-input>
-                            </cds-form-item>
-
-                            <cds-form-item>
-                                <cds-text-input id="amount" label="Transfer Amount"
-                                    placeholder="e.g. 50.00" required
-                                    helper-text="Amount to transfer (must be positive, min 0.01)">
-                                </cds-text-input>
-                            </cds-form-item>
-
-                            <cds-button id="submit-btn" type="submit">Transfer Funds</cds-button>
-                        </cds-stack>
-                    </cds-form>
-                </cds-layer>
-
-                <!-- Transfer Result Summary Section -->
-                <cds-layer class="layer" id="result-summary-section" style="display: none;">
-                    <h3>Transfer Completed</h3>
-                    <cds-grid>
-                        <cds-column lg="8" md="4" sm="4">
-                            <cds-stack gap="5">
-                                <h4>Source Account</h4>
-                                <div><strong>Account Number:</strong> <span id="res-from-acc"></span></div>
-                                <div><strong>Available Balance:</strong> <span id="res-from-avail"></span></div>
-                                <div><strong>Actual Balance:</strong> <span id="res-from-act"></span></div>
-                            </cds-stack>
-                        </cds-column>
-                        <cds-column lg="8" md="4" sm="4">
-                            <cds-stack gap="5">
-                                <h4>Destination Account</h4>
-                                <div><strong>Account Number:</strong> <span id="res-to-acc"></span></div>
-                                <div><strong>Available Balance:</strong> <span id="res-to-avail"></span></div>
-                                <div><strong>Actual Balance:</strong> <span id="res-to-act"></span></div>
-                            </cds-stack>
-                        </cds-column>
-                    </cds-grid>
-                </cds-layer>
-            </cds-stack>
-        </div>
-    </cds-layer>
-
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/loading.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/notification.min.js"></script>
-
-    <!-- Page Script -->
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
-        import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
-        import { config } from './config.js';
+        import api, { imsNotImplementedError } from './js/api.js';
+        import { mountPage, notify, clearNotification, errorMessage } from './js/components/layout.js';
+        import {
+            readContext, customerLookupHtml, bindCustomerLookup, fetchCustomerAccounts,
+            loadAccountContext, setFieldError, urls, systemTagHtml
+        } from './js/components/lookup.js';
+        import { showLoadingModal, hideLoadingModal, formatCurrency, escapeHtml } from './js/utils.js';
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
+        const content = document.getElementById('content');
+        const { accountId, customer } = readContext();
 
-            // Set default sort codes
-            const defaultSortCode = config.defaults ? config.defaults.sortCode : '987654';
-            document.getElementById('fromSortCode').value = defaultSortCode;
-            document.getElementById('toSortCode').value = defaultSortCode;
+        let account = null;
+        let customerRef = null;
+        let mode = 'number';          // 'number' or 'customer'
+        let destinationId = null;     // chosen destination account number
 
-            // Check if fromAccountId is in query string
-            const urlParams = new URLSearchParams(window.location.search);
-            const fromAccountParam = urlParams.get('fromAccountId') || urlParams.get('accountId');
-            if (fromAccountParam) {
-                document.getElementById('fromAccountId').value = fromAccountParam;
-            }
+        const crumbsHome = [{ label: 'Home', href: 'admin.html' }];
 
-            // Handle form submission
-            document.getElementById('submit-btn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await handleTransfer();
+        if (customer && !customer.ok) {
+            showLookup();
+            notify('error', 'Invalid customer ID', customer.error);
+        } else if (customer && customer.system === 'IMS') {
+            showImsBlocked(customer);
+        } else if (accountId) {
+            loadSource();
+        } else if (customer) {
+            loadSourcePicker(customer);
+        } else {
+            showLookup();
+        }
+
+        /* ---------- IMS: no transfer route ---------- */
+        function showImsBlocked(ref) {
+            mountPage({
+                crumbs: [...crumbsHome, { label: ref.ref, href: urls.customer(ref.ref) }, { label: 'Transfer funds' }],
+                title: 'Transfer funds'
             });
-        });
-
-        function displayNotification(kind, title, message) {
-            const container = document.getElementById('notification-container');
-            container.innerHTML = `
-                <cds-inline-notification kind="${kind}" title="${title}" subtitle="${message}" hide-close-button></cds-inline-notification>
-                <br />
-            `;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            content.innerHTML = '';
+            notify('warning', 'Not implemented for IMS', imsNotImplementedError('Transferring funds').message);
         }
 
-        function clearNotification() {
-            const container = document.getElementById('notification-container');
-            container.innerHTML = '';
+        /* ---------- no customer: ask for one ---------- */
+        function showLookup() {
+            mountPage({ crumbs: [...crumbsHome, { label: 'Transfer funds' }], title: 'Transfer funds' });
+            content.innerHTML = `
+                <div class="card" style="max-width: 640px;">
+                    <h2 class="card__title">Which customer is sending the money?</h2>
+                    <p class="card__intro">Enter the customer ID, then choose the account to transfer from.</p>
+                    ${customerLookupHtml({ buttonLabel: 'Continue' })}
+                </div>`;
+            bindCustomerLookup({ onFound: (r) => { window.location.href = urls.transfer(null, r.ref); } });
         }
 
-        function formatCurrency(val) {
-            const num = parseFloat(val);
-            return isNaN(num) ? 'N/A' : `$${num.toFixed(2)}`;
-        }
-
-        async function handleTransfer() {
-            clearNotification();
-
-            const fromAccountId = document.getElementById('fromAccountId').value.trim();
-            const fromSortCode = document.getElementById('fromSortCode').value.trim();
-            const toAccountId = document.getElementById('toAccountId').value.trim();
-            const toSortCode = document.getElementById('toSortCode').value.trim();
-            const amountStr = document.getElementById('amount').value.trim();
-            const amount = parseFloat(amountStr);
-
-            // Validations
-            if (!fromAccountId) {
-                displayNotification('error', 'Validation Error', 'Please enter a source (From) account number');
-                return;
-            }
-
-            if (!toAccountId) {
-                displayNotification('error', 'Validation Error', 'Please enter a destination (To) account number');
-                return;
-            }
-
-            if (fromAccountId === toAccountId && fromSortCode === toSortCode) {
-                displayNotification('error', 'Validation Error', 'Source and destination accounts cannot be identical');
-                return;
-            }
-
-            if (!fromSortCode || !/^\d{6}$/.test(fromSortCode)) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit From sort code');
-                return;
-            }
-
-            if (!toSortCode || !/^\d{6}$/.test(toSortCode)) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid 6-digit To sort code');
-                return;
-            }
-
-            if (!amountStr || isNaN(amount) || amount <= 0) {
-                displayNotification('error', 'Validation Error', 'Please enter a valid transfer amount greater than 0');
-                return;
-            }
-
-            const transferData = {
-                toAccountId: toAccountId,
-                amount: amount,
-                fromSortCode: fromSortCode,
-                toSortCode: toSortCode
-            };
-
-            showLoadingModal('Processing funds transfer...');
-
+        /* ---------- customer only: pick the source account ---------- */
+        async function loadSourcePicker(ref) {
+            mountPage({
+                crumbs: [...crumbsHome, { label: ref.ref, href: urls.customer(ref.ref) }, { label: 'Transfer funds' }],
+                title: 'Transfer funds',
+                subtitle: `Choose the account to transfer from for customer ${ref.ref}`
+            });
+            content.innerHTML = '<cds-loading></cds-loading>';
             try {
-                const result = await api.accounts.transferFunds(fromAccountId, transferData);
-                hideLoadingModal();
+                const accounts = await fetchCustomerAccounts(ref);
+                if (!accounts.length) {
+                    content.innerHTML = '<div class="card"><div class="empty">This customer has no accounts.</div></div>';
+                    return;
+                }
+                const rows = accounts.map((a) => `
+                    <tr>
+                        <td>${escapeHtml(a.accountNumber || a.accountId)}</td>
+                        <td>${escapeHtml(a.accountType || 'N/A')}</td>
+                        <td class="num">${formatCurrency(a.availableBalance, a.currency)}</td>
+                        <td><a href="${urls.transfer(a.accountId, ref.ref)}">Transfer from this account</a></td>
+                    </tr>`).join('');
+                content.innerHTML = `
+                    <div class="card"><div class="table-wrap"><table class="bz-table">
+                        <thead><tr><th>Account number</th><th>Type</th><th class="num">Available</th><th></th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table></div></div>`;
+            } catch (error) {
+                content.innerHTML = '';
+                notify('error', 'Could not load accounts', errorMessage(error, 'Customer not found or error loading accounts'));
+            }
+        }
 
-                // Display summary
-                document.getElementById('res-from-acc').textContent = fromAccountId;
-                document.getElementById('res-from-avail').textContent = formatCurrency(result.fromAccountAvailableBalance);
-                document.getElementById('res-from-act').textContent = formatCurrency(result.fromAccountActualBalance);
+        /* ---------- source chosen: the form ---------- */
+        async function loadSource() {
+            mountPage({ crumbs: [...crumbsHome, { label: 'Transfer funds' }], title: 'Transfer funds' });
+            content.innerHTML = '<cds-loading></cds-loading>';
+            try {
+                const ctx = await loadAccountContext(accountId, customer);
+                account = ctx.account;
+                customerRef = ctx.ref;
+            } catch (error) {
+                content.innerHTML = '';
+                notify('error', 'Account not found', errorMessage(error, `Could not load account ${accountId}`));
+                return;
+            }
 
-                document.getElementById('res-to-acc').textContent = toAccountId;
-                document.getElementById('res-to-avail').textContent = formatCurrency(result.toAccountAvailableBalance);
-                document.getElementById('res-to-act').textContent = formatCurrency(result.toAccountActualBalance);
+            const number = account.accountNumber || account.accountId;
+            mountPage({
+                crumbs: [
+                    ...crumbsHome,
+                    ...(customerRef ? [{ label: customerRef, href: urls.customer(customerRef) }] : []),
+                    { label: `Account ${number}`, href: urls.account(account.accountId, customerRef) },
+                    { label: 'Transfer funds' }
+                ],
+                title: 'Transfer funds',
+                subtitle: `From account ${number}${customerRef ? ` for customer ${customerRef}` : ''}`
+            });
+            renderForm();
+        }
 
-                document.getElementById('result-summary-section').style.display = 'block';
+        function renderForm() {
+            const a = account;
+            content.innerHTML = `
+                <div class="stat-row">
+                    <div class="stat"><div class="stat__label">From account</div><div class="stat__value">${escapeHtml(a.accountNumber || a.accountId)}</div></div>
+                    <div class="stat"><div class="stat__label">Type</div><div class="stat__value">${escapeHtml(a.accountType || 'N/A')}</div></div>
+                    <div class="stat"><div class="stat__label">Available balance</div><div class="stat__value" id="source-balance">${formatCurrency(a.availableBalance, a.currency)}</div></div>
+                </div>
 
-                showSuccessModal(
-                    'Transfer Successful',
-                    `Successfully transferred $${amount.toFixed(2)} from account ${fromAccountId} to account ${toAccountId}.`
-                );
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">Send to</h2>${systemTagHtml('CICS')}</div>
+                    <div class="destination-tabs">
+                        <cds-button id="mode-number" size="sm">Account number</cds-button>
+                        <cds-button id="mode-customer" size="sm" kind="tertiary">A customer's accounts</cds-button>
+                    </div>
+                    <div id="destination-panel"></div>
+                </div>
 
-                // Clear amount field
-                document.getElementById('amount').value = '';
+                <div class="card">
+                    <h2 class="card__title">Amount</h2>
+                    <div class="form-grid">
+                        <cds-text-input id="amount" label="Amount" placeholder="e.g. 50.00" helper-text="Must be greater than 0"></cds-text-input>
+                    </div>
+                    <div class="form-actions">
+                        <cds-button id="submit-btn">Transfer funds</cds-button>
+                        <cds-button kind="secondary" href="${urls.account(a.accountId, customerRef)}">Cancel</cds-button>
+                    </div>
+                </div>
 
-                // Scroll to result summary
-                window.scrollTo({
-                    top: document.getElementById('result-summary-section').offsetTop - 50,
-                    behavior: 'smooth'
+                <div id="result"></div>`;
+
+            document.getElementById('mode-number').addEventListener('click', () => setMode('number'));
+            document.getElementById('mode-customer').addEventListener('click', () => setMode('customer'));
+            document.getElementById('submit-btn').addEventListener('click', submit);
+            document.getElementById('amount').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); submit(); }
+            });
+            setMode('number');
+        }
+
+        function setMode(next) {
+            mode = next;
+            destinationId = null;
+            document.getElementById('mode-number').setAttribute('kind', mode === 'number' ? 'primary' : 'tertiary');
+            document.getElementById('mode-customer').setAttribute('kind', mode === 'customer' ? 'primary' : 'tertiary');
+            const panel = document.getElementById('destination-panel');
+
+            if (mode === 'number') {
+                panel.innerHTML = `
+                    <div class="form-grid">
+                        <cds-text-input id="toAccountId" label="Destination account number" placeholder="e.g. 10000002"
+                            helper-text="The 8 digit account number. Press Enter to continue."></cds-text-input>
+                    </div>`;
+                const input = document.getElementById('toAccountId');
+                input.addEventListener('input', () => { destinationId = null; setFieldError(input, ''); });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (acceptTypedAccount()) document.getElementById('amount').focus();
+                    }
+                });
+            } else {
+                panel.innerHTML = `
+                    <p class="card__intro">Enter the customer who should receive the money, then pick one of their accounts.</p>
+                    ${customerLookupHtml({ inputId: 'toCustomerId', buttonId: 'to-customer-btn', label: 'Destination customer ID', buttonLabel: 'Find accounts' })}
+                    <div id="destination-accounts" style="margin-top: 1.25rem;"></div>`;
+                bindCustomerLookup({
+                    inputId: 'toCustomerId',
+                    buttonId: 'to-customer-btn',
+                    onFound: loadDestinationAccounts
+                });
+            }
+        }
+
+        /** Validates the typed account number; returns true when destinationId is set. */
+        function acceptTypedAccount() {
+            const input = document.getElementById('toAccountId');
+            const value = (input.value || '').trim();
+            if (!/^\d{8}$/.test(value)) {
+                setFieldError(input, 'Account number must be 8 digits');
+                destinationId = null;
+                return false;
+            }
+            if (String(value) === String(account.accountId)) {
+                setFieldError(input, 'Destination must be different from the source account');
+                destinationId = null;
+                return false;
+            }
+            setFieldError(input, '');
+            destinationId = value;
+            return true;
+        }
+
+        async function loadDestinationAccounts(ref) {
+            const target = document.getElementById('destination-accounts');
+            destinationId = null;
+            if (ref.system === 'IMS') {
+                target.innerHTML = '';
+                notify('warning', 'Not implemented for IMS', imsNotImplementedError('Transferring funds').message);
+                return;
+            }
+            clearNotification();
+            target.innerHTML = '<cds-loading></cds-loading>';
+            try {
+                const accounts = (await fetchCustomerAccounts(ref))
+                    .filter((a) => String(a.accountId) !== String(account.accountId));
+                if (!accounts.length) {
+                    target.innerHTML = `<div class="empty">Customer ${escapeHtml(ref.ref)} has no other accounts to send to.</div>`;
+                    return;
+                }
+                const rows = accounts.map((a) => `
+                    <tr>
+                        <td>${escapeHtml(a.accountNumber || a.accountId)}</td>
+                        <td>${escapeHtml(a.accountType || 'N/A')}</td>
+                        <td class="num">${formatCurrency(a.availableBalance, a.currency)}</td>
+                        <td><cds-button size="sm" kind="tertiary" class="pick-destination" data-id="${escapeHtml(a.accountId)}">Select</cds-button></td>
+                    </tr>`).join('');
+                target.innerHTML = `
+                    <div class="table-wrap"><table class="bz-table">
+                        <thead><tr><th>Account number</th><th>Type</th><th class="num">Available</th><th></th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table></div>
+                    <p class="card__intro" id="destination-selected" style="margin-top: 1rem;">No account selected yet.</p>`;
+                target.querySelectorAll('.pick-destination').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        destinationId = button.dataset.id;
+                        target.querySelectorAll('.pick-destination').forEach((b) => b.setAttribute('kind', 'tertiary'));
+                        button.setAttribute('kind', 'primary');
+                        document.getElementById('destination-selected').textContent = `Sending to account ${destinationId}.`;
+                    });
                 });
             } catch (error) {
+                target.innerHTML = '';
+                notify('error', 'Could not load accounts', errorMessage(error, 'Customer not found or error loading accounts'));
+            }
+        }
+
+        async function submit() {
+            clearNotification();
+            if (mode === 'number') acceptTypedAccount();
+            if (!destinationId) {
+                return notify('error', 'Validation error',
+                    mode === 'number' ? 'Enter a valid destination account number' : 'Find a customer and select a destination account');
+            }
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (!amount || amount <= 0) return notify('error', 'Validation error', 'Enter an amount greater than 0');
+
+            showLoadingModal('Processing funds transfer...');
+            try {
+                const result = await api.accounts.transferFunds(account.accountId, { toAccountId: destinationId, amount }, 'CICS');
                 hideLoadingModal();
-                console.error('Transfer error:', error);
 
-                let errorMessage = 'Failed to process transfer';
-                if (error.message) {
-                    errorMessage = error.message;
-                } else if (error.status === 404) {
-                    errorMessage = 'One or both accounts were not found';
-                } else if (error.status === 400) {
-                    errorMessage = 'Invalid transfer request or insufficient funds.';
-                } else if (error.status === 500) {
-                    errorMessage = 'Server error during transfer.';
-                }
+                account.availableBalance = result.fromAccountAvailableBalance;
+                document.getElementById('source-balance').textContent = formatCurrency(result.fromAccountAvailableBalance, account.currency);
+                document.getElementById('amount').value = '';
 
-                showErrorModal('Transfer Failed', errorMessage);
+                document.getElementById('result').innerHTML = `
+                    <div class="card">
+                        <h2 class="card__title">Transfer completed</h2>
+                        <div class="transfer-result">
+                            <div class="stat-row">
+                                <div class="stat"><div class="stat__label">Source account</div><div class="stat__value">${escapeHtml(account.accountNumber || account.accountId)}</div></div>
+                                <div class="stat"><div class="stat__label">Available balance</div><div class="stat__value">${formatCurrency(result.fromAccountAvailableBalance, account.currency)}</div></div>
+                                <div class="stat"><div class="stat__label">Actual balance</div><div class="stat__value">${formatCurrency(result.fromAccountActualBalance, account.currency)}</div></div>
+                            </div>
+                            <div class="stat-row">
+                                <div class="stat"><div class="stat__label">Destination account</div><div class="stat__value">${escapeHtml(destinationId)}</div></div>
+                                <div class="stat"><div class="stat__label">Available balance</div><div class="stat__value">${formatCurrency(result.toAccountAvailableBalance, account.currency)}</div></div>
+                                <div class="stat"><div class="stat__label">Actual balance</div><div class="stat__value">${formatCurrency(result.toAccountActualBalance, account.currency)}</div></div>
+                            </div>
+                        </div>
+                    </div>`;
+                notify('success', 'Transfer successful',
+                    `${formatCurrency(amount, account.currency)} transferred from account ${account.accountNumber || account.accountId} to account ${destinationId}.`);
+            } catch (error) {
+                hideLoadingModal();
+                notify('error', 'Transfer failed', errorMessage(error, 'The transfer could not be processed'));
             }
         }
     </script>
 </body>
-
 </html>

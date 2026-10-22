@@ -1,0 +1,19 @@
+      ******************************************************************
+      *                                                                *
+      *  Copyright IBM Corp. 2023                                      *
+      *                                                                *
+      *                                                                *
+      ******************************************************************
+          03 COMM-EYE                  PIC X(4).
+          03 COMM-CUSTNO               PIC X(10).
+          03 COMM-SCODE                PIC X(6).
+          03 COMM-ACCNO                PIC 9(8).
+          03 COMM-ACC-TYPE             PIC X(8).
+          03 COMM-INT-RATE             PIC 9(4)V99.
+          03 COMM-OPENED               PIC 9(8).
+          03 COMM-OVERDRAFT            PIC 9(8).
+          03 COMM-LAST-STMT-DT         PIC 9(8).
+          03 COMM-NEXT-STMT-DT         PIC 9(8).
+          03 COMM-AVAIL-BAL            PIC S9(10)V99.
+          03 COMM-ACTUAL-BAL           PIC S9(10)V99.
+          03 COMM-SUCCESS              PIC X.

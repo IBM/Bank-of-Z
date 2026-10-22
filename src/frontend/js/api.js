@@ -338,33 +338,69 @@ class AccountsApi extends BaseApi {
         });
     }
 
-    // Stub methods for legacy endpoints not in OpenAPI spec
     /**
-     * Create a new account (stub - not in OpenAPI spec)
+     * Create a new account
+     * POST /accounts
      * @param {Object} accountData - Account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} accountData.customerNumber - Customer number (required)
+     * @param {string} accountData.accountType - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA (required)
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @param {string} [accountData.openedDate] - Opened date (YYYY-MM-DD); defaults to today
+     * @returns {Promise<CreatedAccount>} Created account with accountId, sortCode and balances
      */
     async createAccount(accountData) {
-        throw new Error('Account creation is not supported in the OpenBanking API specification');
+        return this.request(`${this.configuration.baseUrl}/accounts`, {
+            method: 'POST',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**
-     * Update account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
+     * Update account
+     * PUT /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
      * @param {Object} accountData - Updated account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} [accountData.accountType] - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @returns {Promise<UpdatedAccount>} Updated account details
      */
-    async updateAccount(accountNumber, accountData) {
-        throw new Error('Account updates are not supported in the OpenBanking API specification');
+    async updateAccount(accountId, accountData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'PUT',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**
-     * Delete account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
-     * @returns {Promise<Object>} Rejected promise
+     * Delete account
+     * DELETE /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
+     * @returns {Promise<void>} No content on success
      */
-    async deleteAccount(accountNumber) {
-        throw new Error('Account deletion is not supported in the OpenBanking API specification');
+    async deleteAccount(accountId) {
+        await this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * Transfer funds between accounts
+     * POST /accounts/{accountId}/transfer
+     * @param {string} fromAccountId - Source account identifier
+     * @param {Object} transferData - Transfer data
+     * @param {string} transferData.toAccountId - Destination account identifier
+     * @param {number} transferData.amount - Amount to transfer (positive number)
+     * @param {string} [transferData.fromSortCode] - Source bank sort code
+     * @param {string} [transferData.toSortCode] - Destination bank sort code
+     * @returns {Promise<TransferResponse>} Balances of both accounts after transfer
+     */
+    async transferFunds(fromAccountId, transferData) {
+        return this.request(`${this.configuration.baseUrl}/accounts/${fromAccountId}/transfer`, {
+            method: 'POST',
+            body: JSON.stringify(transferData)
+        });
     }
 
     /**

@@ -61,6 +61,8 @@ cd "$SCRIPTS_DIR/../zconfig"
 
 export PATH=/usr/lpp/IBM/cyp/v3r14/pyz/bin:$PATH
 
+# zconfig instrumentation
+export ZCONFIG_CONSUMER="Bank-of-Z"
 zconfig apply \
   --force     \
   -e mq_qmgr_name="${MQ_QMGR_NAME}" \

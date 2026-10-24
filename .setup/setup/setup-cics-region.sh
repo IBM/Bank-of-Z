@@ -113,7 +113,6 @@ fi
 cd "$SCRIPTS_DIR/../zconfig"
 
 # zconfig instrumentation
-export ZCONFIG_CONSUMER="Bank-of-Z"
 zconfig apply \
   -e applid="CICS${APP_SHORT_NAME}" \
   -e sysid="${APP_SHORT_NAME}" \

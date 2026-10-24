@@ -259,7 +259,7 @@ load_config() {
 detect_bank_of_z_location() {
     local IN_REPO=false
     # Detect if we're already in the Bank-of-Z repository
-    print_stage "Detecting Bank of Z location..."
+    print_stage "Detecting Bank of Z location: $PWD ..."
     
     # Check if current directory is a git repo and if it's Bank-of-Z
     if git rev-parse --git-dir > /dev/null 2>&1; then

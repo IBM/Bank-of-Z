@@ -7,7 +7,7 @@
 
 ## 1. Problem Statement
 
-The existing `BankOfZUserBuild` profile in `zapp.yaml` runs [`.setup/setup-remote.sh`](.setup/setup-remote.sh) as its `build:` command. That script performs the **full infrastructure setup**:
+The existing `BankOfZUserBuild` profile in `zapp.yaml` runs [`../.setup/setup-remote.sh`](../.setup/setup-remote.sh) as its `build:` command. That script performs the **full infrastructure setup**:
 
 1. `validate-prereqs` — checks zconfig, DBB, wazi-deploy installations
 2. `environment` — clones DBB accelerators, deploys zBuilder framework
@@ -28,9 +28,9 @@ Using `all` scope (rather than `cics` only) ensures IMS application code, z/OS C
 
 ## 2. Relevant Existing Scripts
 
-All scripts live under [`.setup/`](.setup/) and run directly on z/OS USS. They source [`.setup/config/setenv.sh`](.setup/config/setenv.sh) internally, so no manual environment setup is needed before calling them.
+All scripts live under [`../.setup/`](../.setup/) and run directly on z/OS USS. They source [`../.setup/config/setenv.sh`](../.setup/config/setenv.sh) internally, so no manual environment setup is needed before calling them.
 
-### 2.1 `.setup/runtime-manage.sh`
+### 2.1 `../.setup/runtime-manage.sh`
 
 Manages the Bank of Z server lifecycle.
 
@@ -54,7 +54,7 @@ bash runtime-manage.sh <action> <scope>
 
 > **Decision:** Always use `all` scope. `IMS_DISABLED` must **not** be set so that IMS is included in every stop/start cycle.
 
-### 2.2 `.setup/pipeline-common.sh`
+### 2.2 `../.setup/pipeline-common.sh`
 
 Orchestrates build and/or deploy phases without any infrastructure setup.
 
@@ -70,7 +70,7 @@ bash pipeline-common.sh <phase>
 
 This script re-anchors all environment paths (`DBB_CWD`, `DBB_APP_CONF`, etc.) when invoked in grub mode.
 
-### 2.3 `.setup/tasks/task-dbb-build.sh`
+### 2.3 `../.setup/tasks/task-dbb-build.sh`
 
 Runs the DBB build. Called by `pipeline-common.sh build`.
 
@@ -79,7 +79,7 @@ Runs the DBB build. Called by `pipeline-common.sh build`.
 - Produces logs to `${DBB_LOG_FOLDER}` (resolves to `/usr/local/sandboxes/bank-of-z/logs/dbb`).
 - `finalize_results` trap always publishes the log tar even on failure.
 
-### 2.4 `.setup/tasks/task-wazi-deploy.sh`
+### 2.4 `../.setup/tasks/task-wazi-deploy.sh`
 
 Runs Wazi Deploy. Called by `pipeline-common.sh deploy`.
 
@@ -91,9 +91,9 @@ Runs Wazi Deploy. Called by `pipeline-common.sh deploy`.
 
 ## 3. Implementation Decision: Option B — Wrapper Script
 
-A new thin wrapper script [`.setup/build-remote.sh`](.setup/build-remote.sh) encapsulates the stop/build-and-deploy/start sequence. The `zapp.yaml` profile calls this single script, keeping the YAML clean.
+A new thin wrapper script [`../.setup/build-remote.sh`](../.setup/build-remote.sh) encapsulates the stop/build-and-deploy/start sequence. The `zapp.yaml` profile calls this single script, keeping the YAML clean.
 
-### `.setup/build-remote.sh`
+### `../.setup/build-remote.sh`
 
 ```bash
 #!/bin/bash
@@ -171,7 +171,7 @@ The path `logs/dbb/logs/Bank-of-Z.*.log` (a nested subdirectory path present in 
 
 ## 5. Key Environment Variables
 
-Defined in [`.setup/config/config.yaml`](.setup/config/config.yaml) and exported by [`.setup/config/setenv.sh`](.setup/config/setenv.sh):
+Defined in [`../.setup/config/config.yaml`](../.setup/config/config.yaml) and exported by [`../.setup/config/setenv.sh`](../.setup/config/setenv.sh):
 
 | Variable | Resolved Value | Notes |
 | :--- | :--- | :--- |

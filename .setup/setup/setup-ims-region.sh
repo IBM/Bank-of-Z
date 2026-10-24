@@ -99,7 +99,6 @@ IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
 # zconfig instrumentation
-export ZCONFIG_CONSUMER="Bank-of-Z"
 zconfig apply -e ims_user="${IMS_USER}" \
               -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \

@@ -70,7 +70,7 @@ profiles:
             localCommand: >
               .zopeneditor/grub_client fetch --hostname ${ZOS_USER}@${ZOS_HOST}
               --remoteWorkspace ${ZOS_WORKSPACE}
-              --files "${application}/logs/Bank-of-Z.*.log ${application}/logs/logs/Bank-of-Z.*.log ${application}/logs/deploy/*.console.log"
+              --files "${application}/logs/*.log ${application}/logs/deploy/*.console.log"
               --localDir logs --verbose
 
   - name: BankOfZAppBuild
@@ -96,5 +96,5 @@ profiles:
             localCommand: >
               .zopeneditor/grub_client fetch --hostname ${ZOS_USER}@${ZOS_HOST}
               --remoteWorkspace ${ZOS_WORKSPACE}
-              --files "${application}/logs/Bank-of-Z.*.log ${application}/logs/deploy/*.console.log"
+              --files "${application}/logs/*.log ${application}/logs/deploy/*.console.log"
               --localDir logs --verbose

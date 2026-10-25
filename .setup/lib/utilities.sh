@@ -257,17 +257,20 @@ load_config() {
 #   - unknown
 # ============================================================
 detect_bank_of_z_location() {
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    
     local IN_REPO=false
     # Detect if we're already in the Bank-of-Z repository
-    print_stage "Detecting Bank of Z location: $PWD ..."
+    print_stage "Detecting Bank of Z location: $script_dir ..."
     
     # Check if current directory is a git repo and if it's Bank-of-Z
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    if git  -C "$script_dir" rev-parse --git-dir > /dev/null 2>&1; then
+        local repo_name=$(basename "$(git  -C $script_dir rev-parse --show-toplevel)")
         if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
             IN_REPO=true
             EXECUTION_MODE="grub"
-            BANK_DIR="$(git rev-parse --show-toplevel)"
+            BANK_DIR="$(git -C $script_dir rev-parse --show-toplevel)"
             print_info "Running from within Bank-of-Z repository"
             print_info "Repository location: $BANK_DIR"
             print_success "Using current repository (GRUB workflow detected)"

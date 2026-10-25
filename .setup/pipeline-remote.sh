@@ -81,15 +81,10 @@ main() {
     print_success "Remote pipeline execution completed successfully!"
     
     echo ""
-    echo "Next steps:"
-    echo "  1. Verify CICS region is updated"
-    echo "  2. Test application changes via x3270:"
-    echo "     - logon applid(CICSBOZ)"
-    echo "     - Transaction: OMEN"
-    echo "     - Customer: 1, Account: 1234"
-    echo "  3. Review build logs if needed"
-    echo ""
-    print_info "Pipeline logs available at: /tmp/pipeline.log"
+    ipaddr=$(get_ipaddr)
+    print_info "The Bank of Z interface is available at:"
+    print_info "- https://${ipaddr}:${FRONTEND_HTTPS_PORT}/"
+    print_info "(Please allow about 20s for the interface to become available)"
     echo ""
 }
 

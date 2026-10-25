@@ -26,13 +26,13 @@ application:
       # Configure the source directory for building
       - name: sourceDirs
         value:
-            - "Bank-of-Z/src/base"
-            - "Bank-of-Z/src/api/src/main/api"
-            - "Bank-of-Z/src/frontend"
+            - "${REPO_NAME}/src/base"
+            - "${REPO_NAME}/src/api/src/main/api"
+            - "${REPO_NAME}/src/frontend"
         select:
            - condition: "${LIFECYCLE} == 'user'"
              value:
-                - "Bank-of-Z/src/base"
+                - "${REPO_NAME}/src/base"
 
     - task: ScannerInit
       variables:

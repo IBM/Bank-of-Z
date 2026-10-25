@@ -16,8 +16,8 @@ set +e
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
 fi
-if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    repo_name=$(basename "$(git rev-parse --show-toplevel)")
+if git -C $LOCAL_SCRIPTS_DIR rev-parse --show-toplevel >/dev/null 2>&1; then
+    repo_name=$(basename "$(git -C $LOCAL_SCRIPTS_DIR rev-parse --show-toplevel)")
     if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
         export REPO_NAME=${repo_name}
     else

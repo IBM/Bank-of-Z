@@ -62,7 +62,7 @@ finalize_results() {
     mkdir -p ${DBB_LOG_FOLDER}
 
     if [ -f "$TMP_LOG" ]; then
-        cp "$TMP_LOG" "${DBB_LOG_FOLDER}/dbb-build-console.log" 2>/dev/null || true
+        cp "$TMP_LOG" "${DBB_LOG_FOLDER}/dbb-build.console.log" 2>/dev/null || true
     fi
 
     LOG_TAR="${DBB_LOG_FOLDER}/dbb-build-log.tar"
@@ -71,8 +71,8 @@ finalize_results() {
         chtag -tc ISO8859-1 logs/*.log
         tar cf "$LOG_TAR" logs  2>/dev/null || true
     else
-        echo "No DBB log files found" > ${DBB_LOG_FOLDER}/dbb-build-console.log
-        tar cf "$LOG_TAR" ${DBB_LOG_FOLDER}/dbb-build-console.log 2>/dev/null || true
+        echo "No DBB log files found" > ${DBB_LOG_FOLDER}/dbb-build.console.log
+        tar cf "$LOG_TAR" ${DBB_LOG_FOLDER}/dbb-build.console.log 2>/dev/null || true
     fi
 
     print_result "[LOG-PATH] $LOG_TAR"

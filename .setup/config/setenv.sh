@@ -4,7 +4,7 @@
 # Source library scripts
 # =========================
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export CONFIG_FILE="${CONFIG_FILE:-$LOCAL_SCRIPTS_DIR/config.yaml}"
+export CONFIG_FILE="${BOZ_CONFIG_FILE:-$LOCAL_SCRIPTS_DIR/config.yaml}"
 ENV_FILE="${LOCAL_SCRIPTS_DIR}/.env"
 export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
@@ -12,20 +12,14 @@ source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 set +e
+
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
 fi
-if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    repo_name=$(basename "$(git rev-parse --show-toplevel)")
-    if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
-        export REPO_NAME=${repo_name}
-    else
-        export REPO_NAME="Bank-of-Z"
-    fi
-else
-    export REPO_NAME="Bank-of-Z"
-fi
+
+export ROOT_FOLDER_NAME="$(basename "$(cd "$LOCAL_SCRIPTS_DIR/../.." && pwd)")"
+
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
@@ -54,6 +48,7 @@ ZOS_KEYRING="{{ global.zos_keyring }}"
 ZOS_CREATE_CERTS="{{ global.zos_create_certs }}"
 
 # Application
+APP_NAME="{{ app.app_name }}"
 APP_BASE_NAME="{{ app.base_name }}"
 APP_SHORT_NAME="{{ app.short_name }}"
 APP_BASE_NAME_LOWER="{{ app.base_name | lower }}"
@@ -157,7 +152,7 @@ IMS_DATABASE_LOCK_MANAGER_SERVER_NAME="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-
 ZCONFIG_ZCB_HOME="{{ zconfig.zcb_home }}"
 ZCONFIG_HOME="${ZCONFIG_HOME:-{{ zconfig.zconfig_home }}}"
 # zconfig instrumentation
-ZCONFIG_CONSUMER="Bank-of-Z"
+ZCONFIG_CONSUMER="${ZCONFIG_CONSUMER:-{{ app.app_name }}}"
 
 # Debug
 DEBUG_HLQ="{{ debug.debug_hlq }}"

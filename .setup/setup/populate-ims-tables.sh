@@ -31,7 +31,7 @@ export LIBPATH="$ZOAU_HOME/lib:${LIBPATH:-}"
 # =========================
 # Populate IMS tables
 # =========================
-for file in ${SANDBOX_DIR}/${REPO_NAME}/src/base/ims/LoadData/*.data; do
+for file in ${SANDBOX_DIR}/${ROOT_FOLDER_NAME}/src/base/ims/LoadData/*.data; do
     name=$(basename $file .data)
     set +e
     drm ${IMS_APP_HLQ}.${name}.INPUT 2>/dev/null

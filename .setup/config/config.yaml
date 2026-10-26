@@ -13,6 +13,7 @@ global:
   sandbox_root: "/usr/local/sandboxes"
 
   # Application
+  app_name: "Bank-of-Z"
   app_base_name: "BANKZ"
   app_hlq: "{{ global.app_base_name }}"
   app_short_name: "BOZ" # Maximum 3 characters
@@ -98,6 +99,7 @@ global:
 
 # Application properties
 app:
+  app_name: "{{ global.app_name }}"
   base_name: "{{ global.app_base_name }}"
   short_name: "{{ global.app_short_name }}"
   app_hlq: "{{ global.app_hlq }}"
@@ -141,10 +143,10 @@ zconfig:
 # DBB (Dependency Based Build)
 dbb:
   dbb_home: "{{ global.dbb_home }}"
-  dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
-  dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
-  dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
-  dbb_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs"
+  dbb_build: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/build"
+  dbb_app_conf: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/dbb-app.yaml"
+  dbb_cwd: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/"
+  dbb_log_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs"
   gradle_home:  "{{ global.gradle_home }}"
   igzxjni2: "{{ global.igzxjni2 }}"
   igy_hlq: "{{ global.igy_hlq }}"
@@ -154,16 +156,16 @@ dbb:
 
 # zBuilder framework configuration
 zbuilder:
-  source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
+  source_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/build"
   target_dir: "{{sandbox.path}}/zBuilder"
 
 # ZCodeScan (static analysis)
 zcodescan:
   zcodescan_home: "{{ global.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
-  src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
-  output_dir: "{{sandbox.path}}/${REPO_NAME}/logs/zcodescan"
-  rule_file: "{{sandbox.path}}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml"
+  src_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/src/base"
+  output_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs/zcodescan"
+  rule_file: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/zcodescan/zcodescan-rules.yaml"
   src_encoding: "IBM-1047"
   config_file: "${HOME}/zcs_config_file.yml"
   max_rc: 4
@@ -171,11 +173,11 @@ zcodescan:
 # Wazi Deploy (deployment automation)
 wazideploy:
   wazideploy_home: "{{ global.wazideploy_home }}"
-  deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
-  deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
-  types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
+  deployment_method: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/deployment-method.yml"
+  deployment_envfile: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/Development.yml"
+  types_pattern_mapping: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/types_pattern_mapping.yml"
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
-  deploy_log_dir: "{{sandbox.path}}/${REPO_NAME}/logs/deploy"
+  deploy_log_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs/deploy"
 
 # Debug
 debug:

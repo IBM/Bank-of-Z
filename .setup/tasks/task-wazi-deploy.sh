@@ -66,7 +66,7 @@ finalize_results() {
         tar cf "$LOG_TAR" "$OUTPUT_FOLDER" 2>/dev/null || true
     else
         echo "No Wazi Deploy logs found" > "$OUTPUT_FOLDER/wazi-deploy-console.log"
-        tar cf "$LOG_TAR" "$OUTPUT_FOLDERs" 2>/dev/null || true
+        tar cf "$LOG_TAR" "$OUTPUT_FOLDER" 2>/dev/null || true
     fi
     chtag -b "$LOG_TAR"
 

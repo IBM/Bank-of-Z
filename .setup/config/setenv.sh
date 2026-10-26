@@ -152,7 +152,7 @@ IMS_DATABASE_LOCK_MANAGER_SERVER_NAME="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-
 ZCONFIG_ZCB_HOME="{{ zconfig.zcb_home }}"
 ZCONFIG_HOME="${ZCONFIG_HOME:-{{ zconfig.zconfig_home }}}"
 # zconfig instrumentation
-ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-{{ app.app_name }}}"  
+ZCONFIG_CONSUMER="${ZCONFIG_CONSUMER:-{{ app.app_name }}}"
 
 # Debug
 DEBUG_HLQ="{{ debug.debug_hlq }}"

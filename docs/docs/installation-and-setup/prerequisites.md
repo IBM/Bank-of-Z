@@ -30,13 +30,13 @@ The target z/OS environment must include the following platform components. Cont
 |-----------|-----------------|
 | z/OS | 3.1 |
 | CICS TS | 6.3 |
-| Db2 for z/OS | V13 |
-| IMS Transaction Manager (IMS TM) | V15 |
-| IMS Database | V15 |
+| Db2 for z/OS | 13 |
+| IMS Transaction Manager (IMS TM) | 15 |
+| IMS Database | 15 |
 | z/OS Connect Enterprise Edition | 3.0.101 |
-| IBM MQ | Supported release |
+| IBM MQ for z/OS | 9.4.0 |
 
-**Note:** A pre-existing Db2 subsystem with subsystem ID `DBD1` is required. The setup scripts create the required Db2 database objects within this subsystem but do not create the subsystem itself. IMS, CICS, and z/OS Connect runtime instances are provisioned automatically during deployment.
+**Note:** A pre-existing Db2 subsystem with subsystem ID `DBD1` is required. The setup scripts create the required Db2 database objects within this subsystem but do not create the subsystem itself. IMS, CICS, MQ and z/OS Connect runtime instances are provisioned automatically during deployment.
 
 ## z/OS build and deploy tooling
 
@@ -53,8 +53,7 @@ The following tools must be installed on z/OS USS. These are typically installed
 | ZCodeScan | 1.0.2 | `zcodescan.zcodescan_home` |
 | CICS TS Resource Builder | 1.0.6 | `zconfig.zcb_home` |
 | Git | Current supported version | Must be available in PATH on USS |
-
-**Note:** Bank of Z uses zconfig to provision and configure the CICS resources, IMS resources, and z/OS Connect runtime during the environment setup.
+| IBM MQ for z/OS Unix System Services Component | 9.4.0 | Required for running Bank of Q |
 
 ### USS access requirements
 

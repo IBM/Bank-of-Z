@@ -3,7 +3,7 @@
 #########################################################
 # Common Setup Script for Bank of Z
 # This script runs directly on z/OS USS (not remotely)
-# 
+#
 # Used by:
 #   - GRUB workflow (runs natively after sync)
 #   - VSCode task workflow (triggered via Zowe CLI)
@@ -64,11 +64,11 @@ stage_stop_tasks() {
 #########################################################
 stage_clone_accelerators() {
     print_stage "STAGE: Clone Required Accelerators"
-    
+
     print_info "Cloning DBB repository..."
     print_info "Repository: $DBB_REPO_URL"
     print_info "Target: $BANK_OF_Z_WORK_DIR/dbb"
-    
+
     # Check if git is available
     print_info "Checking git availability..."
     if ! command -v git &> /dev/null; then
@@ -77,7 +77,7 @@ stage_clone_accelerators() {
         exit 1
     fi
     print_success "Git is available"
-    
+
     # Check if dbb directory already exists
     if [ -d "$BANK_OF_Z_WORK_DIR/dbb" ]; then
         if [[ "$EXECUTION_MODE" == "grub" ]]; then
@@ -88,7 +88,7 @@ stage_clone_accelerators() {
             return 0
         fi
     fi
-    
+
     # Clone repository
     print_info "Cloning repository (this may take a few minutes)..."
     cd "$BANK_OF_Z_WORK_DIR"
@@ -102,7 +102,7 @@ stage_clone_accelerators() {
         print_info "  - Repository URL: $DBB_REPO_URL"
         exit 1
     fi
-    
+
     # Verify the clone
     if [ -d "$BANK_OF_Z_WORK_DIR/dbb" ]; then
         print_success "Repository verification successful"
@@ -117,7 +117,7 @@ stage_clone_accelerators() {
 #########################################################
 stage_copy_framework() {
     print_stage "STAGE: Copy Build Framework"
-    
+
     # Print datasets configuration info
     print_info "Datasets configuration from datasets.yaml:"
     echo ""
@@ -129,19 +129,19 @@ stage_copy_framework() {
         print_warning "datasets.yaml not found at: $ZBUILDER_SOURCE/datasets.yaml"
     fi
     echo ""
-    
+
     # Copy zBuilder framework
     print_info "Copying zBuilder framework..."
     print_info "Source: $ZBUILDER_SOURCE"
     print_info "Target: $ZBUILDER_TARGET"
-    
+
     # Check if source directory exists
     if [ ! -d "$ZBUILDER_SOURCE" ]; then
         print_error "zBuilder source directory not found: $ZBUILDER_SOURCE"
         print_info "Make sure the .setup directory is complete"
         exit 1
     fi
-    
+
     # Check if target directory already exists
     if [ -d "$ZBUILDER_TARGET" ]; then
         if [[ "$EXECUTION_MODE" == "grub" ]]; then
@@ -152,12 +152,12 @@ stage_copy_framework() {
             return 0
         fi
     fi
-    
+
     # Create parent directory if needed
     PARENT_DIR=$(dirname "$ZBUILDER_TARGET")
     print_info "Ensuring parent directory exists: $PARENT_DIR"
     mkdir -p "$PARENT_DIR"
-    
+
     # Copy directory recursively
     print_info "Copying zBuilder framework files..."
     if cp -r "$ZBUILDER_SOURCE" "$ZBUILDER_TARGET"; then
@@ -166,7 +166,7 @@ stage_copy_framework() {
         print_error "Failed to copy zBuilder framework"
         exit 1
     fi
-    
+
     print_success "zBuilder framework setup completed successfully"
 }
 
@@ -181,12 +181,12 @@ stage_setup_database() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-db2-tables.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z database setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-db2-tables.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/setup-db2-tables.sh; then
         print_success "Bank of Z application setup completed successfully"
@@ -207,12 +207,12 @@ stage_setup_ims_database() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-tables.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z IMS database setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-tables.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/setup-ims-tables.sh; then
         print_success "Bank of Z application setup completed successfully"
@@ -233,12 +233,12 @@ stage_setup_ims_bankz_regions() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-bankz-regions.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z Setup and start IMS regions script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-bankz-regions.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/setup-ims-bankz-regions.sh; then
         print_success "Bank of Z application setup completed successfully"
@@ -260,12 +260,12 @@ stage_populate_database() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/populate-db2-tables.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z database populate script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/populate-db2-tables.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/populate-db2-tables.sh; then
         print_success "Bank of Z application populate completed successfully"
@@ -286,12 +286,12 @@ stage_populate_ims_database() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/populate-ims-tables.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z database populate script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/populate-ims-tables.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/populate-ims-tables.sh; then
         print_success "Bank of Z application populate completed successfully"
@@ -349,12 +349,12 @@ stage_setup_zosconnect_server() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-zosconnect-server.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z zOS Connect server setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-zosconnect-server.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if bash .setup/setup/setup-zosconnect-server.sh; then
         print_success "Bank of Z application setup completed successfully"
@@ -374,12 +374,12 @@ stage_setup_frontend_server() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-frontend-server.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Bank of Z Frontend Liberty server setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-frontend-server.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if bash .setup/setup/setup-frontend-server.sh; then
         print_success "Frontend Liberty server setup completed successfully"
@@ -390,7 +390,31 @@ stage_setup_frontend_server() {
 
 }
 
+#########################################################
+# STAGE: Setup MQ queue manager
+#########################################################
+stage_setup_mq_queue_manager() {
+    print_stage "STAGE: Create MQ queue manager using zconfig"
 
+    if [ ! -f "$BANK_DIR/.setup/setup/setup-mq-queue-manager.sh" ]; then
+        print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-mq-queue-manager.sh"
+        exit 1
+    fi
+
+    # Run script
+    print_info "Running MQ queue manager setup script..."
+    print_info "Executing: bash $BANK_DIR/.setup/setup/setup-mq-queue-manager.sh"
+    cd "$BANK_DIR"
+
+    set -o pipefail
+
+    if bash .setup/setup/setup-mq-queue-manager.sh; then
+        print_success "MQ queue manager setup completed successfully"
+    else
+        print_error "Failed to setup MQ queue manager"
+        exit 1
+    fi
+}
 
 #########################################################
 # STAGE: Setup CICS region
@@ -403,12 +427,12 @@ stage_setup_cics_region() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-cics-region.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running CICS region setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-cics-region.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if .setup/setup/setup-cics-region.sh; then
         print_success "CICS region setup completed successfully"
@@ -429,13 +453,13 @@ stage_setup_ims_region() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-ims-region.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running IMS region setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-region.sh"
     cd "$BANK_DIR"
-    
-    
+
+
     set -o pipefail
     if .setup/setup/setup-ims-region.sh; then
         print_success "IMS region setup completed successfully"
@@ -456,13 +480,13 @@ stage_setup_debug_profile_service() {
         print_error "Installation script not found: $BANK_DIR/.setup/setup/setup-debug.sh"
         exit 1
     fi
-    
+
     # Run script
     print_info "Running Debug Profile Service setup script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-debug.sh"
     cd "$BANK_DIR"
-    
-    
+
+
     set -o pipefail
     if .setup/setup/setup-debug.sh; then
         print_success "Debug Profile Service setup completed successfully"
@@ -528,9 +552,11 @@ main_setup() {
 
     # infrastructure
     stage_stop_tasks
-    
+
     stage_setup_database
-    
+
+    stage_setup_mq_queue_manager
+
     stage_setup_cics_region
     if [[ "$IMS_DISABLED" != "true" ]]; then
         stage_setup_ims_region
@@ -564,12 +590,12 @@ stage_validate_install() {
         print_error "Validation script not found: $BANK_DIR/.setup/setup/validate-install.sh"
         exit 1
     fi
-    
+
     # Run validation script
     print_info "Running Bank of Z installation validation script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/validate-install.sh"
     cd "$BANK_DIR"
-    
+
     set -o pipefail
     if bash .setup/setup/validate-install.sh; then
         print_success "Installation validation completed successfully"
@@ -644,7 +670,7 @@ main() {
             ;;
         install-bank-of-z)
             main_validation
-            
+
             if ${SCRIPTS_DIR}/pipeline-common.sh build-and-deploy full; then
                 print_success "Remote pipeline completed successfully"
             else
@@ -655,7 +681,7 @@ main() {
             if [[ "$IMS_DISABLED" != "true" ]]; then
                 stage_populate_ims_database
             fi
-            
+
             # Restart frontend and z/OS Connect servers (dropinsEnabled="false")
             opercmd "C FE${APP_SHORT_NAME}" 2>/dev/null || true
             opercmd "C BAQ${APP_SHORT_NAME}" 2>/dev/null || true

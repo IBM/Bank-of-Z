@@ -1,0 +1,29 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - XFRFUNZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-FACCNO:
+            required: false
+            nullable: false
+            expression: "$number($pathParameters.accountId)"
+        - COMM-FSCODE:
+            required: false
+            nullable: false
+            expression: "$exists($body.fromSortCode) ? $number($body.fromSortCode) : 987654"
+        - COMM-TACCNO:
+            required: false
+            nullable: false
+            expression: "$number($body.toAccountId)"
+        - COMM-TSCODE:
+            required: false
+            nullable: false
+            expression: "$exists($body.toSortCode) ? $number($body.toSortCode) : 987654"
+        - COMM-AMT:
+            required: false
+            nullable: false
+            expression: "$body.amount"

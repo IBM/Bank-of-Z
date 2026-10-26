@@ -408,6 +408,35 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /accounts:
+    post:
+      tags:
+        - Accounts
+      summary: Create a new account
+      description: Create a new bank account for a customer via the CICS CREACC program
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     get:
       tags:
         - Accounts
@@ -463,6 +492,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Accounts
+      summary: Update account
+      description: Update editable fields (account type, interest rate, overdraft limit) for a specific account via the CICS UPDACC program
+      operationId: updateAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "00000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Accounts
+      summary: Delete account
+      description: Delete a specific account by account ID
+      operationId: deleteAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the account
+          schema:
+            type: string
+            example: "00000001"
+      responses:
+        '204':
+          description: Account deleted successfully
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -535,6 +628,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepositResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /accounts/{accountId}/transfer:
+    post:
+      tags:
+        - Accounts
+      summary: Transfer funds between accounts
+      description: Transfer funds from this account to another account
+      operationId: transferFunds
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Unique identifier for the source account
+          schema:
+            type: string
+            example: "12345678"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '201':
+          description: Transfer successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -840,6 +972,139 @@ components:
           example: "ACTIVE"
 
 
+    CreateAccountRequest:
+      type: object
+      required:
+        - customerNumber
+        - accountType
+      properties:
+        customerNumber:
+          type: string
+          description: Customer number to create account for
+          example: "0000000042"
+        accountType:
+          type: string
+          description: Type of account to create
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA]
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 99.99
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          minimum: 0
+          description: Overdraft limit in whole currency units
+          example: 500
+        initialBalance:
+          type: number
+          format: double
+          description: Initial balance or amount owed (for Loans/Mortgages)
+          example: 250000.00
+        openedDate:
+          type: string
+          format: date
+          description: Date account is opened (YYYY-MM-DD); defaults to today if omitted
+          example: "2026-01-15"
+
+    CreatedAccount:
+      type: object
+      required:
+        - accountId
+        - sortCode
+      properties:
+        accountId:
+          type: string
+          description: The newly assigned account number
+          example: "00000001"
+        sortCode:
+          type: string
+          description: The bank sort code for this account
+          example: "987654"
+        openedDate:
+          type: string
+          description: Date account was opened (DDMMYYYY format from CREACC)
+          example: "15012026"
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance at account opening
+          example: 0.00
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance at account opening
+          example: 0.00
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        accountType:
+          type: string
+          description: Type of account
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA]
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 99.99
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          minimum: 0
+          description: Overdraft limit in whole currency units
+          example: 500
+
+    UpdatedAccount:
+      type: object
+      required:
+        - accountId
+      properties:
+        accountId:
+          type: string
+          description: Account number
+          example: "00000001"
+        sortCode:
+          type: string
+          description: Bank sort code
+          example: "987654"
+        customerId:
+          type: string
+          description: Customer ID associated with this account
+          example: "0000000042"
+        accountType:
+          type: string
+          description: Updated account type
+          example: "CURRENT"
+        interestRate:
+          type: number
+          format: double
+          description: Updated annual interest rate
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          description: Updated overdraft limit
+          example: 500
+        openedDate:
+          type: string
+          description: Date account was opened (DDMMYYYY format from UPDACC)
+          example: "15012026"
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance
+          example: 1234.56
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance
+          example: 1234.56
+
     AccountList:
       type: object
       required:
@@ -868,7 +1133,7 @@ components:
           example: "ACC987654321" #pragma: allowlist secret
         accountType:
           type: string
-          enum: [CURRENT, SAVINGS, CREDIT_CARD, LOAN]
+          enum: [SAVING, CURRENT, LOAN, MORTGAGE, ISA, SAVINGS, CREDIT_CARD]
           description: Type of account
           example: "CURRENT"
         accountSubType:
@@ -909,6 +1174,25 @@ components:
           type: string
           description: Customer ID associated with this account
           example: "CUST123456"
+        interestRate:
+          type: number
+          format: double
+          description: Annual interest rate (percentage)
+          example: 2.5
+        overdraftLimit:
+          type: integer
+          description: Overdraft limit in whole currency units
+          example: 500
+        availableBalance:
+          type: number
+          format: double
+          description: Available balance
+          example: 1000.00
+        actualBalance:
+          type: number
+          format: double
+          description: Actual balance
+          example: 1000.00
 
     BalanceList:
       type: object
@@ -1053,8 +1337,10 @@ components:
         amount:
           type: number
           format: double
-          minimum: 0.01
-          description: Deposit amount (must be positive)
+          not:
+            maximum: 0
+            minimum: 0
+          description: "Amount to credit or debit. Positive value = credit (deposit); negative value = debit (withdrawal). Must be non-zero."
           example: 100.00
         sortCode:
           type: string
@@ -1092,6 +1378,62 @@ components:
           type: string
           description: Transaction reference number
           example: "DEP20260619001"
+
+    TransferRequest:
+      type: object
+      required:
+        - toAccountId
+        - amount
+      properties:
+        toAccountId:
+          type: string
+          description: Unique identifier for the destination account
+          example: "87654321"
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Transfer amount (must be positive)
+          example: 50.00
+        fromSortCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit bank sort code of the source account
+          example: "987654"
+        toSortCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit bank sort code of the destination account
+          example: "987654"
+
+    TransferResponse:
+      type: object
+      required:
+        - fromAccountAvailableBalance
+        - fromAccountActualBalance
+        - toAccountAvailableBalance
+        - toAccountActualBalance
+      properties:
+        fromAccountAvailableBalance:
+          type: number
+          format: double
+          description: Available balance of source account after transfer
+          example: 950.00
+        fromAccountActualBalance:
+          type: number
+          format: double
+          description: Actual balance of source account after transfer
+          example: 950.00
+        toAccountAvailableBalance:
+          type: number
+          format: double
+          description: Available balance of destination account after transfer
+          example: 550.00
+        toAccountActualBalance:
+          type: number
+          format: double
+          description: Actual balance of destination account after transfer
+          example: 550.00
 
     Error:
       type: object

@@ -4,7 +4,7 @@
 # Source library scripts
 # =========================
 LOCAL_SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export CONFIG_FILE="${CONFIG_FILE:-$LOCAL_SCRIPTS_DIR/config.yaml}"
+export CONFIG_FILE="${BOZ_CONFIG_FILE:-$LOCAL_SCRIPTS_DIR/config.yaml}"
 ENV_FILE="${LOCAL_SCRIPTS_DIR}/.env"
 export LIB_DIR="$LOCAL_SCRIPTS_DIR/../lib"
 source "$LIB_DIR/utilities.sh"
@@ -12,20 +12,14 @@ source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 set +e
+
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
 fi
-if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    repo_name=$(basename "$(git rev-parse --show-toplevel)")
-    if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
-        export REPO_NAME=${repo_name}
-    else
-        export REPO_NAME="Bank-of-Z"
-    fi
-else
-    export REPO_NAME="Bank-of-Z"
-fi
+
+export ROOT_FOLDER_NAME="$(basename "$(cd "$LOCAL_SCRIPTS_DIR/../.." && pwd)")"
+
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
@@ -54,6 +48,7 @@ ZOS_KEYRING="{{ global.zos_keyring }}"
 ZOS_CREATE_CERTS="{{ global.zos_create_certs }}"
 
 # Application
+APP_NAME="{{ app.app_name }}"
 APP_BASE_NAME="{{ app.base_name }}"
 APP_SHORT_NAME="{{ app.short_name }}"
 APP_BASE_NAME_LOWER="{{ app.base_name | lower }}"
@@ -156,6 +151,8 @@ IMS_DATABASE_LOCK_MANAGER_SERVER_NAME="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-
 # zconfig
 ZCONFIG_ZCB_HOME="{{ zconfig.zcb_home }}"
 ZCONFIG_HOME="${ZCONFIG_HOME:-{{ zconfig.zconfig_home }}}"
+# zconfig instrumentation
+ZCONFIG_CONSUMER="${ZCONFIG_CONSUMER:-{{ app.app_name }}}"
 
 # Debug
 DEBUG_HLQ="{{ debug.debug_hlq }}"
@@ -167,6 +164,15 @@ EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
+
+# MQ
+MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
+MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
+MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')
+MQ_CPF=$(get_section_value 'mq' 'cpf')
+MQ_PROCLIB=$(get_section_value 'mq' 'proclib')
+MQ_OTMA_GROUP=$(get_section_value 'mq' 'otma_group')
+MQ_OTMA_IMS=$(get_section_value 'mq' 'otma_ims')
 
 # Zowe Configuration
 ZOWE_RSE_PROFILE="{{ zowe.rse_profile }}"
@@ -183,8 +189,6 @@ set +a
 
 # List of variables to check
 VARS_TO_CHECK=(
-  NEXUS_USER
-  NEXUS_PASSWORD
   IMS_USER
   IMS_PASSWORD
   CICS_USER
@@ -200,7 +204,7 @@ if [ "$(uname)" = "OS/390" ]; then
         error=1
       fi
     done
-    
+
     if [ "$error" -eq 1 ]; then
       print_error "One or more variables are missing. Stopping script." >&2
       rm -f "$ENV_FILE"
@@ -210,3 +214,4 @@ if [ "$(uname)" = "OS/390" ]; then
 fi
 
 export PATH=${PYTHON_HOME:-}/bin:$JAVA_HOME:/bin:$PATH
+

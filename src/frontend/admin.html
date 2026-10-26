@@ -3,116 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Control Panel - Bank of Z</title>
-    
-    <!-- Carbon Design System Styles -->
+    <title>Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-    
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
-    
-    <!-- Main Content -->
-    <cds-layer class="cds--white landing-page">
-        <!-- Banner -->
-        <cds-layer class="layer landing-page__banner">
-            <div class="landing-page__heading">
-                <cds-breadcrumb>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                </cds-breadcrumb>
-                <h1>
-                    Welcome to Bank of Z Sample Application
-                </h1>
-            </div>
-        </cds-layer>
-                    
-        <cds-grid class="cds--content">
-            <cds-column lg="8" md="4" sm="2">
-                <h5>User Services</h5>
-                
-                <cds-button kind="ghost" href="customer-create.html">
-                    Create a new customer
-                </cds-button>
-                <hr class="half-width">
-                
-                <cds-button kind="ghost" href="customer-delete.html">
-                    Delete existing customer
-                </cds-button>
-                <hr class="half-width">
-                
-                <cds-button kind="ghost" href="customer-details.html">
-                    View/Update customer details (and see their accounts)
-                </cds-button>
-                <hr class="half-width">
-                
-                <h5>Account Services</h5>
-                
-                <cds-button kind="ghost" href="account-create.html">
-                    Create a New Account
-                </cds-button>
-                <hr class="half-width">
-                
-                <cds-button kind="ghost" href="account-delete.html">
-                    Delete existing account
-                </cds-button>
-                <hr class="half-width">
-                
-                <cds-button kind="ghost" href="account-details.html">
-                    View/Update account details
-                </cds-button>
-                <hr class="half-width">
-                
-                <cds-button kind="ghost" href="account-deposit.html">
-                    Deposit funds to account
-                </cds-button>
-                <hr class="half-width">
-                <cds-button kind="ghost" href="account-transactions.html">
-                    View account transactions
-                </cds-button>
-                <hr class="half-width">
-            </cds-column>
-            <cds-column lg="8" md="4" sm="2" class="control-panel-right-child">
-                <img class="page-image"
-                        src="assets/images/promo-band-illustration-1920x1080-2x.png"
-                        alt="Carbon illustration">
-            </cds-column>
-        </cds-grid>
-    </div>
 
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/tabs.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
-    
-    <!-- Page Script -->
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+
+                <div class="grid-3">
+                    <!-- 1. Find a customer: the main path -->
+                    <div class="card home-card" id="find-customer">
+                        <span class="home-card__step">Start here</span>
+                        <h2 class="card__title">Find a customer</h2>
+                        <p class="card__intro">
+                            Open a customer to see their details and accounts. From there you can edit them,
+                            open or close accounts, credit or debit, transfer money and view transactions.
+                        </p>
+                        <div id="customer-lookup"></div>
+                    </div>
+
+                    <!-- 2. Create a customer -->
+                    <div class="card home-card" id="create-customer">
+                        <span class="home-card__step">New customer</span>
+                        <h2 class="card__title">Create a customer</h2>
+                        <p class="card__intro">
+                            Register a new customer. Once created you are taken straight to their page
+                            to open their first account.
+                        </p>
+                        <cds-button href="customer-create.html">Create customer</cds-button>
+                    </div>
+
+                    <!-- 3. Find an account by number -->
+                    <div class="card home-card" id="find-account">
+                        <span class="home-card__step">Shortcut</span>
+                        <h2 class="card__title">Find an account by number</h2>
+                        <p class="card__intro">
+                            Already have an account number, for example from a statement? Go straight to it.
+                            IMS accounts are reached through their customer.
+                        </p>
+                        <div class="lookup">
+                            <cds-text-input id="accountId" label="Account number" placeholder="e.g. 00000042"></cds-text-input>
+                            <cds-button id="account-lookup-btn">Find account</cds-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card__title">How it fits together</h2>
+                    <ol class="flow-list" style="margin-top: 1.25rem;">
+                        <li><strong>1. Customer</strong><span>Every journey starts with a customer ID: C for CICS, I for IMS.</span></li>
+                        <li><strong>2. Accounts</strong><span>A customer page lists their accounts and balances, and opens new ones.</span></li>
+                        <li><strong>3. Account</strong><span>An account page shows details and offers credit / debit, transfer and transactions.</span></li>
+                        <li><strong>4. Money moves</strong><span>Transfers pick the destination by account number, or by customer then account.</span></li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
-            
-            // Show the functions panel
-            const panel = document.getElementById('panel-functions');
-            if (panel) {
-                panel.removeAttribute('hidden');
-            }
+        import { mountPage, notify, clearNotification } from './js/components/layout.js';
+        import { customerLookupHtml, bindCustomerLookup, urls, pageUrl } from './js/components/lookup.js';
+
+        mountPage({
+            crumbs: [{ label: 'Home' }],
+            title: 'Bank of Z',
+            subtitle: 'Pick where to start. Most work begins with a customer.'
         });
+
+        document.getElementById('customer-lookup').innerHTML = customerLookupHtml({
+            buttonLabel: 'Find customer'
+        });
+        bindCustomerLookup({ onFound: (ref) => { window.location.href = urls.customer(ref.ref); } });
+
+        const accountInput = document.getElementById('accountId');
+        const goToAccount = () => {
+            clearNotification();
+            const accountId = (accountInput.value || '').trim();
+            if (!/^\d+$/.test(accountId)) {
+                accountInput.setAttribute('invalid', '');
+                accountInput.setAttribute('invalid-text', 'Enter the account number (digits only)');
+                return;
+            }
+            accountInput.removeAttribute('invalid');
+            window.location.href = pageUrl('account-details.html', { accountId });
+        };
+        document.getElementById('account-lookup-btn').addEventListener('click', goToAccount);
+        accountInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); goToAccount(); }
+        });
+
+        // Confirmation after a customer or account was deleted
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('deletedCustomer')) {
+            notify('success', 'Customer deleted', `Customer ${query.get('deletedCustomer')} has been deleted.`);
+        } else if (query.get('deletedAccount')) {
+            notify('success', 'Account deleted', `Account ${query.get('deletedAccount')} has been deleted.`);
+        }
+
+        // Header links such as admin.html#find-customer focus the matching card
+        const focusFromHash = () => {
+            const target = window.location.hash.slice(1);
+            const input = { 'find-customer': 'customerId', 'find-account': 'accountId' }[target];
+            if (input) setTimeout(() => document.getElementById(input)?.focus(), 300);
+        };
+        window.addEventListener('hashchange', focusFromHash);
+        focusFromHash();
     </script>
 </body>
 </html>

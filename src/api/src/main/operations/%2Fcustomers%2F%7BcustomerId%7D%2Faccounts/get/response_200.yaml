@@ -33,6 +33,30 @@ mappings:
               required: true
               nullable: false
               template: "ACTIVE"
+          - customerId:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-CUSTNO\"}}"
+          - openingDate:
+              required: false
+              nullable: false
+              template: "{{$item.\"COMM-OPENED-GROUP\".\"COMM-OPENED-YEAR\"}}-{{$item.\"COMM-OPENED-GROUP\".\"COMM-OPENED-MONTH\"}}-{{$item.\"COMM-OPENED-GROUP\".\"COMM-OPENED-DAY\"}}"
+          - interestRate:
+              required: false
+              nullable: true
+              expression: "$item.\"COMM-INT-RATE\""
+          - overdraftLimit:
+              required: false
+              nullable: true
+              expression: "$item.\"COMM-OVERDRAFT\""
+          - availableBalance:
+              required: false
+              nullable: true
+              expression: "$item.\"COMM-AVAIL-BAL\""
+          - actualBalance:
+              required: false
+              nullable: true
+              expression: "$item.\"COMM-ACTUAL-BAL\""
     - totalCount:
         required: false
         nullable: false

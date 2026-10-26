@@ -19,7 +19,7 @@ Bank of Z uses the following technologies and development capabilities to suppor
 |---|---|
 | IBM DBB | Compiles and packages all application source |
 | Wazi Deploy | Deploys the build archive to CICS and IMS |
-| zconfig | Provisions CICS and IMS runtim environment |
+| zconfig | Provisions CICS, IMS and MQ middleware |
 | z/OS Connect CLI | Configures and starts z/OS Connect APIs |
 
 ## Installation workflow

@@ -7,6 +7,7 @@ vars:
   ims_plex: PLEX2
   db2_hlq: DB2V13
   db2_ssid: DBD1
+  ims_java_conf_path: "/u/ibmuser/dfsjvmpr.props"  
   ims_java_home: "/usr/local/sandboxes/tools/J21.0_64"
   ims_java_dir: "/usr/lpp/ims/imsjava"
   db2_java_dir: "/usr/lpp/db2d10"
@@ -500,7 +501,7 @@ ims:
       config:
         jvm_options:
         - option: -Xoptionsfile
-          value: "/u/{{ vars.ims_user_lower }}/dfsjvmpr.props"
+          value: "{{ vars.ims_java_conf_path }}"
         - option: -Xmx128M
         - option: -Xmn64M
         - option: -XX:+Enable3164Interoperability

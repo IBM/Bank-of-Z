@@ -48,6 +48,7 @@ ZOS_KEYRING="{{ global.zos_keyring }}"
 ZOS_CREATE_CERTS="{{ global.zos_create_certs }}"
 
 # Application
+APP_NAME="{{ app.app_name }}"
 APP_BASE_NAME="{{ app.base_name }}"
 APP_SHORT_NAME="{{ app.short_name }}"
 APP_BASE_NAME_LOWER="{{ app.base_name | lower }}"
@@ -151,7 +152,7 @@ IMS_DATABASE_LOCK_MANAGER_SERVER_NAME="${IMS_DATABASE_LOCK_MANAGER_SERVER_NAME:-
 ZCONFIG_ZCB_HOME="{{ zconfig.zcb_home }}"
 ZCONFIG_HOME="${ZCONFIG_HOME:-{{ zconfig.zconfig_home }}}"
 # zconfig instrumentation
-ZCONFIG_CONSUMER="Bank-of-Z"
+ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-{{ app.app_name }}}"  
 
 # Debug
 DEBUG_HLQ="{{ debug.debug_hlq }}"

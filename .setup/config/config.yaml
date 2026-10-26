@@ -13,6 +13,7 @@ global:
   sandbox_root: "/usr/local/sandboxes"
 
   # Application
+  app_name: "Bank-of-Z"
   app_base_name: "BANKZ"
   app_hlq: "{{ global.app_base_name }}"
   app_short_name: "BOZ" # Maximum 3 characters
@@ -98,6 +99,7 @@ global:
 
 # Application properties
 app:
+  app_name: "{{ global.app_name }}"
   base_name: "{{ global.app_base_name }}"
   short_name: "{{ global.app_short_name }}"
   app_hlq: "{{ global.app_hlq }}"

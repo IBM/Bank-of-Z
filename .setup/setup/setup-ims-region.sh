@@ -34,6 +34,7 @@ export BOZ_IMS_HLQ="${IMS_APP_HLQ}"
 # =========================
 # Stop IBM BOZ regions
 # =========================
+print_info "Stopping IMS ${APP_BASE_NAME} regions .."
 set +e
 # Delete stale stop members so jsub fails silently rather than executing
 # outdated JCL that may reference deleted datasets. Members are rebuilt
@@ -97,6 +98,8 @@ IMS_USER=$(printf '%s' "${IMS_USER}" | tr '[:lower:]' '[:upper:]')
 IMS_USER_LOWER=$(printf '%s' "${IMS_USER}" | tr '[:upper:]' '[:lower:]')
 print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
+# zconfig instrumentation
+export ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-"Bank-of-Z"}
 zconfig apply -e ims_user="${IMS_USER}" \
               -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
@@ -107,6 +110,7 @@ zconfig apply -e ims_user="${IMS_USER}" \
               -e db2_java_dir="${DB2_JAVA_FOLDER}" \
               -e ims_java_dir="${IMS_JAVA_FOLDER}" \
               -e ims_java_home="${IMS_JAVA_HOME}" \
+              -e ims_java_conf_path="${IMS_JAVA_CONF_PATH}" \
               -e db2_ssid="${DB2_SSID}" \
               -e debug_hlq="${DEBUG_HLQ}" \
               -e debug_stc_user="${DEBUG_STC_USER}" \
@@ -124,6 +128,9 @@ else
     print_error "Check logs in: $SCRIPTS_DIR/logs"
     exit 1
 fi
+
+# ACBLIB is mandatory (even empty) for some IMS utilities PROC
+tsocmd "ALLOCATE DATASET('${IMS_APP_HLQ}.ACBLIB') NEW CATALOG DSORG(PO) RECFM(U) BLKSIZE(32760) CYLINDERS SPACE(10,5) DIR(50)" 2> /dev/null || true
 
 deactivate
 

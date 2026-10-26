@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "BAD_REQUEST"
+    - message:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '4' ? 'Amount must be positive' : ($zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAIL-CODE\" = '2' ? 'Insufficient funds or invalid transaction' : 'Invalid transfer request')"

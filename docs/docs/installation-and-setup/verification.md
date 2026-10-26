@@ -66,6 +66,7 @@ Verify that the following application resources have been deployed successfully:
 - CICS resources are active
 - z/OS Connect API artifacts have been deployed
 - Required configuration resources are available
+- MQ queues have been configured, and CICS and IMS bridges are active
 
 ## Verify application access
 
@@ -78,6 +79,7 @@ Typical validation activities include:
 - Viewing account details
 - Executing account transactions
 - Invoking deployed z/OS Connect APIs
+- Testing the Bank of Q Java code
 
 Successful run confirms that the deployed components are communicating correctly.
 

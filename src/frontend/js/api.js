@@ -27,14 +27,30 @@ class ApiConfiguration {
 }
 
 /**
- * Helper function to determine system type from customer ID
- * @param {string} customerId - Customer ID with prefix (C for CICS, I for IMS)
- * @returns {string} 'IMS' or 'CICS'
+ * Build the error thrown when an operation has no IMS endpoint.
+ * IMS is only ever called where the backend defines a route; everything else
+ * fails with this message rather than silently falling back to CICS.
+ * @param {string} operation - Human readable operation, e.g. 'Creating accounts'
+ * @returns {Error} Error with status 501 and code IMS_NOT_IMPLEMENTED
  */
-function getSystemFromCustomerId(customerId) {
-    if (!customerId) return 'CICS';
-    const idStr = customerId.toString().toUpperCase();
-    return idStr.startsWith('I') ? 'IMS' : 'CICS';
+export function imsNotImplementedError(operation) {
+    const error = new Error(`${operation} is not implemented for IMS (I) customers. Use a CICS (C) customer ID.`);
+    error.status = 501;
+    error.code = 'IMS_NOT_IMPLEMENTED';
+    return error;
+}
+
+/**
+ * Sort code is fixed for this bank and cannot be changed by users.
+ */
+const SORT_CODE = config.defaults.sortCode;
+
+/**
+ * Transactions endpoints expect "sortCode-accountNumber"; accept a bare account number too.
+ */
+function toFullAccountId(accountId) {
+    const id = String(accountId);
+    return id.includes('-') ? id : `${SORT_CODE}-${id}`;
 }
 
 /**
@@ -141,7 +157,8 @@ class CustomersApi extends BaseApi {
      * @param {string} [customerData.customerStatus] - Customer status
      * @returns {Promise<CreateCustomerResponse>} Created customer with customerId and sortCode
      */
-    async createCustomer(customerData) {
+    async createCustomer(customerData, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Creating customers');
         return this.request(`${this.configuration.baseUrl}/customers`, {
             method: 'POST',
             body: JSON.stringify(customerData)
@@ -177,11 +194,13 @@ class CustomersApi extends BaseApi {
 
     /**
      * Delete customer
-     * DELETE /customers/{customerId}
-     * @param {string} customerId - Unique customer identifier
+     * DELETE /customers/{customerId} (CICS only)
+     * @param {string} customerId - Unique customer identifier (numeric, without prefix)
+     * @param {string} [system] - 'CICS' (default) or 'IMS' (not implemented)
      * @returns {Promise<void>} No content on success
      */
-    async deleteCustomer(customerId) {
+    async deleteCustomer(customerId, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Deleting customers');
         await this.request(`${this.configuration.baseUrl}/customers/${customerId}`, {
             method: 'DELETE'
         });
@@ -226,36 +245,32 @@ class AccountsApi extends BaseApi {
 
     /**
      * Get account details
-     * GET /accounts/{accountId} or /ims/accounts/{customerId}
+     * GET /accounts/{accountId} (CICS) or /ims/accounts/{customerId} (IMS)
      * @param {string} accountId - Unique identifier for the account
-     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS using customerId)
+     * @param {string} [system] - 'CICS' (default) or 'IMS'
+     * @param {string} [customerId] - Numeric customer ID (required for IMS)
      * @returns {Promise<Account>} Account details
      */
-    async getAccount(accountId, customerId = null) {
-        if (customerId) {
-            // IMS account - use customer ID in path
+    async getAccount(accountId, system = 'CICS', customerId = null) {
+        if (system === 'IMS') {
             return this.request(`${this.configuration.baseUrl}/ims/accounts/${customerId}`);
-        } else {
-            // CICS account
-            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
         }
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`);
     }
 
     /**
      * Get account balances
-     * GET /accounts/{accountId}/balances or /ims/accounts/{customerId}/balances
+     * GET /accounts/{accountId}/balances (CICS) or /ims/accounts/{customerId}/balances (IMS)
      * @param {string} accountId - Unique identifier for the account
-     * @param {string} [customerId] - Optional customer ID (if provided, routes to IMS using customerId)
+     * @param {string} [system] - 'CICS' (default) or 'IMS'
+     * @param {string} [customerId] - Numeric customer ID (required for IMS)
      * @returns {Promise<BalanceList>} Balance information
      */
-    async getAccountBalances(accountId, customerId = null) {
-        if (customerId) {
-            // IMS account - use customer ID in path, not account ID
+    async getAccountBalances(accountId, system = 'CICS', customerId = null) {
+        if (system === 'IMS') {
             return this.request(`${this.configuration.baseUrl}/ims/accounts/${customerId}/balances`);
-        } else {
-            // CICS account
-            return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
         }
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/balances`);
     }
 
     /**
@@ -269,7 +284,9 @@ class AccountsApi extends BaseApi {
      * @param {number} options.offset - Number of transactions to skip (default 0)
      * @returns {Promise<TransactionList>} Transaction history
      */
-    async getAccountTransactions(accountId, options = {}) {
+    async getAccountTransactions(accountId, options = {}, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Viewing transactions');
+        accountId = toFullAccountId(accountId);
         const params = new URLSearchParams();
         if (options.fromDate) params.append('fromDate', options.fromDate);
         if (options.toDate) params.append('toDate', options.toDate);
@@ -292,79 +309,99 @@ class AccountsApi extends BaseApi {
      * @returns {Promise<Transaction>} Transaction details
      */
     async getTransaction(accountId, transactionId) {
-        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}/transactions/${transactionId}`);
+        return this.request(`${this.configuration.baseUrl}/accounts/${toFullAccountId(accountId)}/transactions/${transactionId}`);
     }
 
     /**
-     * Deposit funds to an account
+     * Credit (positive amount) or debit (negative amount) an account
      * POST /accounts/{accountId}/deposit (CICS)
      * POST /ims/accounts/{customerId}/{accountId}/deposit (IMS)
      * @param {string} accountId - Unique identifier for the account
      * @param {Object} depositData - Deposit data
-     * @param {number} depositData.amount - Deposit amount (must be positive, minimum 0.01)
-     * @param {string} depositData.sortCode - 6-digit bank sort code
-     * @param {string} [depositData.description] - Description of the deposit (max 40 characters)
-     * @param {string} [customerId] - Customer ID (required for IMS, optional for CICS)
+     * @param {number} depositData.amount - Non-zero amount; negative = debit
+     * @param {string} [depositData.description] - Description (max 40 characters)
+     * @param {string} [system] - 'CICS' (default) or 'IMS'
+     * @param {string} [customerId] - Numeric customer ID (required for IMS)
      * @returns {Promise<Object>} Deposit result with updated balances
      */
-    async depositToAccount(accountId, depositData, customerId = null) {
-        let url;
-        const system = getSystemFromCustomerId(customerId);
-        
-        console.log('=== DEPOSIT DEBUG ===');
-        console.log('customerId received:', customerId);
-        console.log('system determined:', system);
-        
-        // Strip the C/I prefix to get numeric ID for API
-        const numericCustomerId = customerId ? customerId.toString().replace(/^[CI]/i, '') : null;
-        console.log('numericCustomerId:', numericCustomerId);
-        
-        if (system === 'IMS' && numericCustomerId) {
-            // IMS endpoint: /ims/accounts/{customerId}/{accountId}/deposit
-            url = `${this.configuration.baseUrl}/ims/accounts/${numericCustomerId}/${accountId}/deposit`;
-            console.log('Using IMS endpoint');
-        } else {
-            // CICS endpoint: /accounts/{accountId}/deposit
-            url = `${this.configuration.baseUrl}/accounts/${accountId}/deposit`;
-            console.log('Using CICS endpoint');
-        }
-        
-        console.log('Final URL:', url);
-        console.log('===================');
-        
+    async depositToAccount(accountId, depositData, system = 'CICS', customerId = null) {
+        const url = system === 'IMS'
+            ? `${this.configuration.baseUrl}/ims/accounts/${customerId}/${accountId}/deposit`
+            : `${this.configuration.baseUrl}/accounts/${accountId}/deposit`;
+
         return this.request(url, {
             method: 'POST',
-            body: JSON.stringify(depositData)
+            body: JSON.stringify({ ...depositData, sortCode: SORT_CODE })
         });
     }
 
-    // Stub methods for legacy endpoints not in OpenAPI spec
     /**
-     * Create a new account (stub - not in OpenAPI spec)
+     * Create a new account
+     * POST /accounts
      * @param {Object} accountData - Account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} accountData.customerNumber - Customer number (required)
+     * @param {string} accountData.accountType - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA (required)
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @param {string} [accountData.openedDate] - Opened date (YYYY-MM-DD); defaults to today
+     * @returns {Promise<CreatedAccount>} Created account with accountId, sortCode and balances
      */
-    async createAccount(accountData) {
-        throw new Error('Account creation is not supported in the OpenBanking API specification');
+    async createAccount(accountData, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Creating accounts');
+        return this.request(`${this.configuration.baseUrl}/accounts`, {
+            method: 'POST',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**
-     * Update account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
+     * Update account
+     * PUT /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
      * @param {Object} accountData - Updated account data
-     * @returns {Promise<Object>} Rejected promise
+     * @param {string} [accountData.accountType] - Account type: SAVING|CURRENT|LOAN|MORTGAGE|ISA
+     * @param {number} [accountData.interestRate] - Annual interest rate (0–99.99)
+     * @param {number} [accountData.overdraftLimit] - Overdraft limit in whole units
+     * @returns {Promise<UpdatedAccount>} Updated account details
      */
-    async updateAccount(accountNumber, accountData) {
-        throw new Error('Account updates are not supported in the OpenBanking API specification');
+    async updateAccount(accountId, accountData, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Updating accounts');
+        return this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'PUT',
+            body: JSON.stringify(accountData)
+        });
     }
 
     /**
-     * Delete account (stub - not in OpenAPI spec)
-     * @param {string} accountNumber - Unique account identifier
-     * @returns {Promise<Object>} Rejected promise
+     * Delete account
+     * DELETE /accounts/{accountId}
+     * @param {string} accountId - Unique account identifier
+     * @returns {Promise<void>} No content on success
      */
-    async deleteAccount(accountNumber) {
-        throw new Error('Account deletion is not supported in the OpenBanking API specification');
+    async deleteAccount(accountId, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Deleting accounts');
+        await this.request(`${this.configuration.baseUrl}/accounts/${accountId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * Transfer funds between accounts
+     * POST /accounts/{accountId}/transfer
+     * @param {string} fromAccountId - Source account identifier
+     * @param {Object} transferData - Transfer data
+     * @param {string} transferData.toAccountId - Destination account identifier
+     * @param {number} transferData.amount - Amount to transfer (positive number)
+     * @param {string} [transferData.fromSortCode] - Source bank sort code
+     * @param {string} [transferData.toSortCode] - Destination bank sort code
+     * @returns {Promise<TransferResponse>} Balances of both accounts after transfer
+     */
+    async transferFunds(fromAccountId, transferData, system = 'CICS') {
+        if (system === 'IMS') throw imsNotImplementedError('Transferring funds');
+        return this.request(`${this.configuration.baseUrl}/accounts/${fromAccountId}/transfer`, {
+            method: 'POST',
+            body: JSON.stringify({ ...transferData, fromSortCode: SORT_CODE, toSortCode: SORT_CODE })
+        });
     }
 
     /**

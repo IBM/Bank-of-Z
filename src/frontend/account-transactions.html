@@ -1,408 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Account Transactions - Bank of Z</title>
-
-    <!-- Carbon Design System Styles -->
+    <title>Transactions - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
-
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
 
-    <!-- Main Content -->
-    <div class="cds--content landing-page">
-        <!-- Banner -->
-        <div class="cds--white landing-page__banner">
-            <div class="landing-page__heading">
-                <cds-breadcrumb>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="account-transactions.html">Account Transactions</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                </cds-breadcrumb>
-                <h1>Account Transactions</h1>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+                <div id="content"></div>
             </div>
-        </div>
+        </section>
+    </main>
 
-        <!-- Search and Filter Section -->
-        <div class="cds--row">
-            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
-                <div class="search-section">
-                    <h3>Search Transactions</h3>
-                    <cds-form id="search-form">
-                        <div class="cds--row">
-                            <div class="cds--col-md-4 cds--col-lg-4">
-                                <cds-text-input
-                                    id="accountId"
-                                    label="Account ID"
-                                    placeholder="e.g., 987654-3000 or 3000"
-                                    helper-text="Enter full account ID (sortCode-accountNumber) or just account number"
-                                    required>
-                                </cds-text-input>
-                            </div>
-                            <div class="cds--col-md-4 cds--col-lg-4">
-                                <cds-date-picker>
-                                    <cds-date-picker-input 
-                                        id="fromDate"
-                                        kind="single" 
-                                        label-text="From Date"
-                                        placeholder="yyyy-mm-dd">
-                                    </cds-date-picker-input>
-                                </cds-date-picker>
-                            </div>
-                            <div class="cds--col-md-4 cds--col-lg-4">
-                                <cds-date-picker>
-                                    <cds-date-picker-input 
-                                        id="toDate"
-                                        kind="single" 
-                                        label-text="To Date"
-                                        placeholder="yyyy-mm-dd">
-                                    </cds-date-picker-input>
-                                </cds-date-picker>
-                            </div>
-                        </div>
-                        <br>
-                        <cds-button id="search-btn">Search Transactions</cds-button>
-                    </cds-form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Transactions Table Section -->
-        <div id="transactions-section" class="cds--row" style="display: none;">
-            <div class="cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
-                <br>
-                <h3>Transaction History</h3>
-                <div id="account-info"></div>
-                <br>
-                <div id="transactions-table"></div>
-                <br>
-                <!-- Pagination Controls -->
-                <div id="pagination-controls" style="display: none;">
-                    <cds-button id="prev-btn" kind="secondary" disabled>Previous</cds-button>
-                    <span id="page-info" style="margin: 0 20px;"></span>
-                    <cds-button id="next-btn" kind="secondary">Next</cds-button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/date-picker.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
-
-    <!-- Page Script -->
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, formatCurrency, formatDate } from './js/utils.js';
+        import { mountPage, notify, clearNotification, errorMessage } from './js/components/layout.js';
+        import {
+            readContext, customerLookupHtml, bindCustomerLookup, fetchCustomerAccounts,
+            loadAccountContext, urls, IMS_LIMITED_NOTE, datePickerHtml, readDatePicker
+        } from './js/components/lookup.js';
+        import { formatCurrency, formatDate, escapeHtml } from './js/utils.js';
 
-        let currentAccountId = null;
-        let currentOffset = 0;
-        let currentLimit = 50;
-        let totalCount = 0;
-        let currentFilters = {};
+        const PAGE_SIZE = 25;
+        const content = document.getElementById('content');
+        const { accountId, customer } = readContext();
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
+        let account = null;
+        let customerRef = null;
+        let offset = 0;
+        let total = 0;
+        let filters = {};
 
-            // Check for account ID in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const accountId = urlParams.get('accountId');
-            if (accountId) {
-                document.getElementById('accountId').value = accountId;
-                searchTransactions();
+        if (customer && !customer.ok) {
+            showLookup();
+            notify('error', 'Invalid customer ID', customer.error);
+        } else if (accountId) {
+            loadAccount();
+        } else if (customer) {
+            loadAccountPicker(customer);
+        } else {
+            showLookup();
+        }
+
+        function showLookup() {
+            mountPage({ crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Transactions' }], title: 'Account transactions' });
+            content.innerHTML = `
+                <div class="card" style="max-width: 640px;">
+                    <h2 class="card__title">Which customer?</h2>
+                    <p class="card__intro">Enter the customer ID, then choose one of their accounts.</p>
+                    ${customerLookupHtml({ buttonLabel: 'Continue' })}
+                </div>`;
+            bindCustomerLookup({ onFound: (r) => { window.location.href = urls.transactions(null, r.ref); } });
+        }
+
+        async function loadAccountPicker(ref) {
+            mountPage({
+                crumbs: [{ label: 'Home', href: 'admin.html' }, { label: ref.ref, href: urls.customer(ref.ref) }, { label: 'Transactions' }],
+                title: 'Account transactions',
+                subtitle: `Choose an account for customer ${ref.ref}`
+            });
+            if (ref.system === 'IMS') {
+                content.innerHTML = `<cds-inline-notification kind="error" title="Not implemented for IMS" subtitle="${escapeHtml('Viewing transactions is not implemented for IMS (I) customers. ' + IMS_LIMITED_NOTE)}" hide-close-button style="max-width:none;width:100%"></cds-inline-notification>`;
+                return;
             }
-
-            // Handle search
-            document.getElementById('search-btn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                currentOffset = 0; // Reset pagination
-                await searchTransactions();
-            });
-
-            // Handle Enter key in account ID field
-            document.getElementById('accountId').addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    currentOffset = 0;
-                    await searchTransactions();
+            content.innerHTML = '<cds-loading></cds-loading>';
+            try {
+                const accounts = await fetchCustomerAccounts(ref);
+                if (!accounts.length) {
+                    content.innerHTML = '<div class="card"><div class="empty">This customer has no accounts.</div></div>';
+                    return;
                 }
-            });
+                const rows = accounts.map((a) => `
+                    <tr>
+                        <td>${escapeHtml(a.accountNumber || a.accountId)}</td>
+                        <td>${escapeHtml(a.accountType || 'N/A')}</td>
+                        <td class="num">${formatCurrency(a.availableBalance, a.currency)}</td>
+                        <td><a href="${urls.transactions(a.accountId, ref.ref)}">View transactions</a></td>
+                    </tr>`).join('');
+                content.innerHTML = `<div class="card"><div class="table-wrap"><table class="bz-table">
+                    <thead><tr><th>Account number</th><th>Type</th><th class="num">Available</th><th></th></tr></thead>
+                    <tbody>${rows}</tbody></table></div></div>`;
+            } catch (error) {
+                content.innerHTML = '';
+                notify('error', 'Could not load accounts', errorMessage(error, 'Customer not found or error loading accounts'));
+            }
+        }
 
-            // Pagination handlers
-            document.getElementById('prev-btn').addEventListener('click', async () => {
-                if (currentOffset > 0) {
-                    currentOffset = Math.max(0, currentOffset - currentLimit);
-                    await loadTransactions();
-                }
-            });
+        async function loadAccount() {
+            mountPage({ crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Transactions' }], title: 'Account transactions' });
+            content.innerHTML = '<cds-loading></cds-loading>';
 
-            document.getElementById('next-btn').addEventListener('click', async () => {
-                if (currentOffset + currentLimit < totalCount) {
-                    currentOffset += currentLimit;
-                    await loadTransactions();
-                }
-            });
-        });
-
-        async function searchTransactions() {
-            const accountId = document.getElementById('accountId').value.trim();
-
-            if (!accountId) {
-                showErrorModal('Validation Error', 'Please enter an account ID');
+            if (customer && customer.system === 'IMS') {
+                content.innerHTML = '';
+                notify('error', 'Not implemented for IMS', 'Viewing transactions is not implemented for IMS (I) customers.');
+                return;
+            }
+            try {
+                const ctx = await loadAccountContext(accountId, customer);
+                account = ctx.account;
+                customerRef = ctx.ref;
+            } catch (error) {
+                content.innerHTML = '';
+                notify('error', 'Account not found', errorMessage(error, `Could not load account ${accountId}`));
                 return;
             }
 
-            currentAccountId = accountId;
-            
-            // Get date filters and convert to YYYY-MM-DD format
-            const fromDateValue = document.getElementById('fromDate').value;
-            const toDateValue = document.getElementById('toDate').value;
+            const number = account.accountNumber || account.accountId;
+            mountPage({
+                crumbs: [
+                    { label: 'Home', href: 'admin.html' },
+                    ...(customerRef ? [{ label: customerRef, href: urls.customer(customerRef) }] : []),
+                    { label: `Account ${number}`, href: urls.account(account.accountId, customerRef) },
+                    { label: 'Transactions' }
+                ],
+                title: 'Transactions',
+                subtitle: `Account ${number}${customerRef ? ` for customer ${customerRef}` : ''}`
+            });
 
-            currentFilters = {
-                fromDate: fromDateValue ? convertToISODate(fromDateValue) : undefined,
-                toDate: toDateValue ? convertToISODate(toDateValue) : undefined
-            };
+            content.innerHTML = `
+                <div class="stat-row">
+                    <div class="stat"><div class="stat__label">Account</div><div class="stat__value">${escapeHtml(number)}</div></div>
+                    <div class="stat"><div class="stat__label">Type</div><div class="stat__value">${escapeHtml(account.accountType || 'N/A')}</div></div>
+                    <div class="stat"><div class="stat__label">Available balance</div><div class="stat__value">${formatCurrency(account.availableBalance, account.currency)}</div></div>
+                </div>
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">Filter</h2></div>
+                    <div class="form-grid">
+                        ${datePickerHtml({ id: 'fromDate', label: 'From date' })}
+                        ${datePickerHtml({ id: 'toDate', label: 'To date' })}
+                    </div>
+                    <div class="form-actions">
+                        <cds-button id="apply-btn">Apply</cds-button>
+                        <cds-button id="clear-btn" kind="secondary">Clear</cds-button>
+                        <cds-button kind="tertiary" href="${urls.account(account.accountId, customerRef)}">Back to account</cds-button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">History</h2></div>
+                    <div id="transactions"></div>
+                    <div class="pagination" id="pagination" style="display:none">
+                        <span id="page-info" class="muted"></span>
+                        <div class="chip-row">
+                            <cds-button id="prev-btn" kind="secondary" size="md">Previous</cds-button>
+                            <cds-button id="next-btn" kind="secondary" size="md">Next</cds-button>
+                        </div>
+                    </div>
+                </div>`;
 
-            await loadTransactions();
+            document.getElementById('apply-btn').addEventListener('click', applyFilters);
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                ['fromDate', 'toDate'].forEach((id) => {
+                    const input = document.getElementById(id);
+                    input.closest('cds-date-picker').value = '';
+                    input.value = '';
+                });
+                applyFilters();
+            });
+            document.getElementById('prev-btn').addEventListener('click', () => { offset = Math.max(0, offset - PAGE_SIZE); loadTransactions(); });
+            document.getElementById('next-btn').addEventListener('click', () => { offset += PAGE_SIZE; loadTransactions(); });
+
+            loadTransactions();
         }
 
-        // Convert date from MM/DD/YYYY to YYYY-MM-DD format
-        function convertToISODate(dateString) {
-            if (!dateString) return undefined;
-            
-            // Check if already in YYYY-MM-DD format
-            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-                return dateString;
+        function applyFilters() {
+            clearNotification();
+            const from = readDatePicker('fromDate');
+            const to = readDatePicker('toDate');
+            const iso = /^\d{4}-\d{2}-\d{2}$/;
+            if ((from && !iso.test(from)) || (to && !iso.test(to))) {
+                return notify('error', 'Validation error', 'Dates must be in the format dd/mm/yyyy');
             }
-            
-            // Handle MM/DD/YYYY format
-            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-                const [month, day, year] = dateString.split('/');
-                return `${year}-${month}-${day}`;
+            if (from && to && from > to) {
+                return notify('error', 'Validation error', 'The from date must be on or before the to date');
             }
-            
-            // Try to parse as Date object
-            const date = new Date(dateString);
-            if (!isNaN(date.getTime())) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-            
-            return dateString;
+            filters = { fromDate: from || undefined, toDate: to || undefined };
+            offset = 0;
+            loadTransactions();
         }
 
         async function loadTransactions() {
-            showLoadingModal('Loading transactions...');
-
+            const target = document.getElementById('transactions');
+            target.innerHTML = '<cds-loading small></cds-loading>';
             try {
-                // First, get account details
-                const account = await api.accounts.getAccount(currentAccountId);
-                displayAccountInfo(account);
-
-                // Construct the proper accountId format (sortCode-accountNumber)
-                // If currentAccountId doesn't contain a hyphen, it might be just the account number
-                let fullAccountId = currentAccountId;
-                if (account.sortCode && account.accountNumber && !currentAccountId.includes('-')) {
-                    // Remove any hyphens from sortCode and construct the ID
-                    const sortCode = account.sortCode.replace(/-/g, '');
-                    fullAccountId = `${sortCode}-${account.accountNumber}`;
-                } else if (account.accountId) {
-                    // Use the accountId from the account object if available
-                    fullAccountId = account.accountId;
-                }
-
-                // Then get transactions using the properly formatted accountId
-                const response = await api.accounts.getAccountTransactions(fullAccountId, {
-                    ...currentFilters,
-                    limit: currentLimit,
-                    offset: currentOffset
-                });
-
-                hideLoadingModal();
-
-                totalCount = response.totalCount || 0;
-                displayTransactions(response.transactions || []);
-                updatePaginationControls();
-
-                document.getElementById('transactions-section').style.display = 'block';
+                const response = await api.accounts.getAccountTransactions(account.accountId, { ...filters, limit: PAGE_SIZE, offset });
+                total = response.totalCount || 0;
+                renderTransactions(response.transactions || []);
             } catch (error) {
-                hideLoadingModal();
-                showErrorModal('Error', error.message || 'Failed to load transactions');
+                target.innerHTML = '';
+                notify('error', 'Could not load transactions', errorMessage(error, 'Failed to load transactions'));
             }
         }
 
-        function displayAccountInfo(account) {
-            const infoHTML = `
-                <div class="cds--data-table-container">
-                    <table class="cds--data-table">
-                        <tbody>
-                            <tr>
-                                <th>Account ID</th>
-                                <td>${account.accountId}</td>
-                                <th>Account Number</th>
-                                <td>${account.accountNumber || 'N/A'}</td>
-                            </tr>
-                            <tr>
-                                <th>Account Type</th>
-                                <td>${account.accountType}</td>
-                                <th>Currency</th>
-                                <td>${account.currency}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            document.getElementById('account-info').innerHTML = infoHTML;
-        }
+        function renderTransactions(transactions) {
+            const target = document.getElementById('transactions');
+            const pagination = document.getElementById('pagination');
 
-        function displayTransactions(transactions) {
-            if (!transactions || transactions.length === 0) {
-                document.getElementById('transactions-table').innerHTML = '<p>No transactions found for this account</p>';
-                document.getElementById('pagination-controls').style.display = 'none';
+            if (!transactions.length) {
+                target.innerHTML = '<div class="empty">No transactions found for this account.</div>';
+                pagination.style.display = 'none';
                 return;
             }
 
-            let tableHTML = `
-                <div class="cds--data-table-container">
-                    <table class="cds--data-table cds--data-table--zebra">
-                        <thead>
-                            <tr>
-                                <th>Date & Time</th>
-                                <th>Description</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            transactions.forEach(transaction => {
-                const amount = transaction.amount || 0;
-                const isCredit = transaction.creditDebitIndicator === 'CREDIT';
-                const amountClass = isCredit ? 'credit-amount' : 'debit-amount';
-                const amountPrefix = isCredit ? '+' : '-';
-                
-                // Default transaction type based on credit/debit indicator if not provided
-                const transactionType = transaction.transactionType ||
-                    (isCredit ? 'Credit' : 'Debit');
-                
-                tableHTML += `
+            const rows = transactions.map((t) => {
+                const credit = t.creditDebitIndicator === 'CREDIT';
+                return `
                     <tr>
-                        <td>${formatDate(transaction.bookingDateTime)}</td>
-                        <td>${transaction.transactionInformation || 'N/A'}</td>
-                        <td>${transactionType}</td>
-                        <td class="${amountClass}">${amountPrefix}${formatCurrency(Math.abs(amount), transaction.currency)}</td>
-                        <td>${transaction.status || 'N/A'}</td>
-                        <td>
-                            <a href="transaction-details.html?accountId=${currentAccountId}&transactionId=${transaction.transactionId}">View Details</a>
-                        </td>
-                    </tr>
-                `;
-            });
+                        <td>${escapeHtml(formatDate(t.bookingDateTime))}</td>
+                        <td>${escapeHtml(t.transactionInformation || 'N/A')}</td>
+                        <td class="num ${credit ? 'credit' : 'debit'}">${credit ? '+' : '-'}${formatCurrency(Math.abs(t.amount || 0), t.currency)}</td>
+                        <td>${escapeHtml(t.status || 'N/A')}</td>
+                        <td><a href="${urls.transaction(account.accountId, t.transactionId, customerRef)}">Details</a></td>
+                    </tr>`;
+            }).join('');
 
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            target.innerHTML = `<div class="table-wrap"><table class="bz-table">
+                <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
+                <tbody>${rows}</tbody></table></div>`;
 
-            document.getElementById('transactions-table').innerHTML = tableHTML;
-        }
-
-        function updatePaginationControls() {
-            const pageInfo = document.getElementById('page-info');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const paginationControls = document.getElementById('pagination-controls');
-
-            if (totalCount > currentLimit) {
-                paginationControls.style.display = 'block';
-                
-                const currentPage = Math.floor(currentOffset / currentLimit) + 1;
-                const totalPages = Math.ceil(totalCount / currentLimit);
-                const startItem = currentOffset + 1;
-                const endItem = Math.min(currentOffset + currentLimit, totalCount);
-
-                pageInfo.textContent = `Showing ${startItem}-${endItem} of ${totalCount} transactions (Page ${currentPage} of ${totalPages})`;
-
-                // Update button states
-                if (currentOffset === 0) {
-                    prevBtn.setAttribute('disabled', '');
-                } else {
-                    prevBtn.removeAttribute('disabled');
-                }
-
-                if (currentOffset + currentLimit >= totalCount) {
-                    nextBtn.setAttribute('disabled', '');
-                } else {
-                    nextBtn.removeAttribute('disabled');
-                }
+            if (total > PAGE_SIZE) {
+                pagination.style.display = 'flex';
+                document.getElementById('page-info').textContent =
+                    `Showing ${offset + 1} to ${Math.min(offset + PAGE_SIZE, total)} of ${total}`;
+                document.getElementById('prev-btn').toggleAttribute('disabled', offset === 0);
+                document.getElementById('next-btn').toggleAttribute('disabled', offset + PAGE_SIZE >= total);
             } else {
-                paginationControls.style.display = 'none';
+                pagination.style.display = 'none';
             }
         }
     </script>
-
-    <style>
-        .credit-amount {
-            color: #24a148;
-            font-weight: 600;
-        }
-        
-        .debit-amount {
-            color: #da1e28;
-            font-weight: 600;
-        }
-        
-        .search-section {
-            padding: 20px;
-            background: var(--cds-layer);
-            margin-bottom: 20px;
-        }
-        
-        #pagination-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 0;
-        }
-    </style>
 </body>
-
 </html>

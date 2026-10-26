@@ -1,0 +1,21 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - fromAccountAvailableBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-FAVBAL\""
+    - fromAccountActualBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-FACTBAL\""
+    - toAccountAvailableBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-TAVBAL\""
+    - toAccountActualBalance:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.XFRFUNZ.\"COMM-TACTBAL\""

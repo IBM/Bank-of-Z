@@ -30,3 +30,15 @@ mappings:
               required: false
               nullable: false
               template: "{{$apiRequest.pathParameters.customerId}}"
+          - accountNumber:
+              required: false
+              nullable: false
+              template: "{{$item.\"ACCID-AS\"}}"
+          - availableBalance:
+              required: false
+              nullable: true
+              expression: "$item.\"BALANCE-AS\""
+          - actualBalance:
+              required: false
+              nullable: true
+              expression: "$item.\"BALANCE-AS\""

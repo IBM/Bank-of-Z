@@ -1,0 +1,38 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "type" : "object",
+  "properties" : {
+    "commarea" : {
+      "type" : "object",
+      "properties" : {
+        "DELACCZ" : {
+          "type" : "object",
+          "properties" : {
+            "DELACC-EYE"         : { "maxLength" : 4,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-EYE PIC X(4) USAGE DISPLAY.",  "name" : "DELACC-EYE"  } },
+            "DELACC-CUSTNO"      : { "maxLength" : 10, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-CUSTNO PIC X(10) USAGE DISPLAY.", "name" : "DELACC-CUSTNO" } },
+            "DELACC-SCODE"       : { "maxLength" : 6,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-SCODE PIC X(6) USAGE DISPLAY.",  "name" : "DELACC-SCODE"  } },
+            "DELACC-ACCNO"       : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-ACCNO PIC 9(8) USAGE DISPLAY.", "name" : "DELACC-ACCNO" } },
+            "DELACC-ACC-TYPE"    : { "maxLength" : 8,  "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-ACC-TYPE PIC X(8) USAGE DISPLAY.", "name" : "DELACC-ACC-TYPE" } },
+            "DELACC-INT-RATE"    : { "minimum" : 0, "maximum" : 9999.99, "type" : "number",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-INT-RATE PIC 9(4)V99 USAGE DISPLAY.", "name" : "DELACC-INT-RATE" } },
+            "DELACC-OPENED"      : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-OPENED PIC 9(8) USAGE DISPLAY.", "name" : "DELACC-OPENED" } },
+            "DELACC-OVERDRAFT"   : { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-OVERDRAFT PIC 9(8) USAGE DISPLAY.", "name" : "DELACC-OVERDRAFT" } },
+            "DELACC-LAST-STMT-DT": { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-LAST-STMT-DT PIC 9(8) USAGE DISPLAY.", "name" : "DELACC-LAST-STMT-DT" } },
+            "DELACC-NEXT-STMT-DT": { "minimum" : 0, "maximum" : 99999999, "type" : "integer", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-NEXT-STMT-DT PIC 9(8) USAGE DISPLAY.", "name" : "DELACC-NEXT-STMT-DT" } },
+            "DELACC-AVAIL-BAL"   : { "type" : "number", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-AVAIL-BAL PIC S9(10)V99 USAGE DISPLAY.", "name" : "DELACC-AVAIL-BAL" } },
+            "DELACC-ACTUAL-BAL"  : { "type" : "number", "x-ibm-zcon-metadata" : { "type" : "03 DELACC-ACTUAL-BAL PIC S9(10)V99 USAGE DISPLAY.", "name" : "DELACC-ACTUAL-BAL" } },
+            "DELACC-SUCCESS"     : { "maxLength" : 1, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-SUCCESS PIC X USAGE DISPLAY.", "name" : "DELACC-SUCCESS" } },
+            "DELACC-FAIL-CD"     : { "maxLength" : 1, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-FAIL-CD PIC X USAGE DISPLAY.", "name" : "DELACC-FAIL-CD" } },
+            "DELACC-DEL-SUCCESS" : { "maxLength" : 1, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-SUCCESS PIC X USAGE DISPLAY.", "name" : "DELACC-DEL-SUCCESS" } },
+            "DELACC-DEL-FAIL-CD" : { "maxLength" : 1, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-FAIL-CD PIC X USAGE DISPLAY.", "name" : "DELACC-DEL-FAIL-CD" } },
+            "DELACC-DEL-APPLID"  : { "maxLength" : 8, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-APPLID PIC X(8) USAGE DISPLAY.", "name" : "DELACC-DEL-APPLID" } },
+            "DELACC-DEL-PCB1"    : { "maxLength" : 4, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-PCB1 PIC X(4) USAGE DISPLAY.", "name" : "DELACC-DEL-PCB1" } },
+            "DELACC-DEL-PCB2"    : { "maxLength" : 4, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-PCB2 PIC X(4) USAGE DISPLAY.", "name" : "DELACC-DEL-PCB2" } },
+            "DELACC-DEL-PCB3"    : { "maxLength" : 4, "type" : "string",  "x-ibm-zcon-metadata" : { "type" : "03 DELACC-DEL-PCB3 PIC X(4) USAGE DISPLAY.", "name" : "DELACC-DEL-PCB3" } }
+          }
+        }
+      }
+    }
+  },
+  "required" : [ "commarea" ],
+  "description" : "General wrapper for CICS COMMAREA z/OS Asset requests"
+}

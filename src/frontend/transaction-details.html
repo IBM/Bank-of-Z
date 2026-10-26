@@ -1,295 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Transaction Details - Bank of Z</title>
-
-    <!-- Carbon Design System Styles -->
+    <title>Transaction - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
-
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
 
-    <!-- Main Content -->
-    <div class="cds--content landing-page">
-        <!-- Banner -->
-        <div class="cds--white landing-page__banner">
-            <div class="landing-page__heading">
-                <cds-breadcrumb>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="account-transactions.html">Transactions</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                    <cds-breadcrumb-item>
-                        <cds-breadcrumb-link href="transaction-details.html">Transaction Details</cds-breadcrumb-link>
-                    </cds-breadcrumb-item>
-                </cds-breadcrumb>
-                <h1>Transaction Details</h1>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+                <div id="content"></div>
             </div>
-        </div>
+        </section>
+    </main>
 
-        <!-- Transaction Details Section -->
-        <div id="details-section" class="cds--row">
-            <div class="cds--col-lg-12 cds--col-md-8 cds--col-sm-4">
-                <div id="transaction-info"></div>
-                <br>
-                <cds-button id="back-btn" kind="secondary">Back to Transactions</cds-button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-
-    <!-- Page Script -->
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showErrorModal, formatCurrency, formatDate } from './js/utils.js';
+        import { mountPage, notify, errorMessage } from './js/components/layout.js';
+        import { readContext, urls } from './js/components/lookup.js';
+        import { formatCurrency, formatDate, escapeHtml } from './js/utils.js';
 
-        let currentAccountId = null;
-        let currentTransactionId = null;
+        const content = document.getElementById('content');
+        const { accountId, customer, params } = readContext();
+        const transactionId = params.get('transactionId');
+        const ref = customer && customer.ok ? customer.ref : null;
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
+        const crumbs = [
+            { label: 'Home', href: 'admin.html' },
+            ...(ref ? [{ label: ref, href: urls.customer(ref) }] : []),
+            ...(accountId ? [{ label: `Account ${accountId}`, href: urls.account(accountId, ref) },
+                             { label: 'Transactions', href: urls.transactions(accountId, ref) }] : []),
+            { label: 'Transaction' }
+        ];
+        mountPage({ crumbs, title: 'Transaction details', subtitle: transactionId ? `Transaction ${transactionId}` : '' });
 
-            // Get parameters from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            currentAccountId = urlParams.get('accountId');
-            currentTransactionId = urlParams.get('transactionId');
+        if (!accountId || !transactionId) {
+            notify('error', 'Missing details', 'An account and a transaction are needed to show this page.');
+        } else {
+            load();
+        }
 
-            if (!currentAccountId || !currentTransactionId) {
-                showErrorModal('Error', 'Missing account ID or transaction ID', () => {
-                    window.location.href = 'account-transactions.html';
-                });
-                return;
-            }
-
-            // Load transaction details
-            loadTransactionDetails();
-
-            // Handle back button
-            document.getElementById('back-btn').addEventListener('click', () => {
-                window.location.href = `account-transactions.html?accountId=${currentAccountId}`;
-            });
-        });
-
-        async function loadTransactionDetails() {
-            showLoadingModal('Loading transaction details...');
-
+        async function load() {
+            content.innerHTML = '<cds-loading></cds-loading>';
             try {
-                // First, get account details to ensure we have the proper accountId format
-                let fullAccountId = currentAccountId;
-                try {
-                    const account = await api.accounts.getAccount(currentAccountId);
-                    // Construct the proper accountId format (sortCode-accountNumber)
-                    if (account.sortCode && account.accountNumber && !currentAccountId.includes('-')) {
-                        const sortCode = account.sortCode.replace(/-/g, '');
-                        fullAccountId = `${sortCode}-${account.accountNumber}`;
-                    } else if (account.accountId) {
-                        fullAccountId = account.accountId;
-                    }
-                } catch (accountError) {
-                    console.warn('Could not fetch account details, using provided accountId:', accountError);
-                }
-
-                const transaction = await api.accounts.getTransaction(fullAccountId, currentTransactionId);
-                hideLoadingModal();
-                displayTransactionDetails(transaction);
+                render(await api.accounts.getTransaction(accountId, transactionId));
             } catch (error) {
-                hideLoadingModal();
-                showErrorModal('Error', error.message || 'Failed to load transaction details', () => {
-                    window.location.href = `account-transactions.html?accountId=${currentAccountId}`;
-                });
+                content.innerHTML = '';
+                notify('error', 'Could not load transaction', errorMessage(error, 'Failed to load transaction details'));
             }
         }
 
-        function displayTransactionDetails(transaction) {
-            const amount = transaction.amount || 0;
-            const isCredit = transaction.creditDebitIndicator === 'CREDIT';
-            const amountClass = isCredit ? 'credit-amount' : 'debit-amount';
-            const amountPrefix = isCredit ? '+' : '-';
+        function row(label, value) {
+            return `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+        }
 
-            const detailsHTML = `
-                <div class="transaction-details-card">
-                    <h3>Transaction Information</h3>
-                    <div class="cds--data-table-container">
-                        <table class="cds--data-table">
-                            <tbody>
-                                <tr>
-                                    <th>Transaction ID</th>
-                                    <td colspan="3">${transaction.transactionId}</td>
-                                </tr>
-                                <tr>
-                                    <th>Account ID</th>
-                                    <td>${transaction.accountId}</td>
-                                    ${transaction.status ? `<th>Status</th>
-                                    <td><span class="status-badge status-${transaction.status.toLowerCase()}">${transaction.status}</span></td>` : '<th></th><td></td>'}
-                                </tr>
-                                <tr>
-                                    <th>Amount</th>
-                                    <td class="${amountClass}" style="font-size: 1.5rem; font-weight: 700;">
-                                        ${amountPrefix}${formatCurrency(Math.abs(amount), transaction.currency)}
-                                    </td>
-                                    ${transaction.creditDebitIndicator ? `<th>Type</th>
-                                    <td><span class="type-badge type-${transaction.creditDebitIndicator.toLowerCase()}">${transaction.creditDebitIndicator}</span></td>` : '<th></th><td></td>'}
-                                </tr>
-                                <tr>
-                                    <th>Currency</th>
-                                    <td>${transaction.currency}</td>
-                                    <th>Booking Date & Time</th>
-                                    <td>${formatDate(transaction.bookingDateTime)}</td>
-                                </tr>
-                                ${transaction.valueDateTime ? `
-                                <tr>
-                                    <th>Value Date & Time</th>
-                                    <td colspan="3">${formatDate(transaction.valueDateTime)}</td>
-                                </tr>
-                                ` : ''}
-                                <tr>
-                                    <th>Description</th>
-                                    <td colspan="3">${transaction.transactionInformation || 'N/A'}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        function render(t) {
+            const credit = t.creditDebitIndicator === 'CREDIT';
+            const merchant = t.merchantDetails
+                ? `<div class="card"><div class="card__header"><h2 class="card__title">Merchant</h2></div><dl class="kv">
+                    ${row('Name', escapeHtml(t.merchantDetails.merchantName || 'N/A'))}
+                    ${row('Category code', escapeHtml(t.merchantDetails.merchantCategoryCode || 'N/A'))}
+                   </dl></div>` : '';
+            const balance = t.balance
+                ? `<div class="card"><div class="card__header"><h2 class="card__title">Balance after transaction</h2></div><dl class="kv">
+                    ${row('Type', escapeHtml(t.balance.balanceType || 'N/A'))}
+                    ${row('Amount', formatCurrency(t.balance.amount, t.balance.currency))}
+                   </dl></div>` : '';
 
-                    ${transaction.merchantDetails ? `
-                    <br>
-                    <h3>Merchant Details</h3>
-                    <div class="cds--data-table-container">
-                        <table class="cds--data-table">
-                            <tbody>
-                                <tr>
-                                    <th>Merchant Name</th>
-                                    <td>${transaction.merchantDetails.merchantName || 'N/A'}</td>
-                                </tr>
-                                <tr>
-                                    <th>Merchant Category Code</th>
-                                    <td>${transaction.merchantDetails.merchantCategoryCode || 'N/A'}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    ` : ''}
-
-                    ${transaction.balance ? `
-                    <br>
-                    <h3>Balance After Transaction</h3>
-                    <div class="cds--data-table-container">
-                        <table class="cds--data-table">
-                            <tbody>
-                                <tr>
-                                    <th>Balance Type</th>
-                                    <td>${transaction.balance.balanceType}</td>
-                                </tr>
-                                <tr>
-                                    <th>Amount</th>
-                                    <td>${formatCurrency(transaction.balance.amount, transaction.balance.currency)}</td>
-                                </tr>
-                                <tr>
-                                    <th>Credit/Debit Indicator</th>
-                                    <td>${transaction.balance.creditDebitIndicator || 'N/A'}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    ` : ''}
+            content.innerHTML = `
+                <div class="stat-row">
+                    <div class="stat"><div class="stat__label">Amount</div>
+                        <div class="stat__value ${credit ? 'credit' : 'debit'}">${credit ? '+' : '-'}${formatCurrency(Math.abs(t.amount || 0), t.currency)}</div></div>
+                    <div class="stat"><div class="stat__label">Type</div><div class="stat__value">${credit ? 'Credit' : 'Debit'}</div></div>
+                    <div class="stat"><div class="stat__label">Status</div><div class="stat__value">${escapeHtml(t.status || 'N/A')}</div></div>
                 </div>
-            `;
-
-            document.getElementById('transaction-info').innerHTML = detailsHTML;
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">Details</h2></div>
+                    <dl class="kv">
+                        ${row('Transaction ID', escapeHtml(t.transactionId))}
+                        ${row('Account', escapeHtml(t.accountId || accountId))}
+                        ${row('Booked', escapeHtml(formatDate(t.bookingDateTime)))}
+                        ${t.valueDateTime ? row('Value date', escapeHtml(formatDate(t.valueDateTime))) : ''}
+                        ${row('Description', escapeHtml(t.transactionInformation || 'N/A'))}
+                    </dl>
+                </div>
+                ${merchant}${balance}
+                <div><cds-button kind="secondary" href="${urls.transactions(accountId, ref)}">Back to transactions</cds-button></div>`;
         }
     </script>
-
-    <style>
-        .transaction-details-card {
-            background: var(--cds-layer);
-            padding: 2rem;
-            border-radius: 4px;
-        }
-
-        .credit-amount {
-            color: #24a148;
-            font-weight: 600;
-        }
-        
-        .debit-amount {
-            color: #da1e28;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-booked {
-            background-color: #24a148;
-            color: white;
-        }
-
-        .status-pending {
-            background-color: #f1c21b;
-            color: #161616;
-        }
-
-        .status-cancelled {
-            background-color: #da1e28;
-            color: white;
-        }
-
-        .type-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .type-credit {
-            background-color: #d0e2ff;
-            color: #0043ce;
-        }
-
-        .type-debit {
-            background-color: #ffd7d9;
-            color: #750e13;
-        }
-
-        .cds--data-table th {
-            width: 200px;
-            font-weight: 600;
-        }
-    </style>
 </body>
-
 </html>

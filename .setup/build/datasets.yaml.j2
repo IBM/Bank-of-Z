@@ -29,6 +29,10 @@ variables:
   - name: ZOSCONNECT_HTTPS_PORT
     value: {{ zosconnect.https_port }}
 
+  # Reposity top folder name
+  - name: ROOT_FOLDER_NAME
+    value: ${ROOT_FOLDER_NAME}
+
   # z/OS macro library. Example: SYS1.MACLIB
   - name: MACLIB
     value: SYS1.MACLIB

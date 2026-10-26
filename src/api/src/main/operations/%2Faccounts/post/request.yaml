@@ -1,0 +1,69 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - CREACCZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-EYECATCHER:
+            required: false
+            nullable: false
+            template: "ACCT"
+        - COMM-CUSTNO:
+            required: false
+            nullable: false
+            expression: "$number($replace($string($body.customerNumber), /^[cC]/, ''))"
+        - COMM-KEY:
+            required: false
+            nullable: false
+            mappings:
+            - COMM-SORTCODE:
+                required: false
+                nullable: false
+                template: "987654"
+            - COMM-NUMBER:
+                required: false
+                nullable: false
+                template: "0"
+        - COMM-ACC-TYPE:
+            required: false
+            nullable: false
+            template: "{{$body.accountType}}"
+        - COMM-INT-RT:
+            required: false
+            nullable: false
+            expression: "$exists($body.interestRate) ? $number($body.interestRate) : 0"
+        - COMM-OPENED:
+            required: false
+            nullable: false
+            expression: "$exists($body.openedDate) and $match($body.openedDate, /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) ? $number($substring($body.openedDate, 8, 2) & $substring($body.openedDate, 5, 2) & $substring($body.openedDate, 0, 4)) : 0"
+        - COMM-OVERDR-LIM:
+            required: false
+            nullable: false
+            expression: "$exists($body.overdraftLimit) ? $number($body.overdraftLimit) : 0"
+        - COMM-LAST-STMT-DT:
+            required: false
+            nullable: false
+            expression: 0
+        - COMM-NEXT-STMT-DT:
+            required: false
+            nullable: false
+            expression: 0
+        - COMM-AVAIL-BAL:
+            required: false
+            nullable: false
+            expression: "$exists($body.availableBalance) ? $number($body.availableBalance) : ($exists($body.initialBalance) ? $number($body.initialBalance) : 0)"
+        - COMM-ACT-BAL:
+            required: false
+            nullable: false
+            expression: "$exists($body.actualBalance) ? $number($body.actualBalance) : ($exists($body.initialBalance) ? $number($body.initialBalance) : 0)"
+        - COMM-SUCCESS:
+            required: false
+            nullable: false
+            template: "N"
+        - COMM-FAIL-CODE:
+            required: false
+            nullable: false
+            template: " "

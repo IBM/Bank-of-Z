@@ -1,0 +1,29 @@
+---
+version: "1.2"
+mappings:
+- commarea:
+    mappings:
+    - UPDACCZ:
+        required: false
+        nullable: false
+        mappings:
+        - COMM-ACCNO:
+            required: false
+            nullable: false
+            expression: "$number($pathParameters.accountId)"
+        - COMM-SCODE:
+            required: false
+            nullable: false
+            template: "987654"
+        - COMM-ACC-TYPE:
+            required: false
+            nullable: false
+            template: "{{$body.accountType}}"
+        - COMM-INT-RATE:
+            required: false
+            nullable: false
+            expression: "$exists($body.interestRate) ? $number($body.interestRate) : 0"
+        - COMM-OVERDRAFT:
+            required: false
+            nullable: false
+            expression: "$exists($body.overdraftLimit) ? $number($body.overdraftLimit) : 0"

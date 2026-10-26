@@ -67,7 +67,7 @@ else
     RC=$?
     set -e
     if [ $RC -eq 0 ]; then
-        rm -f /tmp/dtcn.ports*
+        rm -f /tmp/dtcn.ports* || true
         cp "${DTCN_PORTS}" "${DTCN_PORTS_TMP}"
         echo "" >> "$DTCN_PORTS_TMP"
         echo "  CICS${APP_SHORT_NAME}:${CICS_DEBUG_PORT}" >> "$DTCN_PORTS_TMP"

@@ -28,6 +28,7 @@ The Bank of Z repository contains the application source, setup automation, buil
 |-----------|-------------|
 | `src/base/cics/` | COBOL programs, BMS maps, and copybooks for the CICS transaction path |
 | `src/base/ims/` | COBOL programs and copybooks for the IMS transaction path |
+| `src/base/mq/` | MQ source code for Bank of Q |
 | `src/base/batch/` | Batch application components |
 | `src/api/` | z/OS Connect API project — Gradle-based build producing the API deployment artifact |
 | `src/frontend/` | Browser-based frontend — HTML, CSS, JavaScript, and a Node.js dev server |
@@ -54,9 +55,9 @@ The Bank of Z repository contains the application source, setup automation, buil
 | `.setup/build/` | DBB build configuration: `datasets.yaml`, `dbb-build.yaml`, language scripts, and zosattributes |
 | `.setup/deploy/` | Wazi Deploy configuration and deployment method definitions |
 | `.setup/jcl/` | JCL assets including `Db2-grant.jcl` |
-| `.setup/zconfig/` | zconfig definitions for provisioning CICS and IMS regions |
+| `.setup/zconfig/` | zconfig definitions for provisioning CICS, IMS and MQ |
 | `.setup/tasks/` | Individual task scripts for DBB build, Wazi Deploy, and ZCodeScan |
-| `.setup/setup/` | Individual setup stage scripts (Db2, CICS, IMS, z/OS Connect, frontend) |
+| `.setup/setup/` | Individual setup stage scripts (Db2, CICS, IMS, MQ, z/OS Connect, frontend) |
 | `.setup/lib/` | Shared shell library functions used by the orchestration scripts |
 
 ---

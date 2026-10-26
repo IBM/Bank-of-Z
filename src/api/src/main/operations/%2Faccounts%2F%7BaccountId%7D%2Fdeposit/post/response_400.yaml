@@ -1,0 +1,13 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - code:
+        required: true
+        nullable: false
+        template: "BAD_REQUEST"
+    - message:
+        required: true
+        nullable: false
+        expression: "$zosAssetResponse.commarea.PAYDBCRZ.\"COMM-FAIL-CODE\" = '3' ? 'Insufficient funds for debit transaction' : ($zosAssetResponse.commarea.PAYDBCRZ.\"COMM-FAIL-CODE\" = '4' ? 'Transaction not permitted on Mortgage or Loan account' : 'Invalid transaction request')"

@@ -1,0 +1,41 @@
+---
+version: "1.2"
+mappings:
+- body:
+    mappings:
+    - accountId:
+        required: true
+        nullable: false
+        template: "{{$zosAssetResponse.commarea.UPDACCZ.\"COMM-ACCNO\"}}"
+    - sortCode:
+        required: false
+        nullable: true
+        template: "{{$zosAssetResponse.commarea.UPDACCZ.\"COMM-SCODE\"}}"
+    - customerId:
+        required: false
+        nullable: true
+        template: "{{$zosAssetResponse.commarea.UPDACCZ.\"COMM-CUSTNO\"}}"
+    - accountType:
+        required: false
+        nullable: true
+        template: "{{$zosAssetResponse.commarea.UPDACCZ.\"COMM-ACC-TYPE\"}}"
+    - interestRate:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.UPDACCZ.\"COMM-INT-RATE\""
+    - overdraftLimit:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.UPDACCZ.\"COMM-OVERDRAFT\""
+    - openedDate:
+        required: false
+        nullable: true
+        expression: "$string($zosAssetResponse.commarea.UPDACCZ.\"COMM-OPENED\")"
+    - availableBalance:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.UPDACCZ.\"COMM-AVAIL-BAL\""
+    - actualBalance:
+        required: false
+        nullable: true
+        expression: "$zosAssetResponse.commarea.UPDACCZ.\"COMM-ACTUAL-BAL\""

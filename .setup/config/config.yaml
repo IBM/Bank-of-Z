@@ -5,7 +5,7 @@
 version: "1.0.0"
 
 # Global properties
-# - Shared by middleware/tools 
+# - Shared by middleware/tools
 # - Subject to change with middleware/tools updates
 global:
 
@@ -13,6 +13,7 @@ global:
   sandbox_root: "/usr/local/sandboxes"
 
   # Application
+  app_name: "Bank-of-Z"
   app_base_name: "BANKZ"
   app_hlq: "{{ global.app_base_name }}"
   app_short_name: "BOZ" # Maximum 3 characters
@@ -65,7 +66,7 @@ global:
   cics_hlq: "CICSTS63"
   cics_uss_dir: "/usr/lpp/cicsts/cicsts63"
   cics_sec: "YES"
-  
+
   # IMS
   ims_disabled: "false"
   ims_sys_hlq: "IMSV15"
@@ -75,7 +76,7 @@ global:
   ims_ixvolser: "IMSV15"
   ims_irlm_enablement: false
   ims_database_lock_manager_server_name: "IRLM"
-  
+
   # DB2
   db2_hlq: "DB2V13"
   db2_dsntep: "DSNTEP13"
@@ -86,9 +87,19 @@ global:
   db2_grants:
   - "CICSUSER"
 
+  # MQ
+  mq_qmgr_name: "MQ21"
+  mq_install_hlq: "MQCD94"
+  mq_qmgr_hlq: "CSQ.{{ mq.qmgr_name }}"
+  mq_cpf: "!{{ mq.qmgr_name }}"
+  mq_proclib: "SYS1.PROCLIB"
+  mq_otma_group: "IMSXCFGN"
+  mq_otma_ims: "{{ global.ims_datastore }}"
+
 
 # Application properties
 app:
+  app_name: "{{ global.app_name }}"
   base_name: "{{ global.app_base_name }}"
   short_name: "{{ global.app_short_name }}"
   app_hlq: "{{ global.app_hlq }}"
@@ -115,7 +126,7 @@ repositories:
 # Java Home
 java:
   java_home: "{{ global.java_home }}"
-  
+
 # Python Home
 python:
   python_home: "{{ global.python_home }}"
@@ -132,10 +143,10 @@ zconfig:
 # DBB (Dependency Based Build)
 dbb:
   dbb_home: "{{ global.dbb_home }}"
-  dbb_build: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
-  dbb_app_conf: "{{sandbox.path}}/${REPO_NAME}/dbb-app.yaml"
-  dbb_cwd: "{{sandbox.path}}/${REPO_NAME}/"
-  dbb_log_dir: "{{sandbox.path}}/logs/dbb"
+  dbb_build: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/build"
+  dbb_app_conf: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/dbb-app.yaml"
+  dbb_cwd: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/"
+  dbb_log_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs"
   gradle_home:  "{{ global.gradle_home }}"
   igzxjni2: "{{ global.igzxjni2 }}"
   igy_hlq: "{{ global.igy_hlq }}"
@@ -145,16 +156,16 @@ dbb:
 
 # zBuilder framework configuration
 zbuilder:
-  source_dir: "{{sandbox.path}}/${REPO_NAME}/.setup/build"
+  source_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/build"
   target_dir: "{{sandbox.path}}/zBuilder"
 
 # ZCodeScan (static analysis)
 zcodescan:
   zcodescan_home: "{{ global.zcodescan_home }}"
   cwd_dir: "{{sandbox.path}}"
-  src_dir: "{{sandbox.path}}/${REPO_NAME}/src/base"
-  output_dir: "{{sandbox.path}}/zcodescan"
-  rule_file: "{{sandbox.path}}/${REPO_NAME}/zcodescan/zcodescan-rules.yaml"
+  src_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/src/base"
+  output_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs/zcodescan"
+  rule_file: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/zcodescan/zcodescan-rules.yaml"
   src_encoding: "IBM-1047"
   config_file: "${HOME}/zcs_config_file.yml"
   max_rc: 4
@@ -162,11 +173,11 @@ zcodescan:
 # Wazi Deploy (deployment automation)
 wazideploy:
   wazideploy_home: "{{ global.wazideploy_home }}"
-  deployment_method: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/deployment-method.yml"
-  deployment_envfile: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/Development.yml"
-  types_pattern_mapping: "{{sandbox.path}}/${REPO_NAME}/.setup/deploy/types_pattern_mapping.yml"
+  deployment_method: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/deployment-method.yml"
+  deployment_envfile: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/Development.yml"
+  types_pattern_mapping: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/.setup/deploy/types_pattern_mapping.yml"
   zdeploy_dir: "{{sandbox.path}}/dbb/WaziDeploy/zDeploy"
-  deploy_log_dir: "{{sandbox.path}}/logs/deploy"
+  deploy_log_dir: "{{sandbox.path}}/${ROOT_FOLDER_NAME}/logs/deploy"
 
 # Debug
 debug:
@@ -231,7 +242,7 @@ ims:
     ssl_port: 9966
   db2_database: "IMSBANK"
   db2_table: "HISTORY"
-  db2_plan_ibtran: "IBTRAN" 
+  db2_plan_ibtran: "IBTRAN"
   db2_plan_ibghist: "IBGHIST"
   db2_plan_ibshist: "IBSHIST"
   jobcard: "//{{jobname if jobname is defined else 'BOZJOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
@@ -306,3 +317,13 @@ db2:
   sdsnlod2: "{{ db2.db2_hlq }}.SDSNLOD2"
   jobcard: "//{{jobname if jobname is defined else app.short_name + 'JOB'}} JOB (ACCT),'IMS BANK',CLASS=A,MSGCLASS=H,NOTIFY=&SYSUID"
   db2_java_dir: "{{ global.db2_java_dir }}"
+
+# MQ configuration
+mq:
+  qmgr_name: "{{ global.mq_qmgr_name }}"
+  install_hlq: "{{ global.mq_install_hlq }}"
+  qmgr_hlq: "{{ global.mq_qmgr_hlq }}"
+  cpf: "{{ global.mq_cpf }}"
+  proclib: "{{ global.mq_proclib }}"
+  otma_group: "{{ global.mq_otma_group }}"
+  otma_ims: "{{ global.mq_otma_ims }}"

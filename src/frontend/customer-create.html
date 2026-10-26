@@ -3,160 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Create Customer - Bank of Z</title>
-    
-    <!-- Carbon Design System Styles -->
+    <title>Create customer - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-    
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
-    
-    <!-- Main Content -->
-    <cds-layer class="cds--white landing-page">
-        <!-- Banner -->
-        <cds-layer class="landing-page__heading landing-page__banner">
-            <cds-breadcrumb>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="customer-create.html">Create Customer</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-            </cds-breadcrumb>
-            <h1>Create new customer</h1>
-        </cds-layer>
 
-        <div class="cds--content">
-            <cds-stack gap="7">
-                <h2>Customer Information</h2>
-                
-                <div class="form-constrained">
-                    <cds-stack gap="7">
-                    <cds-select id="title" label-text="Title">
-                        <cds-select-item value="Mr">Mr</cds-select-item>
-                        <cds-select-item value="Mrs">Mrs</cds-select-item>
-                        <cds-select-item value="Miss">Miss</cds-select-item>
-                        <cds-select-item value="Ms">Ms</cds-select-item>
-                        <cds-select-item value="Dr">Dr</cds-select-item>
-                        <cds-select-item value="Drs">Drs</cds-select-item>
-                        <cds-select-item value="Professor">Professor</cds-select-item>
-                        <cds-select-item value="Sir">Sir</cds-select-item>
-                        <cds-select-item value="Lady">Lady</cds-select-item>
-                        <cds-select-item value="Lord">Lord</cds-select-item>
-                    </cds-select>
-                    <cds-text-input
-                        id="firstName"
-                        label="First name"
-                        placeholder="Enter first name"
-                        maxlength="50"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="lastName"
-                        label="Last name"
-                        placeholder="Enter last name"
-                        maxlength="50"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="phoneNumber"
-                        label="Phone number"
-                        placeholder="Enter phone number"
-                        maxlength="20"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="addressLine1"
-                        label="Address line 1"
-                        placeholder="Enter address line 1"
-                        maxlength="50"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="addressLine2"
-                        label="Address line 2"
-                        placeholder="Enter address line 2"
-                        maxlength="50">
-                    </cds-text-input>
-                    <cds-text-input
-                        id="city"
-                        label="City"
-                        placeholder="Enter city"
-                        maxlength="50"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="postalCode"
-                        label="Postcode"
-                        placeholder="Enter postcode"
-                        maxlength="10"
-                        required>
-                    </cds-text-input>
-                    <cds-text-input
-                        id="country"
-                        label="Country"
-                        placeholder="Enter country"
-                        maxlength="50"
-                        required>
-                    </cds-text-input>
-                    <cds-date-picker date-format="d/m/Y">
-                        <cds-date-picker-input 
-                            id="dateOfBirth"
-                            kind="single" 
-                            label-text="Date of Birth"
-                            placeholder="dd/mm/yyyy">
-                        </cds-date-picker-input>
-                    </cds-date-picker>
-                    <cds-button id="submit-btn" type="submit" style="width:100%;">Submit</cds-button>
-                </cds-stack>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
+
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+
+                <div class="card">
+                    <h2 class="card__title">Personal details</h2>
+                    <div class="form-grid">
+                        <cds-select id="title" label-text="Title" value="Mr">
+                            <cds-select-item value="Mr">Mr</cds-select-item>
+                            <cds-select-item value="Mrs">Mrs</cds-select-item>
+                            <cds-select-item value="Miss">Miss</cds-select-item>
+                            <cds-select-item value="Ms">Ms</cds-select-item>
+                            <cds-select-item value="Dr">Dr</cds-select-item>
+                            <cds-select-item value="Drs">Drs</cds-select-item>
+                            <cds-select-item value="Professor">Professor</cds-select-item>
+                            <cds-select-item value="Sir">Sir</cds-select-item>
+                            <cds-select-item value="Lady">Lady</cds-select-item>
+                            <cds-select-item value="Lord">Lord</cds-select-item>
+                        </cds-select>
+                        <cds-text-input id="firstName" label="First name" maxlength="50"></cds-text-input>
+                        <cds-text-input id="lastName" label="Last name" maxlength="50"></cds-text-input>
+                        <cds-date-picker date-format="d/m/Y">
+                            <cds-date-picker-input id="dateOfBirth" kind="single" label-text="Date of birth" placeholder="dd/mm/yyyy"></cds-date-picker-input>
+                        </cds-date-picker>
+                        <cds-text-input id="phoneNumber" label="Phone number" maxlength="20"></cds-text-input>
+                    </div>
                 </div>
-            </cds-stack>
-        </div>
-    </cds-layer>
 
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/date-picker.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
-    <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
-    
-    <!-- Page Script -->
+                <div class="card">
+                    <h2 class="card__title">Address</h2>
+                    <div class="form-grid">
+                        <cds-text-input id="addressLine1" label="Address line 1" maxlength="50"></cds-text-input>
+                        <cds-text-input id="addressLine2" label="Address line 2 (optional)" maxlength="50"></cds-text-input>
+                        <cds-text-input id="city" label="City" maxlength="50"></cds-text-input>
+                        <cds-text-input id="postalCode" label="Postcode" maxlength="10"></cds-text-input>
+                        <cds-text-input id="country" label="Country" maxlength="50"></cds-text-input>
+                    </div>
+                    <div class="form-actions">
+                        <cds-button id="submit-btn">Create customer</cds-button>
+                        <cds-button kind="secondary" href="admin.html">Cancel</cds-button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal, parseDate } from './js/utils.js';
-        import { config } from './config.js';
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
-            
-            // Handle form submission
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await createCustomer();
-            });
+        import { mountPage, notify, clearNotification, errorMessage } from './js/components/layout.js';
+        import { urls } from './js/components/lookup.js';
+        import { showLoadingModal, hideLoadingModal, parseDate, formatCustomerId } from './js/utils.js';
+
+        mountPage({
+            crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Create customer' }],
+            title: 'Create customer',
+            subtitle: 'New customers are created in CICS. Creating IMS customers is not implemented yet.'
         });
-        
+
+        document.getElementById('submit-btn').addEventListener('click', createCustomer);
+
+        const value = (id) => (document.getElementById(id).value || '').trim();
+
         // Mirrors the OpenAPI constraints in src/api/src/main/api/openapi.yaml#CreateCustomerRequest.
         // The backend (CRECUST COBOL) silently truncates over-length names instead of
         // rejecting them, so this is the only place that actually stops it.
@@ -168,11 +89,11 @@
                 'Date of birth': dateOfBirth,
                 'Address line 1': addressLine1,
                 'City': city,
-                'Postal code': postalCode,
+                'Postcode': postalCode,
                 'Country': country
             };
             const missing = Object.entries(requiredFields)
-                .filter(([label, value]) => !value)
+                .filter(([, v]) => !v)
                 .map(([label]) => label);
             if (missing.length > 0) {
                 return `Please fill in: ${missing.join(', ')}`;
@@ -184,80 +105,62 @@
                 'Address line 1': [addressLine1, 100],
                 'Address line 2': [addressLine2, 100],
                 'City': [city, 50],
-                'Postal code': [postalCode, 10],
+                'Postcode': [postalCode, 10],
                 'Country': [country, 50]
             };
-            for (const [label, [value, max]] of Object.entries(maxLengths)) {
-                if (value && value.length > max) {
-                    return `${label} must be ${max} characters or fewer (currently ${value.length})`;
+            for (const [label, [v, max]] of Object.entries(maxLengths)) {
+                if (v && v.length > max) {
+                    return `${label} must be ${max} characters or fewer (currently ${v.length})`;
                 }
             }
-            if (dateOfBirth) {
-                const parsed = parseDate(dateOfBirth);
-                if (!/^\d{4}-\d{2}-\d{2}$/.test(parsed)) {
-                    return 'Date of birth must be a valid date';
-                }
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dateOfBirth) || Number.isNaN(Date.parse(parseDate(dateOfBirth)))) {
+                return 'Date of birth must be a valid date in the form dd/mm/yyyy';
             }
             return null;
         }
 
         async function createCustomer() {
-            const title = document.getElementById('title').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const dateOfBirth = document.getElementById('dateOfBirth').value;
-            const addressLine1 = document.getElementById('addressLine1').value;
-            const addressLine2 = document.getElementById('addressLine2').value;
-            const city = document.getElementById('city').value;
-            const postalCode = document.getElementById('postalCode').value;
-            const country = document.getElementById('country').value;
+            clearNotification();
+            const data = {
+                title: value('title'),
+                firstName: value('firstName'),
+                lastName: value('lastName'),
+                phoneNumber: value('phoneNumber'),
+                dateOfBirth: value('dateOfBirth'),
+                addressLine1: value('addressLine1'),
+                addressLine2: value('addressLine2'),
+                city: value('city'),
+                postalCode: value('postalCode'),
+                country: value('country')
+            };
 
-            const validationError = validateCustomerData({
-                firstName, lastName, phoneNumber, dateOfBirth, addressLine1, addressLine2, city, postalCode, country
-            });
-            if (validationError) {
-                showErrorModal('Validation Error', validationError);
-                return;
-            }
+            const validationError = validateCustomerData(data);
+            if (validationError) return notify('error', 'Validation error', validationError);
 
             const customerData = {
-                title: title || undefined,
-                firstName,
-                lastName,
-                dateOfBirth: dateOfBirth ? parseDate(dateOfBirth) : undefined,
-                phoneNumber: phoneNumber || undefined,
+                title: data.title || undefined,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                dateOfBirth: parseDate(data.dateOfBirth),
+                phoneNumber: data.phoneNumber,
                 address: {
-                    addressLine1,
-                    addressLine2: addressLine2 || undefined,
-                    city,
-                    postalCode: postalCode || undefined,
-                    country: country || undefined
+                    addressLine1: data.addressLine1,
+                    addressLine2: data.addressLine2 || undefined,
+                    city: data.city,
+                    postalCode: data.postalCode,
+                    country: data.country
                 },
                 customerStatus: 'ACTIVE'
             };
 
             showLoadingModal('Creating customer...');
-
             try {
-                const response = await api.customers.createCustomer(customerData);
+                const response = await api.customers.createCustomer(customerData, 'CICS');
                 hideLoadingModal();
-
-                showSuccessModal(
-                    'Customer created successfully',
-                    `A customer profile for ${firstName} ${lastName} has been created. Customer ID: ${response.customerId}`,
-                    () => {
-                        window.location.href = 'customer-details.html';
-                    }
-                );
+                window.location.href = urls.customer(formatCustomerId(response.customerId, 'CICS'));
             } catch (error) {
                 hideLoadingModal();
-
-                if (error.message && error.message.includes('Failed to fetch')) {
-                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
-                } else {
-                    showErrorModal('Error', error.message || 'Failed to create customer. Please try again.');
-                }
+                notify('error', 'Could not create customer', errorMessage(error, 'Failed to create customer. Please try again.'));
             }
         }
     </script>

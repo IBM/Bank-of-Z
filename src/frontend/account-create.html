@@ -1,183 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
-    <title>Create Account - Bank of Z</title>
-
-    <!-- Carbon Design System Styles -->
+    <title>Open account - Bank of Z</title>
     <link rel="stylesheet" href="css/carbon-styles.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/carbon-overrides.css">
 </head>
-
 <body>
-    <!-- Header Container -->
     <div id="header-container"></div>
 
-    <!-- Main Content -->
-    <cds-layer class="cds--white landing-page">
-        <!-- Banner -->
-        <cds-layer class="landing-page__banner landing-page__heading">
-            <cds-breadcrumb>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="index.html">Home</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="admin.html">Control Panel</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-                <cds-breadcrumb-item>
-                    <cds-breadcrumb-link href="account-create.html">Create Account</cds-breadcrumb-link>
-                </cds-breadcrumb-item>
-            </cds-breadcrumb>
-            <h1>Create new account</h1>
-        </cds-layer>
+    <main class="page">
+        <section class="page-banner"><div class="page-inner" id="banner"></div></section>
 
-        <div class="cds--content">
-            <cds-stack gap="7">
-                <h2>Account Information</h2>
-                
-                <!-- Form Content -->
-                <cds-form id="account-form" class="form-constrained">
-                    <cds-stack gap="7">
-                        <cds-form-item>
-                            <cds-text-input id="customerNumber" label="Customer Number"
-                                placeholder="Enter customer number" required>
-                            </cds-text-input>
-                        </cds-form-item>
+        <section class="page-content">
+            <div class="page-inner">
+                <div id="notification-container"></div>
+                <div id="content"></div>
+            </div>
+        </section>
+    </main>
 
-                        <cds-form-item>
-                            <cds-select id="accountType" label-text="Account Type">
-                                <cds-select-item value="">Select...</cds-select-item>
-                                <cds-select-item value="SAVING">Savings</cds-select-item>
-                                <cds-select-item value="CURRENT">Current</cds-select-item>
-                                <cds-select-item value="LOAN">Loan</cds-select-item>
-                                <cds-select-item value="MORTGAGE">Mortgage</cds-select-item>
-                                <cds-select-item value="ISA">ISA</cds-select-item>
-                            </cds-select>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-number-input id="interestRate" label="Interest Rate (%)" value="0" min="0" max="100"
-                                step="0.01">
-                            </cds-number-input>
-                        </cds-form-item>
-
-                        <cds-form-item>
-                            <cds-number-input id="overdraft" label="Overdraft Limit" value="0" min="0" step="100">
-                            </cds-number-input>
-                        </cds-form-item>
-
-                        <cds-button id="submit-btn" type="submit">Submit</cds-button>
-                    </cds-stack>
-                </cds-form>
-            </cds-stack>
-        </div>
-    </cds-layer>
-
-    <!-- Carbon Web Components - Component-specific imports -->
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/ui-shell.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/breadcrumb.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/form.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/text-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/select.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/number-input.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/button.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/modal.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/grid.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/stack.min.js"></script>
-    <script type="module"
-        src="https://1.www.s81c.com/common/carbon/web-components/version/v2.47.0/layer.min.js"></script>
-
-    <!-- Page Script -->
+    <script type="module" src="js/carbon.js"></script>
     <script type="module">
-        import { createAdminHeader } from './js/components/headers.js';
         import api from './js/api.js';
-        import { showLoadingModal, hideLoadingModal, showSuccessModal, showErrorModal } from './js/utils.js';
-        import { config } from './config.js';
+        import { mountPage, notify, clearNotification, errorMessage } from './js/components/layout.js';
+        import {
+            readContext, customerLookupHtml, bindCustomerLookup, urls, pageUrl, IMS_LIMITED_NOTE
+        } from './js/components/lookup.js';
+        import { showLoadingModal, hideLoadingModal, escapeHtml } from './js/utils.js';
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject header
-            document.getElementById('header-container').innerHTML = createAdminHeader();
+        const content = document.getElementById('content');
+        const { customer } = readContext();
 
-            // Handle form submission
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await createAccount();
+        if (!customer) {
+            showLookup();
+        } else if (!customer.ok) {
+            showLookup();
+            notify('error', 'Invalid customer ID', customer.error);
+        } else {
+            showForm(customer);
+        }
+
+        /* ---------- step 1: which customer? ---------- */
+        function showLookup() {
+            mountPage({ crumbs: [{ label: 'Home', href: 'admin.html' }, { label: 'Open account' }], title: 'Open an account' });
+            content.innerHTML = `
+                <div class="card" style="max-width: 640px;">
+                    <h2 class="card__title">Which customer is this for?</h2>
+                    <p class="card__intro">Accounts always belong to a customer. Enter their customer ID to continue.</p>
+                    ${customerLookupHtml({ buttonLabel: 'Continue' })}
+                </div>`;
+            bindCustomerLookup({ onFound: (r) => { window.location.href = urls.createAccount(r.ref); } });
+        }
+
+        /* ---------- step 2: account terms ---------- */
+        function showForm(ref) {
+            mountPage({
+                crumbs: [{ label: 'Home', href: 'admin.html' }, { label: ref.ref, href: urls.customer(ref.ref) }, { label: 'Open account' }],
+                title: 'Open an account',
+                subtitle: `For customer ${ref.ref}`
             });
-        });
 
-        async function createAccount() {
-            // Get form values
-            const customerNumber = document.getElementById('customerNumber').value;
-            const accountType = document.getElementById('accountType').value;
-            const interestRate = document.getElementById('interestRate').value || '0';
-            const overdraft = document.getElementById('overdraft').value || '0';
-
-            // Validate required fields
-            if (!customerNumber || !accountType) {
-                showErrorModal('Validation Error', 'Please fill in all required fields');
+            if (ref.system === 'IMS') {
+                content.innerHTML = `
+                    <cds-inline-notification kind="error" title="Not implemented for IMS"
+                        subtitle="${escapeHtml('Opening accounts is not implemented for IMS (I) customers. ' + IMS_LIMITED_NOTE)}"
+                        hide-close-button style="max-width:none;width:100%"></cds-inline-notification>
+                    <div><cds-button kind="secondary" href="${urls.customer(ref.ref)}">Back to customer</cds-button></div>`;
                 return;
             }
 
-            // Get current date in YYYY-MM-DD format for dateOpened
-            const today = new Date().toISOString().split('T')[0];
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card__header"><h2 class="card__title">Account terms</h2></div>
+                    <div class="form-grid">
+                        <cds-select id="accountType" label-text="Account type">
+                            <cds-select-item value="">Select...</cds-select-item>
+                            <cds-select-item value="CURRENT">Current</cds-select-item>
+                            <cds-select-item value="SAVING">Savings</cds-select-item>
+                            <cds-select-item value="ISA">ISA</cds-select-item>
+                            <cds-select-item value="LOAN">Loan</cds-select-item>
+                            <cds-select-item value="MORTGAGE">Mortgage</cds-select-item>
+                        </cds-select>
+                        <cds-number-input id="interestRate" label="Interest rate (%)" value="0" min="0" max="99.99" step="0.01"></cds-number-input>
+                        <cds-number-input id="overdraft" label="Overdraft limit" value="0" min="0" step="100"></cds-number-input>
+                        <cds-number-input id="initialBalance" label="Initial balance / amount owed" value="0" step="100"
+                            helper-text="For a loan or mortgage, enter the amount owed"></cds-number-input>
+                    </div>
+                    <div class="form-actions">
+                        <cds-button id="submit-btn">Open account</cds-button>
+                        <cds-button kind="secondary" href="${urls.customer(ref.ref)}">Cancel</cds-button>
+                    </div>
+                </div>`;
 
-            // Prepare data according to API schema
-            const accountData = {
-                customerNumber: customerNumber,
-                accountType: accountType,
-                interestRate: interestRate,
-                overdraft: overdraft,
-                dateOpened: today,
-                sortCode: config.defaults.sortCode
-            };
+            document.getElementById('submit-btn').addEventListener('click', () => createAccount(ref));
+        }
 
-            // Show loading
-            showLoadingModal('Creating account...');
+        async function createAccount(ref) {
+            clearNotification();
+            const accountType = document.getElementById('accountType').value;
+            const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const overdraftLimit = parseInt(document.getElementById('overdraft').value, 10) || 0;
+            const initialBalance = parseFloat(document.getElementById('initialBalance').value) || 0;
 
+            if (!accountType) return notify('error', 'Validation error', 'Choose an account type');
+            if (interestRate < 0 || interestRate > 99.99) return notify('error', 'Validation error', 'Interest rate must be between 0 and 99.99');
+            if (overdraftLimit < 0) return notify('error', 'Validation error', 'Overdraft limit must be zero or more');
+
+            showLoadingModal('Opening account...');
             try {
-                const response = await api.accounts.createAccount(accountData);
+                const response = await api.accounts.createAccount({
+                    customerNumber: ref.id,
+                    accountType,
+                    interestRate,
+                    overdraftLimit,
+                    initialBalance,
+                    openedDate: new Date().toISOString().split('T')[0]
+                }, ref.system);
                 hideLoadingModal();
-
-                showSuccessModal(
-                    'Account created successfully',
-                    `Account has been created. Account Number: ${response.id || response.accountNumber}`,
-                    () => {
-                        window.location.href = 'account-details.html';
-                    }
-                );
+                window.location.href = pageUrl('account-details.html', {
+                    accountId: response.accountId,
+                    customerId: ref.ref,
+                    created: '1'
+                });
             } catch (error) {
                 hideLoadingModal();
-                console.log(error);
-                
-                if (error.message.includes('not supported') || error.message.includes('not implemented')) {
-                    showErrorModal('Feature Not Implemented', error.message);
-                } else if (error.message.includes('Failed to fetch')) {
-                    showErrorModal('Network Error', 'Failed to connect to the server. Please check your connection.');
-                } else {
-                    showErrorModal('Error', error.message || 'Failed to create account. Please check the customer number exists.');
-                }
+                notify('error', 'Could not open account', errorMessage(error, 'Failed to create account. Check the customer exists.'));
             }
         }
     </script>
 </body>
-
 </html>

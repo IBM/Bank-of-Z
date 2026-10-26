@@ -12,17 +12,14 @@ source "$LIB_DIR/colors.sh"
 source "$LIB_DIR/prerequisites.sh"
 export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
 set +e
-export ROOT_FOLDER_NAME="Bank-of-Z"
+
 # Load CICS/IMS credentials
 if [[ -f $HOME/.profile.bankz ]]; then
     source $HOME/.profile.bankz 2>/dev/null
 fi
-if git -C $LOCAL_SCRIPTS_DIR rev-parse --show-toplevel >/dev/null 2>&1; then
-    repo_name=$(basename "$(git -C $LOCAL_SCRIPTS_DIR rev-parse --show-toplevel)")
-    if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
-        export ROOT_FOLDER_NAME=${repo_name}
-    fi
-fi
+
+export ROOT_FOLDER_NAME="$(basename "$(cd "$LOCAL_SCRIPTS_DIR/../.." && pwd)")"
+
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi

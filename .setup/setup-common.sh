@@ -92,7 +92,7 @@ stage_clone_accelerators() {
     # Clone repository
     print_info "Cloning repository (this may take a few minutes)..."
     cd "$BANK_OF_Z_WORK_DIR"
-    if git clone "$DBB_REPO_URL"; then
+    if git clone --no-progress "$DBB_REPO_URL"; then
         print_success "DBB repository cloned successfully"
     else
         print_error "Failed to clone DBB repository"

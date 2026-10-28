@@ -135,6 +135,15 @@ ims_route: "{{ extra_vars.ims_route if extra_vars.ims_route is defined else defa
 sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined else '/usr/local/sandboxes/bank-of-z' }}"
 
 # Variables for ims_acb_gen building block
+ims_dfs3uacb_default:
+   acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
+   ims_id: "{{ ims.datastore }}"
+   steplib: "{{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL"
+   reslib: "{{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL"
+   proclib: "{{ ims_hlq }}.{{ ims_datastore }}.PROCLIB"
+   jobcard: "CATPOP  JOB 'WD-CATPOP',MSGLEVEL=(1,1),MSGCLASS=R,NOTIFY=&SYSUID"
+   max_rc : 4
+
 ims_acb_gen_default:
    acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
    command_input: "BUILD"

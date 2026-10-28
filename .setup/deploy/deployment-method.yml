@@ -351,7 +351,7 @@ activities:
     tags:
       - ims_acb_management
       - ims
-      
+      - never      
 
   - name: IMS_OLCUTL_MANAGEMENT
     description: |
@@ -404,7 +404,8 @@ activities:
     tags:
       - ims_catalog_management
       - ims
-
+      - never
+      
   - name: IMS_JCL_POPULATE_MANAGEMENT
     description: |
       This activity is dedicated to the deployment of IMS with Management ACBs
@@ -418,9 +419,10 @@ activities:
               This step build the ACBs and populate catalogue
             properties:
               - key: template
-                value: job_submit
-              - key: var_job_submit
-                value: jcl_ims_catpop
+                value: ims_dfs3uacb
+#                value: job_submit
+#              - key: var_job_submit
+#                value: jcl_ims_catpop
             retry:
               max_attempt: 2
               interval: 1
@@ -433,7 +435,7 @@ activities:
     tags:
     - ims_jcl_catpop_management
     - ims
-    - never
+    
 
   - name: IMS_MACLIB_MANAGEMENT
     description: |

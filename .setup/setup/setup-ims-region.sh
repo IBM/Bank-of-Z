@@ -125,6 +125,9 @@ else
     exit 1
 fi
 
+# ACBLIB is mandatory (even empty) for some IMS utilities PROC
+tsocmd "ALLOCATE DATASET('${IMS_APP_HLQ}.ACBLIB') NEW CATALOG DSORG(PO) RECFM(U) BLKSIZE(32760) CYLINDERS SPACE(10,5) DIR(50)" 2> /dev/null || true
+
 deactivate
 
 # =========================

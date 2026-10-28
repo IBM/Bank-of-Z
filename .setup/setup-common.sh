@@ -92,7 +92,7 @@ stage_clone_accelerators() {
     # Clone repository
     print_info "Cloning repository (this may take a few minutes)..."
     cd "$BANK_OF_Z_WORK_DIR"
-    if git clone "$DBB_REPO_URL"; then
+    if git clone --no-progress "$DBB_REPO_URL"; then
         print_success "DBB repository cloned successfully"
     else
         print_error "Failed to clone DBB repository"
@@ -435,7 +435,8 @@ stage_setup_ims_region() {
     print_info "Executing: bash $BANK_DIR/.setup/setup/setup-ims-region.sh"
     cd "$BANK_DIR"
     
-    
+    $HOME/kill-ims9.sh -y
+
     set -o pipefail
     if .setup/setup/setup-ims-region.sh; then
         print_success "IMS region setup completed successfully"

@@ -1559,7 +1559,7 @@ resourceDefinitions:
       name: EZACONFG
       group: SOCKETS
       description: CICS Sockets configuration file
-      dsname: BANKZ.CICSBOZ.TCP.CONFIG
+      dsname: IMSBANK.CICSBOZ.TCP.CONFIG
       lsrpoolnum: 1
       dsnsharing: ALLREQS
       strings: 01

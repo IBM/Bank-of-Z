@@ -100,13 +100,14 @@ class ProvisioningTests(unittest.TestCase):
     def test_deployment_parameters(self):
         values = self.values()
         settings = values["db2_provisioning"]
+        admin_user = values["cfg"]["zos_admin_user"]
         expected = {
             "catalog": "DBD2", "storage_class": "SGDB213",
             "user_catalog": "CATALOG.VS01.DB2V13", "volume": "DB2V13",
-            "data_class": "DCDB2EXT", "authid": "BOZTEST",
+            "data_class": "DCDB2EXT", "authid": admin_user,
             "javaenv": "DBD2.DSN1WLMJ.JAVAENV",
-            "javaenvv": "/u/boztest/dbd2envfile.txt",
-            "jvmprops": "/u/boztest/dbd2jvmsp",
+            "javaenvv": f"/u/{admin_user.lower()}/dbd2envfile.txt",
+            "jvmprops": f"/u/{admin_user.lower()}/dbd2jvmsp",
             "sdsnexit": "DB2V13.DBD2.SDSNEXIT",
         }
         for key, value in expected.items():
@@ -155,8 +156,9 @@ read_db2_master_status
         template = script.split("<<'EOF'\n", 1)[1].split("\nEOF", 1)[0]
         cached = Environment(undefined=StrictUndefined).from_string(template).render(self.values())
         test = ('set -e\nDB2_SSID=ZZ99\nDB2_PROVISION=true\nDB2_PROVISION_CATALOG=CUSTOM\n'
+                + 'get_section_value() { printf DBD2; }\n'
                 + snapshot + '\n' + cached
-                + '\nDB2_PROVISION_CATALOG=STALE\nget_section_value() { printf DBD2; }\n' + restore
+                + '\nDB2_PROVISION_CATALOG=STALE\n' + restore
                 + '\n[[ "$DB2_SSID" == ZZ99 && "$DB2_PROVISION" == true ]]\n'
                 + '[[ "$DB2_PROVISION_CATALOG" == CUSTOM ]]\n'
                 + '[[ "$DB2_PROVISION_JAVAENVV" == *zz99* ]]\n')

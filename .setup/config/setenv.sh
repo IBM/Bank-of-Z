@@ -76,6 +76,9 @@ ZOAU_HOME="${ZOAU_HOME:-{{ zoau.zoau_home }}}"
 ZBUILDER_SOURCE="{{ zbuilder.source_dir }}"
 ZBUILDER_TARGET="{{ zbuilder.target_dir }}"
 
+# Gradle
+GRADLE_HOME="{{ dbb.gradle_home }}"
+
 # DBB
 DBB_HOME="{{ dbb.dbb_home }}"
 DBB_BUILD="{{ dbb.dbb_build }}"
@@ -166,6 +169,7 @@ DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
 
 # MQ
+MQ_DISABLED="${MQ_DISABLED:-{{ mq.disabled }}}"
 MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
 MQ_INSTALL_HLQ=$(get_section_value 'mq' 'install_hlq')
 MQ_QMGR_HLQ=$(get_section_value 'mq' 'qmgr_hlq')

@@ -36,6 +36,7 @@
 #
 # Environment variables:
 #   IMS_DISABLED    Set to true to skip all IMS tasks (default: false)
+#   MQ_DISABLED     Set to true to skip all MQ tasks (default: false)
 #   IMS_COLD_START  Set to true to perform a cold start on the next IMS
 #                   restart instead of a warm restart (default: false)
 #########################################################
@@ -81,6 +82,7 @@ print_usage() {
     echo ""
     echo "Environment variables:"
     echo "  IMS_DISABLED    Set to true to skip all IMS tasks (default: false)"
+    echo "  MQ_DISABLED     Set to true to skip all MQ tasks (default: false)"
     echo "  IMS_COLD_START  Set to true to cold-start IMS on next restart (default: false)"
 }
 
@@ -692,7 +694,11 @@ do_stop() {
         all)
             # Stop order: Frontend -> MQ -> CICS -> IMS
             stop_frontend
-            stop_mq
+            if [[ "${MQ_DISABLED:-false}" != "true" ]]; then
+                stop_mq
+            else
+                print_info "MQ_DISABLED=true - skipping MQ stop"
+            fi
             stop_cics
             if [[ "${IMS_DISABLED:-false}" != "true" ]]; then
                 stop_ims_regions
@@ -733,7 +739,11 @@ do_start() {
                 print_info "IMS_DISABLED=true - skipping IMS start"
             fi
             start_cics
-            start_mq
+            if [[ "${MQ_DISABLED:-false}" != "true" ]]; then
+                start_mq
+            else
+                print_info "MQ_DISABLED=true - skipping MQ start"
+            fi
             start_frontend
             ;;
         ims)
@@ -766,7 +776,11 @@ do_verify() {
                 print_info "IMS_DISABLED=true - skipping IMS verification"
             fi
             verify_cics
-            verify_mq
+            if [[ "${MQ_DISABLED:-false}" != "true" ]]; then
+                verify_mq
+            else
+                print_info "MQ_DISABLED=true - skipping MQ verification"
+            fi
             verify_frontend
             ;;
         ims)

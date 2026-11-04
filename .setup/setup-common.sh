@@ -555,7 +555,9 @@ main_setup() {
 
     stage_setup_database
 
-    stage_setup_mq_queue_manager
+    if [[ "$MQ_DISABLED" != "true" ]]; then
+        stage_setup_mq_queue_manager
+    fi
 
     stage_setup_cics_region
     if [[ "$IMS_DISABLED" != "true" ]]; then

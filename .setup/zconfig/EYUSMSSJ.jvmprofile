@@ -14,3 +14,4 @@ JVMLOG=//DD:JVMLOG
 -Xshareclasses:name=cicsts.&APPLID;,groupAccess,nonfatal
 _BPXK_DISABLE_SHLIB=YES
 -Dcom.ibm.tools.attach.enable=no
+-Dcom.ibm.cics.jvmserver.controller.timeout=360000

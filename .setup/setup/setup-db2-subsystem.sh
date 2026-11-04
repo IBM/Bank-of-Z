@@ -62,7 +62,14 @@ if [[ "$state" == active ]]; then
 fi
 
 # Resolve values before zconfig reads the file, including optional SMS fields.
-provision_file=$(mktemp "$SCRIPTS_DIR/../zconfig/db2-rendered.XXXXXX")
+provision_file=$("$PYTHON_HOME/bin/python3" -c '
+import os
+import sys
+import tempfile
+fd, path = tempfile.mkstemp(prefix="db2-rendered.", dir=sys.argv[1])
+os.close(fd)
+print(path)
+' "$SCRIPTS_DIR/../zconfig")
 trap 'rm -f "$provision_file"' EXIT
 if command -v chtag >/dev/null 2>&1; then
     chtag -b "$provision_file"

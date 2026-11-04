@@ -22,7 +22,7 @@ def master_status(text, ssid):
             continue
         if "NOT FOUND" in line:
             absent = True
-        elif "STC" in fields:
+        elif "STC" in fields or re.search(r"\bA=[0-9A-F]{4}\b", line):
             return "active"
     return "inactive" if absent else "unknown"
 

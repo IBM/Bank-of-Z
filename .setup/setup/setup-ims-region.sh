@@ -100,7 +100,7 @@ print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
 # zconfig instrumentation
 export ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-"Bank-of-Z"}
-zconfig apply -e ims_user="${IMS_USER}" \
+python3 "$SCRIPTS_DIR/../lib/ims_provisioning.py" apply -e ims_user="${IMS_USER}" \
               -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \

@@ -198,8 +198,7 @@ fi
 
 rm -f message.log
 
-print_info "Executing command:"
-print_info "\t$CMD"
+print_info "Executing deployment command (credential arguments omitted)"
 : > "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log"
 ${CMD} 2>&1 | tee "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log" | while IFS= read -r line
 do
@@ -220,8 +219,8 @@ print_success "BankZ deployment completed successfully"
 # =========================
 # Cleanup
 # =========================
-print_info "Cleaning up package file"
+print_info "Archiving deployed package; retaining build package for redeployment"
 rm -f $TMPL_CONFIG_FILE
-mv -f "$PACKAGE_URL" "$PACKAGE_URL.deployed"
+cp -p "$PACKAGE_URL" "$PACKAGE_URL.deployed"
 
 print_success "Wazi Deploy process completed successfully"

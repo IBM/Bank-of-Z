@@ -39,10 +39,11 @@ stage_stop_tasks() {
     cd "$BANK_DIR"
     bash .setup/runtime-manage.sh stop all
 
-    # =========================
-    # Stop IMS1 (legacy / spare)
-    # =========================
-    jcan P "IMS1*" 2>/dev/null || true
+    set -e
+}
+
+stage_clean_application_resources() {
+    set +e
 
     # ===========================
     # Clean application datasets
@@ -443,6 +444,11 @@ stage_setup_db2_subsystem() {
 stage_deprovision_db2_subsystem() {
     print_stage "Deprovision Db2 subsystem with zconfig"
 
+    if [[ "${DB2_DEPROVISION_CONFIRM:-}" != "$DB2_SSID" ]]; then
+        print_error "Refusing to deprovision Db2 subsystem ${DB2_SSID} without explicit confirmation"
+        return 2
+    fi
+
     if [ ! -f "$BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh" ]; then
         print_error "Installation script not found: $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
         exit 1
@@ -474,7 +480,7 @@ wait_for_cics_cmci() {
 
     print_info "Waiting for CICS CMCI port ${CICS_CMCI_PORT}..."
     while (( elapsed < CICS_CMCI_START_TIMEOUT_SECONDS )); do
-        if netstat -a 2>/dev/null | grep -qi ":${CICS_CMCI_PORT}.*listen"; then
+        if netstat -a 2>/dev/null | grep -Eqi "(\\.\\.|:)${CICS_CMCI_PORT}[[:space:]].*listen"; then
             print_success "CICS CMCI is listening on port ${CICS_CMCI_PORT}"
             return 0
         fi
@@ -639,6 +645,7 @@ main_setup() {
 
     # infrastructure
     stage_stop_tasks
+    stage_clean_application_resources
 
     if [[ "${DB2_PROVISION}" == "true" ]]; then
         if [[ "${DB2_REPROVISION,,}" == "true" ]]; then

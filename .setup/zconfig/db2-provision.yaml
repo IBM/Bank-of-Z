@@ -1,6 +1,8 @@
 db2:
   ## h26o
   class: A
+  # Db2 routine installation can exceed zconfig's 60-second job timeout.
+  timeout: 900
   ssid: "{{ vars.db2_ssid }}"
   hlq: "{{ vars.db2_hlq }}"
   insdspre: "{{ vars.db2_hlq }}.{{ vars.db2_ssid }}"
@@ -10,7 +12,7 @@ db2:
   db2_authorization_ids:
     authid: "{{ vars.db2_authid }}"
     sysadm: "{{ vars.db2_authid }}"
-    sysam2: "{{ vars.db2_authid }}"
+    sysadm2: "{{ vars.db2_authid }}"
     sysopr1: "{{ vars.db2_authid }}"
     sysopr2: "{{ vars.db2_authid }}"
     secadm1: "{{ vars.db2_authid }}"

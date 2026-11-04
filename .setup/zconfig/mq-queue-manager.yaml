@@ -447,6 +447,11 @@ queue_managers:
       descr: 'IMS bridge storage class'
     queues:
       local:
+      # MQCONN uses this initiation queue in addition to the bridge queues below.
+      - name: 'BOZ.CICS.INITQ'
+        descr: 'Bank of Z CICS initiation queue'
+        usage: 'NORMAL'
+        stgclass: 'DEFAULT'
       - name: '{{ vars.mq_qmgr_name }}.DEAD.QUEUE'
         qsgdisp: 'QMGR'
         cfstruct: ''

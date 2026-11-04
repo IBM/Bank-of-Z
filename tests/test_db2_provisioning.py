@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -45,6 +46,9 @@ class ProvisioningTests(unittest.TestCase):
             ("D A,ZB01MSTR", "unknown"),
             ("D A,ZB01MSTR\nIEE115I ZB01MSTR NOT FOUND", "inactive"),
             ("IEE115I ACTIVITY\nZB01MSTR ZB01MSTR STC 00042", "active"),
+            ("ZB01MSTR ZB01MSTR IEFPROC NSW S A=003E PER=NO SMC=000\n"
+             "WUID=STC00032 USERID=STCDB2", "active"),
+            ("ZB01MSTR A=ZZZZ", "unknown"),
             ("OTHERMSR OTHERMSR STC 00042", "unknown"),
             ("ZB01MSTR2 ZB01MSTR2 STC 00042", "unknown"),
             ("ICH408I ZB01MSTR NOT AUTHORIZED", "unknown"),
@@ -163,6 +167,76 @@ read_db2_master_status
                 + '[[ "$DB2_PROVISION_CATALOG" == CUSTOM ]]\n'
                 + '[[ "$DB2_PROVISION_JAVAENVV" == *zz99* ]]\n')
         subprocess.run(["bash"], input=test, text=True, check=True)
+
+    def test_cics_readiness_accepts_zos_and_linux_listeners(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        helper = "wait_for_cics_cmci() {" + script.split("wait_for_cics_cmci() {", 1)[1].split("\nstage_setup_cics_region()", 1)[0]
+        harness = '''
+print_info() { :; }
+print_success() { :; }
+print_error() { :; }
+netstat() { printf '%s\\n' "$RESPONSE"; }
+opercmd() { :; }
+sleep() { :; }
+APP_SHORT_NAME=BOZ
+CICS_CMCI_PORT=27100
+CICS_CMCI_START_TIMEOUT_SECONDS=5
+'''
+        cases = [
+            ("CICSBOZ 00000001 0.0.0.0..27100 0.0.0.0..0 Listen", True),
+            ("tcp 0 0 0.0.0.0:27100 0.0.0.0:* LISTEN", True),
+            ("CICSBOZ 00000001 0.0.0.0..271001 0.0.0.0..0 Listen", False),
+            ("CICSBOZ 00000001 0.0.0.0..27100 0.0.0.0..0 Establsh", False),
+        ]
+        for response, expected in cases:
+            with self.subTest(response=response):
+                result = subprocess.run(["bash"], input=harness + helper + "\nwait_for_cics_cmci\n",
+                                        text=True, capture_output=True,
+                                        env=dict(os.environ, RESPONSE=response))
+                self.assertEqual(result.returncode == 0, expected, result.stderr)
+
+    def test_stopping_consumers_does_not_delete_resources_or_cancel_base_ims(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        stop = "stage_stop_tasks() {" + script.split("stage_stop_tasks() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
+        with tempfile.TemporaryDirectory() as work:
+            runtime = Path(work) / ".setup/runtime-manage.sh"
+            runtime.parent.mkdir()
+            runtime.touch()
+            harness = '''
+print_stage() { :; }
+print_info() { :; }
+print_error() { :; }
+bash() { printf 'runtime:%s\\n' "$*"; }
+jcan() { printf 'UNEXPECTED cancellation:%s\\n' "$*"; }
+drm() { printf 'UNEXPECTED dataset removal:%s\\n' "$*"; }
+rm() { printf 'UNEXPECTED file removal:%s\\n' "$*"; }
+dtouch() { :; }
+sleep() { :; }
+APP_HLQ=BANKZ
+APP_ZOS_VERSION=V0R1M0
+APP_SHORT_NAME=BOZ
+SANDBOX_DIR=/test-sandbox
+'''
+            result = subprocess.run(["bash"], input=harness + stop + "\nstage_stop_tasks\n",
+                                    text=True, capture_output=True,
+                                    env=dict(os.environ, BANK_DIR=work))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), "runtime:.setup/runtime-manage.sh stop all")
+
+    def test_deprovision_confirmation_precedes_service_shutdown(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        helper = "stage_deprovision_db2_subsystem() {" + script.split("stage_deprovision_db2_subsystem() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
+        harness = '''
+print_stage() { :; }
+print_error() { :; }
+stage_stop_tasks() { printf 'UNEXPECTED shutdown\\n'; }
+'''
+        for confirmation in ("", "DBD1"):
+            result = subprocess.run(["bash"], input=harness + helper + "\nstage_deprovision_db2_subsystem\n",
+                                    text=True, capture_output=True,
+                                    env=dict(os.environ, DB2_SSID="DBD2", DB2_DEPROVISION_CONFIRM=confirmation))
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertEqual(result.stdout, "")
 
 
 if __name__ == "__main__":

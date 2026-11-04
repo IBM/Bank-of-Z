@@ -139,6 +139,8 @@ sandbox_path: "{{ extra_vars.sandbox_path if extra_vars.sandbox_path is defined 
 ims_acb_gen_default:
    acb_lib: "{{ ims_hlq }}.{{ ims_datastore }}.ACBLIBA"
    command_input: "BUILD"
+   # Reclaim replaced PDS members before and after repeated ACB generation.
+   compression: "PRECOMP,POSTCOMP"
    steplib :
      - "{{ ims_hlq }}.{{ ims_datastore }}.SDFSRESL"
    reslib:

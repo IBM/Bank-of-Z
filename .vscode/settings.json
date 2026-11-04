@@ -10,5 +10,11 @@
     },
     "zopeneditor.zowe": {
         "defaultCliProfile": "bank-of-z.rse"
+    },
+    "zowe.cics.persistent": {
+        "persistence": true,
+        "loadedCICSProfile": [
+            "bank-of-z.cics"
+        ],
     }
 }

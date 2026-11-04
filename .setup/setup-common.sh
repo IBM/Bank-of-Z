@@ -123,6 +123,7 @@ stage_copy_framework() {
     print_info "Datasets configuration from datasets.yaml:"
     echo ""
     python "$SCRIPTS_DIR/lib/render_template.py" --configFile $CONFIG_FILE \
+        --extraVar "db2_provision=${DB2_PROVISION:-false}" \
         --templateFile "$SCRIPTS_DIR/build/datasets.yaml.j2"  --outputFile "$SCRIPTS_DIR/build/datasets.yaml"
     if [ -f "$ZBUILDER_SOURCE/datasets.yaml" ]; then
         grep -A 200 "^variables:" "$ZBUILDER_SOURCE/datasets.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20 || true
@@ -528,7 +529,7 @@ stage_setup_cics_region() {
         exit 1
     fi
 
-    if [[ "${CICS_AUTO_REPLY_GO,,}" == "true" ]]; then
+    if [[ "${DB2_PROVISION:-false}" == "true" && "${CICS_AUTO_REPLY_GO:-false}" == [Tt][Rr][Uu][Ee] ]]; then
         wait_for_cics_cmci || exit 1
     fi
 }

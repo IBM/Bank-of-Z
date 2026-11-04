@@ -120,6 +120,7 @@ mkdir -p ${DBB_LOG_FOLDER}
 chtag -r src/api/src/main/api/openapi.yaml
 set -e
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "db2_provision=${DB2_PROVISION:-false}" \
     --templateFile "$SCRIPTS_DIR/../build/datasets.yaml.j2"  --outputFile "$SCRIPTS_DIR/../build/datasets.yaml"
 
 dbb build "$BUILD_TYPE" --debug --hlq "${APP_HLQ}.DBB" --log-encoding ISO8859-1 $BUILD_OPTIONS --config "$DBB_APP_CONF" 2>&1 | tee "$TMP_LOG" | while read -r line

@@ -100,7 +100,12 @@ print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
 # zconfig instrumentation
 export ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-"Bank-of-Z"}
-python3 "$SCRIPTS_DIR/../lib/ims_provisioning.py" apply -e ims_user="${IMS_USER}" \
+IMS_ZCONFIG_COMMAND=(zconfig)
+if [[ "${DB2_PROVISION:-false}" == "true" ]]; then
+    # Limit the image-specific startup workaround to new Db2 installations.
+    IMS_ZCONFIG_COMMAND=(python3 "$SCRIPTS_DIR/../lib/ims_provisioning.py")
+fi
+"${IMS_ZCONFIG_COMMAND[@]}" apply -e ims_user="${IMS_USER}" \
               -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \

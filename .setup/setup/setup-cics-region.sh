@@ -70,8 +70,8 @@ fi
 
 # CICS TS Resource Builder receives the definitions file directly and does not
 # render zconfig's {{ vars.* }} expressions. Resolve the Db2 connection name
-# here before Resource Builder validates the definitions.
-if grep -q '{{ vars.db2_ssid }}' "$DEFINITION_FILE" || [[ "$DB2_SSID" != "DBD1" ]]; then
+# only for new provisioning or an explicitly selected non-default Db2 SSID.
+if [[ "${DB2_PROVISION:-false}" == "true" || "$DB2_SSID" != "DBD1" ]]; then
     if [ ! -f "$BACKUP_FILE" ]; then
         cp "$DEFINITION_FILE" "$BACKUP_FILE"
     fi
@@ -152,6 +152,7 @@ zconfig apply \
   -e tcpip_hlq="${DEBUG_TCPIP_HQL}" \
   -e cics_sec="${CICS_SEC}" \
   -e db2_ssid="${DB2_SSID}" \
+  -e db2_provision="${DB2_PROVISION:-false}" \
   -e mq_qmgr_name="${MQ_QMGR_NAME}" \
   -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   -e proclib="${CICS_SYS_PROCLIB}" \

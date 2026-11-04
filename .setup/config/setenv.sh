@@ -204,8 +204,8 @@ EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 
 # Db2
 DB2_PROVISION_CATALOG="${DB2_PROVISION_CATALOG-{{ db2_provisioning.catalog | default('') }}}"
-DB2_PROVISION="${DB2_PROVISION:-{{ cfg.db2_provision }}}"
-DB2_REPROVISION="${DB2_REPROVISION:-{{ cfg.db2_reprovision }}}"
+DB2_PROVISION="${DB2_PROVISION:-{{ cfg.db2_provision | default('false') }}}"
+DB2_REPROVISION="${DB2_REPROVISION:-{{ cfg.db2_reprovision | default('false') }}}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"

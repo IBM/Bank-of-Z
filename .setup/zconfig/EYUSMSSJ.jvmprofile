@@ -4,8 +4,10 @@ WORK_DIR={{ vars.region_uss_dir }}
 -Xmx1G
 -Xmso1M
 -Dfile.encoding=ISO-8859-1
+{% if vars.db2_provision | default('false') | string | lower == 'true' %}
 OSGI_FRAMEWORK_TIMEOUT=600
 -Dcom.ibm.cics.jvmserver.controller.timeout=600000
+{% endif %}
 WLP_INSTALL_DIR={{ vars.cics_uss_dir }}/wlp
 STDOUT=//DD:JVMOUT
 STDERR=//DD:JVMERR

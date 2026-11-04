@@ -79,9 +79,9 @@ fi
 DCP=$(command -v dcp 2>/dev/null) || { print_error "dcp (ZOAU) not found on PATH"; exit 1; }
 
 _TOOLS_DIR="${SANDBOX_DIR}/../tools"
-BCJAR=$(ls "$_TOOLS_DIR"/*/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
+BCJAR=$(ls $GRADLE_HOME/lib/plugins/bcprov-*.jar 2>/dev/null | head -1)
 if [ -z "$BCJAR" ]; then
-  print_error "bcprov-*.jar not found under $_TOOLS_DIR"; exit 1
+  print_error "bcprov-*.jar not found under \$GRADLE_HOME ($GRADLE_HOME)"; exit 1
 fi
 
 # -----------------------------------------------------------------------

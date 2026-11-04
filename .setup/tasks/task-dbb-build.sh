@@ -42,9 +42,11 @@ if [ -f "$DBB_CONFG_HOME/bin/dbb" ]; then
 fi
 
 export PATH="$JAVA_HOME/bin:$DBB_HOME/bin:$PATH"
-export GRADLE_USER_HOME="$SANDBOX_DIR/.gradle"
-export GRADLE_OPTS="-Dfile.encoding=UTF-8"
+export GRADLE_USER_HOME="$SANDBOX_DIR/../.gradle"
+export GRADLE_OPTS="-Dfile.encoding=UTF-8 -Xmx1g -Xms128m"
 export GRADLE_DAEMON_BIND_ADDRESS=127.0.0.1
+
+export _BPX_SHAREAS=NO
 
 # =========================
 # Temporary log

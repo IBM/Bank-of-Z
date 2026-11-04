@@ -39,4 +39,8 @@ tasks.named('processTestResources').configure {
     dependsOn tasks.named('openApiGenerate')
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.fork = false
+}
+
 // Made with Bob

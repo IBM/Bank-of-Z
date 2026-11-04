@@ -360,6 +360,7 @@ ims:
         operations_server_name: 2OM1
         imsplex:
           imsplex_name_suffix: "{{ vars.ims_plex }}"
+          #audit_log_stream_name_for_command_input_and_output: SYSLOG.OM2Q01.LOG
         mvs_file_name_for_command_translation: "{{ vars.ims_sys_hlq }}.SDFSDATA"
     - member_name: CSLRI000
       config:

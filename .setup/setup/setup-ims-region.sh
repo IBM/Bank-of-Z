@@ -100,7 +100,14 @@ print_info "Setting IMS user to ${IMS_USER} (USS: ${IMS_USER_LOWER})"
 
 # zconfig instrumentation
 export ZCONFIG_CONSUMER=${ZCONFIG_CONSUMER:-"Bank-of-Z"}
-zconfig apply -e ims_user="${IMS_USER}" \
+IMS_ZCONFIG_COMMAND=(zconfig)
+if [[ "${DB2_PROVISION:-false}" == "true" ]]; then
+    # Temporary workaround: zconfig can select another region's IMS READY reply.
+    # Limit it to new-Db2 Bank installs. Remove after the upstream fix is installed
+    # and verified with multiple IMS regions and target cold-start completion.
+    IMS_ZCONFIG_COMMAND=(python3 "$SCRIPTS_DIR/../lib/ims_provisioning.py")
+fi
+"${IMS_ZCONFIG_COMMAND[@]}" apply -e ims_user="${IMS_USER}" \
               -e ims_user_lower="${IMS_USER_LOWER}" \
               -e imsid="${IMS_DATASTORE}" -e ims_hlq="${IMS_APP_HLQ}" \
               -e ims_plex="${IMS_PLEX}" \

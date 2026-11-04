@@ -169,6 +169,19 @@ class ProvisioningTests(unittest.TestCase):
             self.assertEqual("OSGI_FRAMEWORK_TIMEOUT=600" in rendered, provision == "true")
             self.assertEqual("controller.timeout=600000" in rendered, provision == "true")
 
+    def test_ims_startup_wrapper_is_only_selected_for_new_db2(self):
+        script = (ROOT / ".setup/setup/setup-ims-region.sh").read_text()
+        selection = script[script.index("IMS_ZCONFIG_COMMAND=(zconfig)"):script.index('"${IMS_ZCONFIG_COMMAND[@]}" apply')]
+        for provision in (None, "false", "true"):
+            env = dict(os.environ, SCRIPTS_DIR="/test/setup")
+            env.pop("DB2_PROVISION", None)
+            if provision is not None:
+                env["DB2_PROVISION"] = provision
+            result = subprocess.run(["bash"], input=selection + '\nprintf "%s\\n" "${IMS_ZCONFIG_COMMAND[@]}"\n',
+                                    text=True, capture_output=True, env=env, check=True)
+            expected = ["python3", "/test/setup/../lib/ims_provisioning.py"] if provision == "true" else ["zconfig"]
+            self.assertEqual(result.stdout.splitlines(), expected)
+
     def test_cics_startup_reply_requires_both_opt_ins(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()
         stage = "stage_setup_cics_region() {" + script.split("stage_setup_cics_region() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"

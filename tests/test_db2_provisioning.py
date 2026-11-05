@@ -61,6 +61,76 @@ class ProvisioningTests(unittest.TestCase):
             with self.subTest(response=response):
                 self.assertEqual(db2.master_status(response, "ZB01"), expected)
 
+    def test_wlm_console_response_states(self):
+        for response, expected in [
+            ("D WLM,APPLENV=DBD2WLM_REXX", "unknown"),
+            (" DBD2WLM_REXX AVAILABLE\n ATTRIBUTES: PROC=DBD2WLMR", "AVAILABLE"),
+            (" DBD2WLM_REXX QUIESCED", "QUIESCED"),
+            (" DBD1WLM_REXX AVAILABLE", "unknown"),
+            (" DBD2WLM_REXX AVAILABLE\n DBD2WLM_REXX QUIESCED", "unknown"),
+        ]:
+            self.assertEqual(db2.wlm_status(response, "DBD2WLM_REXX"), expected)
+
+    def test_rexx_quiesce_restores_on_success_and_failure(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        helpers = script[script.index("read_db2_rexx_state() {"):script.index("wait_for_cics_cmci() {")]
+        harness = '''
+print_success() { :; }
+print_error() { printf '%s\\n' "$*" >&2; }
+opercmd() {
+    printf '%s\\n' "$*" >> "$COMMANDS"
+    case "$*" in
+        'D WLM,APPLENV=DBD2WLM_REXX') printf 'DBD2WLM_REXX %s\\n' "$(cat "$STATE")" ;;
+        'V WLM,APPLENV=DBD2WLM_REXX,QUIESCE') printf QUIESCED > "$STATE" ;;
+        'V WLM,APPLENV=DBD2WLM_REXX,RESUME') printf AVAILABLE > "$STATE" ;;
+        *) return 1 ;;
+    esac
+}
+'''
+        for fail in (False, True):
+            with self.subTest(fail=fail), tempfile.TemporaryDirectory() as work:
+                state, commands = Path(work)/"state", Path(work)/"commands"
+                state.write_text("AVAILABLE")
+                suffix = "stage_quiesce_db2_rexx\n" + ("exit 7\n" if fail else "stage_resume_db2_rexx\n")
+                result = subprocess.run(["bash"], input="set -e\n" + harness + helpers + suffix,
+                                        text=True, capture_output=True,
+                                        env=dict(os.environ, DB2_SSID="DBD2", STATE=str(state), COMMANDS=str(commands),
+                                                 PYTHON_HOME=str(Path(sys.executable).parent.parent), SCRIPTS_DIR=str(ROOT/".setup")))
+                self.assertEqual(result.returncode, 7 if fail else 0, result.stderr)
+                self.assertEqual(state.read_text(), "AVAILABLE")
+                issued = commands.read_text().splitlines()
+                self.assertEqual(issued.count("V WLM,APPLENV=DBD2WLM_REXX,QUIESCE"), 1)
+                self.assertEqual(issued.count("V WLM,APPLENV=DBD2WLM_REXX,RESUME"), 1)
+
+    def test_rexx_quiesce_preserves_operator_state_and_rejects_unknown(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        helpers = script[script.index("read_db2_rexx_state() {"):script.index("wait_for_cics_cmci() {")]
+        for state, expected in (("QUIESCED", 0), ("unknown", 1)):
+            harness = '''
+print_error() { :; }
+read_db2_rexx_state() { printf '%s\\n' "$INITIAL_STATE"; }
+control_db2_rexx() { printf 'UNEXPECTED control\\n'; return 9; }
+'''
+            result = subprocess.run(["bash"], input=helpers + harness + "stage_quiesce_db2_rexx\n",
+                                    text=True, capture_output=True,
+                                    env=dict(os.environ, DB2_SSID="DBD2", INITIAL_STATE=state))
+            self.assertEqual(result.returncode, expected, result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_new_environment_only_quiesces_after_db2_provisioning(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        setup = script[script.index("main_setup() {"):script.index("# STAGE: Validate Installation")]
+        branch = setup[setup.index('    if [[ "${DB2_PROVISION}"'):setup.index("    stage_setup_database")]
+        harness = '''
+print_info() { :; }
+stage_setup_db2_subsystem() { printf 'provision\\n'; }
+stage_quiesce_db2_rexx() { printf 'quiesce\\n'; }
+'''
+        for provision in ("false", "true"):
+            result = subprocess.run(["bash"], input=harness + branch, text=True, capture_output=True, check=True,
+                                    env=dict(os.environ, DB2_PROVISION=provision, DB2_REPROVISION="false"))
+            self.assertEqual(result.stdout, "provision\nquiesce\n" if provision == "true" else "")
+
     def test_catalog_override_and_default(self):
         values = self.environment()
         self.assertEqual(self.render(values)["catalog"], "DBD2")
@@ -159,15 +229,38 @@ class ProvisioningTests(unittest.TestCase):
             self.assertEqual({key: libraries[key] for key in original}, expected)
 
     def test_cics_jvm_timeouts_require_new_db2(self):
-        profile = (ROOT / ".setup/zconfig/EYUSMSSJ.jvmprofile").read_text()
-        values = dict(java_home="/java", region_uss_dir="/sandbox", cics_uss_dir="/cics")
+        original = (ROOT / ".setup/zconfig/EYUSMSSJ.jvmprofile").read_bytes()
+        script = (ROOT / ".setup/setup/setup-cics-region.sh").read_text()
+        prepare = script[script.index("# zconfig resolves simple vars"):script.index("# Cleanup\n")]
+        finalize = "finalize_results() {" + script.split("finalize_results() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
         for provision in (None, "false", "true"):
-            variables = dict(values)
-            if provision is not None:
-                variables["db2_provision"] = provision
-            rendered = Environment(undefined=StrictUndefined).from_string(profile).render(vars=variables)
-            self.assertEqual("OSGI_FRAMEWORK_TIMEOUT=600" in rendered, provision == "true")
-            self.assertEqual("controller.timeout=600000" in rendered, provision == "true")
+            with self.subTest(provision=provision), tempfile.TemporaryDirectory() as work:
+                root = Path(work)
+                (root / "setup").mkdir()
+                (root / "zconfig").mkdir()
+                profile = root / "zconfig/EYUSMSSJ.jvmprofile"
+                profile.write_bytes(original)
+                env = dict(os.environ, SCRIPTS_DIR=str(root / "setup"),
+                           PYTHON_HOME=str(Path(sys.executable).parent.parent))
+                env.pop("DB2_PROVISION", None)
+                if provision is not None:
+                    env["DB2_PROVISION"] = provision
+                subprocess.run(["bash"], input='set -e\nchtag() { :; }\n' + prepare,
+                               env=env, text=True, capture_output=True, check=True)
+                rendered = profile.read_text()
+                self.assertNotIn("{%", rendered)
+                self.assertEqual("OSGI_FRAMEWORK_TIMEOUT=600" in rendered, provision == "true")
+                self.assertEqual("controller.timeout=600000" in rendered, provision == "true")
+                if provision != "true":
+                    self.assertEqual(profile.read_bytes(), original)
+                restore_env = dict(env, JVM_PROFILE_FILE=str(profile),
+                                   JVM_PROFILE_BACKUP=str(profile) + ".back",
+                                   BACKUP_FILE=str(root / "absent-definitions-backup"),
+                                   DEBUG_BACKUP=str(root / "absent-debug-backup"))
+                subprocess.run(["bash"], input=finalize + "\nfinalize_results\n",
+                               env=restore_env, text=True, capture_output=True, check=True)
+                self.assertEqual(profile.read_bytes(), original)
+                self.assertFalse(Path(str(profile) + ".back").exists())
 
     def test_ims_startup_wrapper_is_only_selected_for_new_db2(self):
         script = (ROOT / ".setup/setup/setup-ims-region.sh").read_text()
@@ -249,7 +342,7 @@ chtag() { printf 'UNEXPECTED tag\\n'; }
 
     def test_cics_connection_rewrite_requires_a_db2_selection(self):
         script = (ROOT / ".setup/setup/setup-cics-region.sh").read_text()
-        rewrite = script[script.index('if [[ "${DB2_PROVISION:-false}"'):script.index("# Cleanup\n")]
+        rewrite = script[script.index('if [[ "${DB2_PROVISION:-false}"'):script.index("# zconfig resolves simple vars")]
         source = '- db2conn:\n    name: "{{ vars.db2_ssid }}"\n    db2id: "{{ vars.db2_ssid }}"\n'
         for provision, ssid in [("false", "DBD1"), ("false", "CUSTOM"), ("true", "DBD1"), ("true", "DBD2")]:
             with self.subTest(provision=provision, ssid=ssid), tempfile.TemporaryDirectory() as work:

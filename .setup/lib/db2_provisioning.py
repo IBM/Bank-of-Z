@@ -27,6 +27,16 @@ def master_status(text, ssid):
     return "inactive" if absent else "unknown"
 
 
+def wlm_status(text, name):
+    """Read only an unambiguous row for the requested WLM environment."""
+    states = set()
+    for line in text.upper().splitlines():
+        fields = line.split()
+        if len(fields) >= 2 and fields[0] == name.upper():
+            states.add(fields[1])
+    return states.pop() if len(states) == 1 else "unknown"
+
+
 def prepare(template, environ):
     """Resolve the existing template using exported setup values, without eval."""
     names = {
@@ -82,6 +92,8 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     status = commands.add_parser("status")
     status.add_argument("ssid")
+    wlm = commands.add_parser("wlm-status")
+    wlm.add_argument("name")
     render = commands.add_parser("render")
     render.add_argument("template", type=Path)
     render.add_argument("output", type=Path)
@@ -91,6 +103,8 @@ def main():
     args = parser.parse_args()
     if args.command == "status":
         print(master_status(sys.stdin.read(), args.ssid))
+    elif args.command == "wlm-status":
+        print(wlm_status(sys.stdin.read(), args.name))
     elif args.command == "render":
         data = prepare(args.template.read_text(encoding="utf-8"), os.environ)
         args.output.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")

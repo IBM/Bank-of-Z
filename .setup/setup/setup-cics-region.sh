@@ -25,6 +25,9 @@ trap 'exec >&- 2>&-; wait' EXIT
 
 finalize_results() {
     RC=$?
+    if [[ -n "${JVM_PROFILE_BACKUP:-}" && -f "$JVM_PROFILE_BACKUP" ]]; then
+        mv "$JVM_PROFILE_BACKUP" "$JVM_PROFILE_FILE"
+    fi
     if [ -f "$BACKUP_FILE" ]; then
         mv "$BACKUP_FILE" "$DEFINITION_FILE"
         chtag -tc $YAML_ENCODING "$DEFINITION_FILE"
@@ -93,6 +96,26 @@ PYTHON
     chtag -tc UTF-8 "$DEFINITION_FILE"
 fi
 
+# zconfig resolves simple vars in JVM profiles, not Jinja control blocks.
+# Apply the optional new-Db2 startup settings to a temporary working copy;
+# the exit handler restores the original template, including its file tag.
+JVM_PROFILE_FILE="$SCRIPTS_DIR/../zconfig/EYUSMSSJ.jvmprofile"
+JVM_PROFILE_BACKUP="${JVM_PROFILE_FILE}.back"
+if [[ "${DB2_PROVISION:-false}" == "true" ]]; then
+    cp -p "$JVM_PROFILE_FILE" "$JVM_PROFILE_BACKUP"
+    chtag -b "$JVM_PROFILE_FILE"
+    "$PYTHON_HOME/bin/python3" - "$JVM_PROFILE_FILE" <<'PYTHON'
+from pathlib import Path
+import sys
+
+profile = Path(sys.argv[1])
+profile.write_bytes(profile.read_bytes() +
+                    b"\nOSGI_FRAMEWORK_TIMEOUT=600\n"
+                    b"-Dcom.ibm.cics.jvmserver.controller.timeout=600000\n")
+PYTHON
+    chtag -tc UTF-8 "$JVM_PROFILE_FILE"
+fi
+
 # =========================
 # Cleanup
 # =========================
@@ -152,7 +175,6 @@ zconfig apply \
   -e tcpip_hlq="${DEBUG_TCPIP_HQL}" \
   -e cics_sec="${CICS_SEC}" \
   -e db2_ssid="${DB2_SSID}" \
-  -e db2_provision="${DB2_PROVISION:-false}" \
   -e mq_qmgr_name="${MQ_QMGR_NAME}" \
   -e mq_install_hlq="${MQ_INSTALL_HLQ}" \
   -e proclib="${CICS_SYS_PROCLIB}" \

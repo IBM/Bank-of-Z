@@ -472,6 +472,63 @@ stage_deprovision_db2_subsystem() {
 }
 
 #########################################################
+# Helpers: Release the new Db2 REXX worker's procedure-library allocation
+#########################################################
+read_db2_rexx_state() {
+    local response
+    response=$(opercmd "D WLM,APPLENV=${BANKZ_DB2_REXX_ENV}") || return 1
+    printf '%s\n' "$response" | "$PYTHON_HOME/bin/python3" \
+        "$SCRIPTS_DIR/lib/db2_provisioning.py" wlm-status "$BANKZ_DB2_REXX_ENV"
+}
+
+control_db2_rexx() {
+    local action="$1" expected="$2" state elapsed=0
+    opercmd "V WLM,APPLENV=${BANKZ_DB2_REXX_ENV},${action}" || return 1
+    while (( elapsed < 60 )); do
+        state=$(read_db2_rexx_state) || return 1
+        if [[ "$state" == "$expected" ]]; then
+            print_success "Db2 REXX environment ${BANKZ_DB2_REXX_ENV} is ${expected}"
+            return 0
+        fi
+        sleep 2
+        elapsed=$((elapsed + 2))
+    done
+    print_error "Db2 REXX environment ${BANKZ_DB2_REXX_ENV} did not reach ${expected}"
+    return 1
+}
+
+stage_resume_db2_rexx() {
+    if [[ "${BANKZ_DB2_REXX_RESUME_PENDING:-false}" == "true" ]]; then
+        control_db2_rexx RESUME AVAILABLE || return 1
+        BANKZ_DB2_REXX_RESUME_PENDING=false
+        trap - EXIT
+    fi
+}
+
+stage_quiesce_db2_rexx() {
+    local ssid_pattern='^[A-Z$#@][A-Z0-9$#@]{0,3}$' state
+    if [[ ! "$DB2_SSID" =~ $ssid_pattern ]]; then
+        print_error "Invalid Db2 subsystem ID for WLM control"
+        return 1
+    fi
+    BANKZ_DB2_REXX_ENV="${DB2_SSID}WLM_REXX"
+    state=$(read_db2_rexx_state) || return 1
+    # Preserve an environment that the operator had already quiesced.
+    if [[ "$state" == "QUIESCED" ]]; then
+        return 0
+    fi
+    if [[ "$state" != "AVAILABLE" ]]; then
+        print_error "Refusing to change Db2 REXX environment in state ${state}"
+        return 1
+    fi
+    # Routine verification starts the REXX worker, which retains SYS1.PROCLIB.
+    # Release that allocation while the Bank middleware procedures are written.
+    BANKZ_DB2_REXX_RESUME_PENDING=true
+    trap 'bankz_exit_rc=$?; stage_resume_db2_rexx || bankz_exit_rc=1; exit "$bankz_exit_rc"' EXIT
+    control_db2_rexx QUIESCE QUIESCED
+}
+
+#########################################################
 # STAGE: Setup CICS region
 #########################################################
 wait_for_cics_cmci() {
@@ -636,6 +693,7 @@ print_usage() {
 # Main execution
 #########################################################
 main_setup() {
+    BANKZ_DB2_REXX_RESUME_PENDING=false
     echo ""
     SYS=$(uname -Ia)
     print_info "Running on: $SYS"
@@ -649,12 +707,13 @@ main_setup() {
     stage_clean_application_resources
 
     if [[ "${DB2_PROVISION}" == "true" ]]; then
-        if [[ "${DB2_REPROVISION,,}" == "true" ]]; then
+        if [[ "${DB2_REPROVISION:-false}" == [Tt][Rr][Uu][Ee] ]]; then
             print_warning "DB2_REPROVISION=true: removing ${DB2_SSID} before provisioning it again"
             export DB2_DEPROVISION_CONFIRM="${DB2_SSID}"
             stage_deprovision_db2_subsystem
         fi
         stage_setup_db2_subsystem
+        stage_quiesce_db2_rexx
     else
         print_info "Skipping Db2 provisioning (DB2_PROVISION=false) - using pre-existing subsystem ${DB2_SSID}"
     fi
@@ -679,6 +738,7 @@ main_setup() {
 
     stage_setup_zosconnect_server
     stage_setup_frontend_server
+    stage_resume_db2_rexx
 
     # Summary
     print_stage "SETUP COMPLETE"

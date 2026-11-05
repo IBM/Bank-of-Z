@@ -13,7 +13,6 @@ vars:
   tcpip_hlq: "TCPIP"
   cics_sec: "YES"
   db2_ssid: "DBD1"
-  db2_provision: "false"
   mq_qmgr_name: "MQ21"
   mq_install_hlq: "MQCD94"
   proclib: "SYS1.PROCLIB"
@@ -106,3 +105,4 @@ cics_region:
   jvm_profile_dir: "{{ vars.region_uss_dir }}/{{ vars.applid }}/JVMProfiles"
   jvm_profiles:
     - path: "EYUSMSSJ.jvmprofile"
+ 

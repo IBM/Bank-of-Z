@@ -20,6 +20,19 @@ fi
 
 export ROOT_FOLDER_NAME="$(basename "$(cd "$LOCAL_SCRIPTS_DIR/../.." && pwd)")"
 
+# A profile can clear USER. Resolve it after loading profile settings because
+# config.yaml uses ${USER} for z/OS user defaults.
+export USER=$(printf '%s' "${USER:-${LOGNAME:-$(basename "$HOME")}}" | tr '[:lower:]' '[:upper:]')
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+    repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    if [[ "$repo_name" =~ ^Bank-of-Z ]]; then
+        export REPO_NAME=${repo_name}
+    else
+        export REPO_NAME="Bank-of-Z"
+    fi
+else
+    export REPO_NAME="Bank-of-Z"
+fi
 if command -v chtag >/dev/null 2>&1; then
     chtag -t -c ISO8859-1 "$CONFIG_FILE"
 fi
@@ -161,9 +174,24 @@ DEBUG_TCPIP_HQL="{{ debug.tcpip_hlq }}"
 EQAPROF_CONF_DIR="{{ debug.eqaprof_conf_dir }}"
 
 # Db2
+{% set provisioning = db2_provisioning | default({}) %}
+DB2_PROVISION_CATALOG="${DB2_PROVISION_CATALOG-{{ provisioning.catalog | default('') }}}"
+DB2_PROVISION="${DB2_PROVISION:-{{ cfg.db2_provision | default('false') }}}"
+DB2_REPROVISION="${DB2_REPROVISION:-{{ cfg.db2_reprovision | default('false') }}}"
 DB2_HLQ="${DB2_HLQ:-{{ db2.db2_hlq }}}"
 DB2_SSID="${DB2_SSID:-{{ db2.ssid }}}"
 DB2_JAVA_FOLDER="${DB2_JAVA_FOLDER:-{{ db2.db2_java_dir }}}"
+DB2_PROVISION_USER_CATALOG="${DB2_PROVISION_USER_CATALOG:-{{ provisioning.user_catalog | default('') }}}"
+DB2_PROVISION_AUTHID="${DB2_PROVISION_AUTHID:-{{ provisioning.authid | default('') }}}"
+DB2_PROVISION_VOLUME="${DB2_PROVISION_VOLUME:-{{ provisioning.volume | default('') }}}"
+DB2_PROVISION_STORAGE_CLASS="${DB2_PROVISION_STORAGE_CLASS:-{{ provisioning.storage_class | default('') }}}"
+DB2_PROVISION_DATA_CLASS="${DB2_PROVISION_DATA_CLASS:-{{ provisioning.data_class | default('') }}}"
+DB2_PROVISION_JAVA_HOME="${DB2_PROVISION_JAVA_HOME:-{{ provisioning.java_home | default('') }}}"
+DB2_PROVISION_JAVAENV="${DB2_PROVISION_JAVAENV:-{{ provisioning.javaenv | default('') }}}"
+DB2_PROVISION_JAVAENVV="${DB2_PROVISION_JAVAENVV:-{{ provisioning.javaenvv | default('') }}}"
+DB2_PROVISION_JVMPROPS="${DB2_PROVISION_JVMPROPS:-{{ provisioning.jvmprops | default('') }}}"
+DB2_PROVISION_SDSNEXIT="${DB2_PROVISION_SDSNEXIT:-{{ provisioning.sdsnexit | default('') }}}"
+DB2_PROVISION_START_TIMEOUT_SECONDS="${DB2_PROVISION_START_TIMEOUT_SECONDS:-{{ provisioning.start_timeout_seconds | default(180) }}}"
 
 # MQ
 MQ_QMGR_NAME=$(get_section_value 'mq' 'qmgr_name')
@@ -186,6 +214,9 @@ set -a
 chmod 777 "$ENV_FILE" 2>/dev/null || true
 source "$ENV_FILE"
 set +a
+
+DB2_PROVISION=$(printf '%s' "$DB2_PROVISION" | tr '[:upper:]' '[:lower:]')
+DB2_REPROVISION=$(printf '%s' "$DB2_REPROVISION" | tr '[:upper:]' '[:lower:]')
 
 # List of variables to check
 VARS_TO_CHECK=(

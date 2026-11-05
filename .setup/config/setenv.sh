@@ -28,11 +28,17 @@ set -e
 
 TEMPLATE_FILE="${LOCAL_SCRIPTS_DIR}/.env.template"
 
-if [[ ! -f "$ENV_FILE" || "$ENV_FILE" -ot "$CONFIG_FILE" || "$ENV_FILE" -ot "${BASH_SOURCE[0]}" ]]; then
-    print_warning "Creating $ENV_FILE file ..."
-    print_warning " - Not already exists or not in sync with:"
-    print_warning "   - '$CONFIG_FILE'"
-    print_warning "   - '${BASH_SOURCE[0]}'"
+env_reason=""
+if [[ ! -f "$ENV_FILE" ]]; then
+    env_reason="it does not exist"
+elif [[ "$ENV_FILE" -ot "$CONFIG_FILE" ]]; then
+    env_reason="it is older than '$CONFIG_FILE'"
+elif [[ "$ENV_FILE" -ot "${BASH_SOURCE[0]}" ]]; then
+    env_reason="it is older than '${BASH_SOURCE[0]}'"
+fi
+
+if [[ -n "$env_reason" ]]; then
+    print_info "Creating $ENV_FILE file because $env_reason ..."
     cat > "$TEMPLATE_FILE" <<'EOF'
 # =========================
 # Environment

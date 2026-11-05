@@ -123,7 +123,6 @@ stage_copy_framework() {
     print_info "Datasets configuration from datasets.yaml:"
     echo ""
     python "$SCRIPTS_DIR/lib/render_template.py" --configFile $CONFIG_FILE \
-        --extraVar "db2_provision=${DB2_PROVISION:-false}" \
         --templateFile "$SCRIPTS_DIR/build/datasets.yaml.j2"  --outputFile "$SCRIPTS_DIR/build/datasets.yaml"
     if [ -f "$ZBUILDER_SOURCE/datasets.yaml" ]; then
         grep -A 200 "^variables:" "$ZBUILDER_SOURCE/datasets.yaml" | grep -E "^[[:space:]]*#.*Example:" | head -20 || true
@@ -531,39 +530,6 @@ stage_quiesce_db2_rexx() {
 #########################################################
 # STAGE: Setup CICS region
 #########################################################
-wait_for_cics_cmci() {
-    local cics_job="CICS${APP_SHORT_NAME}"
-    local elapsed=0
-    local reply_id=""
-
-    print_info "Waiting for CICS CMCI port ${CICS_CMCI_PORT}..."
-    while (( elapsed < CICS_CMCI_START_TIMEOUT_SECONDS )); do
-        if netstat -a 2>/dev/null | grep -Eqi "(\\.\\.|:)${CICS_CMCI_PORT}[[:space:]].*listen"; then
-            print_success "CICS CMCI is listening on port ${CICS_CMCI_PORT}"
-            return 0
-        fi
-
-        if [[ -z "$reply_id" ]]; then
-            reply_id=$(opercmd 'D R,L' 2>/dev/null |
-                grep "DFHSI1580D ${cics_job} PLT program EZACIC20" |
-                awk '$2 == "R" && $1 ~ /^[0-9]+$/ { print $1; exit }' || true)
-            if [[ -n "$reply_id" ]]; then
-                print_info "Replying GO to CICS startup prompt ${reply_id}"
-                opercmd "R ${reply_id},GO" >/dev/null 2>&1 || {
-                    print_error "Unable to reply GO to CICS startup prompt ${reply_id}"
-                    return 1
-                }
-            fi
-        fi
-
-        sleep 5
-        ((elapsed += 5))
-    done
-
-    print_error "CICS CMCI did not listen on port ${CICS_CMCI_PORT} within ${CICS_CMCI_START_TIMEOUT_SECONDS} seconds"
-    return 1
-}
-
 stage_setup_cics_region() {
     print_stage "STAGE: Create CICS region with zconfig"
 
@@ -584,10 +550,6 @@ stage_setup_cics_region() {
     else
         print_error "Failed to setup CICS region"
         exit 1
-    fi
-
-    if [[ "${DB2_PROVISION:-false}" == "true" && "${CICS_AUTO_REPLY_GO:-false}" == [Tt][Rr][Uu][Ee] ]]; then
-        wait_for_cics_cmci || exit 1
     fi
 }
 

@@ -177,20 +177,10 @@ python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
 
 rm -rf "${DEPLOY_LOG_FOLDER}/work-bankz"
 
-# Keep the ordinary IMS deployment profile unchanged. Generate the ACB-space
-# workaround only for a Bank installation that explicitly provisions Db2.
-deployment_env_file="$DEPLOY_ENV_FILE"
-if [[ "${DB2_PROVISION:-false}" == "true" ]]; then
-    deployment_env_file="$OUTPUT_FOLDER/Development-db2.yml"
-    "$PYTHON_HOME/bin/python3" "$SCRIPTS_DIR/../lib/db2_provisioning.py" deployment-environment \
-        "$DEPLOY_ENV_FILE" "$deployment_env_file"
-    chtag -tc UTF-8 "$deployment_env_file"
-fi
-
 CMD="wazideploy-deploy \
  --workingFolder ${DEPLOY_LOG_FOLDER}/work-bankz \
  --deploymentPlan $OUTPUT_FOLDER/deploymentPlan-bankz.yaml \
- --envFile $deployment_env_file \
+ --envFile $DEPLOY_ENV_FILE \
  -e script_dir=$SCRIPTS_DIR \
  -e @$TMPL_CONFIG_FILE \
  -e application=$APP_BASE_NAME \
@@ -229,8 +219,8 @@ print_success "BankZ deployment completed successfully"
 # =========================
 # Cleanup
 # =========================
-print_info "Archiving deployed package; retaining build package for redeployment"
+print_info "Cleaning up package file"
 rm -f $TMPL_CONFIG_FILE
-cp -p "$PACKAGE_URL" "$PACKAGE_URL.deployed"
+mv -f "$PACKAGE_URL" "$PACKAGE_URL.deployed"
 
 print_success "Wazi Deploy process completed successfully"

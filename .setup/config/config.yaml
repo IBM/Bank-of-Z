@@ -78,8 +78,7 @@ global:
   ims_database_lock_manager_server_name: "IRLM"
 
   # DB2
-  # Opt in to new-subsystem provisioning and its IMS/CICS compatibility fixes.
-  # Existing-subsystem installations keep the normal middleware setup path.
+  # Opt in to provisioning a new Db2 subsystem instead of using an existing one.
   db2_provision: "false"
   # When true, each environment run removes the zconfig-managed subsystem
   # before provisioning it again. This is destructive and requires
@@ -246,12 +245,6 @@ cics:
   user: "${CICS_USER}"
   password: "${CICS_PASSWORD}"
   cmci_port: 27100
-  # Some ZDVT images pause CICS startup at the EZACIC20 PLT prompt.
-  # Requires global.db2_provision="true" as well as this explicit opt-in.
-  # Set to "true" only when automatically replying GO is appropriate.
-  auto_reply_go: "false"
-  # CICS can take several minutes to bring CMCI online after startup.
-  cmci_start_timeout_seconds: 300
   ipic_port: 4320
   debug_port: 27103
   sys_proclib: "{{ global.sys_proclib }}"

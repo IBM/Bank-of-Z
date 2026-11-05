@@ -73,7 +73,7 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_rexx_quiesce_restores_on_success_and_failure(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()
-        helpers = script[script.index("read_db2_rexx_state() {"):script.index("wait_for_cics_cmci() {")]
+        helpers = script[script.index("read_db2_rexx_state() {"):script.index("stage_setup_cics_region() {")]
         harness = '''
 print_success() { :; }
 print_error() { printf '%s\\n' "$*" >&2; }
@@ -104,7 +104,7 @@ opercmd() {
 
     def test_rexx_quiesce_preserves_operator_state_and_rejects_unknown(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()
-        helpers = script[script.index("read_db2_rexx_state() {"):script.index("wait_for_cics_cmci() {")]
+        helpers = script[script.index("read_db2_rexx_state() {"):script.index("stage_setup_cics_region() {")]
         for state, expected in (("QUIESCED", 0), ("unknown", 1)):
             harness = '''
 print_error() { :; }
@@ -208,142 +208,11 @@ stage_quiesce_db2_rexx() { printf 'quiesce\\n'; }
         self.assertEqual(values["db2"]["ssid"], "DBD1")
         self.assertEqual(values["db2"]["runlib"], "DBD1.RUNLIB.LOAD")
 
-    def test_build_libraries_follow_the_effective_provisioning_switch(self):
-        original = {"SDFHPL1": "DFH.V6R2M24P.CICS.SDFHPL1",
-                    "SCSQCOBC": "CSQ.V9R1M0.SCSQCOBC",
-                    "SCSQPLIC": "CSQ.V9R3M0.SCSQPLIC",
-                    "SCSQMACS": "CSQ.V9R3M0.SCSQMACS",
-                    "SCSQLOAD": "CSQ.V9R1M0.SCSQLOAD"}
-        for provision in ("false", "true"):
-            # Deliberately override the opposite config value, as callers can.
-            values = self.values(provision=provision == "false")
-            values.update(db2_provision=provision)
-            values["cics"]["cics_hlq"] = "OTHER.CICS"
-            values["mq"]["install_hlq"] = "OTHER.MQ"
-            rendered = templates.render_template(ROOT / ".setup/build/datasets.yaml.j2", values)
-            import yaml
-            libraries = {entry["name"]: entry["value"] for entry in yaml.safe_load(rendered)["variables"]}
-            expected = original if provision == "false" else {
-                key: "OTHER.CICS.CICS.SDFHPL1" if key == "SDFHPL1" else "OTHER.MQ." + key
-                for key in original}
-            self.assertEqual({key: libraries[key] for key in original}, expected)
-
-    def test_cics_jvm_timeouts_require_new_db2(self):
-        original = (ROOT / ".setup/zconfig/EYUSMSSJ.jvmprofile").read_bytes()
-        script = (ROOT / ".setup/setup/setup-cics-region.sh").read_text()
-        prepare = script[script.index("# zconfig resolves simple vars"):script.index("# Cleanup\n")]
-        finalize = "finalize_results() {" + script.split("finalize_results() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
-        for provision in (None, "false", "true"):
-            with self.subTest(provision=provision), tempfile.TemporaryDirectory() as work:
-                root = Path(work)
-                (root / "setup").mkdir()
-                (root / "zconfig").mkdir()
-                profile = root / "zconfig/EYUSMSSJ.jvmprofile"
-                profile.write_bytes(original)
-                env = dict(os.environ, SCRIPTS_DIR=str(root / "setup"),
-                           PYTHON_HOME=str(Path(sys.executable).parent.parent))
-                env.pop("DB2_PROVISION", None)
-                if provision is not None:
-                    env["DB2_PROVISION"] = provision
-                subprocess.run(["bash"], input='set -e\nchtag() { :; }\n' + prepare,
-                               env=env, text=True, capture_output=True, check=True)
-                rendered = profile.read_text()
-                self.assertNotIn("{%", rendered)
-                self.assertEqual("OSGI_FRAMEWORK_TIMEOUT=600" in rendered, provision == "true")
-                self.assertEqual("controller.timeout=600000" in rendered, provision == "true")
-                if provision != "true":
-                    self.assertEqual(profile.read_bytes(), original)
-                restore_env = dict(env, JVM_PROFILE_FILE=str(profile),
-                                   JVM_PROFILE_BACKUP=str(profile) + ".back",
-                                   BACKUP_FILE=str(root / "absent-definitions-backup"),
-                                   DEBUG_BACKUP=str(root / "absent-debug-backup"))
-                subprocess.run(["bash"], input=finalize + "\nfinalize_results\n",
-                               env=restore_env, text=True, capture_output=True, check=True)
-                self.assertEqual(profile.read_bytes(), original)
-                self.assertFalse(Path(str(profile) + ".back").exists())
-
-    def test_ims_startup_wrapper_is_only_selected_for_new_db2(self):
-        script = (ROOT / ".setup/setup/setup-ims-region.sh").read_text()
-        selection = script[script.index("IMS_ZCONFIG_COMMAND=(zconfig)"):script.index('"${IMS_ZCONFIG_COMMAND[@]}" apply')]
-        for provision in (None, "false", "true"):
-            env = dict(os.environ, SCRIPTS_DIR="/test/setup")
-            env.pop("DB2_PROVISION", None)
-            if provision is not None:
-                env["DB2_PROVISION"] = provision
-            result = subprocess.run(["bash"], input=selection + '\nprintf "%s\\n" "${IMS_ZCONFIG_COMMAND[@]}"\n',
-                                    text=True, capture_output=True, env=env, check=True)
-            expected = ["python3", "/test/setup/../lib/ims_provisioning.py"] if provision == "true" else ["zconfig"]
-            self.assertEqual(result.stdout.splitlines(), expected)
-
-    def test_cics_startup_reply_requires_both_opt_ins(self):
-        script = (ROOT / ".setup/setup-common.sh").read_text()
-        stage = "stage_setup_cics_region() {" + script.split("stage_setup_cics_region() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
-        with tempfile.TemporaryDirectory() as work:
-            setup = Path(work) / ".setup/setup/setup-cics-region.sh"
-            setup.parent.mkdir(parents=True)
-            setup.write_text("exit 0\n")
-            setup.chmod(0o700)
-            harness = '''
-print_stage() { :; }
-print_info() { :; }
-print_success() { :; }
-wait_for_cics_cmci() { printf 'waited\\n'; }
-'''
-            for provision in ("false", "true"):
-                for auto_reply in ("false", "true"):
-                    result = subprocess.run(["bash"], input=harness + stage + "\nstage_setup_cics_region\n",
-                                            text=True, capture_output=True, check=True,
-                                            env=dict(os.environ, BANK_DIR=work, DB2_PROVISION=provision,
-                                                     CICS_AUTO_REPLY_GO=auto_reply))
-                    self.assertEqual(result.stdout, "waited\n" if provision == auto_reply == "true" else "")
-
-    def test_ims_compression_is_only_in_the_generated_db2_profile(self):
-        import yaml
-        source = (ROOT / ".setup/deploy/Development.yml").read_text()
-        original = yaml.safe_load(source)
-        self.assertNotIn("compression", original["ims_acb_gen_default"])
-        generated = db2.deployment_environment(source)
-        self.assertEqual(generated["ims_acb_gen_default"].pop("compression"), "PRECOMP,POSTCOMP")
-        self.assertEqual(generated, original)
-
-    def test_db2_deployment_profile_preserves_custom_ims_settings(self):
-        source = 'ims_acb_gen_default:\n  compression: POSTCOMP\n'
-        self.assertEqual(db2.deployment_environment(source)["ims_acb_gen_default"]["compression"], "POSTCOMP")
-        self.assertEqual(db2.deployment_environment("kind: Environment\n"), {"kind": "Environment"})
-
-    def test_deployment_profile_selection_preserves_the_original_when_disabled(self):
-        script = (ROOT / ".setup/tasks/task-wazi-deploy.sh").read_text()
-        selection = script[script.index('deployment_env_file="$DEPLOY_ENV_FILE"'):script.index('CMD="wazideploy-deploy')]
-        harness = '''
-PYTHON_HOME=/unused
-chtag() { printf 'UNEXPECTED tag\\n'; }
-'''
-        result = subprocess.run(["bash"], input=harness + selection + '\nprintf "%s\\n" "$deployment_env_file"\n',
-                                text=True, capture_output=True, check=True,
-                                env=dict(os.environ, DB2_PROVISION="false", DEPLOY_ENV_FILE="/original/Development.yml"))
-        self.assertEqual(result.stdout, "/original/Development.yml\n")
-
-    def test_enabled_deployment_selects_a_separate_profile_and_keeps_jinja(self):
-        import yaml
-        script = (ROOT / ".setup/tasks/task-wazi-deploy.sh").read_text()
-        selection = script[script.index('deployment_env_file="$DEPLOY_ENV_FILE"'):script.index('CMD="wazideploy-deploy')]
-        original_path = ROOT / ".setup/deploy/Development.yml"
-        original = original_path.read_bytes()
-        with tempfile.TemporaryDirectory() as work:
-            result = subprocess.run(["bash"], input='set -e\nchtag() { :; }\n' + selection + '\nprintf "%s\\n" "$deployment_env_file"\n',
-                                    text=True, capture_output=True, check=True,
-                                    env=dict(os.environ, DB2_PROVISION="true", OUTPUT_FOLDER=work,
-                                             PYTHON_HOME=str(Path(sys.executable).parent.parent),
-                                             SCRIPTS_DIR=str(ROOT / ".setup/tasks"), DEPLOY_ENV_FILE=str(original_path)))
-            generated = yaml.safe_load(Path(result.stdout.strip()).read_text())
-            self.assertEqual(generated["ims_acb_gen_default"].pop("compression"), "PRECOMP,POSTCOMP")
-            self.assertEqual(generated, yaml.safe_load(original))
-        self.assertEqual(original_path.read_bytes(), original)
-
     def test_cics_connection_rewrite_requires_a_db2_selection(self):
         script = (ROOT / ".setup/setup/setup-cics-region.sh").read_text()
-        rewrite = script[script.index('if [[ "${DB2_PROVISION:-false}"'):script.index("# zconfig resolves simple vars")]
-        source = '- db2conn:\n    name: "{{ vars.db2_ssid }}"\n    db2id: "{{ vars.db2_ssid }}"\n'
+        rewrite = script[script.index('if [[ "${DB2_PROVISION:-false}"'):script.index("# Cleanup\n")]
+        source = (ROOT / ".setup/zconfig/bank-of-z-definitions.yaml").read_text()
+        source += '\n# An unrelated resource must keep its original identifier.\n- program:\n    name: DBD1\n'
         for provision, ssid in [("false", "DBD1"), ("false", "CUSTOM"), ("true", "DBD1"), ("true", "DBD2")]:
             with self.subTest(provision=provision, ssid=ssid), tempfile.TemporaryDirectory() as work:
                 definition = Path(work) / "definitions.yaml"
@@ -355,6 +224,8 @@ chtag() { printf 'UNEXPECTED tag\\n'; }
                                         PYTHON_HOME=str(Path(sys.executable).parent.parent)))
                 expected = source if provision == "false" and ssid == "DBD1" else source.replace("{{ vars.db2_ssid }}", ssid)
                 self.assertEqual(definition.read_text(), expected)
+                if provision == "true" or ssid != "DBD1":
+                    self.assertEqual(Path(str(definition) + ".back").read_text(), source)
 
     def test_status_query_failures_stop_the_caller(self):
         env = dict(os.environ, SCRIPTS_DIR=str(ROOT / ".setup/setup"),
@@ -394,33 +265,6 @@ read_db2_master_status
                 + '[[ "$DB2_PROVISION_CATALOG" == CUSTOM ]]\n'
                 + '[[ "$DB2_PROVISION_JAVAENVV" == *zz99* ]]\n')
         subprocess.run(["bash"], input=test, text=True, check=True)
-
-    def test_cics_readiness_accepts_zos_and_linux_listeners(self):
-        script = (ROOT / ".setup/setup-common.sh").read_text()
-        helper = "wait_for_cics_cmci() {" + script.split("wait_for_cics_cmci() {", 1)[1].split("\nstage_setup_cics_region()", 1)[0]
-        harness = '''
-print_info() { :; }
-print_success() { :; }
-print_error() { :; }
-netstat() { printf '%s\\n' "$RESPONSE"; }
-opercmd() { :; }
-sleep() { :; }
-APP_SHORT_NAME=BOZ
-CICS_CMCI_PORT=27100
-CICS_CMCI_START_TIMEOUT_SECONDS=5
-'''
-        cases = [
-            ("CICSBOZ 00000001 0.0.0.0..27100 0.0.0.0..0 Listen", True),
-            ("tcp 0 0 0.0.0.0:27100 0.0.0.0:* LISTEN", True),
-            ("CICSBOZ 00000001 0.0.0.0..271001 0.0.0.0..0 Listen", False),
-            ("CICSBOZ 00000001 0.0.0.0..27100 0.0.0.0..0 Establsh", False),
-        ]
-        for response, expected in cases:
-            with self.subTest(response=response):
-                result = subprocess.run(["bash"], input=harness + helper + "\nwait_for_cics_cmci\n",
-                                        text=True, capture_output=True,
-                                        env=dict(os.environ, RESPONSE=response))
-                self.assertEqual(result.returncode == 0, expected, result.stderr)
 
     def test_stopping_consumers_does_not_delete_resources_or_cancel_base_ims(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()

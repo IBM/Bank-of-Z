@@ -78,15 +78,6 @@ def prepare(template, environ):
     return result
 
 
-def deployment_environment(template):
-    """Add the new-Db2 deployment workaround without changing the shared file."""
-    result = yaml.safe_load(template)
-    settings = result.get("ims_acb_gen_default")
-    if isinstance(settings, dict):
-        settings.setdefault("compression", "PRECOMP,POSTCOMP")
-    return result
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -97,9 +88,6 @@ def main():
     render = commands.add_parser("render")
     render.add_argument("template", type=Path)
     render.add_argument("output", type=Path)
-    deploy = commands.add_parser("deployment-environment")
-    deploy.add_argument("template", type=Path)
-    deploy.add_argument("output", type=Path)
     args = parser.parse_args()
     if args.command == "status":
         print(master_status(sys.stdin.read(), args.ssid))
@@ -107,9 +95,6 @@ def main():
         print(wlm_status(sys.stdin.read(), args.name))
     elif args.command == "render":
         data = prepare(args.template.read_text(encoding="utf-8"), os.environ)
-        args.output.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
-    else:
-        data = deployment_environment(args.template.read_text(encoding="utf-8"))
         args.output.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
 
 

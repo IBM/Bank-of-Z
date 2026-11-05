@@ -73,13 +73,23 @@ fi
 # only for new provisioning or an explicitly selected non-default Db2 SSID.
 if [[ "${DB2_PROVISION:-false}" == "true" || "$DB2_SSID" != "DBD1" ]]; then
     if [ ! -f "$BACKUP_FILE" ]; then
-        cp "$DEFINITION_FILE" "$BACKUP_FILE"
+        if ! cp "$DEFINITION_FILE" "$BACKUP_FILE"; then
+            # A failed copy can leave an incomplete backup. Do not let the
+            # EXIT handler replace the intact definitions with that file.
+            rm -f "$BACKUP_FILE"
+            BACKUP_FILE=""
+            print_error "Unable to back up CICS definitions for the Db2 connection"
+            exit 1
+        fi
     fi
 
     # Prevent USS automatic conversion from changing the bytes in this UTF-8
     # file. CICS TS Resource Builder requires its YAML input to be UTF-8.
-    chtag -b "$DEFINITION_FILE"
-    "$PYTHON_HOME/bin/python3" - "$DEFINITION_FILE" "$DB2_SSID" <<'PYTHON'
+    if ! chtag -b "$DEFINITION_FILE"; then
+        print_error "Unable to prepare CICS definition encoding for the Db2 connection"
+        exit 1
+    fi
+    if ! "$PYTHON_HOME/bin/python3" - "$DEFINITION_FILE" "$DB2_SSID" <<'PYTHON'
 from pathlib import Path
 import sys
 
@@ -89,7 +99,14 @@ contents = definition_file.read_text(encoding="utf-8")
 contents = contents.replace("{{ vars.db2_ssid }}", db2_ssid)
 definition_file.write_text(contents, encoding="utf-8")
 PYTHON
-    chtag -tc UTF-8 "$DEFINITION_FILE"
+    then
+        print_error "Unable to resolve the selected Db2 connection in CICS definitions"
+        exit 1
+    fi
+    if ! chtag -tc UTF-8 "$DEFINITION_FILE"; then
+        print_error "Unable to tag the CICS definitions after Db2 connection setup"
+        exit 1
+    fi
 fi
 
 # =========================

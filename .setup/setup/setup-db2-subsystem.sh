@@ -17,6 +17,9 @@ SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 source "$SCRIPTS_DIR/../lib/db2-status.sh"
 
+"$PYTHON_HOME/bin/python3" "$SCRIPTS_DIR/../lib/db2_provisioning.py" \
+    check-config "$CONFIG_FILE" --provision || exit 1
+
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
     [[ -z "$line" ]] && continue

@@ -136,24 +136,16 @@ def load_config(filename):
 
 
 def normalize_config(config):
-    """Support the legacy ``global`` section during the cfg migration."""
+    """Accept either section name without rewriting configuration values."""
     if not isinstance(config, dict):
         return config
 
     result = deepcopy(config)
     if "cfg" not in result and isinstance(result.get("global"), dict):
-        result["cfg"] = deepcopy(result["global"])
-
-    def replace_legacy_reference(node):
-        if isinstance(node, dict):
-            return {key: replace_legacy_reference(value) for key, value in node.items()}
-        if isinstance(node, list):
-            return [replace_legacy_reference(value) for value in node]
-        if isinstance(node, str):
-            return node.replace("global.", "cfg.")
-        return node
-
-    return replace_legacy_reference(result)
+        result["cfg"] = result["global"]
+    elif "global" not in result and isinstance(result.get("cfg"), dict):
+        result["global"] = result["cfg"]
+    return result
 
 
 def render_template(template_file, variables):

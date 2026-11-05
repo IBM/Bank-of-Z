@@ -4,15 +4,19 @@ set -eu
 # Script  : deprovision-db2-subsystem.sh
 # Summary : Remove a Db2 subsystem previously provisioned by zconfig.
 #
-# This is deliberately not part of the normal `environment` phase. Removing
-# a Db2 subsystem deletes its zconfig-managed resources and is destructive.
+# Removing a Db2 subsystem deletes its zconfig-managed resources and is
+# destructive. It also runs during environment setup if DB2_REPROVISION=true.
 # Invoke through setup-common.sh with DB2_DEPROVISION_CONFIRM set to the exact
-# configured SSID.
+# configured SSID. Bank consumers must already be stopped; this script never
+# stops IMS, CICS, MQ, or frontend servers.
 # =============================================================================
 
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPTS_DIR/../config/setenv.sh"
 source "$SCRIPTS_DIR/../lib/db2-status.sh"
+
+"$PYTHON_HOME/bin/python3" "$SCRIPTS_DIR/../lib/db2_provisioning.py" \
+    check-config "$CONFIG_FILE" || exit 1
 
 exec > >(while IFS= read -r line; do
     line="${line%"${line##*[![:space:]]}"}"
@@ -36,16 +40,24 @@ if [[ ! -f "$ZCONFIG_HOME/bin/activate" ]]; then
 fi
 
 source "$ZCONFIG_HOME/bin/activate"
+ssid_pattern='^[A-Z$#@][A-Z0-9$#@]{0,3}$'
+if [[ ! "$DB2_SSID" =~ $ssid_pattern ]]; then
+    print_error "Invalid Db2 subsystem ID; refusing removal"
+    exit 1
+fi
 target_id="db2://${DB2_SSID}"
 
 print_stage "Deprovision Db2 subsystem with zconfig"
 print_warning "Removing zconfig-managed Db2 subsystem ${DB2_SSID}"
 
-if ! zconfig ls 2>/dev/null | grep -Fq "$target_id"; then
+managed=$(read_db2_managed_state) || exit 1
+if [[ "$managed" != present ]]; then
     print_error "No zconfig state exists for ${target_id}; refusing to remove an unknown subsystem"
     deactivate
     exit 1
 fi
+
+verify_db2_consumers_stopped || exit 1
 
 print_info "Using zconfig --ie so an already-absent Db2 resource does not block repeatable teardown"
 if ! zconfig rm "$target_id" -v --ie; then
@@ -54,7 +66,8 @@ if ! zconfig rm "$target_id" -v --ie; then
     exit 1
 fi
 
-if zconfig ls 2>/dev/null | grep -Fq "$target_id"; then
+managed=$(read_db2_managed_state) || exit 1
+if [[ "$managed" != absent ]]; then
     print_error "zconfig still reports ${target_id} after removal"
     deactivate
     exit 1

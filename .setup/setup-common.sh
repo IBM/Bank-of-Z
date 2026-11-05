@@ -39,11 +39,14 @@ stage_stop_tasks() {
     cd "$BANK_DIR"
     bash .setup/runtime-manage.sh stop all
 
-    set -e
-}
-
-stage_clean_application_resources() {
-    set +e
+    # =========================
+    # Stop IMS1 (legacy / spare)
+    # =========================
+    # Preserve the existing-subsystem path; fresh Db2 setup stops only the
+    # configured Bank tasks rather than cancelling unrelated legacy IMS.
+    if [[ "${DB2_PROVISION:-false}" != "true" ]]; then
+        jcan P "IMS1*" 2>/dev/null || true
+    fi
 
     # ===========================
     # Clean application datasets
@@ -454,9 +457,6 @@ stage_deprovision_db2_subsystem() {
         exit 1
     fi
 
-    # Stop Bank of Z consumers before removing the subsystem they use.
-    stage_stop_tasks
-
     print_info "Running Db2 subsystem deprovisioning script..."
     print_info "Executing: bash $BANK_DIR/.setup/setup/deprovision-db2-subsystem.sh"
     cd "$BANK_DIR"
@@ -666,7 +666,6 @@ main_setup() {
 
     # infrastructure
     stage_stop_tasks
-    stage_clean_application_resources
 
     if [[ "${DB2_PROVISION}" == "true" ]]; then
         if [[ "${DB2_REPROVISION:-false}" == [Tt][Rr][Uu][Ee] ]]; then
@@ -784,6 +783,19 @@ main_verify_installation() {
 
 main() {
     local phase="${1:-}"
+    local db2_check_args=()
+
+    # SQL JCL reads CONFIG_FILE directly. Reject conflicting shell identities
+    # before Bank setup can stop services, clean resources, or submit SQL.
+    case "$phase" in
+        environment|install-bank-of-z|verify-installation)
+            if [[ "$phase" == environment && "${DB2_PROVISION}" == true ]]; then
+                db2_check_args+=(--provision)
+            fi
+            "$PYTHON_HOME/bin/python3" "$SCRIPTS_DIR/lib/db2_provisioning.py" \
+                check-config "$CONFIG_FILE" "${db2_check_args[@]}" || return 1
+            ;;
+    esac
 
     # Detect Execution Mode
     detect_bank_of_z_location

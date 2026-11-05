@@ -3,6 +3,7 @@
 import importlib.util
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -166,6 +167,82 @@ stage_quiesce_db2_rexx() { printf 'quiesce\\n'; }
                     result = module.render_config(module.normalize_config(source))
                 self.assertEqual(result["lower"], "boztest")
 
+    def test_literal_component_values_are_not_configuration_references(self):
+        source = {"global": {"db2_provision": "false"},
+                  "cics": {"host": "global.example.invalid"},
+                  "ims": {"java_conf_path": "/u/demo/global.properties"},
+                  "literal": "{{ 'global.properties' }}"}
+        for module in (config, templates):
+            values = module.render_config(module.normalize_config(source))
+            self.assertEqual(values["cics"], source["cics"])
+            self.assertEqual(values["ims"], source["ims"])
+            self.assertEqual(values["literal"], "global.properties")
+
+    def test_pre_provisioning_customer_config_can_render_the_environment(self):
+        # Reconstruct the pre-feature configuration without depending on Git
+        # history being available in a shallow CI checkout.
+        source = config.yaml.safe_load((ROOT / ".setup/config/config.yaml").read_text())
+        del source["db2_provisioning"]
+        del source["global"]["db2_provision"]
+        del source["global"]["db2_reprovision"]
+        source["global"]["db2_runlib"] = "{{ global.db2_ssid }}.RUNLIB.LOAD"
+        script = (ROOT / ".setup/config/setenv.sh").read_text()
+        template = script.split("<<'EOF'\n", 1)[1].split("\nEOF", 1)[0]
+        for module in (config, templates):
+            values = module.render_config(module.normalize_config(source))
+            rendered = Environment(undefined=StrictUndefined).from_string(template).render(values)
+            self.assertIn('DB2_PROVISION="${DB2_PROVISION:-false}"', rendered)
+            self.assertEqual(values["db2"]["runlib"], "DBD1.RUNLIB.LOAD")
+            db2.validate_bank_config(values, {})
+            subprocess.run(["bash", "-n"], input=rendered, text=True, check=True)
+
+    def test_full_bank_phases_reject_conflicting_db2_identity_before_actions(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        main = "main() {" + script.split("main() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
+        values = self.values(provision=False)
+        for name, value in (("DB2_SSID", "ZZ99"), ("DB2_HLQ", "OTHER"),
+                            ("DB2_PROVISION", "true"), ("DB2_JAVA_FOLDER", "/other")):
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, name):
+                db2.validate_bank_config(values, {name: value})
+        harness = '''
+detect_bank_of_z_location() { printf 'UNEXPECTED action\\n'; }
+main_validation() { printf 'UNEXPECTED validation\\n'; }
+main_setup() { printf 'UNEXPECTED setup\\n'; }
+main_verify_installation() { printf 'UNEXPECTED verification\\n'; }
+'''
+        for phase in ("environment", "install-bank-of-z", "verify-installation"):
+            result = subprocess.run(["bash"], input=harness + main + '\nmain "$PHASE"\n',
+                                    text=True, capture_output=True,
+                                    env=dict(os.environ, DB2_SSID="ZZ99", DB2_PROVISION="false", PHASE=phase,
+                                             CONFIG_FILE=str(ROOT/".setup/config/config.yaml"),
+                                             PYTHON_HOME=str(Path(sys.executable).parent.parent),
+                                             SCRIPTS_DIR=str(ROOT/".setup")))
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("DB2_SSID disagrees", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_matching_bank_identity_and_sql_use_the_new_subsystem(self):
+        values = self.values()
+        db2.validate_bank_config(values, {"DB2_SSID": "DBD2", "DB2_HLQ": "DB2V13", "DB2_PROVISION": "true"})
+        rendered = templates.render_template(str(ROOT/".setup/jcl/cics/Db2-drop.j2"), values)
+        self.assertIn("DSN SYSTEM(DBD2)", rendered)
+        self.assertIn("LIB('DB2V13.DBD2.RUNLIB.LOAD')", rendered)
+
+    def test_standalone_provisioning_rejects_conflicting_identity_before_actions(self):
+        with tempfile.TemporaryDirectory() as work:
+            work = Path(work)
+            for directory in ("setup", "config", "lib"):
+                (work/directory).mkdir()
+            for path in ("setup/setup-db2-subsystem.sh", "lib/db2-status.sh", "lib/db2_provisioning.py", "lib/config.py"):
+                shutil.copyfile(ROOT/".setup"/path, work/path)
+            (work/"config/setenv.sh").write_text("opercmd() { printf 'UNEXPECTED z/OS command\\n'; }\n")
+            result = subprocess.run(["bash", str(work/"setup/setup-db2-subsystem.sh")], text=True, capture_output=True,
+                                    env=dict(os.environ, CONFIG_FILE=str(ROOT/".setup/config/config.yaml"),
+                                             PYTHON_HOME=str(Path(sys.executable).parent.parent), DB2_SSID="ZZ99"))
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("DB2_SSID disagrees", result.stderr)
+            self.assertEqual(result.stdout, "")
+
     def test_nested_environment_references_before_filters(self):
         source = {"cfg": {"user": "${BOZ_TEST_USER}"},
                   "path": "/u/{{ cfg.user | lower }}/java"}
@@ -251,22 +328,158 @@ read_db2_master_status
                 else:
                     self.assertNotEqual(result.returncode, 0)
 
-    def test_cached_lifecycle_and_catalog_overrides(self):
+    def test_cached_environment_preserves_explicit_lifecycle_options(self):
         script = (ROOT / ".setup/config/setenv.sh").read_text()
-        snapshot = script[script.index("_BANKZ_CALLER_OVERRIDES=()"):script.index("# A profile can clear USER.")]
-        restore = script[script.index("_BANKZ_CONFIG_DB2_SSID="):script.index("# List of variables to check")]
         template = script.split("<<'EOF'\n", 1)[1].split("\nEOF", 1)[0]
         cached = Environment(undefined=StrictUndefined).from_string(template).render(self.values())
-        test = ('set -e\nDB2_SSID=ZZ99\nDB2_PROVISION=true\nDB2_PROVISION_CATALOG=CUSTOM\n'
+        test = ('set -e\nDB2_REPROVISION=true\nDB2_PROVISION_CATALOG=CUSTOM\n'
                 + 'get_section_value() { printf DBD2; }\n'
-                + snapshot + '\n' + cached
-                + '\nDB2_PROVISION_CATALOG=STALE\n' + restore
-                + '\n[[ "$DB2_SSID" == ZZ99 && "$DB2_PROVISION" == true ]]\n'
+                + cached
+                + '\n[[ "$DB2_SSID" == DBD2 && "$DB2_PROVISION" == true ]]\n'
+                + '[[ "$DB2_REPROVISION" == true ]]\n'
                 + '[[ "$DB2_PROVISION_CATALOG" == CUSTOM ]]\n'
-                + '[[ "$DB2_PROVISION_JAVAENVV" == *zz99* ]]\n')
+                + '[[ "$DB2_PROVISION_JAVAENVV" == *dbd2* ]]\n')
         subprocess.run(["bash"], input=test, text=True, check=True)
 
-    def test_stopping_consumers_does_not_delete_resources_or_cancel_base_ims(self):
+    def test_cached_environment_preserves_an_explicit_empty_catalog(self):
+        script = (ROOT / ".setup/config/setenv.sh").read_text()
+        template = script.split("<<'EOF'\n", 1)[1].split("\nEOF", 1)[0]
+        cached = Environment(undefined=StrictUndefined).from_string(template).render(self.values())
+        for supplied, expected in ((None, "DBD2"), ("", ""), ("CUSTOM", "CUSTOM")):
+            prefix = 'unset DB2_PROVISION_CATALOG\n' if supplied is None else f'DB2_PROVISION_CATALOG="{supplied}"\n'
+            harness = ('set -e\nget_section_value() { printf DBD2; }\n' + prefix
+                       + cached
+                       + '\nprintf "%s" "$DB2_PROVISION_CATALOG"\n')
+            result = subprocess.run(["bash"], input=harness, text=True, capture_output=True, check=True)
+            self.assertEqual(result.stdout, expected)
+
+    def test_cics_db2_preparation_failures_restore_definitions_before_cleanup(self):
+        original = 'db2id: "{{ vars.db2_ssid }}"\n'
+        for step in ("backup", "binary_tag", "python", "utf8_tag"):
+            with self.subTest(step=step), tempfile.TemporaryDirectory() as work:
+                work = Path(work)
+                for directory in ("setup", "config", "zconfig"):
+                    (work/directory).mkdir()
+                script = work/"setup/setup-cics-region.sh"
+                shutil.copyfile(ROOT/".setup/setup/setup-cics-region.sh", script)
+                definition = work/"zconfig/bank-of-z-definitions.yaml"
+                definition.write_text(original)
+                (work/"zconfig/debug-definitions.yaml").write_text("debug: unchanged\n")
+                (work/"config/setenv.sh").write_text('''
+CYAN= NC= ZCONFIG_HOME= ZCONFIG_ZCB_HOME= ZOAU_HOME= LIBPATH=
+APP_HLQ=BANKZ
+print_error() { printf '%s\\n' "$*"; }
+chtag() {
+    [[ "$1" == -p ]] && { printf 't UTF-8 T=on\\n'; return 0; }
+    [[ "$FAIL_STEP" == binary_tag && "$1" == -b ]] && return 8
+    [[ "$FAIL_STEP" == utf8_tag && "$1" == -tc ]] && return 8
+    return 0
+}
+cp() {
+    if [[ "$FAIL_STEP" == backup ]]; then printf partial > "$2"; return 8; fi
+    command cp "$@"
+}
+opercmd() { printf 'UNEXPECTED CICS cancellation\\n'; }
+''')
+                python_home = "/nonexistent-bankz-test-python" if step == "python" else str(Path(sys.executable).parent.parent)
+                result = subprocess.run(["bash", str(script)], text=True, capture_output=True,
+                                        env=dict(os.environ, FAIL_STEP=step, DB2_PROVISION="true", DB2_SSID="ZZ99",
+                                                 PYTHON_HOME=python_home))
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertNotIn("UNEXPECTED", result.stdout + result.stderr)
+                self.assertEqual(definition.read_text(), original)
+
+    def test_deprovision_checks_ownership_and_consumers_without_stopping_them(self):
+        cases = [
+            ({}, True, True),
+            ({"IMS_DISABLED": "true"}, True, True),
+            ({"DB2_SSID": "OTHER"}, False, False),
+            ({"DB2_DEPROVISION_CONFIRM": "WRONG"}, False, False),
+            ({"MANAGED_URI": "db2://ZZ990"}, False, False),
+            ({"INITIAL_LIST_FAIL": "true"}, False, False),
+            ({"ACTIVE_TASK": "CICSBOZ"}, False, False),
+            ({"ACTIVE_TASK": "IMS2MPP1"}, False, False),
+            ({"UNKNOWN_TASK": "IMS2CTL"}, False, False),
+            ({"QUERY_FAIL_TASK": "CICSBOZ"}, False, False),
+            ({"FINAL_LIST_FAIL": "true"}, False, True),
+            ({"KEEP_STATE": "true"}, False, True),
+            ({"REMOVE_FAIL": "true"}, False, True),
+            ({"ACTIVE_TASK": "ZZ99MSTR"}, False, True),
+        ]
+        for overrides, success, removed in cases:
+            with self.subTest(overrides=overrides), tempfile.TemporaryDirectory() as work:
+                work = Path(work)
+                for directory in ("setup", "config", "lib", "tool/bin"):
+                    (work/directory).mkdir(parents=True)
+                for path in ("setup/deprovision-db2-subsystem.sh", "lib/db2-status.sh", "lib/db2_provisioning.py", "lib/config.py"):
+                    shutil.copyfile(ROOT/".setup"/path, work/path)
+                values = config.yaml.safe_load((ROOT/".setup/config/config.yaml").read_text())
+                values["global"]["db2_ssid"] = "ZZ99"
+                (work/"config.yaml").write_text(config.yaml.safe_dump(values))
+                (work/"config/setenv.sh").write_text('''
+CYAN= NC= ZOAU_HOME= LIBPATH=
+print_stage() { :; }
+print_warning() { :; }
+print_info() { printf '%s\\n' "$*"; }
+print_error() { printf 'ERROR: %s\\n' "$*"; }
+print_success() { printf 'SUCCESS: %s\\n' "$*"; }
+opercmd() {
+    printf 'opercmd %s\\n' "$*" >> "$EVENTS"
+    local task="${1##*,}"
+    [[ "$task" == "${QUERY_FAIL_TASK:-}" ]] && return 8
+    [[ "$task" == "${UNKNOWN_TASK:-}" ]] && { printf '%s\\n' "$*"; return 0; }
+    if [[ "$task" == "${ACTIVE_TASK:-}" ]]; then
+        printf '%s %s STC 00042\\n' "$task" "$task"
+    else
+        printf 'IEE115I %s NOT FOUND\\n' "$task"
+    fi
+}
+''')
+                (work/"tool/bin/activate").write_text('''
+deactivate() { :; }
+zconfig() {
+    printf 'zconfig %s\\n' "$*" >> "$EVENTS"
+    case "$1" in
+        ls)
+            if [[ -f "$REMOVED" ]]; then
+                [[ "${FINAL_LIST_FAIL:-}" == true ]] && return 8
+                [[ "${KEEP_STATE:-}" == true ]] && printf '%s\\n' "$MANAGED_URI"
+            else
+                [[ "${INITIAL_LIST_FAIL:-}" == true ]] && return 8
+                printf '│ %s │ managed │\\n' "$MANAGED_URI"
+            fi
+            return 0 ;;
+        rm)
+            touch "$REMOVED"
+            [[ "${REMOVE_FAIL:-}" == true ]] && return 8
+            return 0 ;;
+        *) return 9 ;;
+    esac
+}
+''')
+                env = dict(os.environ, DB2_SSID="ZZ99", DB2_DEPROVISION_CONFIRM="ZZ99", APP_SHORT_NAME="BOZ",
+                           IMS_DISABLED="false", IMS_DATASTORE="IMS2", ZCONFIG_HOME=str(work/"tool"),
+                           CONFIG_FILE=str(work/"config.yaml"), DB2_PROVISION="false",
+                           PYTHON_HOME=str(Path(sys.executable).parent.parent), EVENTS=str(work/"events"),
+                           REMOVED=str(work/"removed"), MANAGED_URI="db2://ZZ99")
+                env.update(overrides)
+                result = subprocess.run(["bash", str(work/"setup/deprovision-db2-subsystem.sh")],
+                                        text=True, capture_output=True, env=env)
+                self.assertEqual(result.returncode == 0, success, result.stdout + result.stderr)
+                self.assertEqual((work/"removed").exists(), removed)
+                self.assertEqual("SUCCESS:" in result.stdout, success, result.stdout)
+                events = (work/"events").read_text() if (work/"events").exists() else ""
+                if removed:
+                    queries = events.split("zconfig rm", 1)[0]
+                    self.assertIn("opercmd D A,CICSBOZ", queries)
+                    if env["IMS_DISABLED"] != "true":
+                        self.assertIn("opercmd D A,IMS2MPP2", queries)
+                if overrides.get("MANAGED_URI") or overrides.get("INITIAL_LIST_FAIL"):
+                    self.assertNotIn("opercmd", events)
+                for line in events.splitlines():
+                    self.assertTrue(line.startswith(("opercmd D A,", "zconfig ls", "zconfig rm db2://ZZ99 -v --ie")), line)
+
+    def test_only_fresh_db2_setup_skips_the_existing_legacy_ims_cleanup(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()
         stop = "stage_stop_tasks() {" + script.split("stage_stop_tasks() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
         with tempfile.TemporaryDirectory() as work:
@@ -278,9 +491,9 @@ print_stage() { :; }
 print_info() { :; }
 print_error() { :; }
 bash() { printf 'runtime:%s\\n' "$*"; }
-jcan() { printf 'UNEXPECTED cancellation:%s\\n' "$*"; }
-drm() { printf 'UNEXPECTED dataset removal:%s\\n' "$*"; }
-rm() { printf 'UNEXPECTED file removal:%s\\n' "$*"; }
+jcan() { printf 'legacy:%s\\n' "$*"; }
+drm() { :; }
+rm() { :; }
 dtouch() { :; }
 sleep() { :; }
 APP_HLQ=BANKZ
@@ -288,11 +501,36 @@ APP_ZOS_VERSION=V0R1M0
 APP_SHORT_NAME=BOZ
 SANDBOX_DIR=/test-sandbox
 '''
-            result = subprocess.run(["bash"], input=harness + stop + "\nstage_stop_tasks\n",
+            for provision in ("false", "true"):
+                result = subprocess.run(["bash"], input=harness + stop + "\nstage_stop_tasks\n",
+                                        text=True, capture_output=True,
+                                        env=dict(os.environ, BANK_DIR=work, DB2_PROVISION=provision))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                expected = "runtime:.setup/runtime-manage.sh stop all\n"
+                if provision == "false":
+                    expected += "legacy:P IMS1*\n"
+                self.assertEqual(result.stdout, expected)
+
+    def test_db2_removal_entrypoint_does_not_call_shared_stop_or_cleanup(self):
+        script = (ROOT / ".setup/setup-common.sh").read_text()
+        helper = "stage_deprovision_db2_subsystem() {" + script.split("stage_deprovision_db2_subsystem() {", 1)[1].split("\n}\n", 1)[0] + "\n}\n"
+        with tempfile.TemporaryDirectory() as work:
+            child = Path(work)/".setup/setup/deprovision-db2-subsystem.sh"
+            child.parent.mkdir(parents=True)
+            child.write_text("#!/bin/bash\nprintf 'db2-only\\n'\n")
+            child.chmod(0o700)
+            harness = '''
+print_stage() { :; }
+print_info() { :; }
+print_error() { :; }
+print_success() { :; }
+stage_stop_tasks() { printf 'UNEXPECTED shared shutdown\\n'; return 9; }
+'''
+            result = subprocess.run(["bash"], input='set -e\n' + harness + helper + "\nstage_deprovision_db2_subsystem\n",
                                     text=True, capture_output=True,
-                                    env=dict(os.environ, BANK_DIR=work))
+                                    env=dict(os.environ, BANK_DIR=work, DB2_SSID="DBD2", DB2_DEPROVISION_CONFIRM="DBD2"))
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stdout.strip(), "runtime:.setup/runtime-manage.sh stop all")
+            self.assertEqual(result.stdout, "db2-only\n")
 
     def test_deprovision_confirmation_precedes_service_shutdown(self):
         script = (ROOT / ".setup/setup-common.sh").read_text()

@@ -12,14 +12,17 @@
                     "type": "zosmf",
                     "properties": {
                         "port": 10443
-                    }
+                    },
+                    "secure": [
+                        "user", "password"
+                    ]
                 },
                 "ssh": {
                     "type": "ssh",
                     "properties": {
                         "port": 22
                     },
-                "secure": [
+                    "secure": [
                         "user", "password"
                     ]
                 },
@@ -36,6 +39,7 @@
                 "cics": {
                     "type": "cics",
                     "properties": {
+                        "protocol": "http",
                         // Change this is you're using a different CMCI port from standard
                         "port": 27100
                     }

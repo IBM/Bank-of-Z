@@ -1,0 +1,17 @@
+{
+  // Mirrors the extensions installed by scripts/setup-vscode.js and scripts/setup-bobide.js.
+  // The IDzEE Extension Pack members (Z Open Editor, Z Open Debug, Compiled Code Coverage)
+  // are listed individually rather than via the pack.
+  "recommendations": [
+    "Zowe.vscode-extension-for-zowe",
+    "Zowe.cics-extension-for-zowe",
+    "IBM.zopeneditor",
+    "IBM.zopendebug",
+    "IBM.compiledcodecoverage",
+    "IBM.cics-ia-extension-for-zowe",
+    "IBM.ims-explorer-for-vscode",
+    "IBM.db2forzosdeveloperextension",
+    "IBM.ibm-zosconnect",
+    "IBM.taz-edt-extension"
+  ]
+}

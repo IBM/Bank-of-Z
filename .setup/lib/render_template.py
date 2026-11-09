@@ -60,7 +60,23 @@ def render_config(config):
     """
     Recursively resolve Jinja expressions inside YAML.
     """
+    def expand_tree(node):
+        if isinstance(node, dict):
+            return {key: expand_tree(value) for key, value in node.items()}
+        if isinstance(node, list):
+            return [expand_tree(value) for value in node]
+        return expand_env_vars(node)
+
+    # Resolve ${VAR} before Jinja filters are applied. In particular, applying
+    # | lower to ${USER} would turn it into ${user} and discard the value.
     result = deepcopy(config)
+    # Environment values may themselves reference other environment variables.
+    # Finish that expansion before filters can change variable-name case.
+    for _ in range(20):
+        expanded = expand_tree(result)
+        if expanded == result:
+            break
+        result = expanded
 
     env = Environment(undefined=StrictUndefined)
 
@@ -116,7 +132,20 @@ def load_config(filename):
     with open(filename, "r", encoding="utf-8") as fd:
         config = yaml.safe_load(fd)
 
-    return render_config(config)
+    return render_config(normalize_config(config))
+
+
+def normalize_config(config):
+    """Accept either section name without rewriting configuration values."""
+    if not isinstance(config, dict):
+        return config
+
+    result = deepcopy(config)
+    if "cfg" not in result and isinstance(result.get("global"), dict):
+        result["cfg"] = result["global"]
+    elif "global" not in result and isinstance(result.get("cfg"), dict):
+        result["global"] = result["cfg"]
+    return result
 
 
 def render_template(template_file, variables):
@@ -162,6 +191,7 @@ def main():
     with open(args.configFile, "r", encoding="utf-8") as fd:
         config = yaml.safe_load(fd)
 
+    config = normalize_config(config)
     config.update(extra_vars)
 
     config = render_config(config)

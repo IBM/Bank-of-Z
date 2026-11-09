@@ -198,8 +198,7 @@ fi
 
 rm -f message.log
 
-print_info "Executing command:"
-print_info "\t$CMD"
+print_info "Executing deployment command (credential arguments omitted)"
 : > "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log"
 ${CMD} 2>&1 | tee "${OUTPUT_FOLDER}/wazideploy-deploy-bankz.console.log" | while IFS= read -r line
 do

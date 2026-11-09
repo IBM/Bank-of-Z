@@ -1,0 +1,25 @@
+//DB2BIND JOB 'DB2',NOTIFY=&SYSUID,CLASS=A,MSGCLASS=H,
+//          MSGLEVEL=(1,1),REGION=4M
+//BIND    EXEC PGM=IKJEFT01
+//STEPLIB  DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNEXIT
+//         DD  DISP=SHR,DSN={{ db2.db2_hlq }}.SDSNLOAD
+//DBRMLIB  DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(BNK2STMT)
+//     DD DISP=SHR,DSN={{ app.app_hlq }}.{{ app.zos_version }}.DBRM(BNKSTMTC)
+//SYSPRINT DD  SYSOUT=*
+//SYSTSPRT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*
+//SYSTSIN DD *
+ DSN SYSTEM({{ db2.ssid }})
+
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
+ QUALIFIER(BANKZ) -
+ MEMBER(BNK2STMT) -
+ ACTION(REPLACE)
+
+ BIND PACKAGE({{ db2.package }}) OWNER({{ db2.sqlid }}) -
+ QUALIFIER(BANKZ) -
+ MEMBER(BNKSTMTC) -
+ ACTION(REPLACE)
+
+ END
+/*

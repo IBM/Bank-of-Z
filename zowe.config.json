@@ -5,6 +5,9 @@
             "properties": {
                 "protocol": "https",
                 "rejectUnauthorized": false,
+                // The z/OS host name varies per user. Zowe does not set
+                // this for you: export ZOS_HOST in your environment
+                // (e.g. export ZOS_HOST=my.zos.host) before using Zowe.
                 "host": "$ZOS_HOST"
             },
             "profiles": {

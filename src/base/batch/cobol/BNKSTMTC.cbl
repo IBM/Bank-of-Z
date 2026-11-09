@@ -128,7 +128,7 @@
       *-----------------------------------------------------------------
       * Host variables - customer query (SELECT INTO)
       *-----------------------------------------------------------------
-       01  HV-CUST-NUMBER             PIC X(10).
+       01  HV-CUST-NUMBER             PIC X(10) VALUE SPACES.
        01  HOST-CUSTOMER-ROW.
            03 HV-CUST-TITLE           PIC X(10).
            03 HV-CUST-FIRST-NAME      PIC X(50).
@@ -139,7 +139,7 @@
            03 HV-CUST-POSTCODE        PIC X(10).
            03 HV-CUST-COUNTRY         PIC X(50).
            03 HV-CUST-PHONE           PIC X(20).
-       01  HV-CUST-SORTCODE           PIC X(6).
+       01  HV-CUST-SORTCODE           PIC X(6) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Null indicators - customer nullable columns
@@ -168,7 +168,7 @@
       *-----------------------------------------------------------------
        01  HV-TRAN-DATE               PIC X(10).
        01  HV-TRAN-TIME               PIC X(6).
-       01  HV-TRAN-TYPE               PIC X(3).
+       01  HV-TRAN-TYPE               PIC X(3) VALUE SPACES.
        01  HV-TRAN-DESC               PIC X(40).
        01  HV-TRAN-AMOUNT             PIC S9(12)V99 COMP-3.
 
@@ -227,15 +227,15 @@
       *-----------------------------------------------------------------
       * Customer ID normalisation fields
       *-----------------------------------------------------------------
-       01  WS-CUST-PREFIX             PIC X.
+       01  WS-CUST-PREFIX             PIC X VALUE SPACE.
       *    Raw digits: 9 usable positions from SYSIN cols 2-10, plus
       *    one extra byte so we can detect > 9 digit overruns.
-       01  WS-CUST-RAW-DIGITS         PIC X(10).
+       01  WS-CUST-RAW-DIGITS         PIC X(10) VALUE SPACES.
        01  WS-DIGIT-LEN               PIC 9(4) COMP VALUE 0.
        01  WS-CUST-ID-CANONICAL       PIC X(10).
        01  WS-CUST-NUMBER-STRIPPED    PIC X(10).
        01  WS-DIGIT-IDX               PIC S9(4) COMP VALUE 0.
-       01  WS-DIGIT-WORK              PIC X(9).
+       01  WS-DIGIT-WORK              PIC X(9) VALUE SPACES.
        01  WS-DIGIT-NUMERIC           PIC 9(9) COMP VALUE 0.
        01  WS-DIGIT-EDIT              PIC 9(9).
 
@@ -287,11 +287,6 @@
        01  WS-CURRENCY-SYMBOL         PIC X VALUE '$'.
 
       *-----------------------------------------------------------------
-      * General message work field
-      *-----------------------------------------------------------------
-       01  WS-MSG                     PIC X(132).
-
-      *-----------------------------------------------------------------
       * Transaction classification flag
       *-----------------------------------------------------------------
        01  WS-TRAN-CLASS              PIC X(1).
@@ -303,10 +298,10 @@
       * Amount editing work fields
       *-----------------------------------------------------------------
        01  WS-AMT-EDIT-POS            PIC $$,$$$,$$$,$$9.99.
-       01  WS-AMT-WORK-POS            PIC S9(12)V99 COMP-3.
-       01  WS-AMT-FORMATTED           PIC X(17).
-       01  WS-AMT-FORMATTED-14        PIC X(14).
-       01  WS-AMT-TEMP                PIC X(17).
+       01  WS-AMT-WORK-POS            PIC S9(12)V99 COMP-3 VALUE 0.
+       01  WS-AMT-FORMATTED           PIC X(17) VALUE SPACES.
+       01  WS-AMT-FORMATTED-14        PIC X(14) VALUE SPACES.
+       01  WS-AMT-TEMP                PIC X(17) VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Sort-code display work (raw 6-digit -> NN-NN-NN)
@@ -318,7 +313,7 @@
            03 FILLER                  PIC X VALUE '-'.
            03 WS-SC-D3                PIC X(2).
 
-       01  WS-SORTCODE-RAW            PIC X(6).
+       01  WS-SORTCODE-RAW            PIC X(6) VALUE SPACES.
        01  WS-SORTCODE-RAW-R REDEFINES WS-SORTCODE-RAW.
            03 WS-SC-R1                PIC X(2).
            03 WS-SC-R2                PIC X(2).
@@ -374,8 +369,8 @@
       * Column 1 = ANSI carriage control; columns 2-133 = print data
       *-----------------------------------------------------------------
        01  WS-PRINT-LINE.
-           03 WS-PL-CC                PIC X.
-           03 WS-PL-DATA              PIC X(132).
+           03 WS-PL-CC                PIC X       VALUE SPACE.
+           03 WS-PL-DATA              PIC X(132)  VALUE SPACES.
 
       *-----------------------------------------------------------------
       * Fixed report line constants
@@ -570,7 +565,7 @@
 
            IF WS-RETURN-CODE = 12
                MOVE 12 TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE-21
@@ -589,7 +584,7 @@
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
       *    Read and validate SYSIN control record
@@ -597,7 +592,7 @@
            IF WS-RETURN-CODE >= 4
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
       *    Validate SYSIN fields (collect-all errors per spec sec.2.2.3)
@@ -605,7 +600,7 @@
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
       *    Normalise customer ID
@@ -619,14 +614,14 @@
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
            IF WS-ACCT-FOUND = 'N'
       *        No accounts - message already emitted; suppress SYSPRINT
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
       *    Query customer demographics for first account sort code
@@ -637,7 +632,7 @@
            IF WS-RETURN-CODE >= 8
                PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
                MOVE WS-RETURN-CODE TO RETURN-CODE
-               STOP RUN
+               GOBACK
            END-IF
 
       *    Process all accounts (cursor open from 2000-QUERY-ACCOUNTS)
@@ -655,7 +650,7 @@
 
            PERFORM 6200-CLOSE-FILES THRU 6200-EXIT
            MOVE WS-RETURN-CODE TO RETURN-CODE
-           STOP RUN.
+           GOBACK.
 
       ******************************************************************
       * 1000 - SYSIN OPEN / READ / VALIDATE
@@ -848,16 +843,10 @@
                            WS-PERIOD-MM   > WS-CURR-MM)
                            MOVE WS-PERIOD-YYYY TO WS-PERIOD-YYYY-DISP
                            MOVE WS-PERIOD-MM   TO WS-PERIOD-MM-DISP
-                           STRING WS-PERIOD-YYYY-DISP
-                                  DELIMITED BY SIZE
-                                  '-' DELIMITED BY SIZE
-                                  WS-PERIOD-MM-DISP
-                                  DELIMITED BY SIZE
-                                  INTO WS-MSG
-                           END-STRING
                            DISPLAY 'BNKZE0008: Statement period is '
                                    'in the future: '
-                                   WS-MSG(1:7)
+                                   WS-PERIOD-YYYY-DISP '-'
+                                   WS-PERIOD-MM-DISP
                            PERFORM 9100-RAISE-ERROR THRU 9100-EXIT
                            ADD 1 TO WS-SYSIN-ERROR-COUNT
                        END-IF
@@ -866,14 +855,9 @@
       *        Period omitted - default to current month
                MOVE WS-CURR-YYYY TO WS-PERIOD-YYYY
                MOVE WS-CURR-MM   TO WS-PERIOD-MM
-               STRING WS-CURR-YYYY DELIMITED BY SIZE
-                      '-'          DELIMITED BY SIZE
-                      WS-CURR-MM   DELIMITED BY SIZE
-                      INTO WS-MSG
-               END-STRING
                DISPLAY 'BNKZI0001: Statement period omitted; '
                        'defaulting to current month: '
-                       WS-MSG(1:7)
+                       WS-CURR-YYYY '-' WS-CURR-MM
                PERFORM 9200-RAISE-INFO THRU 9200-EXIT
            END-IF.
        1200-EXIT.
@@ -1212,25 +1196,20 @@
            MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
            MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
            MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Customer ID line
            MOVE WS-CUST-ID-CANONICAL TO WS-CL-CUSTID
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CUSTID-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Blank line
-           MOVE ' ' TO WS-PL-CC
-           MOVE SPACES TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8430-WRITE-BLANK-LINE THRU 8430-EXIT
 
       *    Customer information header
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CUSTINFO-HDR TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Name line: TITLE FIRSTNAME LASTNAME
            MOVE SPACES TO WS-CUST-NAME-DISP
@@ -1245,15 +1224,13 @@
                   INTO WS-CUST-NAME-DISP
            END-STRING
            MOVE WS-CUST-NAME-DISP TO WS-CI-NAME
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CI-NAME-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Address line 1
            MOVE HV-CUST-ADDR1 TO WS-CI-ADDR1
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CI-ADDR1-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Address line 2 (only if non-blank AND addr1 was not N/A)
       *    Spec sec.3.3: when addr1 is null/blank (printed as N/A), addr2
@@ -1261,9 +1238,8 @@
            IF HV-CUST-ADDR2 NOT = SPACES
            AND HV-CUST-ADDR1 NOT = 'N/A'
                MOVE HV-CUST-ADDR2 TO WS-CI-ADDR2
-               MOVE ' ' TO WS-PL-CC
                MOVE WS-CI-ADDR2-LINE TO WS-PL-DATA
-               PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+               PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
            END-IF
 
       *    Address final line: City, Postcode, Country
@@ -1280,43 +1256,35 @@
                       DELIMITED BY SIZE
                   INTO WS-CI-ADDRFINAL
            END-STRING
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CI-ADDRFINAL-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Phone line
            MOVE HV-CUST-PHONE TO WS-CI-PHONE
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CI-PHONE-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Blank line after customer info
-           MOVE ' ' TO WS-PL-CC
-           MOVE SPACES TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+           PERFORM 8430-WRITE-BLANK-LINE THRU 8430-EXIT.
        4000-EXIT.
            EXIT.
 
       *-----------------------------------------------------------------
        4010-WRITE-BANNER.
       *-----------------------------------------------------------------
-           MOVE '1' TO WS-PL-CC
-
-      *    Banner line 1 (=== line)
+      *    Banner line 1 (=== line) - first line of a new page
            MOVE WS-BANNER-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8420-WRITE-NEWPAGE-LINE THRU 8420-EXIT
 
       *    Page header line: BANK OF Z ... PAGE: n
            MOVE WS-PAGE-NUMBER TO WS-PAGE-EDIT
            MOVE WS-PAGE-EDIT   TO WS-PH-PAGE-NO
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-PAGE-HDR-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Banner line 2 (=== line)
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-BANNER-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT.
        4010-EXIT.
            EXIT.
 
@@ -1336,14 +1304,12 @@
            MOVE WS-PERIOD-FROM-DISP TO WS-SP-FROM
            MOVE WS-PERIOD-TO-DISP   TO WS-SP-TO
            MOVE WS-ISSUE-DATE-DISP  TO WS-SP-ISSUE
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-STMT-PERIOD-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
            MOVE WS-CUST-ID-CANONICAL TO WS-CL-CUSTID
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-CUSTID-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Reprint account header block (items 3-5 of spec sec.4.3 list)
            PERFORM 4200-WRITE-ACCT-HEADER THRU 4200-EXIT.
@@ -1361,45 +1327,37 @@
            PERFORM 8300-FORMAT-SORTCODE THRU 8300-EXIT
 
       *    Account separator
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-ACCT-SEP-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Account header line
            MOVE HV-ACCT-TYPE   TO WS-AH-TYPE
            MOVE HV-ACCT-NUMBER TO WS-AH-NUMBER
            MOVE WS-SORTCODE-DISP TO WS-AH-SORTCODE(1:8)
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-ACCT-HDR-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Account separator
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-ACCT-SEP-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Opening balance: always $0.00
            MOVE 0 TO WS-AMT-WORK-POS
            PERFORM 8100-FORMAT-AMOUNT THRU 8100-EXIT
            MOVE WS-AMT-FORMATTED TO WS-OB-AMOUNT
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-OPEN-BAL-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Blank line
-           MOVE ' ' TO WS-PL-CC
-           MOVE SPACES TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8430-WRITE-BLANK-LINE THRU 8430-EXIT
 
       *    Column headings
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-COL-HDR-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Column separator line
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-COL-SEP-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT.
        4200-EXIT.
            EXIT.
 
@@ -1452,6 +1410,10 @@
                        MOVE 'Y' TO WS-TRAN-EOF
                    ELSE
       *                Valid row - apply null defaults
+                       IF NI-TRAN-TYPE < 0
+                           MOVE SPACES TO HV-TRAN-TYPE
+                       END-IF
+
                        IF NI-TRAN-DESC < 0
                        OR HV-TRAN-DESC = SPACES
                            MOVE 'N/A' TO HV-TRAN-DESC
@@ -1469,9 +1431,8 @@
                            PERFORM 4100-PAGE-EJECT THRU 4100-EXIT
                        END-IF
 
-                       MOVE ' ' TO WS-PL-CC
                        MOVE WS-TRAN-LINE TO WS-PL-DATA
-                       PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+                       PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
                        ADD 1 TO WS-TRAN-COUNT
                    END-IF
@@ -1483,20 +1444,13 @@
 
       *    No transactions in period
            IF WS-TRAN-COUNT = 0
-               MOVE ' ' TO WS-PL-CC
                MOVE WS-NO-TRAN-LINE TO WS-PL-DATA
-               PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+               PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
-               STRING 'BNKZI0003: No transactions found for '
-                       'account ' DELIMITED BY SIZE
-                      HV-ACCT-NUMBER DELIMITED BY SIZE
-                      ' in period ' DELIMITED BY SIZE
-                      WS-PERIOD-FROM-DISP DELIMITED BY SIZE
-                      ' to '       DELIMITED BY SIZE
-                      WS-PERIOD-TO-DISP   DELIMITED BY SIZE
-                      INTO WS-MSG
-               END-STRING
-               DISPLAY WS-MSG
+               DISPLAY 'BNKZI0003: No transactions found for '
+                       'account ' HV-ACCT-NUMBER
+                       ' in period ' WS-PERIOD-FROM-DISP
+                       ' to ' WS-PERIOD-TO-DISP
                PERFORM 9200-RAISE-INFO THRU 9200-EXIT
            END-IF
 
@@ -1539,20 +1493,12 @@
                            MOVE HV-TRAN-AMOUNT TO WS-AMT-WORK-POS
                        END-IF
                        PERFORM 8100-FORMAT-AMOUNT THRU 8100-EXIT
-                       STRING 'BNKZI0007: Informational transaction '
-                               'type ' DELIMITED BY SIZE
-                              HV-TRAN-TYPE DELIMITED BY SIZE
-                              ' has non-zero amount '
-                                  DELIMITED BY SIZE
-                              FUNCTION TRIM(WS-AMT-TEMP, LEADING)
-                                  DELIMITED BY SIZE
-                              ' for account '   DELIMITED BY SIZE
-                              HV-ACCT-NUMBER    DELIMITED BY SIZE
-                              '; treated as withdrawal'
-                                  DELIMITED BY SIZE
-                              INTO WS-MSG
-                       END-STRING
-                       DISPLAY WS-MSG
+                       DISPLAY 'BNKZI0007: Informational transaction '
+                               'type ' HV-TRAN-TYPE
+                               ' has non-zero amount '
+                               FUNCTION TRIM(WS-AMT-TEMP, LEADING)
+                               ' for account ' HV-ACCT-NUMBER
+                               '; treated as withdrawal'
                        PERFORM 9200-RAISE-INFO THRU 9200-EXIT
                        MOVE 'W' TO WS-TRAN-CLASS
                    ELSE
@@ -1560,16 +1506,10 @@
                    END-IF
                WHEN OTHER
       *            Unrecognised type -> warning, treat as withdrawal
-                   STRING 'BNKZI0006: Unrecognised transaction type '
-                           DELIMITED BY SIZE
-                          HV-TRAN-TYPE DELIMITED BY SIZE
-                          ' for account ' DELIMITED BY SIZE
-                          HV-ACCT-NUMBER DELIMITED BY SIZE
-                          '; treated as withdrawal'
-                              DELIMITED BY SIZE
-                          INTO WS-MSG
-                   END-STRING
-                   DISPLAY WS-MSG
+                   DISPLAY 'BNKZI0006: Unrecognised transaction type '
+                           HV-TRAN-TYPE
+                           ' for account ' HV-ACCT-NUMBER
+                           '; treated as withdrawal'
                    PERFORM 9200-RAISE-INFO THRU 9200-EXIT
                    MOVE 'W' TO WS-TRAN-CLASS
            END-EVALUATE.
@@ -1646,31 +1586,23 @@
            MOVE WS-AMT-FORMATTED TO WS-EB-AMOUNT
 
       *    Blank line before totals
-           MOVE ' ' TO WS-PL-CC
-           MOVE SPACES TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8430-WRITE-BLANK-LINE THRU 8430-EXIT
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-TOTAL-WITH-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-TOTAL-DEP-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-EOM-BAL-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Account closing separator
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-ACCT-SEP-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
       *    Blank line after separator
-           MOVE ' ' TO WS-PL-CC
-           MOVE SPACES TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+           PERFORM 8430-WRITE-BLANK-LINE THRU 8430-EXIT.
        4400-EXIT.
            EXIT.
 
@@ -1692,17 +1624,14 @@
                PERFORM 4100-PAGE-EJECT THRU 4100-EXIT
            END-IF
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-BANNER-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-END-STMT-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT
 
-           MOVE ' ' TO WS-PL-CC
            MOVE WS-BANNER-LINE TO WS-PL-DATA
-           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT.
        5000-EXIT.
            EXIT.
 
@@ -1861,8 +1790,10 @@
       *-----------------------------------------------------------------
        8400-WRITE-SYSPRINT.
       *-----------------------------------------------------------------
-      *    Writes WS-PRINT-LINE to SYSPRINT-FILE.
-      *    Increments WS-LINE-COUNT.
+      *    Low-level service: writes WS-PRINT-LINE to SYSPRINT-FILE
+      *    and increments WS-LINE-COUNT.
+      *    Do not PERFORM directly - use 8410, 8420 or 8430 so that
+      *    the carriage control (WS-PL-CC) is always set correctly.
       *-----------------------------------------------------------------
            WRITE SYSPRINT-RECORD FROM WS-PRINT-LINE
            IF WS-SYSPRINT-STATUS NOT = '00'
@@ -1874,6 +1805,37 @@
                ADD 1 TO WS-LINE-COUNT
            END-IF.
        8400-EXIT.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       8410-WRITE-STD-LINE.
+      *-----------------------------------------------------------------
+      *    Writes WS-PL-DATA as a standard line (blank carriage control).
+      *-----------------------------------------------------------------
+           MOVE ' ' TO WS-PL-CC
+           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+       8410-EXIT.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       8420-WRITE-NEWPAGE-LINE.
+      *-----------------------------------------------------------------
+      *    Writes WS-PL-DATA as the first line of a new page
+      *    (carriage control '1').
+      *-----------------------------------------------------------------
+           MOVE '1' TO WS-PL-CC
+           PERFORM 8400-WRITE-SYSPRINT THRU 8400-EXIT.
+       8420-EXIT.
+           EXIT.
+
+      *-----------------------------------------------------------------
+       8430-WRITE-BLANK-LINE.
+      *-----------------------------------------------------------------
+      *    Writes a standard blank line.
+      *-----------------------------------------------------------------
+           MOVE SPACES TO WS-PL-DATA
+           PERFORM 8410-WRITE-STD-LINE THRU 8410-EXIT.
+       8430-EXIT.
            EXIT.
 
       ******************************************************************

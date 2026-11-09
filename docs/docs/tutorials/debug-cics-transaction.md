@@ -36,9 +36,15 @@ The **Debug Profile Service** holds named profiles. When a CICS transaction runs
 
 ## Step 1 — Configure the Zowe zOpenDebug Profile
 
-The Bank of Z repository ships a pre-configured `zOpenDebug` profile block in `zowe.config.json` with DPS port `8192` and RDS port `8194`. You need to supply the host name `zowe.config.user.json` (copied from `zowe.config.user.json.template`).
+The Bank of Z repository ships a pre-configured `zOpenDebug` profile block in `zowe.config.json` with DPS port `8192` and RDS port `8194`. You need to supply the host name by setting the `ZOS_HOST` environment variable, which `zowe.config.json` reads. Alternatively, you can create a git-ignored `zowe.config.user.json` to override the host.
 
-**Step 1.1:** Open `zowe.config.user.json` and set the host and credentials for the `bank-of-z` profile:
+**Step 1.1:** Set the `ZOS_HOST` environment variable to the host name or IP address of your z/OS system:
+
+```bash
+export ZOS_HOST=192.168.1.10
+```
+
+Optionally, instead of using the environment variable, create `zowe.config.user.json` and set the host and credentials for the `bank-of-z` profile:
 
 ```json
 {

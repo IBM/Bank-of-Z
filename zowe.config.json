@@ -4,12 +4,17 @@
         "bank-of-z": {
             "properties": {
                 "protocol": "https",
-                "rejectUnauthorized": false
+                "rejectUnauthorized": false,
+                // The z/OS host name varies per user. Zowe does not set
+                // this for you: export ZOS_HOST in your environment
+                // (e.g. export ZOS_HOST=my.zos.host) before using Zowe.
+                "host": "$ZOS_HOST"
             },
             "profiles": {
                 "zosmf": {
                     "type": "zosmf",
                     "properties": {
+                        // Not the default z/OSMF port (443)
                         "port": 10443
                     },
                     "secure": [
@@ -28,6 +33,7 @@
                 "rse": {
                     "type": "rse",
                     "properties": {
+                        // Not the default RSE API port (6800)
                         "port": 8195,
                         "basePath": "rseapi"
                     },
@@ -46,10 +52,12 @@
                 "zOpenDebug": {
                     "type": "zOpenDebug",
                     "properties": {
+                        // Not the default HTTPS/secured DPS configuration template port (8143)
                         "dpsPort": 8192,
                         "dpsContextRoot": "api/v1",
                         "dpsSecured": true,
                         "authenticationType": "basic",
+                        // Not the default secured RDS configuration template port (8002)
                         "rdsPort": 8194,
                         "rdsSecured": true,
                         "uuid": "05a46db4-b73f-4c81-9f0a-51350d171355"

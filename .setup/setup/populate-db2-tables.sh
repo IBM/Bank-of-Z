@@ -35,6 +35,11 @@ rm -f /tmp/IMS-Db2-* 2>/dev/null || true
 rm -f /tmp/CICS-Db2-* 2>/dev/null || true
 rm -f /tmp/Db2-* 2>/dev/null || true
 
+# Batch
+python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
+    --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/batch/Db2-bind.j2"  --outputFile "/tmp/Batch-Db2-bind-$$.jcl"
+run_job_and_wait "/tmp/Batch-Db2-bind-$$.jcl"
+
 # CICS
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "jobname=DB2BIND" --templateFile "$SCRIPTS_DIR/../jcl/cics/Db2-bind.j2"  --outputFile "/tmp/CICS-Db2-bind-$$.jcl"

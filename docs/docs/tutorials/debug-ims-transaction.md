@@ -37,22 +37,15 @@ When you activate an **IMS Isolation** debug profile, the DPS clones an existing
 
 ## Step 1 — Configure the Zowe zOpenDebug Profile
 
-The Bank of Z repository ships a pre-configured `zOpenDebug` profile block in `zowe.config.json` with DPS port `8192` and RDS port `8194`. You need to supply the host name in `zowe.config.user.json` (copied from `zowe.config.user.json.template`).
+The Bank of Z repository ships a pre-configured `zOpenDebug` profile block in `zowe.config.json` with DPS port `8192` and RDS port `8194`. Everything in that file is common to all users except the z/OS host name, which `zowe.config.json` reads from the `ZOS_HOST` environment variable. Zowe does not set this variable for you, so you must export it yourself.
 
-**Step 1.1:** Open `zowe.config.user.json` and set the host and credentials for the `bank-of-z` profile:
+**Step 1.1:** Export the `ZOS_HOST` environment variable, set to the host name or IP address of your z/OS system, in the shell (or environment) from which you run the Zowe CLI or launch your IDE:
 
-```json
-{
-  "profiles": {
-    "bank-of-z": {
-      "properties": {
-        "host": "192.168.1.10"
-      },
-      "secure": ["user", "password"]
-    }
-  }
-}
+```bash
+export ZOS_HOST=192.168.1.10
 ```
+
+To avoid repeating this in every session, add the `export` line to your shell profile (for example `~/.zshrc` or `~/.bashrc`).
 
 **Step 1.2:** Store credentials in the Zowe secure credential store:
 

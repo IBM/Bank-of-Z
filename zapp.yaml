@@ -37,6 +37,7 @@ profiles:
           # - BANKZ.V0R1M0.LOAD # Application load libraries
           - BANKZ.V0R1M0.LOADLIB
           - BANKZ.V0R1M0.LOAD
+          - BANKZ.IMS2.PGMLIB
           
   # Custom ZCodeScan rules example
   - name: zcodescan

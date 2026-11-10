@@ -57,17 +57,7 @@ run_job_and_wait "/tmp/IMS-bankz-reg-works-$$.jcl" "4"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/DFSJMP.j2"  --outputFile "/tmp/IMS-bankz-reg-jmp-$$.txt"
-cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-reg-jmp-$$.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSJMP),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
+cp "/tmp/IMS-bankz-reg-jmp-$$.txt" "//'${IMS_APP_HLQ}.PROCLIB(DFSJMP)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=3" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/jmp/SIMLINK.j2"\
@@ -124,73 +114,22 @@ run_job_and_wait "/tmp/IMS-bankz-reg-mpr2-$$.jcl"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=1" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/mpp/DFSMPR1.j2"  --outputFile "/tmp/IMS-bankz-reg-mpr1-$$.txt"
-cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-reg-mpr1-$$.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSMPR1),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
+cp "/tmp/IMS-bankz-reg-mpr1-$$.txt" "//'${IMS_APP_HLQ}.PROCLIB(DFSMPR1)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
     --extraVar "region_num=1" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/mpp/DFSMPR2.j2"  --outputFile "/tmp/IMS-bankz-reg-mpr2-$$.txt"
-cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-reg-mpr2-$$.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSMPR2),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
+cp "/tmp/IMS-bankz-reg-mpr2-$$.txt" "//'${IMS_APP_HLQ}.PROCLIB(DFSMPR2)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
      --extraVar "region_num=1" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/mpp/STOPMPP.j2"  --outputFile "/tmp/IMS-bankz-reg-stop1-$$.txt"
-cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-reg-stop1-$$.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.JOBS(STOPMPP1),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
+cp "/tmp/IMS-bankz-reg-stop1-$$.txt" "//'${IMS_APP_HLQ}.JOBS(STOPMPP1)'"
 
 python "$SCRIPTS_DIR/../lib/render_template.py" --configFile $CONFIG_FILE \
      --extraVar "region_num=2" --templateFile "$SCRIPTS_DIR/../jcl/ims/templates/mpp/STOPMPP.j2"  --outputFile "/tmp/IMS-bankz-reg-stop2-$$.txt"
-cat > "/tmp/IMS-bankz-reg-copy.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-reg-stop2-$$.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.JOBS(STOPMPP2),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-reg-copy.jcl"
+cp "/tmp/IMS-bankz-reg-stop2-$$.txt" "//'${IMS_APP_HLQ}.JOBS(STOPMPP2)'"
 
 echo "IEFBR14" > "/tmp/IMS-bankz-dfsintdc.txt"
-a2e -f ISO8859-1 -t IBM-1047 "/tmp/IMS-bankz-dfsintdc.txt"
-cat > "/tmp/IMS-bankz-dfsintdc.jcl" <<EOF
-//COPYJOB JOB CLASS=A,MSGCLASS=A
-//STEP1 EXEC PGM=IKJEFT01
-//IN   DD PATH='/tmp/IMS-bankz-dfsintdc.txt'
-//OUT  DD DSN=${IMS_APP_HLQ}.PROCLIB(DFSINTDC),DISP=SHR
-//SYSTSPRT DD SYSOUT=*
-//SYSTSIN DD *
- OCOPY INDD(IN) OUTDD(OUT) TEXT
-/*
-EOF
-run_job_and_wait "/tmp/IMS-bankz-dfsintdc.jcl"
+cp "/tmp/IMS-bankz-dfsintdc.txt" "//'${IMS_APP_HLQ}.PROCLIB(DFSINTDC)'"
 
 # =========================
 # Start IBM BOZ regions

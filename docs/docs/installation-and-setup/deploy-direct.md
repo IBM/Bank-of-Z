@@ -12,6 +12,13 @@ Use this procedure to deploy Bank of Z by connecting directly to z/OS USS via SS
 - Git installed on z/OS USS
 - A z/OS environment that meets the requirements described in [Prerequisites](prerequisites.html)
 
+> **Log files:** Every phase (`validate-prereqs`, `environment`, `install-bank-of-z`, `verify-installation`) automatically writes a timestamped log to `$BANK_OF_Z_WORK_DIR/setup-logs/setup-<YYYYMMDD-HHmmSS>.log`. Output continues to appear in your terminal at the same time. Use the log files to review the full output after the fact or to share details when troubleshooting.
+>
+> ```bash
+> ls $BANK_OF_Z_WORK_DIR/setup-logs/
+> # setup-20250601-143022.log  setup-20250601-155410.log  …
+> ```
+
 ---
 
 ## 1. SSH to z/OS

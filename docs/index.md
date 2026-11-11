@@ -83,4 +83,4 @@ Bank of Z provides guided scenarios that demonstrate common IBM Z development an
 
 ---
 
-Last updated: {{ 'now' | date: "%B %d, %Y" }}test
+Last updated: {{ 'now' | date: "%B %d, %Y" }}

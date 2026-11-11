@@ -18,9 +18,7 @@ This repository contains the source files and build system for the Bank of Z doc
 
 1. **Add/Edit DITA files** in the `Docs/` folder
 2. **Run the conversion script**:
-   ```bash
-   python3 scripts/convert_dita_to_md.py
-   ```
+
 3. **Commit and push** your changes
 4. **Wait 2-3 minutes** for GitHub Pages to rebuild
 
@@ -31,24 +29,21 @@ That's it! The TOC and navigation update automatically.
 ```bash
 # Clone the repository
 git clone https://github.com/IBM/Bank-of-Z.git
-cd Bank-of-Z-doc
+cd Bank-of-Z/docs
 
 # Install dependencies
-pip3 install pyyaml
+bundle config set --local path 'vendor/bundle'
 bundle install  # For local Jekyll testing
-
-# Convert DITA to Markdown
-python3 scripts/convert_dita_to_md.py
 
 # Test locally (optional)
 bundle exec jekyll serve
-# Visit http://localhost:4000/Bank-of-Z-doc/
+# Visit http://localhost:4000/Bank-of-Z/
 ```
 
 ## 📁 Repository Structure
 
 ```
-Bank-of-Z-doc/
+Bank-of-Z/
 ├── _config.yml                 # Jekyll configuration
 ├── _data/
 │   └── toc.yml                 # Auto-generated TOC (don't edit manually)
@@ -63,8 +58,6 @@ Bank-of-Z-doc/
 │   ├── introduction/
 │   ├── installation-and-setup/
 │   └── ...
-├── scripts/
-│   └── convert_dita_to_md.py   # DITA to Markdown converter
 ├── .github/workflows/
 │   └── convert-docs.yml        # Optional: Auto-conversion on push
 └── index.md                    # Home page
@@ -128,9 +121,6 @@ To enable, ensure GitHub Actions has write permissions in your repository settin
 # Install Ruby dependencies
 bundle install
 
-# Install Python dependencies
-pip3 install pyyaml
-
 # Run Jekyll locally
 bundle exec jekyll serve
 
@@ -191,14 +181,9 @@ Edit `scripts/convert_dita_to_md.py` to customize:
 
 ## 🐛 Troubleshooting
 
-### TOC Not Updating
-
-**Solution**: Run `python3 scripts/convert_dita_to_md.py` and commit changes
-
 ### Missing Dependencies
 
 ```bash
-pip3 install pyyaml
 bundle install
 ```
 

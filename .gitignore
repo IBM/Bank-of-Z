@@ -37,3 +37,6 @@ scripts/update-frontend-file-zos.sh
 .bobz
 .zopeneditor/
 zos-downloads/
+docs/vendor/
+docs/.bundle/
+docs/.jekyll-metadata

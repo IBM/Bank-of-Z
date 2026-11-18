@@ -37,8 +37,6 @@ ims:
       secondary_space: 63
       unit: MB
   ims_proclib:
-    dsn:
-    - "{{ vars.ims_hlq }}.PROCLIB"
     members:
     - member_name: DFSPBIMS
       config:

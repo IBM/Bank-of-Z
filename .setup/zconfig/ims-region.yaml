@@ -48,7 +48,6 @@ ims:
         aoi_type1_security_mode: R
         appc_enablement: false
         appc_security_setting: F
-        ims_vtam_appl_id: "{{ vars.imsid }}"
         automatic_restart_manager_registration: false
         dynamic_terminal_auto_signoff_time: 60
         automatic_restart: false
@@ -90,7 +89,6 @@ ims:
         number_of_format_fetch_request_elements: 30
         otma_xcf_group_name: IMSXCFGN
         high_communication_io_pool_upper_limit_expansion: 2047M
-        dependent_region_scheduling_connection_id: "{{ vars.imsid }}"
         ims_identifier: "{{ vars.imsid }}"
         time_to_calculate_iovf_free_space_for_each_open_area: 7200
         irlm_enablement: "{{ vars.ims_irlm_enablement }}"
@@ -208,8 +206,6 @@ ims:
     - member_name: DFSFIXDC
       config:
         nuc: 33
-    - member_name: DFSDRFDC
-      config: {}
     - member_name: DFSINTDC
       config:
         preinitialization_modules:
@@ -527,6 +523,17 @@ ims:
     ESMT: DSNMIN10
     REO: R
     CRC: '-'
+  ims_shared_queue_summary:
+    enabled: false
+    dfssq_member: null
+    cqs_members: []
+  ims_bpe_summary:
+  - member: BPECFGIV
+    exit_members: []
+    resolved_exit_members: []
+  - member: BPECONFG
+    exit_members: []
+    resolved_exit_members: []
   dbd_libraries:
   - "{{ vars.imsid }}.DBDSOR"
   psb_libraries:
@@ -2613,10 +2620,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: MULT
+      commit_mode: SNGL
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: 
-      conversational_scratchpad_area_size: 0
+      spa_data_truncation_option_on_program_switch: S
+      conversational_scratchpad_area_size: 80
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2629,7 +2636,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: N
+      conversational_option: Y
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQANBSWT:
@@ -2683,10 +2690,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2699,7 +2706,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT013B:
@@ -2718,10 +2725,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2734,7 +2741,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT013C:
@@ -2753,10 +2760,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2769,7 +2776,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT013D:
@@ -2788,10 +2795,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2804,7 +2811,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT013E:
@@ -2823,10 +2830,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2839,7 +2846,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT013F:
@@ -2858,10 +2865,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2874,7 +2881,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0131:
@@ -2893,10 +2900,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2909,7 +2916,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0132:
@@ -2928,10 +2935,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2944,7 +2951,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0133:
@@ -2963,10 +2970,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -2979,7 +2986,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0134:
@@ -2998,10 +3005,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3014,7 +3021,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0135:
@@ -3033,10 +3040,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3049,7 +3056,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0136:
@@ -3068,10 +3075,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3084,7 +3091,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0137:
@@ -3103,10 +3110,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3119,7 +3126,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0138:
@@ -3138,10 +3145,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3154,7 +3161,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0139:
@@ -3173,10 +3180,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3189,7 +3196,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014A:
@@ -3208,10 +3215,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3224,7 +3231,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014B:
@@ -3243,10 +3250,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3259,7 +3266,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014C:
@@ -3278,10 +3285,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3294,7 +3301,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014D:
@@ -3313,10 +3320,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3329,7 +3336,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014E:
@@ -3348,10 +3355,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3364,7 +3371,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT014F:
@@ -3383,10 +3390,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3399,7 +3406,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0141:
@@ -3418,10 +3425,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3434,7 +3441,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0142:
@@ -3453,10 +3460,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3469,7 +3476,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0143:
@@ -3488,10 +3495,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3504,7 +3511,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0144:
@@ -3523,10 +3530,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3539,7 +3546,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0145:
@@ -3558,10 +3565,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3574,7 +3581,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0146:
@@ -3593,10 +3600,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3609,7 +3616,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0147:
@@ -3628,10 +3635,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3644,7 +3651,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0148:
@@ -3663,10 +3670,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3679,7 +3686,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0149:
@@ -3698,10 +3705,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3714,7 +3721,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015A:
@@ -3733,10 +3740,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3749,7 +3756,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015B:
@@ -3768,10 +3775,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3784,7 +3791,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015C:
@@ -3803,10 +3810,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3819,7 +3826,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015D:
@@ -3838,10 +3845,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3854,7 +3861,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015E:
@@ -3873,10 +3880,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3889,7 +3896,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT015F:
@@ -3908,10 +3915,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3924,7 +3931,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0151:
@@ -3943,10 +3950,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3959,7 +3966,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0152:
@@ -3978,10 +3985,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -3994,7 +4001,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0153:
@@ -4013,10 +4020,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4029,7 +4036,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0154:
@@ -4048,10 +4055,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4064,7 +4071,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0155:
@@ -4083,10 +4090,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4099,7 +4106,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0156:
@@ -4118,10 +4125,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4134,7 +4141,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0157:
@@ -4153,10 +4160,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4169,7 +4176,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0158:
@@ -4188,10 +4195,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4204,7 +4211,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0159:
@@ -4223,10 +4230,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4239,7 +4246,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016A:
@@ -4258,10 +4265,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4274,7 +4281,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016B:
@@ -4293,10 +4300,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4309,7 +4316,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016C:
@@ -4328,10 +4335,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4344,7 +4351,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016D:
@@ -4363,10 +4370,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4379,7 +4386,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016E:
@@ -4398,10 +4405,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4414,7 +4421,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT016F:
@@ -4433,10 +4440,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4449,7 +4456,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0161:
@@ -4468,10 +4475,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4484,7 +4491,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0162:
@@ -4503,10 +4510,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4519,7 +4526,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0163:
@@ -4538,10 +4545,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4554,7 +4561,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0164:
@@ -4573,10 +4580,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4589,7 +4596,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0165:
@@ -4608,10 +4615,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4624,7 +4631,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0166:
@@ -4643,10 +4650,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4659,7 +4666,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0167:
@@ -4678,10 +4685,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4694,7 +4701,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0168:
@@ -4713,10 +4720,10 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: S
-      conversational_scratchpad_area_size: 80
+      spa_data_truncation_option_on_program_switch: ''
+      conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
       log_write_ahead_option: Y
@@ -4729,7 +4736,7 @@ ims:
       serial_processing_option: N
       wait_for_input_option: N
       automated_operator_interface_command_call_option: Y
-      conversational_option: Y
+      conversational_option: N
       transaction_level_statistics_option: N
       transaction_expiration_time: 0
     EQAT0169:
@@ -4750,7 +4757,7 @@ ims:
       fast_path_emh_buffer_size: 0
       commit_mode: MULT
       message_segment_type: MULTSEG
-      spa_data_truncation_option_on_program_switch: 
+      spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
       msc_remote_system_id: 0
       msc_local_system_id: 0
@@ -4783,7 +4790,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4818,7 +4825,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4853,7 +4860,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4888,7 +4895,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4923,7 +4930,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4958,7 +4965,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -4993,7 +5000,7 @@ ims:
       input_edit_routine_name: ''
       fast_path_option: N
       fast_path_emh_buffer_size: 0
-      commit_mode: SNGL
+      commit_mode: MULT
       message_segment_type: MULTSEG
       spa_data_truncation_option_on_program_switch: ''
       conversational_scratchpad_area_size: 0
@@ -6340,6 +6347,524 @@ ims:
           IC RECOMMENDED: 'ON'
           RECOV NEEDED: 'OFF'
           RECEIVE NEEDED: 'OFF'
+    - DBD: DFSCD000
+      TYPE: HALDB
+      DBORG: PHIDAM
+      DSORG: OSAM
+      DMB#: '1'
+      SHARE LEVEL: '3'
+      FLAGS:
+        RECOVERABLE: 'YES'
+        IC NEEDED: ''
+        IC RECOMMENDED: ''
+        RECOV NEEDED: ''
+        RECEIVE NEEDED: ''
+        BACKOUT NEEDED: ''
+        READ ONLY: ''
+        ONLINE REORG CAPABLE: 'YES'
+      PARTITIONS:
+      - PARTITION: DFSCD01
+        PARTITION ID: '00001'
+        DSN PREFIX: "{{ vars.ims_hlq }}.DFSCD000"
+        PARTITION HIGH KEY/STRING (CHAR): DBD
+        PARTITION HIGH KEY/STRING (HEX): C4C2C44040404040E9E9E9E9E9E9E9E9
+        FLAGS:
+          RECOVERABLE: ''
+          IC NEEDED: 'OFF'
+          IC RECOMMENDED: ''
+          RECOV NEEDED: 'OFF'
+          RECEIVE NEEDED: 'OFF'
+          BACKOUT NEEDED: 'OFF'
+          READ ONLY: 'OFF'
+          PROHIBIT AUTHORIZATION: 'OFF'
+          TRACKING SUSPENDED: 'NO'
+          OFR REQUIRED: 'NO'
+          PARTITION INIT NEEDED: 'NO'
+          OLREORG CURSOR ACTIVE: 'NO'
+          PARTITION DISABLED: 'NO'
+          ONLINE REORG CAPABLE: 'YES'
+          REORG INTENT: 'NO'
+          QUIESCE IN PROGRESS: 'NO'
+          QUIESCE HELD: 'NO'
+          ALTER IN PROGRESS: 'NO'
+          PARTITION ALTERED: 'NO'
+        DBDS:
+        - DDN: DFSCD01A
+          DSID: '001'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.A00001"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '852082'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD01B
+          DSID: '006'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.B00001"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '398770'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD01C
+          DSID: '007'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.C00001"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '2155354'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD01D
+          DSID: 008
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.D00001"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '0'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD01L
+          DSID: '003'
+          DATASET_TYPE: ILDS
+          DBORG: INDEX
+          DSORG: VSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.L00001"
+            GENMAX: ''
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ''
+            OICJCL: ''
+            RECOVJCL: ''
+            RECVJCL: ''
+            storage:
+              CLUSTER: "{{ vars.ims_hlq }}.DFSCD000.L00001"
+              DATA: "{{ vars.ims_hlq }}.DFSCD000.L00001.DATA"
+              ORGANIZATION: INDEXED
+              STORAGECLASS: SCBASE
+              VOLSER: USER00
+              SPACE-TYPE: TRACK
+              SPACE-PRI: 1
+              SPACE-SEC: 1
+              EXTENT-NUMBER: 1
+              CISIZE: 512
+              AVGLRECL: 50
+              MAXLRECL: 50
+              SHROPTNS: (3,3)
+              REUSE: true
+              SPANNED: false
+            image_copies: []
+          FLAGS:
+            IC NEEDED: ''
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: ''
+        - DDN: DFSCD01X
+          DSID: '005'
+          DATASET_TYPE: PRIMARY_INDEX
+          DBORG: INDEX
+          DSORG: VSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.X00001"
+            GENMAX: ''
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ''
+            OICJCL: ''
+            RECOVJCL: ''
+            RECVJCL: ''
+            storage:
+              CLUSTER: "{{ vars.ims_hlq }}.DFSCD000.X00001"
+              DATA: "{{ vars.ims_hlq }}.DFSCD000.X00001.DATA"
+              ORGANIZATION: INDEXED
+              STORAGECLASS: SCBASE
+              VOLSER: USER00
+              SPACE-TYPE: TRACK
+              SPACE-PRI: 1
+              SPACE-SEC: 1
+              EXTENT-NUMBER: 1
+              CISIZE: 4096
+              AVGLRECL: 22
+              MAXLRECL: 22
+              SHROPTNS: (3,3)
+              REUSE: true
+              SPANNED: false
+            image_copies: []
+          FLAGS:
+            IC NEEDED: ''
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: ''
+      - PARTITION: DFSCD02
+        PARTITION ID: '00002'
+        DSN PREFIX: "{{ vars.ims_hlq }}.DFSCD000"
+        PARTITION HIGH KEY/STRING (CHAR): PARTITION
+        PARTITION HIGH KEY/STRING (HEX): FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FLAGS:
+          RECOVERABLE: ''
+          IC NEEDED: 'OFF'
+          IC RECOMMENDED: ''
+          RECOV NEEDED: 'OFF'
+          RECEIVE NEEDED: 'OFF'
+          BACKOUT NEEDED: 'OFF'
+          READ ONLY: 'OFF'
+          PROHIBIT AUTHORIZATION: 'OFF'
+          TRACKING SUSPENDED: 'NO'
+          OFR REQUIRED: 'NO'
+          PARTITION INIT NEEDED: 'NO'
+          OLREORG CURSOR ACTIVE: 'NO'
+          PARTITION DISABLED: 'NO'
+          ONLINE REORG CAPABLE: 'YES'
+          REORG INTENT: 'NO'
+          QUIESCE IN PROGRESS: 'NO'
+          QUIESCE HELD: 'NO'
+          ALTER IN PROGRESS: 'NO'
+          PARTITION ALTERED: 'NO'
+        DBDS:
+        - DDN: DFSCD02A
+          DSID: '001'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.A00002"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '852082'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD02B
+          DSID: '006'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.B00002"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '179716'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD02C
+          DSID: '007'
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.C00002"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '0'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD02D
+          DSID: 008
+          DATASET_TYPE: DATA
+          DBORG: HIDAM
+          DSORG: OSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.D00002"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              dsorg: PS
+              recfm: FBS
+              lrecl: '4096'
+              blksize: '4096'
+              volser: USER00
+              alloc: '2153232'
+              used: '285442'
+              secondary: '1076616'
+              extents: '1'
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
+        - DDN: DFSCD02L
+          DSID: '003'
+          DATASET_TYPE: ILDS
+          DBORG: INDEX
+          DSORG: VSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.L00002"
+            GENMAX: ''
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ''
+            OICJCL: ''
+            RECOVJCL: ''
+            RECVJCL: ''
+            storage:
+              CLUSTER: "{{ vars.ims_hlq }}.DFSCD000.L00002"
+              DATA: "{{ vars.ims_hlq }}.DFSCD000.L00002.DATA"
+              ORGANIZATION: INDEXED
+              STORAGECLASS: SCBASE
+              VOLSER: USER00
+              SPACE-TYPE: TRACK
+              SPACE-PRI: 1
+              SPACE-SEC: 1
+              EXTENT-NUMBER: 1
+              CISIZE: 512
+              AVGLRECL: 50
+              MAXLRECL: 50
+              SHROPTNS: (3,3)
+              REUSE: true
+              SPANNED: false
+            image_copies: []
+          FLAGS:
+            IC NEEDED: ''
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: ''
+        - DDN: DFSCD02X
+          DSID: '005'
+          DATASET_TYPE: PRIMARY_INDEX
+          DBORG: INDEX
+          DSORG: VSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCD000.X00002"
+            GENMAX: ''
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ''
+            OICJCL: ''
+            RECOVJCL: ''
+            RECVJCL: ''
+            storage:
+              CLUSTER: "{{ vars.ims_hlq }}.DFSCD000.X00002"
+              DATA: "{{ vars.ims_hlq }}.DFSCD000.X00002.DATA"
+              ORGANIZATION: INDEXED
+              STORAGECLASS: SCBASE
+              VOLSER: USER00
+              SPACE-TYPE: TRACK
+              SPACE-PRI: 1
+              SPACE-SEC: 1
+              EXTENT-NUMBER: 1
+              CISIZE: 4096
+              AVGLRECL: 22
+              MAXLRECL: 22
+              SHROPTNS: (3,3)
+              REUSE: true
+              SPANNED: false
+            image_copies: []
+          FLAGS:
+            IC NEEDED: ''
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: ''
+    - DBD: DFSCX000
+      TYPE: HALDB
+      DBORG: PSINDEX
+      DSORG: VSAM
+      DMB#: '2'
+      SHARE LEVEL: '3'
+      FLAGS:
+        RECOVERABLE: 'YES'
+        IC NEEDED: ''
+        IC RECOMMENDED: ''
+        RECOV NEEDED: ''
+        RECEIVE NEEDED: ''
+        BACKOUT NEEDED: ''
+        READ ONLY: ''
+        ONLINE REORG CAPABLE: 'NO'
+      PARTITIONS:
+      - PARTITION: DFSCX01
+        PARTITION ID: '00001'
+        DSN PREFIX: "{{ vars.ims_hlq }}.DFSCX000"
+        PARTITION HIGH KEY/STRING (CHAR): PARTITION
+        PARTITION HIGH KEY/STRING (HEX): FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FLAGS:
+          RECOVERABLE: ''
+          IC NEEDED: 'OFF'
+          IC RECOMMENDED: ''
+          RECOV NEEDED: 'OFF'
+          RECEIVE NEEDED: 'OFF'
+          BACKOUT NEEDED: ''
+          READ ONLY: ''
+        DBDS:
+        - DDN: DFSCX01A
+          DSID: '001'
+          DATASET_TYPE: PRIMARY_INDEX
+          DBORG: INDEX
+          DSORG: VSAM
+          DSN:
+            name: "{{ vars.ims_hlq }}.DFSCX000.A00001"
+            GENMAX: 2
+            REUSE: false
+            RECOVPD: ''
+            ICJCL: ICJCL
+            OICJCL: OICJCL
+            RECOVJCL: RECOVJCL
+            RECVJCL: ICRCVJCL
+            storage:
+              CLUSTER: "{{ vars.ims_hlq }}.DFSCX000.A00001"
+              DATA: "{{ vars.ims_hlq }}.DFSCX000.A00001.DATA"
+              ORGANIZATION: INDEXED
+              STORAGECLASS: SCBASE
+              VOLSER: USER00
+              SPACE-TYPE: TRACK
+              SPACE-PRI: 1
+              SPACE-SEC: 1
+              EXTENT-NUMBER: 1
+              CISIZE: 4096
+              AVGLRECL: 82
+              MAXLRECL: 82
+              SHROPTNS: (3,3)
+              REUSE: true
+              SPANNED: false
+            image_copies: []
+          FLAGS:
+            IC NEEDED: 'OFF'
+            IC RECOMMENDED: ''
+            RECOV NEEDED: 'OFF'
+            RECEIVE NEEDED: 'OFF'
     - DBD: HISTORY
       TYPE: IMS
       DBORG: HDAM

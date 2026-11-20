@@ -6033,7 +6033,6 @@ ims:
       database_type: DL/I
       database_access_type: UPD
       database_resident_dmb_option: N
-  ims_dependent_region:
     mpp_regions:
     - jobname: "{{ vars.imsid }}MPP1"
       regid: '4'

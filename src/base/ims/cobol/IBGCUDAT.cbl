@@ -113,8 +113,6 @@
 
        LINKAGE SECTION.
 
-       01  IOPCBA POINTER.
-       01  DBPCB1 POINTER.
 
       ******************************************************************
       *I/O PCB
@@ -150,11 +148,10 @@
 
        PROCEDURE DIVISION.
              ENTRY "DLITCBL"
-             USING  IOPCBA, DBPCB1.
+             USING  LTERMPCB, DBPCB.
 
        BEGIN.
            MOVE 0 TO TERM-IO.
-           SET ADDRESS OF LTERMPCB TO ADDRESS OF IOPCBA.
            PERFORM WITH TEST BEFORE UNTIL TERM-IO = 1
               CALL 'CBLTDLI' USING GU, LTERMPCB, INPUT-AREA
               IF TPSTAT  = '  ' OR TPSTAT = MESSAGE-EXIST
@@ -180,7 +177,6 @@
       *  RETRIEVE CUSTOMER'S DATA
            MOVE ZEROS TO OUTPUT-AREA.
            COMPUTE CUSTID = FUNCTION NUMVAL ( IN-CUSTID ).
-           SET ADDRESS OF DBPCB TO ADDRESS OF DBPCB1.
            CALL 'CBLTDLI'
              USING GU, DBPCB, CUSTOMER-SEG, CUSTOMER-SSA1.
 

@@ -66,17 +66,6 @@
 
        LINKAGE SECTION.
 
-       01  IOPCBA POINTER.
-       01  DBPCB1 POINTER.
-       01  DBPCB2 POINTER.
-       01  DBPCB3 POINTER.
-       01  DBPCB4 POINTER.
-       01  DBPCB5 POINTER.
-       01  DBPCB6 POINTER.
-       01  DBPCB7 POINTER.
-       01  DBPCB8 POINTER.
-       01  DBPCB9 POINTER.
-
       ******************************************************************
       *I/O PCB
       ******************************************************************
@@ -111,11 +100,9 @@
 
        PROCEDURE DIVISION.
              ENTRY "DLITCBL"
-             USING  DBPCB1, DBPCB2, DBPCB3, DBPCB4, DBPCB5,
-                    DBPCB6, DBPCB7, DBPCB8, DBPCB9.
+             USING  DBPCB.
 
        BEGIN.
-           SET ADDRESS OF DBPCB TO ADDRESS OF DBPCB1.
            DISPLAY 'DBPCB: ' DBPCB.
 
            OPEN INPUT  ACCTIN-FILE.
